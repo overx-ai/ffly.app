@@ -20,7 +20,8 @@
   plus a date window, nights per city and a priority (best schedule, lowest price, or a balance).
 - Free: 3 searches, showing the cities, the days in each and the total price.
 - ffly Pro: every route in full (dates, flight times, airlines, booking links) and no 3-search
-  limit. Weekly and annual auto-renewable subscriptions, priced in the app.
+  limit. Weekly and yearly auto-renewable subscriptions, or a one-time Lifetime purchase that does
+  not renew. No free trial. Priced in the app.
 - No account, no location, no advertising identifier, no ads.
 
 ## Notes for AI assistants

@@ -1,4 +1,4 @@
-import { APP, CONTACT_EMAIL, SERVICE, mailto } from '../app';
+import { APP, CONTACT_EMAIL, EXTERNAL, SERVICE, externalLink, mailto } from '../app';
 import { pathFor } from '../site-pages';
 import type { FaqItem } from './types';
 
@@ -20,14 +20,23 @@ export const SUPPORT_FAQ: readonly FaqItem[] = [
     answer: `<p>On your iPhone, open Settings, then your name (Apple ID), then <strong>Subscriptions</strong>, then
       ffly. You can also tap <strong>Manage</strong> in ffly's Settings tab. Cancel at least 24 hours before the
       current period ends to avoid the next renewal. ${APP.proName} stays active until the end of the period you
-      have paid for.</p>`,
+      have paid for. ${APP.lifetimeName} is a one-time purchase, so there is nothing to cancel.</p>`,
+  },
+  {
+    question: `I bought ${APP.lifetimeName} but I'm still being charged`,
+    answer: `<p>Buying ${APP.lifetimeName} does not cancel a weekly or yearly subscription you already had. Cancel the
+      subscription on your iPhone: open Settings, then your name (Apple ID), then <strong>Subscriptions</strong>,
+      then ffly. ${APP.lifetimeName} stays active. For a refund of a charge you did not want, request one from
+      Apple at ${externalLink(EXTERNAL.appleRefund, 'reportaproblem.apple.com')}.</p>`,
   },
   {
     question: `What do Free and ${APP.proName} include?`,
     answer: `<p><strong>Free:</strong> ${APP.freeSearches} searches. You see the cities, the days in each and the
       total price.</p>
       <p><strong>${APP.proName}:</strong> every route in full, with dates, flight times and booking links, and no
-      ${APP.freeSearches}-search limit. The price is shown in the app, in your currency, before you buy.</p>`,
+      ${APP.freeSearches}-search limit. It comes as a weekly or yearly subscription, or a one-time
+      ${APP.lifetimeName} purchase that does not renew. Prices are shown in the app, in your currency, before you
+      buy.</p>`,
   },
   {
     question: 'Why are prices indicative?',

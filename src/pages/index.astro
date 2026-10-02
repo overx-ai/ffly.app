@@ -142,8 +142,8 @@ const plans = [
         <div class="sec-head">
           <h2>Free and {APP.proName}</h2>
           <p>
-            Try ffly free. Upgrade when you want the details. {APP.proName} is a weekly or annual subscription,
-            priced in the app in your currency before you buy.
+            Try ffly free. Upgrade when you want the details. {APP.proName} is a weekly or yearly subscription, or a
+            one-time {APP.lifetimeName} purchase, priced in the app in your currency before you buy.
           </p>
         </div>
         <div class="plans">
@@ -158,7 +158,8 @@ const plans = [
           ))}
         </div>
         <p class="fine">
-          Subscriptions renew automatically unless cancelled at least 24 hours before the period ends. See the
+          Subscriptions renew automatically unless cancelled at least 24 hours before the period ends.
+          {APP.lifetimeName} is a one-time purchase and does not renew. See the
           <a href={pathFor('terms')}>Terms of Use</a>.
         </p>
       </div>

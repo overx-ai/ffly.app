@@ -7,6 +7,7 @@ export const APP = {
   storeName: 'ffly',
   subtitle: 'Cheap multi-city trips',
   proName: 'ffly Pro',
+  lifetimeName: 'Lifetime',
   bundleId: 'ai.overx.ffly',
   minimumOs: '17.0',
   freeSearches: 3,
@@ -39,6 +40,7 @@ export const SERVICE = {
 export const EXTERNAL = {
   appleEula: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
   applePrivacy: 'https://www.apple.com/legal/privacy/',
+  appleRefund: 'https://reportaproblem.apple.com',
   revenueCatPrivacy: 'https://www.revenuecat.com/privacy',
   vercelPrivacy: 'https://vercel.com/legal/privacy-policy',
 } as const;

@@ -2,20 +2,21 @@ import { APP, CONTACT_EMAIL, EXTERNAL, LEGAL_EFFECTIVE_DATE, OPERATOR, externalL
 import { pathFor } from '../site-pages';
 import type { LegalDocument } from './types';
 
-// Section 6 is the App Store Guideline 3.1.2(c) auto-renewable subscription disclosure and
-// Section 1 links Apple's Standard EULA. Both are submission requirements, not style: keep them
+// Section 6 is the App Store Guideline 3.1.2(c) auto-renewable subscription disclosure, Section 7
+// the one-time Lifetime purchase (no trial is offered on any plan), and Section 1 links Apple's Standard EULA. Both are submission requirements, not style: keep them
 // whole, with no literal price, and never describe Pro as "unlimited" (the API caps Pro per day).
 
 export const TERMS: LegalDocument = {
   pageTitle: 'Terms of Use',
   description:
-    'Terms of Use for the ffly iPhone app: indicative fares, bookings made on airline sites, and the ffly Pro weekly and annual auto-renewable subscription terms.',
+    'Terms of Use for the ffly iPhone app: indicative fares, bookings made on airline sites, the ffly Pro weekly and yearly auto-renewable subscriptions, and the one-time Lifetime purchase.',
   lastUpdated: LEGAL_EFFECTIVE_DATE,
   summaryTitle: 'The short version',
   summaryText: `ffly helps you plan cheap multi-city trips. It is a search tool, not a travel agent: fares come
     from third-party airline and fare-search websites, prices are indicative, and you book directly on the
-    airline's or fare site's website. ${APP.proName} is an auto-renewing subscription that you manage and cancel
-    in your Apple ID account settings.`,
+    airline's or fare site's website. ${APP.proName} is available as a weekly or yearly auto-renewing subscription,
+    which you manage and cancel in your Apple ID account settings, or as a one-time ${APP.lifetimeName} purchase
+    that does not renew.`,
   sections: [
     {
       id: 'agreement',
@@ -72,7 +73,8 @@ export const TERMS: LegalDocument = {
           you see the cities, the days in each city and the total price; dates, flight times and booking links are
           hidden, and the other routes show only their price and number of cities.</li>
           <li><strong>${APP.proName}:</strong> every route in full, including dates, flight times and booking links,
-          and no ${APP.freeSearches}-search limit. Pro is subject to fair use: a daily search limit protects the
+          and no ${APP.freeSearches}-search limit, as a weekly or yearly subscription (Section 6) or a one-time
+          ${APP.lifetimeName} purchase (Section 7). Pro is subject to fair use: a daily search limit protects the
           service and the websites we check fares on.</li>
         </ul>
         <p>We may change the features of Free and ${APP.proName} over time.</p>`,
@@ -82,7 +84,7 @@ export const TERMS: LegalDocument = {
       title: 'Subscription Terms (Auto-Renewable)',
       content: `
         <ul>
-          <li><strong>${APP.proName}</strong> is offered as weekly and annual auto-renewable subscriptions. The price
+          <li><strong>${APP.proName}</strong> is offered as weekly and yearly auto-renewable subscriptions. The price
           and length of each subscription are shown in the app, in your local currency, before you buy.</li>
           <li>Payment is charged to your Apple ID account at confirmation of purchase.</li>
           <li>The subscription renews automatically unless it is cancelled at least 24 hours before the end of the
@@ -92,10 +94,27 @@ export const TERMS: LegalDocument = {
           iPhone: Settings &rarr; your name &rarr; Subscriptions), or from <strong>Manage</strong> in ffly's
           Settings. Cancelling stops future renewals; ${APP.proName} stays active until the end of the period you
           have paid for.</li>
-          <li>If a free trial is offered, any unused portion of the free trial is forfeited when you purchase a
-          subscription.</li>
+          <li>No free trial is offered.</li>
           <li>Refunds are handled by Apple under its policies. You can restore an existing subscription on a new
           device with <strong>Restore purchases</strong>.</li>
+        </ul>`,
+    },
+    {
+      id: 'lifetime',
+      title: `${APP.proName} ${APP.lifetimeName} Purchase`,
+      content: `
+        <p><strong>${APP.proName} ${APP.lifetimeName}</strong> is a <strong>non-consumable</strong> in-app purchase
+        that unlocks ${APP.proName} with no time limit.</p>
+        <ul>
+          <li>It is a <strong>one-time payment</strong>, charged to your Apple ID account at confirmation of
+          purchase. It does not renew and there is no recurring charge.</li>
+          <li>The price is set per territory on the App Store and is shown to you in the app before you confirm.</li>
+          <li>It restores on other devices signed in to the same Apple ID through <strong>Restore
+          purchases</strong>.</li>
+          <li><strong>Buying ${APP.lifetimeName} does not cancel an existing ${APP.proName} subscription.</strong>
+          Cancel the subscription yourself in your Apple ID account settings (on iPhone: Settings &rarr; your name
+          &rarr; Subscriptions), or it will keep renewing and you will be charged for both.</li>
+          <li>Refunds are handled by Apple under its policies.</li>
         </ul>`,
     },
     {

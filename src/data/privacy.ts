@@ -81,7 +81,7 @@ export const PRIVACY: LegalDocument = {
         id if subscriptions are unavailable. It is not your Apple ID and contains no personal information.</p>
         <p>We use it to:</p>
         <ul>
-          <li>check with RevenueCat whether you have an active ${APP.proName} subscription;</li>
+          <li>check with RevenueCat whether you have ${APP.proName}, by subscription or ${APP.lifetimeName};</li>
           <li>count the free searches you have used and apply the fair-use daily search limit for ${APP.proName}.</li>
         </ul>
         <p>The subscription status (cached for about ${SERVICE.entitlementCacheMinutes} minutes) and the search
@@ -100,12 +100,13 @@ export const PRIVACY: LegalDocument = {
       id: 'purchases',
       title: 'Subscriptions and Purchases',
       content: `
-        <p>${APP.proName} is sold as an in-app subscription through the App Store. Apple processes the payment, under
+        <p>${APP.proName} is sold through the App Store as weekly and yearly in-app subscriptions and as a one-time
+        ${APP.lifetimeName} purchase. Apple processes the payment, under
         ${externalLink(EXTERNAL.applePrivacy, "Apple's Privacy Policy")}.</p>
         <p>We use <strong>RevenueCat</strong>, a third-party subscription platform, to verify purchases. RevenueCat
         receives your anonymous app user id and the App Store transaction details of your ${APP.proName} purchases
         (product, dates, status). It does not receive your name, email address or payment card. Our server asks
-        RevenueCat only whether your app user id has an active ${APP.proName} subscription. Apple and RevenueCat keep
+        RevenueCat only whether your app user id has active ${APP.proName} access. Apple and RevenueCat keep
         purchase records as needed for entitlement, accounting, refunds and fraud prevention. See the
         ${externalLink(EXTERNAL.revenueCatPrivacy, 'RevenueCat Privacy Policy')}.</p>`,
     },
@@ -206,7 +207,7 @@ export const PRIVACY: LegalDocument = {
         <ul>
           <li>Delete trips in the Trips list, or delete the app to remove the data on your device.</li>
           <li>Turn off notifications in iOS Settings.</li>
-          <li>Manage or cancel ${APP.proName} in your Apple ID account settings.</li>
+          <li>Manage or cancel a ${APP.proName} subscription in your Apple ID account settings.</li>
         </ul>
         <p>To make a request or ask a question, email ${mailto(CONTACT_EMAIL)}. You also have the right to lodge a
         complaint with your local data protection authority.</p>`,

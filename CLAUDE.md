@@ -35,8 +35,9 @@ Those repos are the source of truth for copy, colours and claims.
   `docs/compliance/data-inventory.yaml` (Search History, User ID, Purchase History, Product
   Interaction, Device ID; none linked, none tracking). Change one, change all, plus the App Store
   Connect privacy answers. Retention (24 h jobs, 10 min entitlement cache) is from the API config.
-- `/terms` section 6 is the App Store 3.1.2(c) auto-renewable block and section 1 links Apple's
-  Standard EULA. Both are submission requirements. Cross-references say "Section 6": the layout
+- `/terms` section 6 is the App Store 3.1.2(c) auto-renewable block (weekly and yearly), section 7
+  the one-time Lifetime purchase (does not renew, does not cancel a running subscription), and
+  section 1 links Apple's Standard EULA. No free trial is offered on any plan. Both are submission requirements. Cross-references say "Section 6": the layout
   numbers sections by order, so reordering breaks them.
 - Copy was ported from the overx.ai worktree (`sites/main/src/content/ffly/*.ts`) on 2026-10-03.
   **This repo is now the source of truth**; do not re-extract.
