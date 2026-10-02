@@ -17,6 +17,26 @@ export const APP = {
   airlines: ['Ryanair', 'Wizz Air', 'airBaltic'],
 } as const;
 
+// The priorities the API ranks by (1B-bots apps/ffly-api constants.PRIORITY_PRESETS labels).
+export const PRIORITIES = ['Best schedule', 'Balanced', 'Cheapest'] as const;
+
+// A real search, not a promise: ios-ffly docs/specs/001 "Verification (2026-10-02)", the default
+// trip against the live API. Always shown labelled as an example; never restate it as a saving.
+export const EXAMPLE_TRIP = {
+  date: '2 October 2026',
+  start: 'Warsaw',
+  finish: 'Warsaw or Vilnius',
+  routesFound: 6,
+  bestTotal: '€129.62',
+  stops: [
+    { city: 'Warsaw' },
+    { city: 'Madrid', nights: 2 },
+    { city: 'Amsterdam', nights: 2 },
+    { city: 'Rome', nights: 4 },
+    { city: 'Warsaw' },
+  ],
+} as const;
+
 // TODO(owner): set the numeric App Store id once App Store Connect has the app record. Until then
 // the badge renders as "Coming soon", and the Smart App Banner and installUrl are omitted: a dead
 // store link is worse than none.

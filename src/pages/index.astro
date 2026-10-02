@@ -3,12 +3,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import AppStoreBadge from '../components/AppStoreBadge.astro';
-import { APP } from '../app';
+import { APP, EXAMPLE_TRIP, PRIORITIES } from '../app';
 import { pathFor } from '../site-pages';
 import { appSchema, organizationSchema } from '../schema';
 
 const site = Astro.site?.href.replace(/\/$/, '') ?? '';
 const airlines = `${APP.airlines.slice(0, -1).join(', ')}, ${APP.airlines.at(-1)}`;
+const listOf = (items: readonly string[]) => `${items.slice(0, -1).join(', ')} or ${items.at(-1)}`;
 
 const steps = [
   {
@@ -21,7 +22,7 @@ const steps = [
   },
   {
     title: 'Choose what matters',
-    body: 'The best schedule, the lowest price, or a balance of both.',
+    body: `${listOf(PRIORITIES)}. Routes are ranked by what you pick.`,
   },
   {
     title: 'Get your routes',
@@ -29,24 +30,41 @@ const steps = [
   },
 ];
 
-const features = [
+// Copy source of truth: ios-ffly docs/specs/002-value-story.md. Its "Never" column binds every line:
+// no invented numbers, no saving the search did not measure, no fear copy, no medical claims.
+const values = [
   {
-    title: 'The cheapest order and dates',
-    body: 'ffly tries your cities in different orders across your dates and shows the routes where the whole trip costs the least.',
+    tag: 'Money',
+    title: 'The cheapest trip, not the cheapest first flight.',
+    body: 'ffly prices whole routes, trying your cities in different orders across your dates, so a bargain first leg cannot lock you into an expensive rest of the trip.',
   },
   {
-    title: 'Schedule-aware',
-    body: 'Routes favour sensible flight times over pre-dawn wake-ups and midnight landings. Early starts, late arrivals and daylight spent travelling are shown, so a cheap route does not cost you a night of sleep.',
+    tag: 'Hotel nights',
+    title: 'Fewer hotel nights you pay for but barely use.',
+    body: `Every priority, even ${PRIORITIES.at(-1)}, counts a midnight landing as the hotel night it costs you, so the nights you book are nights you actually sleep there.`,
   },
   {
-    title: `Fares from ${airlines} and more`,
-    body: 'ffly checks the flights between your cities across your dates, so you do not have to open ten tabs.',
+    tag: 'Time',
+    title: 'Hours of tab-hopping, done in minutes.',
+    body: `Fares from ${airlines} and more, between all your cities and across every day of your window, compared for you. One search can weigh more than a thousand of them.`,
   },
   {
-    title: "You book on the airline's site",
-    body: "ffly is a search tool, not a travel agent. Tap Book and the airline's own page opens. Fares change often, so check the final price there.",
+    tag: 'Sleep',
+    title: 'Fewer 3 a.m. alarms.',
+    body: 'A 6:05 departure means a 3:30 alarm. ffly favours routes without one, and shows the early starts and lost sleep on the routes that have them.',
+  },
+  {
+    tag: 'Fit',
+    title: 'A schedule that fits how you travel.',
+    body: `${listOf(PRIORITIES)}: routes are ranked by what you chose. There is no single right way to travel.`,
   },
 ];
+
+const exampleCities = EXAMPLE_TRIP.stops.filter((st) => 'nights' in st).map((st) => st.city);
+const exampleTitle = `${EXAMPLE_TRIP.start} to ${exampleCities.slice(0, -1).join(', ')} and ${exampleCities.at(-1)}`;
+const exampleRoute = EXAMPLE_TRIP.stops
+  .map((st) => ('nights' in st ? `${st.city} (${st.nights} nights)` : st.city))
+  .join(', then ');
 
 const plans = [
   {
@@ -120,20 +138,54 @@ const plans = [
       </div>
     </section>
 
-    <section class="sec" id="features">
+    <section class="sec" id="why">
       <div class="container">
         <div class="sec-head">
-          <h2>More cities, fewer red-eyes</h2>
-          <p>The cheapest trip is not always the one with the cheapest first flight. ffly prices the whole route.</p>
+          <h2>What a good route gives back</h2>
+          <p>
+            Money, nights, hours and sleep. Free shows you the route and its total; {APP.proName} shows every route in
+            full, so you can see each of these for yourself.
+          </p>
         </div>
-        <div class="features">
-          {features.map((f) => (
-            <article class="card">
-              <h3>{f.title}</h3>
-              <p>{f.body}</p>
-            </article>
-          ))}
+        <div class="why">
+          <ol class="values">
+            {values.map((v) => (
+              <li>
+                <p class="lbl">{v.tag}</p>
+                <h3>{v.title}</h3>
+                <p>{v.body}</p>
+              </li>
+            ))}
+          </ol>
+
+          <figure class="card example" aria-label={`Example search: ${exampleRoute}`}>
+            <p class="lbl">Example search</p>
+            <h3>{exampleTitle}</h3>
+            <ol class="route">
+              {EXAMPLE_TRIP.stops.map((st) => (
+                <li>
+                  <span class="city">{st.city}</span>
+                  {'nights' in st && <span class="nights">{st.nights} nights</span>}
+                </li>
+              ))}
+            </ol>
+            <p class="total">
+              <span>Best of {EXAMPLE_TRIP.routesFound} routes, flights total</span>
+              <strong>{EXAMPLE_TRIP.bestTotal}</strong>
+            </p>
+            <figcaption>
+              A real search against live fares on {EXAMPLE_TRIP.date}, starting in {EXAMPLE_TRIP.start} and finishing in
+              {' '}{EXAMPLE_TRIP.finish}. It shows what a result looks like, not a price or saving you will get: fares
+              change constantly and your trip will differ. This is the Free view; {APP.proName} adds the dates, flight
+              times and booking links.
+            </figcaption>
+          </figure>
         </div>
+
+        <p class="promise">
+          <strong>Our promise.</strong> No ads. We don't sell your data. Weekly and yearly cancel in two taps;
+          {' '}{APP.lifetimeName} is yours.
+        </p>
       </div>
     </section>
 
@@ -214,7 +266,7 @@ const plans = [
     box-shadow: 0 30px 80px var(--glow), var(--shadow);
   }
 
-  .steps, .features, .plans {
+  .steps, .plans {
     display: grid;
     gap: var(--space-lg);
     margin: var(--space-2xl) 0 0;
@@ -222,7 +274,6 @@ const plans = [
     list-style: none;
   }
   .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
   .step-num {
@@ -237,8 +288,76 @@ const plans = [
     font-weight: 800;
     margin-bottom: var(--space-md);
   }
-  .steps h3, .features h3 { font-size: 1.2rem; padding-bottom: var(--space-sm); }
-  .steps p, .features p { color: var(--ink-2); font-size: 15px; }
+  .steps h3 { font-size: 1.2rem; padding-bottom: var(--space-sm); }
+  .steps p { color: var(--ink-2); font-size: 15px; }
+
+  .why {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: var(--space-2xl);
+    align-items: start;
+    margin-top: var(--space-2xl);
+  }
+  .values { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .values li { padding-block: var(--space-lg); border-top: 1px solid var(--rule-soft); }
+  .values li:first-child { border-top: 0; padding-top: 0; }
+  .values h3 { font-size: 1.3rem; padding-block: var(--space-xs) var(--space-sm); }
+  .values li > p:last-child { color: var(--ink-2); font-size: 15.5px; }
+
+  .example { margin: 0; position: sticky; top: 88px; }
+  .example h3 { font-size: 1.2rem; padding-block: var(--space-xs) var(--space-md); }
+  .route { list-style: none; margin: 0; padding: 0; }
+  .route li {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: 6px 0 6px 24px;
+  }
+  .route li::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    margin-top: -5px;
+    border-radius: 50%;
+    background: var(--grad);
+  }
+  .route li:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: calc(50% + 7px);
+    height: calc(100% - 14px);
+    border-left: 2px dotted var(--rule);
+  }
+  .city { font-family: var(--font-display); font-weight: 700; }
+  .nights { color: var(--ink-3); font-size: 14px; white-space: nowrap; }
+  .total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-md);
+    border-top: 1px solid var(--rule-soft);
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    color: var(--ink-2);
+    font-size: 15px;
+  }
+  .total strong { font-family: var(--font-display); font-size: 1.6rem; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .example figcaption { color: var(--ink-3); font-size: 13px; line-height: 1.5; padding-top: var(--space-md); }
+
+  .promise {
+    margin-top: var(--space-2xl);
+    padding: var(--space-md) var(--space-lg);
+    border-left: 3px solid var(--brand);
+    background: var(--raise);
+    border-radius: var(--radius-md);
+    color: var(--ink-2);
+  }
+  .promise strong { color: var(--ink); }
 
   .plan h3 { font-size: 1.4rem; padding-block: var(--space-sm) var(--space-md); }
   .plan ul { margin: 0; padding-left: 1.2em; color: var(--ink-2); display: flex; flex-direction: column; gap: 6px; }
@@ -251,6 +370,8 @@ const plans = [
 
   @media (max-width: 960px) {
     .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .why { grid-template-columns: minmax(0, 1fr); }
+    .example { position: static; }
   }
   @media (max-width: 860px) {
     .grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-2xl); }
@@ -259,7 +380,7 @@ const plans = [
     .hero { padding-top: var(--space-xl); }
   }
   @media (max-width: 640px) {
-    .steps, .features, .plans { grid-template-columns: minmax(0, 1fr); }
+    .steps, .plans { grid-template-columns: minmax(0, 1fr); }
     .sec { padding-block: var(--space-2xl); }
   }
 </style>

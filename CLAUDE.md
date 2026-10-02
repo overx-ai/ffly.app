@@ -45,7 +45,12 @@ Those repos are the source of truth for copy, colours and claims.
 ## Copy rules
 - **Never "unlimited".** Pro has a daily fair-use cap. The Pro line is
   "Every route in full, and no 3-search limit".
-- **No prices**, in copy or JSON-LD (`offers`). No ratings or download counts.
+- **No prices**, in copy or JSON-LD (`offers`). No ratings or download counts. The one fare figure on
+  the site is `EXAMPLE_TRIP` (a real live search, ios-ffly spec 001), always labelled "Example search"
+  with its date and "not a price or saving you will get". Never restate it as a saving.
+- **The value section follows `ios-ffly/docs/specs/002-value-story.md`**, and its "Never" column is
+  binding: no invented or unmeasured numbers, no fear or guilt copy, no fake discounts or urgency,
+  no medical claims about sleep, no claim that one priority is the right way to travel.
 - "Favour sensible flight times over pre-dawn wake-ups and midnight landings", never a promise
   that no route has them.
 - ffly is a search tool, not a travel agent; fares are indicative; you book on the airline's site.

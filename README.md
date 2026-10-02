@@ -37,6 +37,7 @@ grep -roh 'href="/[^"]*/"' dist ; echo "(empty is correct)"
 grep -rl -e "—" -e "&mdash;" --include='*.html' dist ; echo "(empty is correct)"
 grep -ril unlimited dist ; echo "(empty is correct)"
 grep -ro '"offers"\|"aggregateRating"' dist ; echo "(empty is correct)"
+grep -rohE --include='*.html' '€ ?[0-9][0-9.,]*' dist   # only the labelled EXAMPLE_TRIP total
 ```
 
 Then read every page at 390px and 1280px in both colour schemes.
