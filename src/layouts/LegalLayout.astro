@@ -1,0 +1,66 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { breadcrumb } from '../schema';
+import { pathFor } from '../site-pages';
+import type { LegalDocument } from '../data/types';
+
+interface Props extends LegalDocument { slug: string; }
+
+const { slug, pageTitle, description, lastUpdated, summaryTitle, summaryText, sections } = Astro.props;
+const site = Astro.site?.href.replace(/\/$/, '') ?? '';
+const crumbs = breadcrumb(site, [
+  { name: 'Home', path: pathFor('') },
+  { name: pageTitle, path: pathFor(slug) },
+]);
+---
+<BaseLayout title={pageTitle} description={description} slug={slug} structuredData={[crumbs]}>
+  <Header />
+  <main id="main" class="container page legal">
+    <h1>{pageTitle}</h1>
+    <p class="updated">Last updated: {lastUpdated}</p>
+
+    <aside class="summary">
+      <p class="lbl">{summaryTitle}</p>
+      <p set:html={summaryText} />
+    </aside>
+
+    {sections.map((s, i) => (
+      <section class="block" id={s.id}>
+        <h2><span class="num">{String(i + 1).padStart(2, '0')}</span>{s.title}</h2>
+        <div set:html={s.content} />
+      </section>
+    ))}
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .summary {
+    background: var(--raise);
+    border: 1px solid var(--rule-soft);
+    border-left: 3px solid var(--brand);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    margin-top: var(--space-xl);
+  }
+  .summary p + p { padding-top: var(--space-sm); color: var(--ink-2); }
+
+  .block { padding-top: var(--space-2xl); scroll-margin-top: 80px; }
+  .block h2 {
+    font-size: 1.35rem;
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+    padding-bottom: var(--space-md);
+  }
+  .num { color: var(--brand); font-size: 0.85em; font-variant-numeric: tabular-nums; }
+
+  .block :global(p), .block :global(li) { color: var(--ink-2); }
+  .block :global(p + p), .block :global(ul), .block :global(ul + p), .block :global(p + ul) { margin-top: var(--space-md); }
+  .block :global(ul) { padding-left: 1.2em; display: flex; flex-direction: column; gap: 8px; margin-bottom: 0; }
+  .block :global(strong) { color: var(--ink); }
+  .block :global(code) { font-size: 0.92em; overflow-wrap: anywhere; }
+  .legal :global(a) { overflow-wrap: anywhere; }
+</style>

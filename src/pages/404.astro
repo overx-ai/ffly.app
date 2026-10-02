@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { pathFor } from '../site-pages';
+---
+<BaseLayout title="Page not found" description="That page does not exist." slug="404" noindex>
+  <Header />
+  <main id="main" class="container page">
+    <h1>Page not found</h1>
+    <p class="msg">That page does not exist. Your next trip, however, still might.</p>
+    <a class="btn" href={pathFor('')}>Back to the home page</a>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .msg { color: var(--ink-2); padding-block: var(--space-md) var(--space-lg); }
+</style>

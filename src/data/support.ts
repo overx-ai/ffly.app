@@ -1,0 +1,55 @@
+import { APP, CONTACT_EMAIL, SERVICE, mailto } from '../app';
+import { pathFor } from '../site-pages';
+import type { FaqItem } from './types';
+
+export const SUPPORT = {
+  pageTitle: 'Support',
+  description:
+    'Help with ffly: restoring purchases, cancelling ffly Pro, why fares are indicative, blurred routes on the Free plan, and deleting your data.',
+  lastUpdated: 'October 3, 2026',
+} as const;
+
+export const SUPPORT_FAQ: readonly FaqItem[] = [
+  {
+    question: 'How do I restore my purchase?',
+    answer: `<p>In ffly, open the <strong>Settings</strong> tab and tap <strong>Restore purchases</strong>. Use the
+      same Apple ID you bought ${APP.proName} with.</p>`,
+  },
+  {
+    question: `How do I cancel ${APP.proName}?`,
+    answer: `<p>On your iPhone, open Settings, then your name (Apple ID), then <strong>Subscriptions</strong>, then
+      ffly. You can also tap <strong>Manage</strong> in ffly's Settings tab. Cancel at least 24 hours before the
+      current period ends to avoid the next renewal. ${APP.proName} stays active until the end of the period you
+      have paid for.</p>`,
+  },
+  {
+    question: `What do Free and ${APP.proName} include?`,
+    answer: `<p><strong>Free:</strong> ${APP.freeSearches} searches. You see the cities, the days in each and the
+      total price.</p>
+      <p><strong>${APP.proName}:</strong> every route in full, with dates, flight times and booking links, and no
+      ${APP.freeSearches}-search limit. The price is shown in the app, in your currency, before you buy.</p>`,
+  },
+  {
+    question: 'Why are prices indicative?',
+    answer: `<p>ffly checks fares on airline and fare-search websites at a point in time. Fares change often and
+      may not include baggage or other fees, so always confirm the final price on the airline's site before you
+      book.</p>`,
+  },
+  {
+    question: 'Why are some routes blurred?',
+    answer: `<p>On the Free plan, ffly shows the cities, the days in each and the total price, and blurs the
+      dates, flight times and booking links. ${APP.proName} shows every route in full.</p>`,
+  },
+  {
+    question: 'Is ffly a travel agent?',
+    answer: `<p>No. ffly is a search tool. It does not sell tickets and is not a party to your booking: you book
+      directly with the airline, under its terms.</p>`,
+  },
+  {
+    question: 'How do I delete my data?',
+    answer: `<p>ffly has no account. Swipe a trip in the Trips list to delete it, and uninstall the app to clear
+      the rest of the data on your device, except the free-search counter that iOS keeps in the Keychain. Searches
+      on our server expire on their own within ${SERVICE.searchRetentionHours} hours. See the
+      <a href="${pathFor('privacy')}">Privacy Policy</a> for details, or write to ${mailto(CONTACT_EMAIL)}.</p>`,
+  },
+];

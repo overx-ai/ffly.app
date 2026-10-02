@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SUPPORT, SUPPORT_FAQ } from '../data/support';
+import { CONTACT_EMAIL } from '../app';
+import { pathFor } from '../site-pages';
+import { breadcrumb, faqSchema } from '../schema';
+
+const site = Astro.site?.href.replace(/\/$/, '') ?? '';
+const schemas = [
+  faqSchema(SUPPORT_FAQ),
+  breadcrumb(site, [
+    { name: 'Home', path: pathFor('') },
+    { name: SUPPORT.pageTitle, path: pathFor('support') },
+  ]),
+];
+---
+<BaseLayout title={SUPPORT.pageTitle} description={SUPPORT.description} slug="support" structuredData={schemas}>
+  <Header />
+  <main id="main" class="container page">
+    <h1>Support</h1>
+    <p class="lead">
+      Questions, problems or a route that looks wrong? Write to us and a person will reply.
+    </p>
+
+    <div class="contact card">
+      <div>
+        <p class="lbl">Email us</p>
+        <p><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
+      </div>
+      <div>
+        <p class="lbl">Legal</p>
+        <p><a href={pathFor('privacy')}>Privacy Policy</a> and <a href={pathFor('terms')}>Terms of Use</a></p>
+      </div>
+    </div>
+
+    <h2>Common questions</h2>
+    <div class="faq">
+      {SUPPORT_FAQ.map((item) => (
+        <details>
+          <summary>{item.question}</summary>
+          <div set:html={item.answer} />
+        </details>
+      ))}
+    </div>
+
+    <p class="updated">Last updated: {SUPPORT.lastUpdated}</p>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .lead { color: var(--ink-2); font-size: 1.1rem; padding-top: var(--space-md); }
+  .contact {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-lg);
+    margin-block: var(--space-2xl);
+  }
+  .contact p + p { padding-top: var(--space-xs); color: var(--ink-2); font-size: 15px; overflow-wrap: anywhere; }
+  h2 { font-size: 1.5rem; padding-bottom: var(--space-lg); }
+  .updated { padding-top: var(--space-2xl); }
+  @media (max-width: 640px) { .contact { grid-template-columns: minmax(0, 1fr); } }
+</style>

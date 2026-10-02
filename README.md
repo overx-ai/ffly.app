@@ -1,0 +1,45 @@
+# ffly-site
+
+Website for **ffly**, at `ffly.app`. Astro 4, static, one dependency, zero client JavaScript.
+
+```bash
+npm install
+npm run dev      # localhost:4321
+npm run build    # -> dist/
+npm run preview
+```
+
+## Pages
+| Route | Source |
+|---|---|
+| `/` | `src/pages/index.astro` |
+| `/support` | `src/pages/support.astro` + `src/data/support.ts` |
+| `/privacy` | `src/layouts/LegalLayout.astro` + `src/data/privacy.ts` |
+| `/terms` | `src/layouts/LegalLayout.astro` + `src/data/terms.ts` |
+| `/404` | `src/pages/404.astro`, noindex |
+| `/sitemap.xml` | `src/pages/sitemap.xml.ts`, from `src/site-pages.ts` |
+| `/robots.txt`, `/llms.txt` | `public/` |
+
+The app and the App Store listing link `/`, `/support`, `/privacy` and `/terms`. They must stay
+at those exact paths.
+
+## Verification
+
+```bash
+npm run build && npm run preview -- --port 4329 &
+
+# 200, one H1 and one canonical on every page.
+for u in / /support /privacy /terms; do
+  curl -s localhost:4329$u | grep -c '<h1\|rel="canonical"'; done   # 2 each
+
+# No trailing-slash internal links, no em dashes, no "unlimited", no prices in schema.
+grep -roh 'href="/[^"]*/"' dist ; echo "(empty is correct)"
+grep -rl -e "—" -e "&mdash;" --include='*.html' dist ; echo "(empty is correct)"
+grep -ril unlimited dist ; echo "(empty is correct)"
+grep -ro '"offers"\|"aggregateRating"' dist ; echo "(empty is correct)"
+```
+
+Then read every page at 390px and 1280px in both colour schemes.
+
+## Deploy
+Vercel, from `main`. See [docs/001-deployment.md](docs/001-deployment.md).

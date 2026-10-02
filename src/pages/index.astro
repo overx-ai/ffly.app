@@ -1,0 +1,264 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import AppStoreBadge from '../components/AppStoreBadge.astro';
+import { APP } from '../app';
+import { pathFor } from '../site-pages';
+import { appSchema, organizationSchema } from '../schema';
+
+const site = Astro.site?.href.replace(/\/$/, '') ?? '';
+const airlines = `${APP.airlines.slice(0, -1).join(', ')}, ${APP.airlines.at(-1)}`;
+
+const steps = [
+  {
+    title: 'Pick your cities',
+    body: `Where you start, up to ${APP.maxEnds} places to finish, and up to ${APP.maxCities} cities to see. Mark each one a must or a maybe: a maybe is skipped when leaving it out makes the trip cheaper.`,
+  },
+  {
+    title: 'Set dates and nights',
+    body: 'Choose your travel window and how many nights you want in each city.',
+  },
+  {
+    title: 'Choose what matters',
+    body: 'The best schedule, the lowest price, or a balance of both.',
+  },
+  {
+    title: 'Get your routes',
+    body: 'ffly runs the search in the background and lets you know when your routes are ready.',
+  },
+];
+
+const features = [
+  {
+    title: 'The cheapest order and dates',
+    body: 'ffly tries your cities in different orders across your dates and shows the routes where the whole trip costs the least.',
+  },
+  {
+    title: 'Schedule-aware',
+    body: 'Routes favour sensible flight times over pre-dawn wake-ups and midnight landings. Early starts, late arrivals and daylight spent travelling are shown, so a cheap route does not cost you a night of sleep.',
+  },
+  {
+    title: `Fares from ${airlines} and more`,
+    body: 'ffly checks the flights between your cities across your dates, so you do not have to open ten tabs.',
+  },
+  {
+    title: "You book on the airline's site",
+    body: "ffly is a search tool, not a travel agent. Tap Book and the airline's own page opens. Fares change often, so check the final price there.",
+  },
+];
+
+const plans = [
+  {
+    name: 'Free',
+    line: `${APP.freeSearches} searches`,
+    items: ['The cities in the cheapest order', 'The days in each city', 'The total price'],
+  },
+  {
+    name: APP.proName,
+    line: `Every route in full, and no <span class="nw">${APP.freeSearches}-search</span> limit`,
+    items: ['Dates and flight times', 'Airlines and booking links', 'Every route, not just the top one'],
+  },
+];
+---
+<BaseLayout
+  title="ffly: cheap multi-city trips for iPhone"
+  description={`Pick the cities you want to see. ffly finds the cheapest order and dates, favours sensible flight times, and checks fares from ${airlines} and more.`}
+  slug=""
+  structuredData={[appSchema(site), organizationSchema(site)]}
+>
+  <Header />
+
+  <main id="main">
+    <section class="hero">
+      <div class="container grid">
+        <div class="pitch">
+          <p class="lbl">ffly for iPhone</p>
+          <h1>Cheap <span class="nw">multi-city</span> trips</h1>
+          <p class="lead">
+            Pick the cities you want to see. ffly finds the cheapest order and dates to visit them all, then you book
+            each flight on the airline's own site.
+          </p>
+          <ul class="chips" aria-label="Fare sources">
+            {APP.airlines.map((a) => <li>{a}</li>)}
+            <li>and more</li>
+          </ul>
+          <div class="actions">
+            <AppStoreBadge />
+            <span class="note">Free to try: {APP.freeSearches} searches</span>
+          </div>
+        </div>
+        <div class="art">
+          <img
+            src="/icon-360.webp"
+            srcset="/icon-360.webp 360w, /icon-720.webp 720w"
+            sizes="(max-width: 860px) 132px, 340px"
+            width="360"
+            height="360"
+            alt="The ffly app icon: a fly with airplane wings following a dotted route between three map pins."
+            fetchpriority="high"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="how">
+      <div class="container">
+        <div class="sec-head">
+          <h2>How it works</h2>
+          <p>Tell ffly where you want to go. It works out the order, the dates and the flights.</p>
+        </div>
+        <ol class="steps">
+          {steps.map((s, i) => (
+            <li class="card">
+              <span class="step-num" aria-hidden="true">{i + 1}</span>
+              <h3>{s.title}</h3>
+              <p>{s.body}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section class="sec" id="features">
+      <div class="container">
+        <div class="sec-head">
+          <h2>More cities, fewer red-eyes</h2>
+          <p>The cheapest trip is not always the one with the cheapest first flight. ffly prices the whole route.</p>
+        </div>
+        <div class="features">
+          {features.map((f) => (
+            <article class="card">
+              <h3>{f.title}</h3>
+              <p>{f.body}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="plans">
+      <div class="container">
+        <div class="sec-head">
+          <h2>Free and {APP.proName}</h2>
+          <p>
+            Try ffly free. Upgrade when you want the details. {APP.proName} is a weekly or annual subscription,
+            priced in the app in your currency before you buy.
+          </p>
+        </div>
+        <div class="plans">
+          {plans.map((p, i) => (
+            <article class:list={['card', 'plan', { pro: i === 1 }]}>
+              <p class="lbl">{p.name}</p>
+              <h3 set:html={p.line} />
+              <ul>
+                {p.items.map((it) => <li>{it}</li>)}
+              </ul>
+            </article>
+          ))}
+        </div>
+        <p class="fine">
+          Subscriptions renew automatically unless cancelled at least 24 hours before the period ends. See the
+          <a href={pathFor('terms')}>Terms of Use</a>.
+        </p>
+      </div>
+    </section>
+
+    <section class="sec close">
+      <div class="container">
+        <h2>Where to next?</h2>
+        <p>Pick the cities. ffly does the ordering, the dates and the fare checks.</p>
+        <AppStoreBadge />
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .hero { padding-block: var(--space-3xl) var(--space-2xl); overflow: hidden; }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: var(--space-3xl);
+    align-items: center;
+  }
+  .pitch { display: flex; flex-direction: column; gap: var(--space-lg); }
+  h1 {
+    font-size: clamp(2.6rem, 7vw, 4.5rem);
+    letter-spacing: -0.035em;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    padding-bottom: 0.06em;
+  }
+  .lead { color: var(--ink-2); font-size: 1.2rem; max-width: 30em; }
+  .chips { display: flex; flex-wrap: wrap; gap: var(--space-sm); list-style: none; padding: 0; margin: 0; }
+  .chips li {
+    font-size: 14px;
+    color: var(--ink-2);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-pill);
+    padding: 4px 12px;
+  }
+  .actions { display: flex; align-items: center; gap: var(--space-md) var(--space-lg); flex-wrap: wrap; padding-top: var(--space-xs); }
+  .note { color: var(--ink-3); font-size: 14px; }
+
+  .art { display: flex; justify-content: center; min-width: 0; }
+  .art img {
+    width: 340px;
+    border-radius: 22.5%;
+    box-shadow: 0 30px 80px var(--glow), var(--shadow);
+  }
+
+  .steps, .features, .plans {
+    display: grid;
+    gap: var(--space-lg);
+    margin: var(--space-2xl) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .step-num {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--grad);
+    color: var(--on-brand);
+    font-family: var(--font-display);
+    font-weight: 800;
+    margin-bottom: var(--space-md);
+  }
+  .steps h3, .features h3 { font-size: 1.2rem; padding-bottom: var(--space-sm); }
+  .steps p, .features p { color: var(--ink-2); font-size: 15px; }
+
+  .plan h3 { font-size: 1.4rem; padding-block: var(--space-sm) var(--space-md); }
+  .plan ul { margin: 0; padding-left: 1.2em; color: var(--ink-2); display: flex; flex-direction: column; gap: 6px; }
+  .plan.pro { border: 1.5px solid transparent; background: linear-gradient(var(--bg), var(--bg)) padding-box, var(--grad) border-box; }
+  .fine { color: var(--ink-3); font-size: 14px; padding-top: var(--space-lg); }
+
+  .close { text-align: center; }
+  .close h2 { font-size: clamp(1.9rem, 4vw, 2.6rem); }
+  .close p { color: var(--ink-2); max-width: 34em; margin: var(--space-md) auto var(--space-lg); }
+
+  @media (max-width: 960px) {
+    .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-2xl); }
+    .art { order: -1; justify-content: flex-start; }
+    .art img { width: 132px; box-shadow: 0 16px 40px var(--glow); }
+    .hero { padding-top: var(--space-xl); }
+  }
+  @media (max-width: 640px) {
+    .steps, .features, .plans { grid-template-columns: minmax(0, 1fr); }
+    .sec { padding-block: var(--space-2xl); }
+  }
+</style>

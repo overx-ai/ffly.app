@@ -1,0 +1,53 @@
+---
+import { APP, CONTACT_EMAIL, DEVELOPER, PUBLISHER } from '../app';
+import { pathFor } from '../site-pages';
+const year = new Date().getFullYear();
+---
+<footer>
+  <div class="container">
+    <nav class="links" aria-label="Footer">
+      <a href={pathFor('support')}>Support</a>
+      <a href={pathFor('privacy')}>Privacy</a>
+      <a href={pathFor('terms')}>Terms</a>
+      <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+    </nav>
+    <p class="fine">
+      {APP.name} is a search tool, not a travel agent, and is not affiliated with any airline. Fares are
+      indicative: confirm the final price on the airline's site before you book.
+    </p>
+    <p class="fine legal">
+      <span>&copy; {year} {DEVELOPER}</span>
+      <span>Created by <a href={PUBLISHER.url} rel="noopener">{PUBLISHER.label}</a></span>
+    </p>
+  </div>
+</footer>
+
+<style>
+  footer {
+    border-top: 1px solid var(--rule-soft);
+    padding-block: var(--space-2xl) var(--space-3xl);
+    margin-top: var(--space-2xl);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-lg);
+    padding-bottom: var(--space-sm);
+  }
+  .links a {
+    color: var(--ink);
+    font-size: 15px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .fine {
+    color: var(--ink-3);
+    font-size: 13px;
+    line-height: 1.55;
+    max-width: var(--max-width-prose);
+    padding-top: var(--space-sm);
+  }
+  .legal { display: flex; flex-wrap: wrap; gap: var(--space-xs) var(--space-lg); }
+  .legal a { color: var(--ink-2); text-decoration: underline; text-underline-offset: 2px; }
+</style>
