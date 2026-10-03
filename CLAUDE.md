@@ -1,14 +1,18 @@
 # ffly-site (ffly.app)
 
 Marketing, support and legal site for **ffly** (`ai.overx.ffly`), the iPhone app for cheap
-multi-city trips. Astro 4, static output, no client JavaScript, deployed on Vercel.
+multi-city trips. Astro 4, static output, deployed on Vercel. Client JavaScript only on `/search`.
 
 The app source lives at `../../0E-extensions/ios-ffly`, the API at `1B-bots` `apps/ffly-api`.
 Those repos are the source of truth for copy, colours and claims.
 
 ## Tech Stack
 - Astro 4, `output: 'static'`, `trailingSlash: 'never'`. **One dependency: `astro`.**
-- **Zero client JavaScript.** Theme switching is pure CSS, the FAQ is `<details>`.
+- **Zero client JavaScript, except `/search`.** Theme switching is pure CSS, the FAQ is `<details>`.
+  `/search` (the free web search, `docs/specs/001-search-web-app.md`) ships one bundled script:
+  `src/scripts/{ffly-api,search}.ts`, plain TypeScript, no framework, rendering via `textContent`/`<template>`
+  only (never `innerHTML` with API data). It calls `FFLY_API_BASE` anonymously: `X-Platform: web`, never
+  `X-Client-Id`. Ads stay off while `ADSENSE_CLIENT` is `undefined` in `src/app.ts`.
 - Deploy: `git push origin main`, then Vercel builds. `vercel.json` is clean URLs only.
   Hosting and DNS: [docs/001-deployment.md](docs/001-deployment.md).
 

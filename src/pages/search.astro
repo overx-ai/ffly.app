@@ -1,0 +1,171 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import AppStoreBadge from '../components/AppStoreBadge.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { APP } from '../app';
+import { pathFor } from '../site-pages';
+import { breadcrumb } from '../schema';
+import '../styles/search.css';
+
+const site = Astro.site?.href.replace(/\/$/, '') ?? '';
+const title = 'Search cheap multi-city trips';
+const crumbs = breadcrumb(site, [
+  { name: 'Home', path: pathFor('') },
+  { name: title, path: pathFor('search') },
+]);
+---
+<BaseLayout
+  title={title}
+  description="Pick the cities you want to see. ffly finds the cheapest order and dates to visit them all, free on the web, with live fares."
+  slug="search"
+  structuredData={[crumbs]}
+>
+  <Header />
+
+  <main id="main" class="container search-page">
+    <div class="search-head">
+      <p class="lbl">Free web search</p>
+      <h1>Search cheap <span class="nw">multi-city</span> trips</h1>
+      <p class="lead">
+        Pick the cities you want to see. ffly finds the cheapest order and dates to visit them all. The web search
+        shows the best route and its total; the {APP.name} app shows every route in full.
+      </p>
+    </div>
+
+    <noscript>
+      <div class="card notice">
+        <p>The web search needs JavaScript. The {APP.name} app runs the same search on iPhone.</p>
+        <AppStoreBadge />
+      </div>
+    </noscript>
+
+    <form id="search-form" class="card search-form" novalidate>
+      <p id="search-loading" class="note">Loading cities…</p>
+      <fieldset id="search-fields" class="fields" disabled>
+        <legend class="sr-only">Your trip</legend>
+
+        <div class="field">
+          <label for="start">Start from</label>
+          <input id="start" type="text" list="places" autocomplete="off" placeholder="Type a city" />
+        </div>
+
+        <div class="field">
+          <label for="end">Finish in</label>
+          <input id="end" type="text" list="places" autocomplete="off" placeholder="Same as start" aria-describedby="end-hint" />
+          <p id="end-hint" class="hint">Leave empty to finish where you start.</p>
+        </div>
+
+        <div class="field">
+          <label for="city">Cities to visit <span id="city-count" class="count"></span></label>
+          <ul id="cities" class="chips" aria-label="Cities to visit"></ul>
+          <input id="city" type="text" list="places" autocomplete="off" placeholder="Add a city" aria-describedby="city-hint" />
+          <p id="city-hint" class="hint">Pick each city from the list. ffly works out the order.</p>
+        </div>
+
+        <fieldset class="field pair">
+          <legend>Travel window</legend>
+          <label>Leave from <input id="date-from" type="date" /></label>
+          <label>Back by <input id="date-to" type="date" /></label>
+        </fieldset>
+
+        <fieldset class="field pair">
+          <legend>Nights in each city</legend>
+          <label>At least <input id="min-nights" type="number" inputmode="numeric" min="1" /></label>
+          <label>At most <input id="max-nights" type="number" inputmode="numeric" min="1" /></label>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>What matters most</legend>
+          <div id="priorities" class="choices"></div>
+        </fieldset>
+
+        <label class="check"><input id="direct" type="checkbox" /> Direct flights only</label>
+
+        <p id="form-error" class="form-error" role="alert"></p>
+        <button id="submit" class="btn" type="submit">Find routes</button>
+        <p id="quota-note" class="note"></p>
+      </fieldset>
+      <datalist id="places"></datalist>
+    </form>
+
+    <AdSlot position="form" />
+
+    <div id="problem" class="card problem" role="alert" hidden>
+      <p id="problem-text"></p>
+      <button id="retry" class="btn btn-soon" type="button" hidden>Try again</button>
+    </div>
+
+    <section id="progress" class="card progress" aria-labelledby="progress-title" hidden>
+      <p id="progress-title" class="lbl">Searching</p>
+      <p id="progress-status" class="status" aria-live="polite"></p>
+      <div id="progress-bar" class="bar" role="progressbar" aria-labelledby="progress-title" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <span id="progress-fill"></span>
+      </div>
+      <p id="progress-detail" class="note"></p>
+    </section>
+
+    <AdSlot position="progress" />
+
+    <section id="results" class="results" aria-labelledby="results-title" aria-live="polite" hidden>
+      <h2 id="results-title"></h2>
+      <p id="results-trip" class="note"></p>
+      <p id="results-empty" class="note" hidden>Try a wider travel window or a different number of nights.</p>
+      <p id="insights" class="insights" hidden></p>
+      <div id="best"></div>
+      <AdSlot position="results" />
+      <ol id="others" class="others"></ol>
+      <p id="more-routes" hidden><a href="#upsell"></a></p>
+      <p id="coverage" class="quiet" hidden></p>
+    </section>
+
+    <section id="upsell" class="card upsell" aria-labelledby="upsell-title" hidden>
+      <p class="lbl">{APP.name} for iPhone</p>
+      <h2 id="upsell-title">Every route in full, in the app</h2>
+      <p>{APP.proName} shows the dates, flight times, airlines and booking links for every route.</p>
+      <AppStoreBadge />
+    </section>
+  </main>
+
+  <template id="chip-template">
+    <li class="chip"><span class="chip-name"></span><button type="button" class="chip-remove">&times;</button></li>
+  </template>
+
+  <template id="priority-template">
+    <label class="choice">
+      <input type="radio" name="priority" />
+      <span><strong class="choice-label"></strong><span class="hint choice-hint"></span></span>
+    </label>
+  </template>
+
+  <template id="best-template">
+    <article class="card route best">
+      <div class="route-head">
+        <p class="lbl">Best route</p>
+        <strong class="price"></strong>
+      </div>
+      <ol class="chain"></ol>
+      <a class="locked" href="#upsell" hidden>Dates, flight times and booking links are in the app</a>
+    </article>
+  </template>
+
+  <template id="stop-template">
+    <li><span class="city"></span><span class="nights"></span></li>
+  </template>
+
+  <template id="route-template">
+    <li class="card route compact">
+      <span class="rank"></span>
+      <span class="cities"></span>
+      <strong class="price"></strong>
+      <a class="locked" href="#upsell" hidden>See this route in the app</a>
+    </li>
+  </template>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  import '../scripts/search';
+</script>

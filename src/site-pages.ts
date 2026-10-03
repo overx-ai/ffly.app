@@ -12,6 +12,7 @@ export const SITE_PAGES = [
   { slug: 'support', lastmod: '2026-10-03' },
   { slug: 'privacy', lastmod: '2026-10-03' },
   { slug: 'terms',   lastmod: '2026-10-03' },
+  { slug: 'search',  lastmod: '2026-10-03' },
 ] as const;
 
 export type Slug = (typeof SITE_PAGES)[number]['slug'];

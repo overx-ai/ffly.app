@@ -57,6 +57,34 @@ export const SERVICE = {
   entitlementCacheMinutes: 10,
 } as const;
 
+export const FFLY_API_BASE = `https://${SERVICE.apiHost}/ffly`;
+
+// The web search at /search (src/scripts/search.ts), an anonymous Free caller of FFLY_API_BASE.
+export const WEB_SEARCH = {
+  platform: 'web',
+  pollMs: 2000,
+  storageKey: 'ffly.search',
+  locale: 'en-GB',
+  startInDays: 21,
+  windowDays: 7,
+  minNights: 2,
+  maxNights: 4,
+} as const;
+
+// Display names for the API's `sources[].source` ids.
+export const FARE_SOURCES: Readonly<Record<string, string>> = {
+  ryanair: 'Ryanair',
+  wizz: 'Wizz Air',
+  airbaltic: 'airBaltic',
+  azair: 'AZair',
+};
+
+// TODO(owner): set both to switch the /search ad slots on. Until then nothing ad-related renders
+// and no AdSense script loads. Serving ads also needs the consent banner and a privacy update.
+export const ADSENSE_CLIENT: string | undefined = undefined;
+export type AdPosition = 'form' | 'progress' | 'results';
+export const ADSENSE_SLOTS: Record<AdPosition, string> | undefined = undefined;
+
 export const EXTERNAL = {
   appleEula: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
   applePrivacy: 'https://www.apple.com/legal/privacy/',

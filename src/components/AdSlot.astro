@@ -1,0 +1,8 @@
+---
+import { ADSENSE_CLIENT, ADSENSE_SLOTS, type AdPosition } from '../app';
+
+interface Props { position: AdPosition; }
+
+const slot = ADSENSE_SLOTS?.[Astro.props.position];
+---
+{ADSENSE_CLIENT && slot && <div class="ad-slot" data-ad-client={ADSENSE_CLIENT} data-ad-slot={slot} aria-hidden="true" />}

@@ -4,6 +4,7 @@
 - [README](../README.md): pages, local commands, verification
 - [CLAUDE.md](../CLAUDE.md): rules for every session (fixed URLs, facts, legal coupling, copy rules)
 - [001 - Deployment](001-deployment.md): Vercel project, Namecheap DNS, go-live checks
+- [Spec 001 - Web search](specs/001-search-web-app.md): `/search`, the free web search on ffly API v1.2
 
 ## Documentation Tree
 ```
@@ -25,4 +26,4 @@ README.md (overview + verification)
 - none
 
 ---
-*Last updated: 2026-10-03 (initial site)*
+*Last updated: 2026-10-03 (web search)*

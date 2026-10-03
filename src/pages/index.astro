@@ -103,6 +103,7 @@ const plans = [
           </ul>
           <div class="actions">
             <AppStoreBadge />
+            <a class="web" href={pathFor('search')}>Try it on the web</a>
             <span class="note">Free to try: {APP.freeSearches} searches</span>
           </div>
         </div>
@@ -257,6 +258,7 @@ const plans = [
   }
   .actions { display: flex; align-items: center; gap: var(--space-md) var(--space-lg); flex-wrap: wrap; padding-top: var(--space-xs); }
   .note { color: var(--ink-3); font-size: 14px; }
+  .web { font-family: var(--font-display); font-weight: 700; min-height: 44px; display: inline-flex; align-items: center; }
 
   .art { display: flex; justify-content: center; min-width: 0; }
   .art img {

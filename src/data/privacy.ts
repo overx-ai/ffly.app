@@ -229,6 +229,24 @@ export const PRIVACY: LegalDocument = {
         safeguards.</p>`,
     },
     {
+      id: 'web-search',
+      title: 'Web Search on ffly.app',
+      content: `
+        <p>The <a href="${pathFor('search')}">web search</a> on this website sends your search from your browser
+        straight to the ffly API over HTTPS: the start and finish places, the cities you want to visit, the date
+        window, the minimum and maximum nights per city, the priority, whether you asked for direct flights only, a
+        random request id, and the fact that the request comes from the web. It sends no app user id.</p>
+        <p>The search and its results are kept <strong>in the server's memory only</strong> and are deleted after at
+        most ${SERVICE.searchRetentionHours} hours, or sooner when the server restarts. They are not stored with
+        your IP address.</p>
+        <p>The ffly API uses your IP address only to count the free web searches made from it today. That count is
+        held in memory, not in a database, and is cleared at the start of each day (UTC) or when the server
+        restarts.</p>
+        <p>Your browser keeps your latest web search and its id in the tab's session storage, so reloading the page
+        picks it up again. It is deleted when you close the tab. The web search sets no cookies, runs no analytics
+        and shows no ads. If that changes, we will update this policy first.</p>`,
+    },
+    {
       id: 'website',
       title: 'This Website',
       content: `
