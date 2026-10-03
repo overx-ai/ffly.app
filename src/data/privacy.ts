@@ -2,6 +2,7 @@ import {
   APP,
   CONTACT_EMAIL,
   EXTERNAL,
+  FEEDBACK,
   LEGAL_EFFECTIVE_DATE,
   OPERATOR,
   SERVICE,
@@ -12,10 +13,11 @@ import { pathFor } from '../site-pages';
 import type { LegalDocument } from './types';
 
 // Every collected item here is one row of ios-ffly/Template/PrivacyInfo.xcprivacy and
-// docs/compliance/data-inventory.yaml (Search History, User ID, Purchase History, Product
-// Interaction, Device ID, all not linked, no tracking). Change one, change all three, and the
-// App Store Connect privacy answers. Retention figures come from the ffly API config
-// (job_ttl_seconds, entitlement_ttl_seconds) and are in SERVICE.
+// docs/compliance/data-inventory.yaml. Not linked: Search History, User ID, Purchase History, Product
+// Interaction, Device ID. Linked: Email Address (optional) and Customer Support, both from the feedback
+// form (ios-ffly spec 012). No tracking. Change one, change all three, and the App Store Connect privacy
+// answers. Retention figures come from the ffly API config (job_ttl_seconds, entitlement_ttl_seconds)
+// and are in SERVICE. Feedback facts come from 1B-bots shared/form-aggregator and are in FEEDBACK.
 
 export const PRIVACY: LegalDocument = {
   pageTitle: 'Privacy Policy',
@@ -23,12 +25,13 @@ export const PRIVACY: LegalDocument = {
     'How the ffly iPhone app handles data: no account, no location, no ads, no tracking. Trip searches stay in server memory for up to 24 hours; analytics are anonymous.',
   lastUpdated: LEGAL_EFFECTIVE_DATE,
   summaryTitle: 'The short version',
-  summaryText: `ffly has no account and no sign-in. We do not collect your name, email address, phone number
-    or location, we do not use the advertising identifier (IDFA), we show no ads and we do not track you across
+  summaryText: `ffly has no account and no sign-in. We do not collect your name, phone number or location, and
+    we collect your email address only if you choose to add it to feedback you send. We do not use the advertising identifier (IDFA), we show no ads and we do not track you across
     other apps or websites. To find routes, the trip you search for (places, dates, nights and priority) is sent
     to our server together with an anonymous app user id. The server keeps it in memory only, for at most
     ${SERVICE.searchRetentionHours} hours. We collect anonymous usage analytics to improve the app. Subscriptions
-    are paid through Apple and verified through RevenueCat.`,
+    are paid through Apple and verified through RevenueCat. If you send us feedback, our own form service stores
+    your message with basic app and device details, and passes it to our team through Telegram.`,
   sections: [
     {
       id: 'who-we-are',
@@ -36,15 +39,16 @@ export const PRIVACY: LegalDocument = {
       content: `
         <p>ffly is an iPhone app that finds cheap multi-city trips. It is operated by <strong>${OPERATOR}</strong>
         ("we", "us"), the controller of the personal data described here. This policy covers the ffly app, the
-        ffly API at <code>${SERVICE.apiHost}/ffly</code> that the app talks to, and this website.</p>`,
+        ffly API at <code>${SERVICE.apiHost}/ffly</code> that the app talks to, the form service at
+        <code>${FEEDBACK.serviceHost}</code> that receives feedback from the app, and this website.</p>`,
     },
     {
       id: 'not-collected',
       title: 'What We Do Not Collect',
       content: `
         <ul>
-          <li><strong>No account.</strong> ffly has no sign-up or login, so we hold no name, email address, phone
-          number, password or profile.</li>
+          <li><strong>No account.</strong> ffly has no sign-up or login, so we hold no name, phone number, password
+          or profile. We receive an email address only if you add one to feedback you send (Section 8).</li>
           <li><strong>No location.</strong> You pick places by name. ffly does not use Location Services.</li>
           <li><strong>No advertising identifier and no tracking.</strong> ffly does not read the IDFA, does not show
           the App Tracking Transparency prompt because it does not track you, and contains no advertising SDKs.</li>
@@ -82,7 +86,8 @@ export const PRIVACY: LegalDocument = {
         <p>We use it to:</p>
         <ul>
           <li>check with RevenueCat whether you have ${APP.proName}, by subscription or ${APP.lifetimeName};</li>
-          <li>count the free searches you have used and apply the fair-use daily search limit for ${APP.proName}.</li>
+          <li>count the free searches you have used and apply the fair-use daily search limit for ${APP.proName};</li>
+          <li>tell which feedback messages come from the same installation (Section 8).</li>
         </ul>
         <p>The subscription status (cached for about ${SERVICE.entitlementCacheMinutes} minutes) and the search
         counters are held in the server's memory only and are lost when the server restarts.</p>`,
@@ -115,8 +120,9 @@ export const PRIVACY: LegalDocument = {
       title: 'Anonymous Usage Analytics',
       content: `
         <p>ffly sends anonymous usage events to our own analytics service at <code>${SERVICE.analyticsHost}</code>.
-        The events are: search submitted, search finished, booking link tapped, paywall shown, purchase completed,
-        and onboarding started, completed or skipped.</p>
+        The events are: search submitted, priority chosen, search finished, booking link tapped, paywall shown and
+        purchase completed; onboarding started, page viewed, answered, completed or skipped; and feedback sent,
+        feedback question shown and feedback question answered.</p>
         <p>Each event carries:</p>
         <ul>
           <li>the app version, iOS version and device model;</li>
@@ -125,13 +131,50 @@ export const PRIVACY: LegalDocument = {
           <li>the identifier for vendor (IDFV, an Apple id that is unique to our apps on your device and is not the
           advertising identifier), a random install id and a random session id;</li>
           <li>event details: the number of cities, maybe cities and end places in a search and the chosen priority;
-          the outcome of a search and the number of routes found; the position of a route whose booking link you
-          tapped, with its airline and fare source; the screen that opened the paywall; the purchased product; and
-          the onboarding page you finished on.</li>
+          whether you changed the suggested priority; the outcome of a search and the number of routes found; the
+          position of a route whose booking link you tapped, with its airline and fare source; the screen that
+          opened the paywall; the purchased product; the onboarding page you viewed or finished on, and whether you
+          set a home place (yes or no, never the place); the category of feedback you sent, whether you added an
+          email address (yes or no, never the address), whether the message was sent or queued, and whether it was
+          about the app or a search; and your answer to the feedback question (love it, it's OK, needs work, or
+          closed).</li>
         </ul>
-        <p>Analytics events never contain the names of the places you search, your travel dates, or any contact
-        detail. They are not linked to your identity and are not used for tracking or advertising. We keep them
+        <p>Analytics events never contain the names of the places you search, your travel dates, the text of your
+        feedback, or any contact detail. They are not linked to your identity and are not used for tracking or advertising. We keep them
         only as long as needed to understand how the app is used, then aggregate or delete them.</p>`,
+    },
+    {
+      id: 'feedback',
+      title: 'Feedback You Send',
+      content: `
+        <p>You can send us a message from <strong>Send feedback</strong> in Settings, from <strong>Tell us about
+        this search</strong> on a search, or from the short question ffly may ask after a few finished searches.
+        Nothing is sent until you tap <strong>Send</strong>. A message contains:</p>
+        <ul>
+          <li>the text you write and the category you pick (general, feature request or bug report), and your
+          answer ("It's OK" or "Needs work") if you came from that question;</li>
+          <li>the app version and build, iOS version, device model, the app's language and whether you are on Free
+          or ${APP.proName};</li>
+          <li>when you send it from a search: the search id, the codes of the places in the route, the date window,
+          the priority, whether the search found routes, found none, failed or was still running, the number of
+          routes, your plan
+          and, if you were looking at a route, its position in the list;</li>
+          <li>your email address, only if you type one into the optional email field;</li>
+          <li>your anonymous app user id (Section 4) and a two-letter language code.</li>
+        </ul>
+        <p>We use it only to read and answer your feedback and to fix what you report.</p>
+        <p>The message goes over HTTPS to our own form service at <code>${FEEDBACK.serviceHost}</code>. It stores
+        the message in its database together with the IP address and user agent of the request, and records it in
+        its server logs. It also uses the IP address to limit how many messages can be sent per minute. It then
+        forwards a copy to a Telegram chat that our team uses to read feedback: the text (long messages are
+        shortened), your email address if you added one, and your app user id. Telegram processes that copy under
+        the ${externalLink(EXTERNAL.telegramPrivacy, 'Telegram Privacy Policy')}.</p>
+        <p>Feedback is linked to you: it carries your app user id, and your email address if you added one. If you
+        would rather not be contacted, leave the email field empty. We keep feedback as long as we need it to handle your message.
+        You can ask us to delete it, and the email address you gave, at any time by writing to
+        ${mailto(CONTACT_EMAIL)}.</p>
+        <p>If you are offline, the message waits on your device (up to ${FEEDBACK.queuedMessages} messages, for at
+        most ${FEEDBACK.queuedDays} days) and is sent the next time ffly starts and can reach our server.</p>`,
     },
     {
       id: 'on-device',
@@ -143,7 +186,7 @@ export const PRIVACY: LegalDocument = {
           <li><strong>Free search counter:</strong> the number of free searches used, kept in the iOS Keychain. iOS
           may keep Keychain items after the app is deleted, so reinstalling does not reset it.</li>
           <li><strong>App settings:</strong> the random install id and app state such as whether onboarding is done
-          and when the notification and rating prompts were shown.</li>
+          and when the notification, rating and feedback prompts were shown.</li>
         </ul>
         <p>This data is not uploaded. Deleting the app removes it, except the Keychain counter described above.</p>`,
     },
@@ -170,7 +213,8 @@ export const PRIVACY: LegalDocument = {
       content: `
         <ul>
           <li><strong>Data used to track you:</strong> none.</li>
-          <li><strong>Data linked to you:</strong> none.</li>
+          <li><strong>Data linked to you:</strong> Email Address (Contact Info), only if you add one to feedback, and
+          Customer Support (User Content), the feedback you send.</li>
           <li><strong>Data not linked to you:</strong> Search History (trip searches), User ID (the anonymous app
           user id), Purchase History (${APP.proName} transactions), Product Interaction (usage events) and Device ID
           (IDFV and the random install id).</li>
@@ -182,7 +226,9 @@ export const PRIVACY: LegalDocument = {
       content: `
         <p>Where the GDPR or similar laws apply, we process trip searches, the app user id and purchase status to
         provide the service you ask for (performance of a contract), and anonymous analytics and search limits on
-        the basis of our legitimate interests in improving ffly, keeping it fair and protecting it from abuse.</p>`,
+        the basis of our legitimate interests in improving ffly, keeping it fair and protecting it from abuse. We
+        process feedback you send, and the email address you choose to add, on the basis of our legitimate interest
+        in answering you and fixing what you report.</p>`,
     },
     {
       id: 'sharing',
@@ -191,6 +237,9 @@ export const PRIVACY: LegalDocument = {
         <ul>
           <li><strong>Apple</strong> processes App Store payments.</li>
           <li><strong>RevenueCat</strong> verifies subscriptions, as described in Section 6.</li>
+          <li><strong>Our form service</strong> receives the feedback you send, and <strong>Telegram</strong> carries
+          a copy of it to our team, as described in Section 8. See the
+          ${externalLink(EXTERNAL.telegramPrivacy, 'Telegram Privacy Policy')}.</li>
           <li>The infrastructure providers that host our servers and this website process data on our behalf.</li>
         </ul>
         <p>We may also disclose information when the law requires it. We do not sell data and do not share it with
@@ -201,13 +250,15 @@ export const PRIVACY: LegalDocument = {
       title: 'Your Choices and Rights',
       content: `
         <p>Depending on where you live, you may have the right to access, correct, delete or port your personal
-        data, and to object to or restrict its processing. Because ffly has no account and the data we receive is
-        not linked to your identity, we usually cannot tell which records are yours. Search data on our server
-        expires on its own within ${SERVICE.searchRetentionHours} hours.</p>
+        data, and to object to or restrict its processing. ffly has no account, and apart from feedback the data we
+        receive is not linked to your identity, so we usually cannot tell which records are yours. Search data on
+        our server expires on its own within ${SERVICE.searchRetentionHours} hours.</p>
         <ul>
           <li>Delete trips in the Trips list, or delete the app to remove the data on your device.</li>
           <li>Turn off notifications in iOS Settings.</li>
           <li>Manage or cancel a ${APP.proName} subscription in your Apple ID account settings.</li>
+          <li>Ask us to delete feedback you sent and the email address you added. Write from that address, or tell
+          us roughly when you sent it, so we can find it.</li>
         </ul>
         <p>To make a request or ask a question, email ${mailto(CONTACT_EMAIL)}. You also have the right to lodge a
         complaint with your local data protection authority.</p>`,

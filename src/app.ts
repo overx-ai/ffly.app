@@ -59,6 +59,14 @@ export const SERVICE = {
 
 export const FFLY_API_BASE = `https://${SERVICE.apiHost}/ffly`;
 
+// The in-app feedback form (ios-ffly spec 012): OverX's form-aggregator, and the app's offline queue
+// (FeedbackQueueRules). form-aggregator has no retention job, so there is no retention figure here.
+export const FEEDBACK = {
+  serviceHost: `${SERVICE.apiHost}/forms`,
+  queuedMessages: 20,
+  queuedDays: 7,
+} as const;
+
 // The web search at /search (src/scripts/search.ts), an anonymous Free caller of FFLY_API_BASE.
 export const WEB_SEARCH = {
   platform: 'web',
@@ -90,10 +98,11 @@ export const EXTERNAL = {
   applePrivacy: 'https://www.apple.com/legal/privacy/',
   appleRefund: 'https://reportaproblem.apple.com',
   revenueCatPrivacy: 'https://www.revenuecat.com/privacy',
+  telegramPrivacy: 'https://telegram.org/privacy',
   vercelPrivacy: 'https://vercel.com/legal/privacy-policy',
 } as const;
 
-export const LEGAL_EFFECTIVE_DATE = 'October 3, 2026';
+export const LEGAL_EFFECTIVE_DATE = 'October 4, 2026';
 
 export const mailto = (email: string) => `<a href="mailto:${email}">${email}</a>`;
 

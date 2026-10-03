@@ -35,10 +35,13 @@ Those repos are the source of truth for copy, colours and claims.
 - Footer of every page carries "Created by overx.ai" linking to `https://overx.ai` (followed).
 
 ## Legal pages are one decision across repos
-- `/privacy` lists exactly the five types in `ios-ffly/Template/PrivacyInfo.xcprivacy` and
-  `docs/compliance/data-inventory.yaml` (Search History, User ID, Purchase History, Product
-  Interaction, Device ID; none linked, none tracking). Change one, change all, plus the App Store
+- `/privacy` lists exactly the seven types in `ios-ffly/Template/PrivacyInfo.xcprivacy` and
+  `docs/compliance/data-inventory.yaml`: Search History, User ID, Purchase History, Product
+  Interaction, Device ID (not linked), and Email Address (optional) and Customer Support (linked, from
+  the feedback form, ios-ffly spec 012); none tracking. Change one, change all, plus the App Store
   Connect privacy answers. Retention (24 h jobs, 10 min entitlement cache) is from the API config.
+  Feedback goes to 1B-bots `shared/form-aggregator` (database, logs, Telegram chat), which has no
+  retention job: never state a number of days for it. Its facts are `FEEDBACK` in `src/app.ts`.
 - `/terms` section 6 is the App Store 3.1.2(c) auto-renewable block (weekly and yearly), section 7
   the one-time Lifetime purchase (does not renew, does not cancel a running subscription), and
   section 1 links Apple's Standard EULA. No free trial is offered on any plan. Both are submission requirements. Cross-references say "Section 6": the layout
