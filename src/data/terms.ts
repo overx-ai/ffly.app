@@ -186,9 +186,9 @@ export const TERMS: LegalDocument = {
       id: 'governing-law',
       title: 'Governing Law',
       content: `
-        <p>These Terms are governed by the laws of the jurisdiction in which we operate, without regard to conflict
-        of law principles. This does not take away the protection of mandatory laws of the country where you
-        live.</p>`,
+        <p>These Terms are governed by the laws of the <strong>Republic of Belarus</strong>, without regard to
+        conflict of law rules. This does not take away the protection of mandatory consumer laws of the country
+        where you live.</p>`,
     },
     {
       id: 'contact',
