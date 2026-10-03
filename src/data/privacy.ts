@@ -121,8 +121,8 @@ export const PRIVACY: LegalDocument = {
       content: `
         <p>ffly sends anonymous usage events to our own analytics service at <code>${SERVICE.analyticsHost}</code>.
         The events are: search submitted, priority chosen, search finished, booking link tapped, paywall shown and
-        purchase completed; onboarding started, page viewed, answered, completed or skipped; and feedback sent,
-        feedback question shown and feedback question answered.</p>
+        purchase completed; onboarding started, page viewed, answered, completed or skipped; and feedback sent, and
+        search rated or rating dismissed.</p>
         <p>Each event carries:</p>
         <ul>
           <li>the app version, iOS version and device model;</li>
@@ -136,8 +136,8 @@ export const PRIVACY: LegalDocument = {
           opened the paywall; the purchased product; the onboarding page you viewed or finished on, and whether you
           set a home place (yes or no, never the place); the category of feedback you sent, whether you added an
           email address (yes or no, never the address), whether the message was sent or queued, and whether it was
-          about the app or a search; and your answer to the feedback question (love it, it's OK, needs work, or
-          closed).</li>
+          about the app or a search; and, for a search you rate (${APP.proName} only), the number of stars, the
+          search's priority, its number of routes and whether you went on to write feedback.</li>
         </ul>
         <p>Analytics events never contain the names of the places you search, your travel dates, the text of your
         feedback, or any contact detail. They are not linked to your identity and are not used for tracking or advertising. We keep them
@@ -148,11 +148,11 @@ export const PRIVACY: LegalDocument = {
       title: 'Feedback You Send',
       content: `
         <p>You can send us a message from <strong>Send feedback</strong> in Settings, from <strong>Tell us about
-        this search</strong> on a search, or from the short question ffly may ask after a few finished searches.
+        this search</strong> on a search, or, with ${APP.proName}, after rating a search with three stars or fewer.
         Nothing is sent until you tap <strong>Send</strong>. A message contains:</p>
         <ul>
-          <li>the text you write and the category you pick (general, feature request or bug report), and your
-          answer ("It's OK" or "Needs work") if you came from that question;</li>
+          <li>the text you write and the category you pick (general, feature request or bug report), and the
+          stars you gave if you came from rating a search;</li>
           <li>the app version and build, iOS version, device model, the app's language and whether you are on Free
           or ${APP.proName};</li>
           <li>when you send it from a search: the search id, the codes of the places in the route, the date window,
@@ -186,7 +186,8 @@ export const PRIVACY: LegalDocument = {
           <li><strong>Free search counter:</strong> the number of free searches used, kept in the iOS Keychain. iOS
           may keep Keychain items after the app is deleted, so reinstalling does not reset it.</li>
           <li><strong>App settings:</strong> the random install id and app state such as whether onboarding is done
-          and when the notification, rating and feedback prompts were shown.</li>
+          and when the notification and rating prompts were shown, and which searches you rated or dismissed the
+          rating for.</li>
         </ul>
         <p>This data is not uploaded. Deleting the app removes it, except the Keychain counter described above.</p>`,
     },
