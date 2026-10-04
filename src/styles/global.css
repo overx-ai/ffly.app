@@ -1,30 +1,80 @@
-/* Tokens first, always. The complete LIGHT palette lives on bare :root; dark overrides in
-   the media query. Never declare a colour only inside a media block: it would be undefined
-   whenever the query does not match.
-   The app uses iOS semantic colours, so the site follows the system scheme as the app does.
-   --brand is the app's AccentColor (light #006BE3, dark #4094FF); --grad is sampled from the
-   corners of the app icon (design/icon/icon-a-gradient.png). */
+/* Owner rule: only the app icon's colours and their tints and shades (navy, gold, red, white,
+   black). No other hue and no gradients. Gold stays yellow: never darkened, and on a light
+   background only a fill, an underline of 2px or more, or a highlight, never text or a thin line. The complete LIGHT palette lives on bare :root; dark
+   overrides in the media query. Never declare a colour only inside a media block: it would be
+   undefined whenever the query does not match. */
+
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("/fonts/bricolage-grotesque-latin.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Figtree";
+  src: url("/fonts/figtree-latin.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/ibm-plex-mono-400-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/ibm-plex-mono-500-latin.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/ibm-plex-mono-600-latin.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
-  --bg:        #ffffff;
-  --bg-2:      #f3f5fb;
-  --raise:     rgba(13, 18, 38, 0.035);
-  --ink:       #0d1226;
-  --ink-2:     #3c4359;
-  --ink-3:     #5f6680;
-  --rule:      rgba(13, 18, 38, 0.12);
-  --rule-soft: rgba(13, 18, 38, 0.07);
+  --navy:         #071230;
+  --navy-deep:    #040A1C;
+  --navy-raised:  #0F1C42;
+  --navy-ink:     #0B1530;
+  --navy-mute:    #5A6482;
+  --navy-line:    #C9D0E0;
+  --navy-fill:    #E3E8F2;
+  --navy-mist:    #F4F6FB;
+  --navy-haze:    #A7B0CC;
+  --navy-land:    #18224B;
+  --navy-edge:    #26325E;
+  --gold:         #F2C14E;
+  --gold-tint:    #FCEFCB;
+  --red:          #D93A2B;
+  --red-bright:   #FF6B5E;
+  --white:        #FFFFFF;
+  --black:        #000000;
 
-  --brand:     #006BE3;
-  --violet:    #7b2ff7;
-  --on-brand:  #ffffff;
-  --grad:      linear-gradient(135deg, #0066FB 0%, #452FF4 55%, #9E11F7 100%);
-  --glow:      rgba(69, 47, 244, 0.28);
+  --bg:       var(--navy-mist);
+  --surface:  var(--white);
+  --fill:     var(--navy-fill);
+  --rule:     var(--navy-line);
+  --ink:      var(--navy-ink);
+  --ink-2:    var(--navy-mute);
+  --accent:   var(--navy-ink);
+  --danger:   var(--red);
+  --on-gold:  var(--navy);
+  --night:    var(--navy);
+  --on-night: var(--navy-mist);
+  --shadow:   0 1px 0 rgba(7, 18, 48, 0.06), 0 30px 60px -30px rgba(7, 18, 48, 0.45);
 
-  --shadow: 0 20px 48px rgba(13, 18, 38, 0.12);
-
-  --font-display: ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
-  --font-body: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif;
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   --space-xs: 4px;
   --space-sm: 8px;
@@ -33,35 +83,32 @@
   --space-xl: 32px;
   --space-2xl: 48px;
   --space-3xl: 72px;
+  --space-4xl: 96px;
 
-  --radius-sm: 8px;
+  --radius-sm: 6px;
   --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --radius-lg: 18px;
   --radius-pill: 999px;
 
-  --max-width: 1140px;
+  --max-width: 1152px;
   --max-width-prose: 720px;
+  --gutter: clamp(16px, 5vw, 48px);
+  --header-offset: 88px;
 
   color-scheme: light dark;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg:        #090c1a;
-    --bg-2:      #10142a;
-    --raise:     rgba(232, 236, 255, 0.05);
-    --ink:       #f5f7ff;
-    --ink-2:     #b7bdd3;
-    --ink-3:     #8a90a8;
-    --rule:      rgba(232, 236, 255, 0.12);
-    --rule-soft: rgba(232, 236, 255, 0.07);
-
-    --brand:     #4094FF;
-    --violet:    #b07cff;
-    --glow:      rgba(110, 80, 255, 0.35);
-
-    --shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+    --bg:       var(--navy-deep);
+    --surface:  var(--navy-raised);
+    --fill:     var(--navy-land);
+    --rule:     var(--navy-edge);
+    --ink:      var(--navy-mist);
+    --ink-2:    var(--navy-haze);
+    --accent:   var(--gold);
+    --danger:   var(--red-bright);
+    --shadow:   0 30px 60px -30px rgba(0, 0, 0, 0.8);
   }
 }
 
@@ -74,120 +121,118 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 17px;
-  line-height: 1.6;
+  font-size: 16px;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4 {
   font-family: var(--font-display);
   font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
   margin: 0;
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 
 p { margin: 0; }
+code { font-family: var(--font-mono); }
 img { max-width: 100%; height: auto; display: block; }
 
-a { color: var(--brand); text-decoration: none; }
-a:hover { text-decoration: underline; }
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: var(--gold);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+a:hover { text-decoration-color: currentColor; }
+
+::selection { background: var(--gold-tint); color: var(--navy-ink); }
 
 :focus-visible {
-  outline: 2px solid var(--brand);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
 }
 
 .container {
   width: 100%;
-  max-width: var(--max-width);
+  max-width: calc(var(--max-width) + 2 * var(--gutter));
   margin-inline: auto;
-  padding-inline: var(--space-lg);
-}
-
-@media (max-width: 480px) {
-  .container { padding-inline: var(--space-md); }
-  .btn { font-size: 15px; padding: 13px 16px; gap: 8px; }
+  padding-inline: var(--gutter);
 }
 
 .lbl {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--brand);
+  color: var(--accent);
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: var(--grad);
-  color: var(--on-brand);
-  font-family: var(--font-display);
+  background: var(--gold);
+  color: var(--on-gold);
+  font-family: var(--font-body);
   font-weight: 700;
-  font-size: 17px;
-  padding: 14px 26px;
-  border-radius: var(--radius-md);
+  font-size: 16px;
+  padding: 13px 24px;
+  border: 0;
+  border-radius: var(--radius-pill);
   min-height: 44px;
   text-decoration: none;
 }
-.btn:hover { text-decoration: none; filter: brightness(1.08); }
+.btn:hover { text-decoration: none; filter: brightness(1.05); }
 
 .btn-soon {
   background: transparent;
   color: var(--ink);
   border: 1px solid var(--rule);
-  cursor: default;
 }
 .btn-soon:hover { filter: none; }
 
-.sec { padding-block: var(--space-3xl); }
-.sec + .sec { border-top: 1px solid var(--rule-soft); }
-.sec-head { display: flex; flex-direction: column; gap: var(--space-md); max-width: var(--max-width-prose); }
-.sec-head h2 { font-size: clamp(1.9rem, 4vw, 2.5rem); }
-.sec-head p { color: var(--ink-2); font-size: 1.06rem; }
-
 .card {
-  background: var(--raise);
-  border: 1px solid var(--rule-soft);
-  border-radius: var(--radius-xl);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
   padding: var(--space-lg);
 }
 
 /* Page shell shared by /support and the legal pages. */
-.page { max-width: var(--max-width-prose); padding-block: var(--space-3xl); }
-.page h1 { font-size: clamp(2.1rem, 5vw, 2.9rem); }
-.updated { color: var(--ink-3); font-size: 14px; padding-top: var(--space-sm); }
+.page { max-width: calc(var(--max-width-prose) + 2 * var(--gutter)); padding-block: var(--space-3xl); }
+.page h1 { font-size: clamp(2.4rem, 6vw, 3.4rem); letter-spacing: -0.04em; }
+.updated { color: var(--ink-2); font-size: 14px; padding-top: var(--space-sm); }
 
 /* FAQ accordion, zero JavaScript. */
-.faq { display: flex; flex-direction: column; gap: var(--space-sm); max-width: var(--max-width-prose); }
-.faq details {
-  border: 1px solid var(--rule-soft);
-  border-radius: var(--radius-md);
-  background: var(--raise);
-}
+.faq { display: flex; flex-direction: column; max-width: var(--max-width-prose); }
+.faq details { border-top: 1px solid var(--rule); padding-block: var(--space-md); }
+.faq details:last-child { border-bottom: 1px solid var(--rule); }
 .faq summary {
   cursor: pointer;
-  padding: var(--space-md) var(--space-lg);
   font-family: var(--font-display);
   font-weight: 700;
+  font-size: 18px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
   min-height: 44px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-md);
   list-style: none;
 }
 .faq summary::-webkit-details-marker { display: none; }
-.faq summary::after { content: "+"; margin-left: auto; color: var(--brand); font-size: 1.3em; }
-.faq details[open] summary::after { content: "\2013"; }
-.faq details > div { padding: 0 var(--space-lg) var(--space-md); color: var(--ink-2); }
+.faq summary::after { content: "+"; color: var(--accent); font-weight: 500; font-size: 1.3em; line-height: 1; }
+.faq details[open] summary::after { content: "\2212"; }
+.faq details > div { padding-top: var(--space-sm); color: var(--ink-2); }
 .faq details > div p + p { padding-top: var(--space-sm); }
 
-/* A route as a dotted chain of stops: the home page example and the /search best route. */
+/* A route as a chain of stops: the /search best route. */
 .chain { list-style: none; margin: 0; padding: 0; }
 .chain li {
   position: relative;
@@ -205,7 +250,7 @@ a:hover { text-decoration: underline; }
   height: 10px;
   margin-top: -5px;
   border-radius: 50%;
-  background: var(--grad);
+  background: var(--gold);
 }
 .chain li:not(:last-child)::after {
   content: "";
@@ -216,13 +261,13 @@ a:hover { text-decoration: underline; }
   border-left: 2px dotted var(--rule);
 }
 .chain .city { font-family: var(--font-display); font-weight: 700; }
-.chain .nights { color: var(--ink-3); font-size: 14px; white-space: nowrap; }
+.chain .nights { color: var(--ink-2); font-family: var(--font-mono); font-size: 13px; white-space: nowrap; }
 
 .nw { white-space: nowrap; }
 
 .skip-link {
   position: absolute; left: -9999px;
-  background: var(--brand); color: var(--on-brand);
+  background: var(--gold); color: var(--on-gold);
   padding: var(--space-sm) var(--space-md); border-radius: var(--radius-sm);
 }
 .skip-link:focus { left: var(--space-md); top: var(--space-md); z-index: 10; }

@@ -8,11 +8,8 @@ export const APP = {
   subtitle: 'Cheap multi-city trips',
   proName: 'ffly Pro',
   lifetimeName: 'Lifetime',
-  bundleId: 'ai.overx.ffly',
   minimumOs: '17.0',
   freeSearches: 3,
-  maxCities: 8,
-  maxEnds: 3,
   savedTrips: 20,
   airlines: ['Ryanair', 'Wizz Air', 'airBaltic', 'Volotea'],
 } as const;
@@ -23,17 +20,17 @@ export const PRIORITIES = ['Best schedule', 'Balanced', 'Cheapest'] as const;
 // A real search, not a promise: ios-ffly docs/specs/001 "Verification (2026-10-02)", the default
 // trip against the live API. Always shown labelled as an example; never restate it as a saving.
 export const EXAMPLE_TRIP = {
-  date: '2 October 2026',
+  searchedOn: '2026-10-02',
   start: 'Warsaw',
   finish: 'Warsaw or Vilnius',
   routesFound: 6,
   bestTotal: '€129.62',
   stops: [
-    { city: 'Warsaw' },
-    { city: 'Madrid', nights: 2 },
-    { city: 'Amsterdam', nights: 2 },
-    { city: 'Rome', nights: 4 },
-    { city: 'Warsaw' },
+    { city: 'Warsaw', code: 'WAW' },
+    { city: 'Madrid', code: 'MAD', nights: 2 },
+    { city: 'Amsterdam', code: 'AMS', nights: 2 },
+    { city: 'Rome', code: 'FCO', nights: 4 },
+    { city: 'Warsaw', code: 'WAW' },
   ],
 } as const;
 

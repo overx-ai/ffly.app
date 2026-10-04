@@ -2,7 +2,7 @@
    Astro scope attribute. Every rule hangs off .search-page so no other page is affected. */
 
 .search-page {
-  max-width: var(--max-width-prose);
+  max-width: calc(var(--max-width-prose) + 2 * var(--gutter));
   padding-block: var(--space-2xl) var(--space-3xl);
   display: flex;
   flex-direction: column;
@@ -21,11 +21,11 @@
 }
 
 .search-head { display: flex; flex-direction: column; gap: var(--space-md); }
-.search-head h1 { font-size: clamp(2.1rem, 5vw, 2.9rem); }
-.search-head .lead { color: var(--ink-2); font-size: 1.06rem; }
+.search-head h1 { font-size: clamp(2.4rem, 6vw, 3.4rem); letter-spacing: -0.04em; }
+.search-head .lead { color: var(--ink-2); font-size: clamp(17px, 1.6vw, 19px); }
 
-.search-page .note { color: var(--ink-3); font-size: 14px; }
-.search-page .hint { color: var(--ink-3); font-size: 13px; line-height: 1.4; }
+.search-page .note { color: var(--ink-2); font-size: 14px; }
+.search-page .hint { color: var(--ink-2); font-size: 13px; line-height: 1.4; }
 .search-page .notice,
 .search-page .problem,
 .search-page .upsell { display: flex; flex-direction: column; gap: var(--space-md); align-items: flex-start; }
@@ -49,7 +49,7 @@
   font-weight: 700;
   padding: 0;
 }
-.search-form .count { color: var(--ink-3); font-weight: 600; font-size: 14px; }
+.search-form .count { color: var(--ink-2); font-family: var(--font-mono); font-weight: 500; font-size: 13px; }
 
 .search-form input[type="text"],
 .search-form input[type="date"],
@@ -58,6 +58,8 @@
   min-height: 44px;
   padding: 10px 14px;
   font: inherit;
+  font-family: var(--font-body);
+  font-weight: 400;
   font-size: 16px;
   color: var(--ink);
   background: var(--bg);
@@ -66,13 +68,13 @@
   -webkit-appearance: none;
   appearance: none;
 }
-.search-form input::placeholder { color: var(--ink-3); }
-.search-form input:disabled { background: var(--raise); }
-.search-form input:focus-visible { outline-offset: 0; border-color: var(--brand); }
+.search-form input::placeholder { color: var(--ink-2); }
+.search-form input:disabled { background: var(--fill); }
+.search-form input:focus-visible { outline-offset: 0; border-color: var(--accent); }
 
 .search-form .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm) var(--space-md); }
 .search-form .pair > legend { grid-column: 1 / -1; padding-bottom: var(--space-sm); }
-.search-form .pair label { display: flex; flex-direction: column; gap: var(--space-xs); color: var(--ink-2); font-size: 14px; min-width: 0; }
+.search-form .pair label { display: flex; flex-direction: column; gap: var(--space-xs); color: var(--ink-2); font-family: var(--font-body); font-weight: 500; font-size: 14px; min-width: 0; }
 
 .search-form .chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-sm); }
 .search-form .chips:empty { display: none; }
@@ -83,7 +85,7 @@
   padding-left: 14px;
   border: 1px solid var(--rule);
   border-radius: var(--radius-pill);
-  background: var(--raise);
+  background: var(--fill);
   font-weight: 600;
 }
 .search-form .chip-remove {
@@ -91,7 +93,7 @@
   min-height: 40px;
   border: 0;
   background: none;
-  color: var(--ink-3);
+  color: var(--ink-2);
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
@@ -110,45 +112,45 @@
 }
 .search-form .choice {
   padding: 12px 14px;
-  border: 1px solid var(--rule-soft);
+  border: 1px solid var(--rule);
   border-radius: var(--radius-md);
 }
-.search-form .choice:has(input:checked) { border-color: var(--brand); background: var(--raise); }
+.search-form .choice:has(input:checked) { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .search-form .choice > span { display: flex; flex-direction: column; gap: 2px; }
 .search-form .check { align-items: center; }
 .search-form input[type="radio"],
 .search-form input[type="checkbox"] {
-  accent-color: var(--brand);
+  accent-color: var(--accent);
   width: 20px;
   height: 20px;
   margin: 2px 0 0;
   flex: none;
 }
 
-.search-form .form-error { color: var(--violet); font-weight: 600; }
+.search-form .form-error { color: var(--danger); font-weight: 600; }
 .search-form .form-error:empty { display: none; }
 .search-form .btn { justify-content: center; border: 0; cursor: pointer; }
 .search-form .btn:disabled { filter: grayscale(0.6); opacity: 0.6; cursor: default; }
 
-.search-page .problem { border-left: 3px solid var(--violet); }
-.search-page .problem .btn { font: inherit; font-family: var(--font-display); font-weight: 700; cursor: pointer; }
+.search-page .problem { border-left: 3px solid var(--danger); }
+.search-page .problem .btn { font: inherit; font-weight: 700; cursor: pointer; }
 
 .search-page .progress,
 .search-page .results,
-.search-page .upsell { scroll-margin-top: 88px; }
+.search-page .upsell { scroll-margin-top: var(--header-offset); }
 .search-page .progress { display: flex; flex-direction: column; gap: var(--space-sm); }
 .search-page .status { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; }
 .search-page .bar {
   height: 8px;
   border-radius: var(--radius-pill);
-  background: var(--rule-soft);
+  background: var(--fill);
   overflow: hidden;
 }
 .search-page .bar > span {
   display: block;
   height: 100%;
   width: 0;
-  background: var(--grad);
+  background: var(--gold);
   border-radius: inherit;
   transition: width 0.4s ease;
 }
@@ -157,13 +159,13 @@
 .search-page .results h2 { font-size: clamp(1.6rem, 4vw, 2rem); }
 .search-page .insights {
   padding: var(--space-md) var(--space-lg);
-  border-left: 3px solid var(--brand);
-  background: var(--raise);
+  border-left: 3px solid var(--gold);
+  background: var(--surface);
   border-radius: var(--radius-md);
   color: var(--ink-2);
   font-size: 15px;
 }
-.search-page .quiet { color: var(--ink-3); font-size: 13px; }
+.search-page .quiet { color: var(--ink-2); font-size: 13px; }
 
 .search-page .route .price {
   font-family: var(--font-display);
@@ -186,14 +188,13 @@
   padding: var(--space-md) var(--space-lg);
   border-radius: var(--radius-lg);
 }
-.search-page .compact .rank { font-family: var(--font-display); font-weight: 700; }
+.search-page .compact .rank { font-family: var(--font-mono); font-weight: 600; font-size: 14px; }
 .search-page .compact .cities { color: var(--ink-2); }
 .search-page .compact .price { font-size: 1.2rem; }
 .search-page .compact .locked { grid-column: 1 / -1; }
 
 .search-page .upsell {
-  border: 1.5px solid transparent;
-  background: linear-gradient(var(--bg), var(--bg)) padding-box, var(--grad) border-box;
+  border-left: 3px solid var(--gold);
 }
 .search-page .upsell h2 { font-size: 1.5rem; }
 .search-page .upsell > p:not(.lbl) { color: var(--ink-2); }

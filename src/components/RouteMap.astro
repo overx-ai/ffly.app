@@ -1,0 +1,214 @@
+---
+import EUROPE from '../data/europe-map.json';
+import { EXAMPLE_TRIP } from '../app';
+
+type Point = readonly [number, number];
+
+const BOW = 0.16;
+const ARROW_T = 0.62;
+const BADGE_T = 0.4;
+const BADGE_OFFSET = 16;
+const LENGTH_SAMPLES = 32;
+// The fly moves at one speed (map units per second) and waits at each city in proportion to its nights.
+const FLY = { speed: 110, startDwell: 0.9, dwellPerNight: 0.45, scale: 1.5 };
+// Label offsets are hand-placed so no label sits on a leg; a new example trip needs new ones.
+const LABELS: Record<string, { dx: number; dy: number; anchor: 'start' | 'end'; note?: string }> = {
+  Warsaw: { dx: 18, dy: 0, anchor: 'start', note: 'start and finish' },
+  Madrid: { dx: -18, dy: 2, anchor: 'end' },
+  Amsterdam: { dx: 18, dy: -4, anchor: 'start' },
+  Rome: { dx: 16, dy: 22, anchor: 'start' },
+};
+
+const cities: Record<string, number[]> = EUROPE.cities;
+const pointOf = (city: string): Point => {
+  const p = cities[city];
+  if (!p) throw new Error(`europe-map.json has no point for ${city}: add it to scripts/europe-map.py`);
+  return [p[0], p[1]];
+};
+const fmt = (n: number) => +n.toFixed(1);
+
+const stops = EXAMPLE_TRIP.stops.map((s) => pointOf(s.city));
+const loop = stops.slice(0, -1);
+const cx = loop.reduce((sum, p) => sum + p[0], 0) / loop.length;
+const cy = loop.reduce((sum, p) => sum + p[1], 0) / loop.length;
+
+// Each leg is a quadratic arc bowed away from the trip's centroid, so the loop reads as a ring
+// and the legs never cross.
+const legs = stops.slice(0, -1).map((a, i) => {
+  const b = stops[i + 1];
+  const mx = (a[0] + b[0]) / 2;
+  const my = (a[1] + b[1]) / 2;
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  let nx = -(b[1] - a[1]) / len;
+  let ny = (b[0] - a[0]) / len;
+  if ((mx + nx - cx) ** 2 + (my + ny - cy) ** 2 < (mx - cx) ** 2 + (my - cy) ** 2) {
+    nx = -nx;
+    ny = -ny;
+  }
+  const c: Point = [mx + nx * len * BOW, my + ny * len * BOW];
+  const at = (t: number): Point => [
+    (1 - t) ** 2 * a[0] + 2 * (1 - t) * t * c[0] + t * t * b[0],
+    (1 - t) ** 2 * a[1] + 2 * (1 - t) * t * c[1] + t * t * b[1],
+  ];
+  const tangent = (t: number): Point => [
+    2 * (1 - t) * (c[0] - a[0]) + 2 * t * (b[0] - c[0]),
+    2 * (1 - t) * (c[1] - a[1]) + 2 * t * (b[1] - c[1]),
+  ];
+  const [ax, ay] = at(ARROW_T);
+  const [tx, ty] = tangent(ARROW_T);
+  const [bx, by] = at(BADGE_T);
+  let length = 0;
+  for (let i = 1, prev = a; i <= LENGTH_SAMPLES; i++) {
+    const q = at(i / LENGTH_SAMPLES);
+    length += Math.hypot(q[0] - prev[0], q[1] - prev[1]);
+    prev = q;
+  }
+  const [mx2, my2] = at(0.5);
+  const [tx2, ty2] = tangent(0.5);
+  return {
+    start: `M${fmt(a[0])},${fmt(a[1])}`,
+    curve: `Q${fmt(c[0])},${fmt(c[1])} ${fmt(b[0])},${fmt(b[1])}`,
+    arrow: `translate(${fmt(ax)},${fmt(ay)}) rotate(${fmt((Math.atan2(ty, tx) * 180) / Math.PI)})`,
+    badge: [fmt(bx + nx * BADGE_OFFSET), fmt(by + ny * BADGE_OFFSET)] as const,
+    mid: `translate(${fmt(mx2)},${fmt(my2)}) rotate(${fmt((Math.atan2(ty2, tx2) * 180) / Math.PI)})`,
+    length,
+  };
+});
+const flightPath = `${legs[0].start} ${legs.map((l) => l.curve).join(' ')}`;
+
+const totalLength = legs.reduce((sum, l) => sum + l.length, 0);
+const times = [0, FLY.startDwell];
+const points = [0, 0];
+let clock = FLY.startDwell;
+let flown = 0;
+legs.forEach((l, i) => {
+  clock += l.length / FLY.speed;
+  flown += l.length;
+  times.push(clock);
+  points.push(flown / totalLength);
+  const stop = EXAMPLE_TRIP.stops[i + 1];
+  if ('nights' in stop) {
+    clock += stop.nights * FLY.dwellPerNight;
+    times.push(clock);
+    points.push(flown / totalLength);
+  }
+});
+const keyTimes = times.map((x) => (x / clock).toFixed(4)).join(';');
+const keyPoints = points.map((x) => Math.min(1, x).toFixed(4)).join(';');
+
+const pins = EXAMPLE_TRIP.stops.slice(0, -1).map((s) => {
+  const [x, y] = pointOf(s.city);
+  const label = LABELS[s.city];
+  if (!label) throw new Error(`RouteMap has no label placement for ${s.city}`);
+  return { x, y, city: s.city, note: 'nights' in s ? `${s.nights} nights` : label.note, ...label };
+});
+
+const { width, height, land, graticule } = EUROPE;
+const description = `Example search on a map of Europe: ${EXAMPLE_TRIP.stops
+  .map((s) => ('nights' in s ? `${s.city}, ${s.nights} nights` : s.city))
+  .join(', then ')}. Flights total ${EXAMPLE_TRIP.bestTotal}.`;
+---
+<svg class="map" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={description}>
+  <rect class="sea" width={width} height={height} />
+  <path class="land" d={land} />
+  <g class="grat">
+    {graticule.lon.map(([v, x]) => (
+      <>
+        <line x1={x} y1="0" x2={x} y2={height} />
+        <text x={x + 4} y={height - 8}>{`${Math.abs(v)}°${v < 0 ? 'W' : 'E'}`}</text>
+      </>
+    ))}
+    {graticule.lat.map(([v, y]) => (
+      <>
+        <line x1="0" y1={y} x2={width} y2={y} />
+        <text x="6" y={y - 5}>{`${v}°N`}</text>
+      </>
+    ))}
+  </g>
+  {legs.map((l) => <path class="leg" d={`${l.start} ${l.curve}`} />)}
+  {legs.map((l) => <path class="arrow" transform={l.arrow} d="M-7,-5.5 L6,0 L-7,5.5 Z" />)}
+  {legs.map((l, i) => (
+    <g class="badge">
+      <circle cx={l.badge[0]} cy={l.badge[1]} r="10" />
+      <text x={l.badge[0]} y={l.badge[1]}>{i + 1}</text>
+    </g>
+  ))}
+  {pins.map((p) => (
+    <g class="pin">
+      <circle class="ring" cx={p.x} cy={p.y} r="12" />
+      <circle class="dot" cx={p.x} cy={p.y} r="5.5" />
+      <text x={p.x + p.dx} y={p.y + p.dy} text-anchor={p.anchor}>
+        {p.city}<tspan class="note" x={p.x + p.dx} dy="1.4em">{p.note}</tspan>
+      </text>
+    </g>
+  ))}
+  <defs>
+    <g id="fly" class="fly" transform={`scale(${FLY.scale})`}>
+      <path class="w" d="M1,-2 L-6,-15.5 L-10.5,-15.5 L-6.5,-2 Z M1,2 L-6,15.5 L-10.5,15.5 L-6.5,2 Z" />
+      <ellipse class="eng" cx="-3.2" cy="-8.6" rx="3.2" ry="1.7" />
+      <ellipse class="eng" cx="-3.2" cy="8.6" rx="3.2" ry="1.7" />
+      <path class="w" d="M-10,-1.5 L-14.5,-6.5 L-16.5,-6.5 L-14,-1.2 Z M-10,1.5 L-14.5,6.5 L-16.5,6.5 L-14,1.2 Z" />
+      <ellipse class="w" cx="-2" cy="0" rx="11.5" ry="4.4" />
+      <circle class="w" cx="9" cy="0" r="3.8" />
+      <circle class="eye" cx="10.2" cy="-3.1" r="2.7" />
+      <circle class="eye" cx="10.2" cy="3.1" r="2.7" />
+    </g>
+  </defs>
+  <g class="fly-anim" aria-hidden="true">
+    <use href="#fly" />
+    <animateMotion
+      dur={`${clock.toFixed(2)}s`}
+      repeatCount="indefinite"
+      rotate="auto"
+      calcMode="linear"
+      keyTimes={keyTimes}
+      keyPoints={keyPoints}
+      path={flightPath}
+    />
+  </g>
+  <g class="fly-static" aria-hidden="true" transform={legs[0].mid}><use href="#fly" /></g>
+</svg>
+
+<style>
+  /* Always a night map, in both colour schemes: an object on the page, like the boarding pass. */
+  .map {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+  }
+  .sea { fill: var(--navy-deep); }
+  .land { fill: var(--navy-land); }
+  .grat line { stroke: var(--navy-edge); stroke-width: 1; }
+  .grat text { fill: var(--navy-haze); font: 500 9.5px var(--font-mono); }
+  .leg { fill: none; stroke: var(--gold); stroke-width: 3.4; stroke-linecap: round; stroke-dasharray: 0 8; }
+  .arrow { fill: var(--gold); }
+  .badge circle { fill: var(--gold); }
+  .badge text { fill: var(--on-gold); font: 700 11px var(--font-mono); text-anchor: middle; dominant-baseline: central; }
+  .pin .dot { fill: var(--white); }
+  .pin .ring { fill: none; stroke: var(--white); stroke-width: 1.5; opacity: 0.4; }
+  .pin text {
+    fill: var(--white);
+    font: 700 15px var(--font-body);
+    paint-order: stroke;
+    stroke: var(--navy-deep);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+  .pin .note { fill: var(--gold); font: 600 11.5px var(--font-mono); }
+  /* The map scales to about half size on a phone, so its labels grow to stay readable. */
+  @media (max-width: 560px) {
+    .pin text { font-size: 19px; }
+    .pin .note { font-size: 14px; }
+  }
+  /* The fly is the app icon's fly, so it keeps the icon's colours in both schemes. */
+  .fly .w { fill: var(--white); stroke: var(--navy); stroke-width: 0.9; stroke-linejoin: round; }
+  .fly .eng { fill: var(--navy-line); stroke: var(--navy); stroke-width: 0.6; }
+  .fly .eye { fill: var(--red); }
+  .fly-static { display: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .fly-anim { display: none; }
+    .fly-static { display: inline; }
+  }
+</style>

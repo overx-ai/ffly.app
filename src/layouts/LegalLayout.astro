@@ -32,16 +32,16 @@ const { slug, pageTitle, description, summaryTitle, summaryText, sections } = As
 
 <style>
   .summary {
-    background: var(--raise);
-    border: 1px solid var(--rule-soft);
-    border-left: 3px solid var(--brand);
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--gold);
     border-radius: var(--radius-md);
     padding: var(--space-lg);
     margin-top: var(--space-xl);
   }
   .summary p + p { padding-top: var(--space-sm); color: var(--ink-2); }
 
-  .block { padding-top: var(--space-2xl); scroll-margin-top: 80px; }
+  .block { padding-top: var(--space-2xl); scroll-margin-top: var(--header-offset); }
   .block h2 {
     font-size: 1.35rem;
     display: flex;
@@ -49,7 +49,7 @@ const { slug, pageTitle, description, summaryTitle, summaryText, sections } = As
     align-items: baseline;
     padding-bottom: var(--space-md);
   }
-  .num { color: var(--brand); font-size: 0.85em; font-variant-numeric: tabular-nums; }
+  .num { color: var(--accent); font-family: var(--font-mono); font-weight: 600; font-size: 0.8em; font-variant-numeric: tabular-nums; }
 
   .block :global(p), .block :global(li) { color: var(--ink-2); }
   .block :global(p + p), .block :global(ul), .block :global(ul + p), .block :global(p + ul) { margin-top: var(--space-md); }

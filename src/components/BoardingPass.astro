@@ -1,0 +1,246 @@
+---
+import { APP, EXAMPLE_TRIP } from '../app';
+
+interface Props {
+  caption: string;
+}
+
+const { caption } = Astro.props;
+
+// Stand-ins under the blur, shaped like the Pro fields they hide. Never shown unblurred.
+const BLURRED = [
+  { day: '14 OCT', time: '06:40', flight: 'FR 1234' },
+  { day: '16 OCT', time: '11:15', flight: 'V7 1702' },
+  { day: '18 OCT', time: '18:30', flight: 'FR 6345' },
+  { day: '22 OCT', time: '09:05', flight: 'W6 1458' },
+];
+const BARCODE = { width: 196, height: 46 };
+const LCG = { multiplier: 1103515245, increment: 12345 };
+
+const { stops } = EXAMPLE_TRIP;
+const first = stops[0];
+const last = stops[stops.length - 1];
+const visits = stops.filter((s) => 'nights' in s);
+const nights = visits.reduce((sum, s) => sum + ('nights' in s ? s.nights : 0), 0);
+const searched = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' })
+  .format(new Date(EXAMPLE_TRIP.searchedOn))
+  .toUpperCase();
+const legs = stops.slice(0, -1).map((from, i) => ({ from, to: stops[i + 1], hidden: BLURRED[i] }));
+const route = stops.map((s) => s.code).join('-');
+
+// Decorative barcode: bar widths from a tiny LCG seeded by the route, so it is stable across builds.
+let seed = [...route].reduce((acc, ch) => (acc * 31 + ch.charCodeAt(0)) >>> 0, 7);
+const bars: { x: number; w: number }[] = [];
+for (let x = 0; x < BARCODE.width; ) {
+  seed = (Math.imul(seed, LCG.multiplier) + LCG.increment) >>> 0;
+  const w = 1 + ((seed >>> 16) % 3);
+  if ((seed >>> 8) & 1) bars.push({ x, w });
+  x += w + 1;
+}
+---
+<figure class="pass-fig">
+  <div
+    class="pass"
+    role="group"
+    aria-label={`Example boarding pass: Free shows the route, nights and total; dates, flight times and flight numbers are in ${APP.proName}`}
+  >
+    <div class="band">
+      <b><img src="/icon-64.webp" width="22" height="22" alt="" />{APP.name}</b>
+      <span>Boarding pass · <span class="gold">Route 1 of {EXAMPLE_TRIP.routesFound}</span></span>
+    </div>
+    <div class="main">
+      <div class="ends">
+        <div><span class="k">From</span><div class="iata">{first.code}</div><small>{first.city}</small></div>
+        <div class="via">VIA {visits.map((s) => s.code).join(' · ')}</div>
+        <div class="r"><span class="k">To</span><div class="iata">{last.code}</div><small>{last.city}</small></div>
+      </div>
+      <div class="meta">
+        <div><span class="k">Passenger</span><b>YOU</b></div>
+        <div><span class="k">Cities</span><b>{visits.length}</b></div>
+        <div><span class="k">Nights</span><b>{nights}</b></div>
+        <div><span class="k">Searched</span><b>{searched}</b></div>
+      </div>
+      <div class="tbl">
+        <table>
+          <thead>
+            <tr><th>Leg</th><th>Nights</th><th>Date</th><th class="col-departs">Departs</th><th class="col-flight">Flight</th></tr>
+          </thead>
+          <tbody>
+            {legs.map((leg, i) => (
+              <tr>
+                <td class="leg">{leg.from.code} → {leg.to.code} <span>{leg.to.city}</span></td>
+                <td>{'nights' in leg.to ? leg.to.nights : 'End'}</td>
+                <td><span class="hid" aria-hidden="true">{leg.hidden.day}</span>{i === 0 && <span class="lock">PRO</span>}</td>
+                <td class="col-departs"><span class="hid" aria-hidden="true">{leg.hidden.time}</span></td>
+                <td class="col-flight"><span class="hid" aria-hidden="true">{leg.hidden.flight}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="stub">
+      <div><span class="k">Flights total</span><div class="total">{EXAMPLE_TRIP.bestTotal}</div></div>
+      <span class="stamp">Best of<br />{EXAMPLE_TRIP.routesFound} routes</span>
+      <svg class="barcode" viewBox={`0 0 ${BARCODE.width} ${BARCODE.height}`} preserveAspectRatio="none" aria-hidden="true">
+        {bars.map((b) => <rect x={b.x} y="0" width={b.w} height={BARCODE.height} />)}
+      </svg>
+    </div>
+  </div>
+  <figcaption>{caption} Blurred fields are what {APP.proName} fills in.</figcaption>
+</figure>
+
+<style>
+  /* A physical object, so the pass stays paper-white in both colour schemes. */
+  .pass-fig {
+    --paper: var(--white);
+    --paper-ink: var(--navy-ink);
+    --paper-mute: var(--navy-mute);
+    --paper-rule: var(--navy-line);
+    margin: 0;
+    min-width: 0;
+    container-type: inline-size;
+  }
+  .pass {
+    background: var(--paper);
+    color: var(--paper-ink);
+    border-radius: var(--radius-lg);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 168px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    min-width: 0;
+  }
+  .band {
+    grid-column: 1 / -1;
+    background: var(--navy);
+    color: var(--on-night);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    font: 600 11px var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .band b {
+    font: 800 18px var(--font-display);
+    letter-spacing: -0.02em;
+    text-transform: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .band img { border-radius: var(--radius-sm); }
+  .gold { color: var(--gold); }
+  .main { padding: 18px 22px 20px; min-width: 0; }
+  .k {
+    display: block;
+    font: 500 10px var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--paper-mute);
+  }
+  .ends { display: grid; grid-template-columns: auto 1fr auto; align-items: end; gap: 12px; margin-bottom: 14px; }
+  .iata { font: 800 clamp(34px, 9cqi, 52px) / 1 var(--font-display); letter-spacing: -0.03em; }
+  .ends small { display: block; font: 500 12px var(--font-body); color: var(--paper-mute); }
+  .via {
+    align-self: center;
+    text-align: center;
+    font: 500 11px var(--font-mono);
+    color: var(--paper-mute);
+    border-top: 1.5px dashed var(--paper-rule);
+    padding-top: 6px;
+    letter-spacing: 0.06em;
+  }
+  .r { text-align: right; }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 26px;
+    padding-block: 10px;
+    border-block: 1px solid var(--paper-rule);
+    margin-bottom: 6px;
+  }
+  .meta b { font: 600 14px var(--font-mono); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th {
+    font: 500 10px var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--paper-mute);
+    text-align: left;
+    padding: 8px 6px 6px 0;
+  }
+  td { padding: 7px 6px 7px 0; border-top: 1px solid var(--paper-rule); white-space: nowrap; }
+  td.leg { font: 600 13.5px var(--font-mono); }
+  td.leg span { color: var(--paper-mute); font-weight: 400; font-family: var(--font-body); }
+  .hid { filter: blur(4.5px); user-select: none; font-family: var(--font-mono); }
+  .lock {
+    display: inline-block;
+    font: 700 10px var(--font-mono);
+    letter-spacing: 0.08em;
+    background: var(--navy);
+    color: var(--gold);
+    border-radius: 5px;
+    padding: 2px 6px;
+    margin-left: 4px;
+    vertical-align: 1px;
+  }
+  .stub {
+    border-left: 2px dashed var(--paper-rule);
+    padding: 18px 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    min-width: 0;
+  }
+  .stub::before,
+  .stub::after {
+    content: "";
+    position: absolute;
+    left: -12px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--bg);
+  }
+  .stub::before { top: -11px; }
+  .stub::after { bottom: -11px; }
+  .total { font: 800 32px / 1 var(--font-display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .stamp {
+    align-self: flex-start;
+    font: 700 10px / 1.3 var(--font-mono);
+    color: var(--red);
+    border: 1.5px solid var(--red);
+    border-radius: var(--radius-sm);
+    padding: 5px 7px;
+    transform: rotate(-5deg);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .barcode { width: 100%; height: 46px; display: block; margin-top: auto; }
+  .barcode rect { fill: var(--paper-ink); }
+  figcaption { font-size: 13px; color: var(--ink-2); margin-top: 12px; }
+
+  @container (max-width: 520px) {
+    .pass { grid-template-columns: minmax(0, 1fr); }
+    .stub {
+      border-left: 0;
+      border-top: 2px dashed var(--paper-rule);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+    }
+    .stub::before, .stub::after { display: none; }
+    .barcode { grid-column: 1 / -1; }
+    .tbl { overflow-x: auto; }
+    .col-flight { display: none; }
+    .main { padding-inline: 16px; }
+  }
+  @container (max-width: 400px) {
+    .col-departs { display: none; }
+  }
+</style>

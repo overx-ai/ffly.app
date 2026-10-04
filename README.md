@@ -26,6 +26,14 @@ npm run preview
 The app and the App Store listing link `/`, `/support`, `/privacy` and `/terms`. They must stay
 at those exact paths.
 
+## Map data
+`src/data/europe-map.json` (the home hero map) is generated from Natural Earth 50m land by
+`scripts/europe-map.py`, which has no dependencies. Regenerate after changing its cities or viewport:
+
+```bash
+curl -sL https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_land.geojson | python3 scripts/europe-map.py /dev/stdin > src/data/europe-map.json
+```
+
 ## Verification
 
 ```bash

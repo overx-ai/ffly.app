@@ -11,10 +11,9 @@ const home = pathFor('');
     </a>
     <nav aria-label="Main">
       <!-- Absolute, not bare fragments: the ids live on the home page only. -->
-      <a href={`${home}#how`}>How it works</a>
-      <a href={`${home}#why`}>Why ffly</a>
+      <a href={`${home}#why`}>Why {APP.name}</a>
       <a href={`${home}#plans`}>Free and Pro</a>
-      <a href={pathFor('search')}>Web search</a>
+      <a href={pathFor('search')}>Try on the web</a>
       <a href={pathFor('support')}>Support</a>
     </nav>
   </div>
@@ -26,15 +25,15 @@ const home = pathFor('');
     top: 0;
     z-index: 5;
     backdrop-filter: saturate(160%) blur(12px);
-    background: color-mix(in srgb, var(--bg) 82%, transparent);
-    border-bottom: 1px solid var(--rule-soft);
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    border-bottom: 1px solid var(--rule);
   }
   .bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-md);
-    padding-block: 12px;
+    padding-block: 10px;
   }
   .brand {
     display: flex;
@@ -43,12 +42,12 @@ const home = pathFor('');
     color: var(--ink);
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: 21px;
-    letter-spacing: -0.01em;
+    font-size: 24px;
+    letter-spacing: -0.03em;
     min-height: 44px;
+    text-decoration: none;
   }
   .brand img { border-radius: 8px; }
-  .brand:hover { text-decoration: none; }
   nav { display: flex; align-items: center; gap: var(--space-lg); }
   nav a {
     color: var(--ink-2);
@@ -56,9 +55,10 @@ const home = pathFor('');
     min-height: 44px;
     display: inline-flex;
     align-items: center;
+    text-decoration: none;
   }
-  nav a:hover { color: var(--ink); text-decoration: none; }
-  @media (max-width: 560px) {
+  nav a:hover { color: var(--ink); }
+  @media (max-width: 760px) {
     nav { gap: var(--space-md); }
     nav a[href*="#"] { display: none; }
   }

@@ -14,6 +14,10 @@ interface Props {
 
 const { title, description, slug, ogImage = '/og-image.jpg', structuredData = [] } = Astro.props;
 
+// Match --bg in src/styles/global.css (light :root, dark media block).
+const THEME_COLOR = { light: '#F4F6FB', dark: '#040A1C' };
+const PRELOAD_FONTS = ['/fonts/bricolage-grotesque-latin.woff2', '/fonts/figtree-latin.woff2'];
+
 // A page outside SITE_PAGES (the 404) has no slug, so it gets no canonical URL and stays out of search.
 const noindex = slug === undefined;
 const canonical = noindex ? undefined : `${siteOrigin}${pathFor(slug)}`;
@@ -54,8 +58,9 @@ else if (slug !== undefined) schemas = [...structuredData, breadcrumb(title, slu
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#090c1a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content={THEME_COLOR.light} media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content={THEME_COLOR.dark} media="(prefers-color-scheme: dark)" />
+    {PRELOAD_FONTS.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
 
     {schemas.map((s) => (
       <script type="application/ld+json" set:html={JSON.stringify(s)} />

@@ -68,14 +68,26 @@ Those repos are the source of truth for copy, colours and claims.
   site". Name a data source (Aviasales, Travelpayouts) only in `privacy.ts` and `terms.ts`, the legal
   disclosures of the data source, cookies, partner identifier and commission; never in marketing or support copy
   (`npm test` checks every other page and the JS bundle). Airlines (carriers) may be named anywhere.
+- **Value, not mechanics**, outside the legal pages: no cache, Keychain, RevenueCat, server, background,
+  bundle id, nor search limits such as "up to 8" cities. `LEGAL_ONLY` in `scripts/check-legal.mjs` bans them
+  on every other page, in `llms.txt` and in the JS bundle.
 - **No em dashes in published copy.** British spelling.
 
 ## Design
 - Follows the system colour scheme, as the app does (it uses iOS semantic colours). Light tokens
   on bare `:root`, dark in the `prefers-color-scheme` media query; there is no theme toggle. Never
   declare a colour only inside a media block.
-- `--brand` is the app's `AccentColor`; `--grad` is sampled from the icon
-  (`ios-ffly/design/icon/icon-a-gradient.png`). System rounded display stack, no webfont.
+- **Owner rule: only the icon's colours** (navy, gold, red, white, black) and their tints and shades, as
+  primitives at the top of `src/styles/global.css`; no other hue, no gradients. **Gold stays yellow**
+  (`#F2C14E`, tint `#FCEFCB`), never darkened. On a light background gold is only a fill (with navy text),
+  an underline of 2px or more, or a highlight; light-mode links and accents are navy. Dark mode may use
+  gold as text and accent. Red is for the boarding-pass stamp and errors only.
+- The home hero map is always a night map, in both schemes. Its geometry is computed at build time in
+  `src/components/RouteMap.astro` from `src/data/europe-map.json` (regenerate: README); the fly is SVG
+  `<animateMotion>`, so the home page ships no JavaScript. Label offsets there are hand-placed for
+  `EXAMPLE_TRIP`: a new example needs new ones, and a new city needs a point in `scripts/europe-map.py`.
+- Fonts are self-hosted latin woff2 in `public/fonts/`: Bricolage Grotesque (display), Figtree (body),
+  IBM Plex Mono (data).
 - `og:image:width/height` in `BaseLayout` match `public/og-image.jpg` (1200x675). Change both together.
 - **No `favicon.svg`**: an SVG icon silently outranks every PNG.
 - Hyphenated words in large headings go in `<span class="nw">` so they do not break at the hyphen.
