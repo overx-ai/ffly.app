@@ -23,9 +23,9 @@ export const TERMS: LegalDocument = {
   summaryText: `ffly helps you plan cheap multi-city trips. It is a search tool, not a travel agent: fares come
     from third-party airline and fare-search websites, prices are indicative, and <strong>Book</strong> opens the
     airline's site or a booking site such as Aviasales, where you book. Some booking links are partner links: ffly
-    may earn a commission, at no extra cost to you. ${APP.proName} is available as a weekly or yearly auto-renewing subscription,
-    which you manage and cancel in your Apple ID account settings, or as a one-time ${APP.lifetimeName} purchase
-    that does not renew.`,
+    may earn a commission, at no extra cost to you. ${APP.proName} is available as a weekly or yearly auto-renewing
+    subscription, which you manage and cancel in your Apple ID account settings, or as a one-time ${APP.lifetimeName}
+    purchase that does not renew.`,
   sections: [
     {
       id: 'agreement',
@@ -55,9 +55,9 @@ export const TERMS: LegalDocument = {
         <p>ffly is an information tool. We are not a travel agent, tour operator or airline, we do not sell tickets,
         and we are not a party to any booking you make. When you tap <strong>Book</strong>, the airline's site or a
         booking site such as Aviasales opens, and any booking is made with that company under its own terms and
-        conditions.
-        That company alone is responsible for the flight, its price, fees, schedule changes, cancellations, refunds,
-        baggage and other conditions of carriage. Entry, visa and health requirements are your responsibility.</p>
+        conditions. That company alone is responsible for the flight, its price, fees, schedule changes,
+        cancellations, refunds, baggage and other conditions of carriage. Entry, visa and health requirements are
+        your responsibility.</p>
         <p><strong>Partner links.</strong> Some booking links, such as those to Aviasales, are partner links. If you
         book through one, ffly may earn a commission, at no extra cost to you.</p>`,
     },

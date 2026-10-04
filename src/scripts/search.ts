@@ -386,7 +386,7 @@ function insightsLine(i: Insights): string {
 }
 
 function coverageLine(sources: SearchView['sources']): string {
-  return (sources ?? []).some((s) => s.status !== 'ok') ? MESSAGES.coverage : '';
+  return sources?.some((s) => s.status !== 'ok') ? MESSAGES.coverage : '';
 }
 
 function fillRouteCard(card: HTMLElement, route: Route): HTMLElement {
