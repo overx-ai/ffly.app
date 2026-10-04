@@ -50,6 +50,12 @@ for (const type of NOT_LINKED) {
 }
 check(!/not linked to your identity/.test(privacy('searches')), 'Privacy: trip searches must not be called unlinked');
 
+const feedbackNum = readHtml('privacy').match(/id="feedback"[^>]*>\s*<h2[^>]*><span class="num"[^>]*>0*(\d+)</)?.[1];
+check(
+  feedbackNum !== undefined && readHtml('support').includes(`href="/privacy#feedback">Section ${feedbackNum} `),
+  'Support: the delete-my-data answer must link the privacy feedback section by its number',
+);
+
 const DATED_PAGES = ['support', 'privacy', 'terms'];
 const displayDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
 const sitemap = readFileSync(`${DIST}sitemap.xml`, 'utf8');

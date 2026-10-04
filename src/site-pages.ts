@@ -10,7 +10,7 @@
 // listing (fastlane/metadata/*/{marketing,support,privacy}_url.txt) point at them.
 export const SITE_PAGES = [
   { slug: '',        lastmod: '2026-10-03' },
-  { slug: 'support', lastmod: '2026-10-03' },
+  { slug: 'support', lastmod: '2026-10-04' },
   { slug: 'privacy', lastmod: '2026-10-04' },
   { slug: 'terms',   lastmod: '2026-10-04' },
   { slug: 'search',  lastmod: '2026-10-03' },

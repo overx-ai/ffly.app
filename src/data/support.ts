@@ -1,5 +1,6 @@
 import { APP, CONTACT_EMAIL, EXTERNAL, SERVICE, externalLink, mailto } from '../app';
 import { pathFor } from '../site-pages';
+import { PRIVACY } from './privacy';
 import type { FaqItem } from './types';
 
 export const SUPPORT = {
@@ -7,6 +8,8 @@ export const SUPPORT = {
   description:
     'Help with ffly: restoring purchases, cancelling ffly Pro, why fares are indicative, blurred routes on the Free plan, and deleting your data.',
 } as const;
+
+const feedbackSection = PRIVACY.sections.findIndex((s) => s.id === 'feedback') + 1;
 
 export const SUPPORT_FAQ: readonly FaqItem[] = [
   {
@@ -57,7 +60,10 @@ export const SUPPORT_FAQ: readonly FaqItem[] = [
     question: 'How do I delete my data?',
     answer: `<p>ffly has no account. Swipe a trip in the Trips list to delete it, and uninstall the app to clear
       the rest of the data on your device, except the free-search counter that iOS keeps in the Keychain. Searches
-      on our server expire on their own within ${SERVICE.searchRetentionHours} hours. See the
-      <a href="${pathFor('privacy')}">Privacy Policy</a> for details, or write to ${mailto(CONTACT_EMAIL)}.</p>`,
+      on our server expire on their own within ${SERVICE.searchRetentionHours} hours, and Apple and RevenueCat keep
+      purchase records as needed for refunds and accounting.</p>
+      <p>To delete feedback you sent, and the email address if you added one, write to ${mailto(CONTACT_EMAIL)} from
+      that address or tell us roughly when you sent it, as
+      <a href="${pathFor('privacy')}#feedback">Section ${feedbackSection} of the Privacy Policy</a> describes.</p>`,
   },
 ];
