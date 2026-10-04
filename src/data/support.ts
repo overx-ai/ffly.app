@@ -39,10 +39,9 @@ export const SUPPORT_FAQ: readonly FaqItem[] = [
   },
   {
     question: 'Why are prices indicative?',
-    answer: `<p>ffly checks fares on airline and fare-search websites at a point in time, and some fares come from a
-      cache and may be up to a week old. Fares change often and
-      may not include baggage or other fees, so always confirm the final price where you book: Book opens the
-      airline's site or a booking site.</p>`,
+    answer: `<p>ffly checks fares on airline and fare-search websites at a point in time, and some fares were found
+      earlier and may be up to a week old. Fares change often and may not include baggage or other fees, so always
+      confirm the final price where you book: Book opens the airline's site or a booking site.</p>`,
   },
   {
     question: 'Why are some routes blurred?',
@@ -57,9 +56,9 @@ export const SUPPORT_FAQ: readonly FaqItem[] = [
   {
     question: 'How do I delete my data?',
     answer: `<p>ffly has no account. Swipe a trip in the Trips list to delete it, and uninstall the app to clear
-      the rest of the data on your device, except the free-search counter that iOS keeps in the Keychain. Searches
-      on our server expire on their own within ${SERVICE.searchRetentionHours} hours, and Apple and RevenueCat keep
-      purchase records as needed for refunds and accounting.</p>
+      the rest of the data on your device, except the free-search counter, which stays on your iPhone after you
+      uninstall. Your searches are deleted within ${SERVICE.searchRetentionHours} hours. Apple, and the service that
+      manages ${APP.proName} purchases for us, keep purchase records as needed for refunds and accounting.</p>
       <p>To delete feedback you sent, and the email address if you added one, write to ${mailto(CONTACT_EMAIL)} from
       that address or tell us roughly when you sent it, as
       <a href="${pathFor('privacy')}#feedback">Section 8 of the Privacy Policy</a> describes.</p>`,

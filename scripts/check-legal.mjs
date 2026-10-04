@@ -114,21 +114,27 @@ check(
   'vercel.json: CSP connect-src must allow the API host the search bundle calls (SERVICE.apiHost)',
 );
 
-// Only the legal pages name a fare source. Sources that are also carriers (Ryanair, Volotea...) are left out:
-// a carrier is shown wherever a flight is, so banning it would block legitimate UI.
+// Only the legal pages name a fare source or describe how ffly works inside. Sources that are also carriers
+// (Ryanair, Volotea...) are left out: a carrier is shown wherever a flight is, so banning it would block legitimate UI.
 const BUNDLE_COPY = { 'coverage notice': "Some fares couldn't be checked right now.", 'poll retry line': 'Reconnecting…' };
-const FARE_SOURCE_NAMES = ['AZair', 'Aviasales', 'Travelpayouts'];
+const LEGAL_ONLY = [
+  ...['AZair', 'Aviasales', 'Travelpayouts'].map((name) => [name, `the fare source ${name}`]),
+  ...['cache', 'Keychain', 'RevenueCat', 'server', 'background', 'bundle id', 'ai.overx.ffly'].map((term) => [term, `the technical term "${term}"`]),
+  ...['up to 8', 'up to 3 places', 'must or a maybe'].map((phrase) => [phrase, `the mechanics phrase "${phrase}"`]),
+].map(([term, what]) => [new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i'), what]);
 const LEGAL_FILES = ['privacy/index.html', 'terms/index.html'];
 for (const [what, copy] of Object.entries(BUNDLE_COPY)) {
   check(bundle.includes(copy), `Search bundle: ${what} "${copy}" missing`);
 }
+// Inlined CSS is not copy, and words like "background" are CSS properties.
+const withoutCss = (html) => html.replace(/<style\b[\s\S]*?<\/style>/g, '').replace(/\sstyle="[^"]*"/g, '');
 const otherPages = htmlFiles
   .filter((file) => !LEGAL_FILES.includes(file))
-  .map((file) => [file, copyText(readFileSync(`${DIST}${file}`, 'utf8'))]);
+  .map((file) => [file, copyText(withoutCss(readFileSync(`${DIST}${file}`, 'utf8')))]);
 const llms = copyText(readFileSync(`${DIST}llms.txt`, 'utf8'));
 for (const [where, text] of [['Search bundle', bundle], ['llms.txt', llms], ...otherPages]) {
-  for (const name of FARE_SOURCE_NAMES) {
-    check(!new RegExp(name, 'i').test(text), `${where}: must not name the fare source ${name}`);
+  for (const [pattern, what] of LEGAL_ONLY) {
+    check(!pattern.test(text), `${where}: must not name ${what}`);
   }
 }
 // Book opens the airline's site or a booking site, so no page may promise the airline's own site.

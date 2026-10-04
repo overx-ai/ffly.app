@@ -9,11 +9,11 @@
 // /, /support, /privacy and /terms are fixed: the iOS app (LegalLinks.swift) and the App Store
 // listing (fastlane/metadata/*/{marketing,support,privacy}_url.txt) point at them.
 export const SITE_PAGES = [
-  { slug: '',        lastmod: '2026-10-04' },
-  { slug: 'support', lastmod: '2026-10-04' },
+  { slug: '',        lastmod: '2026-10-05' },
+  { slug: 'support', lastmod: '2026-10-05' },
   { slug: 'privacy', lastmod: '2026-10-04' },
   { slug: 'terms',   lastmod: '2026-10-04' },
-  { slug: 'search',  lastmod: '2026-10-04' },
+  { slug: 'search',  lastmod: '2026-10-05' },
 ] as const;
 
 export type Slug = (typeof SITE_PAGES)[number]['slug'];

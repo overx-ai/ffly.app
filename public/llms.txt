@@ -6,23 +6,23 @@
 > and more, and you book each flight on the airline's site or a booking site.
 
 ## Pages
-- [Home](https://ffly.app/): what the app does, how a search works, Free and ffly Pro.
+- [Home](https://ffly.app/): what the app does, an example search, Free and ffly Pro.
 - [Web search](https://ffly.app/search): try a search in the browser, free, once a day; shows the
   top route's cities, nights and total price. The app shows every route in full.
 - [Support](https://ffly.app/support): restoring a purchase, cancelling ffly Pro, why fares
   are indicative, blurred routes on Free, deleting data.
-- [Privacy](https://ffly.app/privacy): no account, no location, no IDFA, no ads; what the
-  server receives and for how long; anonymous analytics.
+- [Privacy](https://ffly.app/privacy): no account, no location, no IDFA, no ads; what we
+  receive and for how long; anonymous analytics.
 - [Terms](https://ffly.app/terms): not a travel agent, indicative fares, the ffly Pro
   auto-renewable subscription terms, Apple's Standard EULA.
 
 ## Facts
-- Platform: iPhone, iOS 17.0 or later. Bundle id ai.overx.ffly. Created by OverX AI (https://overx.ai).
-- A search takes a start, up to 3 places to finish and up to 8 cities, each a must or a maybe,
-  plus a date window, nights per city and a priority (best schedule, lowest price, or a balance).
+- Platform: iPhone, iOS 17.0 or later. Created by OverX AI (https://overx.ai).
+- You choose where you start and finish, the cities to see, your dates, how long to stay in each
+  and what matters most (best schedule, lowest price, or a balance).
 - Free: 3 searches in the app, showing the cities, the days in each and the total price.
-- Web search at ffly.app/search: free, 1 search per day per network, showing the cities, nights and total
-  price of the top route, and only the price and number of cities of the other routes.
+- Web search at ffly.app/search: free, once a day, showing the cities, nights and total price of
+  the top route, and only the price and number of cities of the other routes.
 - ffly Pro: every route in full (dates, flight times, airlines, booking links) and no 3-search
   limit. Weekly and yearly auto-renewable subscriptions, or a one-time Lifetime purchase that does
   not renew. No free trial. Priced in the app.

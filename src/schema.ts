@@ -20,10 +20,11 @@ export function appSchema() {
     creator: overx,
     publisher: overx,
     featureList: [
-      'Finds the cheapest order and dates for a multi-city trip',
-      'Schedule-aware routes that favour sensible flight times',
+      'The cheapest order and dates for a trip to several cities',
+      'Favours sensible flight times over pre-dawn wake-ups and midnight landings',
       `Fares from ${APP.airlines.join(', ')} and more`,
-      "Booking links open the airline's site or a booking site",
+      'Routes ranked by what matters to you: schedule, price or a balance',
+      "Book each flight on the airline's site or a booking site",
     ],
   };
 }
