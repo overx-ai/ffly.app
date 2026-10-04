@@ -5,22 +5,12 @@ import Footer from '../components/Footer.astro';
 import AppStoreBadge from '../components/AppStoreBadge.astro';
 import AdSlot from '../components/AdSlot.astro';
 import { APP } from '../app';
-import { pathFor } from '../site-pages';
-import { breadcrumb } from '../schema';
 import '../styles/search.css';
-
-const site = Astro.site?.href.replace(/\/$/, '') ?? '';
-const title = 'Search cheap multi-city trips';
-const crumbs = breadcrumb(site, [
-  { name: 'Home', path: pathFor('') },
-  { name: title, path: pathFor('search') },
-]);
 ---
 <BaseLayout
-  title={title}
+  title="Search cheap multi-city trips"
   description="Pick the cities you want to see. ffly finds the cheapest order and dates to visit them all, free on the web, with live fares."
   slug="search"
-  structuredData={[crumbs]}
 >
   <Header />
 

@@ -7,7 +7,6 @@ import { APP, EXAMPLE_TRIP, PRIORITIES } from '../app';
 import { pathFor } from '../site-pages';
 import { appSchema, organizationSchema } from '../schema';
 
-const site = Astro.site?.href.replace(/\/$/, '') ?? '';
 const airlines = `${APP.airlines.slice(0, -1).join(', ')}, ${APP.airlines.at(-1)}`;
 const listOf = (items: readonly string[]) => `${items.slice(0, -1).join(', ')} or ${items.at(-1)}`;
 
@@ -83,7 +82,7 @@ const plans = [
   title="ffly: cheap multi-city trips for iPhone"
   description={`Pick the cities you want to see. ffly finds the cheapest order and dates, favours sensible flight times, and checks fares from ${airlines} and more.`}
   slug=""
-  structuredData={[appSchema(site), organizationSchema(site)]}
+  structuredData={[appSchema(), organizationSchema()]}
 >
   <Header />
 

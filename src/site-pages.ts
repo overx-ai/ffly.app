@@ -18,6 +18,9 @@ export const SITE_PAGES = [
 
 export type Slug = (typeof SITE_PAGES)[number]['slug'];
 
+// The build's `site` (astro.config.mjs, PUBLIC_SITE_URL), with no trailing slash.
+export const siteOrigin = import.meta.env.SITE.replace(/\/$/, '');
+
 export const pathFor = (slug: Slug) => (slug ? `/${slug}` : '/');
 
 const displayDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });

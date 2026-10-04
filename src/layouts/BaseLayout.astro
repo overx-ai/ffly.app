@@ -1,8 +1,8 @@
 ---
 import '../styles/global.css';
 import { APP, APP_STORE_ID } from '../app';
-import { pathFor, type Slug } from '../site-pages';
-import { websiteSchema } from '../schema';
+import { pathFor, siteOrigin, type Slug } from '../site-pages';
+import { breadcrumb, websiteSchema } from '../schema';
 
 interface Props {
   title: string;
@@ -14,13 +14,15 @@ interface Props {
 
 const { title, description, slug, ogImage = '/og-image.jpg', structuredData = [] } = Astro.props;
 
-const site = Astro.site?.href.replace(/\/$/, '') ?? '';
 // A page outside SITE_PAGES (the 404) has no slug, so it gets no canonical URL and stays out of search.
 const noindex = slug === undefined;
-const canonical = noindex ? undefined : `${site}${pathFor(slug)}`;
+const canonical = noindex ? undefined : `${siteOrigin}${pathFor(slug)}`;
 // The home title already names the brand; suffixing it would render "ffly ... | ffly".
 const fullTitle = slug === '' ? title : `${title} | ${APP.name}`;
-const schemas = slug === '' ? [websiteSchema(site), ...structuredData] : structuredData;
+const schemas =
+  slug === undefined ? structuredData
+  : slug === '' ? [websiteSchema(), ...structuredData]
+  : [...structuredData, breadcrumb(title, slug)];
 ---
 <!doctype html>
 <html lang="en">
@@ -39,7 +41,7 @@ const schemas = slug === '' ? [websiteSchema(site), ...structuredData] : structu
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}
-    <meta property="og:image" content={`${site}${ogImage}`} />
+    <meta property="og:image" content={`${siteOrigin}${ogImage}`} />
     <!-- Hardcoded to match public/og-image.jpg. Change both together. -->
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="675" />

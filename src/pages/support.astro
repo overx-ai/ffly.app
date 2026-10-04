@@ -5,18 +5,9 @@ import Footer from '../components/Footer.astro';
 import { SUPPORT, SUPPORT_FAQ } from '../data/support';
 import { CONTACT_EMAIL } from '../app';
 import { lastUpdated, pathFor } from '../site-pages';
-import { breadcrumb, faqSchema } from '../schema';
-
-const site = Astro.site?.href.replace(/\/$/, '') ?? '';
-const schemas = [
-  faqSchema(SUPPORT_FAQ),
-  breadcrumb(site, [
-    { name: 'Home', path: pathFor('') },
-    { name: SUPPORT.pageTitle, path: pathFor('support') },
-  ]),
-];
+import { faqSchema } from '../schema';
 ---
-<BaseLayout title={SUPPORT.pageTitle} description={SUPPORT.description} slug="support" structuredData={schemas}>
+<BaseLayout title={SUPPORT.pageTitle} description={SUPPORT.description} slug="support" structuredData={[faqSchema(SUPPORT_FAQ)]}>
   <Header />
   <main id="main" class="container page">
     <h1>Support</h1>

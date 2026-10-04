@@ -1,19 +1,20 @@
 import { APP, APP_STORE_URL, DEVELOPER, PUBLISHER } from './app';
+import { pathFor, siteOrigin, type Slug } from './site-pages';
 
 // No offers.price and no aggregateRating. Prices are territory-set and the app has no
 // ratings yet, so quoting either would be a claim the store does not back.
 
 const overx = { '@type': 'Organization', name: PUBLISHER.name, url: PUBLISHER.url };
 
-export function appSchema(site: string) {
+export function appSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'MobileApplication',
     name: APP.storeName,
     operatingSystem: `iOS ${APP.minimumOs} or later`,
     applicationCategory: 'TravelApplication',
-    url: `${site}/`,
-    image: `${site}/icon-512.png`,
+    url: `${siteOrigin}/`,
+    image: `${siteOrigin}/icon-512.png`,
     ...(APP_STORE_URL ? { installUrl: APP_STORE_URL, downloadUrl: APP_STORE_URL } : {}),
     author: { '@type': 'Person', name: DEVELOPER, url: PUBLISHER.url },
     creator: overx,
@@ -27,28 +28,29 @@ export function appSchema(site: string) {
   };
 }
 
-export function organizationSchema(site: string) {
+export function organizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: APP.name,
-    url: `${site}/`,
-    logo: `${site}/icon-512.png`,
+    url: `${siteOrigin}/`,
+    logo: `${siteOrigin}/icon-512.png`,
     parentOrganization: overx,
   };
 }
 
-export function websiteSchema(site: string) {
+export function websiteSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: APP.name,
-    url: `${site}/`,
+    url: `${siteOrigin}/`,
     creator: overx,
   };
 }
 
-export function breadcrumb(site: string, items: { name: string; path: string }[]) {
+export function breadcrumb(name: string, slug: Slug) {
+  const items: { name: string; slug: Slug }[] = [{ name: 'Home', slug: '' }, { name, slug }];
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -56,7 +58,7 @@ export function breadcrumb(site: string, items: { name: string; path: string }[]
       '@type': 'ListItem',
       position: i + 1,
       name: it.name,
-      item: `${site}${it.path}`,
+      item: `${siteOrigin}${pathFor(it.slug)}`,
     })),
   };
 }

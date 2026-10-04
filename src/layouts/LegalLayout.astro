@@ -2,20 +2,14 @@
 import BaseLayout from './BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { breadcrumb } from '../schema';
-import { lastUpdated, pathFor, type Slug } from '../site-pages';
+import { lastUpdated, type Slug } from '../site-pages';
 import type { LegalDocument } from '../data/types';
 
 interface Props extends LegalDocument { slug: Slug; }
 
 const { slug, pageTitle, description, summaryTitle, summaryText, sections } = Astro.props;
-const site = Astro.site?.href.replace(/\/$/, '') ?? '';
-const crumbs = breadcrumb(site, [
-  { name: 'Home', path: pathFor('') },
-  { name: pageTitle, path: pathFor(slug) },
-]);
 ---
-<BaseLayout title={pageTitle} description={description} slug={slug} structuredData={[crumbs]}>
+<BaseLayout title={pageTitle} description={description} slug={slug}>
   <Header />
   <main id="main" class="container page legal">
     <h1>{pageTitle}</h1>
