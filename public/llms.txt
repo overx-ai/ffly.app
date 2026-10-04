@@ -16,6 +16,15 @@
 - [Terms](https://ffly.app/terms): not a travel agent, indicative fares, the ffly Pro
   auto-renewable subscription terms, Apple's Standard EULA.
 
+## Guides
+- [Guides](https://ffly.app/guides): articles on planning a cheap trip to several cities.
+- [The cheapest order to visit cities on a multi-city trip](https://ffly.app/guides/cheapest-order-to-visit-cities):
+  why the order and dates change the total on low-cost airlines, how to find the cheapest order
+  step by step, and a real five-city example.
+- [Multi-city vs one-way tickets on Europe's budget airlines](https://ffly.app/guides/multi-city-vs-one-way-tickets):
+  multi-city tickets, separate one-ways, open jaw and the airlines' own multi-city tools compared,
+  and how to book separate flights safely.
+
 ## Facts
 - Platform: iPhone, iOS 17.0 or later. Created by OverX AI (https://overx.ai).
 - You choose where you start and finish, the cities to see, your dates, how long to stay in each

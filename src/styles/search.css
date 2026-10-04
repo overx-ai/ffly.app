@@ -166,6 +166,7 @@
   font-size: 15px;
 }
 .search-page .quiet { color: var(--ink-2); font-size: 13px; }
+.search-page .guide-link { color: var(--ink-2); font-size: 14px; }
 
 .search-page .route .price {
   font-family: var(--font-display);

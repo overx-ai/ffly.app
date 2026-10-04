@@ -2,11 +2,11 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import AppStoreBadge from '../components/AppStoreBadge.astro';
+import StoreCtas from '../components/StoreCtas.astro';
 import RouteMap from '../components/RouteMap.astro';
 import BoardingPass from '../components/BoardingPass.astro';
 import { APP, EXAMPLE_TRIP, PRIORITIES, WEB_SEARCH } from '../app';
-import { pathFor } from '../site-pages';
+import { pageLink, pathFor } from '../site-pages';
 import { appSchema, faqSchema, organizationSchema } from '../schema';
 import type { FaqItem } from '../data/types';
 
@@ -72,7 +72,7 @@ const faq: FaqItem[] = [
   },
   {
     question: 'How is it different from searching flights one by one?',
-    answer: `Booking the cheapest next flight each time can leave you with an expensive trip overall. ${APP.name} compares whole routes, so the total is what gets cheaper.`,
+    answer: `Booking the cheapest next flight each time can leave you with an expensive trip overall. ${APP.name} compares whole routes, so the total is what gets cheaper. See ${pageLink('guides/cheapest-order-to-visit-cities', 'how to find the cheapest order to visit cities')}.`,
   },
   {
     question: `Which airlines does ${APP.name} cover?`,
@@ -84,7 +84,7 @@ const faq: FaqItem[] = [
   },
   {
     question: `Does ${APP.name} sell tickets?`,
-    answer: `No. ${APP.name} is a search tool, not a travel agent. Fares are indicative, so confirm the final price where you book.`,
+    answer: `No. ${APP.name} is a search tool, not a travel agent. Fares are indicative, so confirm the final price where you book. Weighing up one booking against several? Read ${pageLink('guides/multi-city-vs-one-way-tickets', 'multi-city vs one-way tickets')}.`,
   },
   {
     question: 'Is there an Android app?',
@@ -109,10 +109,7 @@ const faq: FaqItem[] = [
             Tell {APP.name} the cities you want to see. It finds the order and the dates that make the whole trip cost the
             least, and favours flight times you can live with.
           </p>
-          <div class="ctas">
-            <AppStoreBadge />
-            <a class="web" href={pathFor('search')}>Try a search free on the web</a>
-          </div>
+          <StoreCtas />
           <p class="airlines">Fares from {airlines} and more</p>
         </div>
         <figure class="hero-map">
@@ -166,7 +163,7 @@ const faq: FaqItem[] = [
         {faq.map((item) => (
           <details>
             <summary>{item.question}</summary>
-            <div><p>{item.answer}</p></div>
+            <div><p set:html={item.answer} /></div>
           </details>
         ))}
       </div>
@@ -175,10 +172,7 @@ const faq: FaqItem[] = [
     <section class="close">
       <div class="container close-inner">
         <h2>Pick the cities. {APP.name} finds the trip.</h2>
-        <div class="ctas">
-          <AppStoreBadge />
-          <a class="web" href={pathFor('search')}>Try a search free on the web</a>
-        </div>
+        <StoreCtas />
       </div>
     </section>
   </main>
@@ -200,19 +194,6 @@ const faq: FaqItem[] = [
     letter-spacing: -0.045em;
   }
   .sub { font-size: clamp(17px, 1.6vw, 20px); color: var(--ink-2); max-width: 36ch; margin: 20px 0 28px; }
-  .ctas { display: flex; flex-wrap: wrap; gap: 12px 22px; align-items: center; }
-  .web {
-    font-weight: 700;
-    font-size: 15px;
-    color: var(--ink);
-    border-bottom: 2px solid var(--gold);
-    text-decoration: none;
-    padding-bottom: 2px;
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-  }
-  .web:hover { text-decoration: none; border-bottom-color: var(--ink); }
   .airlines { margin-top: 26px; font-size: 14px; color: var(--ink-2); }
 
   .hero-map { margin: 0; min-width: 0; }
@@ -287,7 +268,13 @@ const faq: FaqItem[] = [
   }
   .home-faq details:last-child { border-bottom: 0; }
 
-  .close { background: var(--night); color: var(--on-night); --store-bg: var(--on-night); --store-ink: var(--night); }
+  .close {
+    background: var(--night);
+    color: var(--on-night);
+    --store-bg: var(--on-night);
+    --store-ink: var(--night);
+    --web-ink: var(--on-night);
+  }
   .close-inner {
     padding-block: clamp(56px, 9vw, 112px);
     display: flex;
@@ -302,8 +289,6 @@ const faq: FaqItem[] = [
     letter-spacing: -0.045em;
     max-width: 15ch;
   }
-  .close .web { color: var(--on-night); }
-  .close .web:hover { border-bottom-color: var(--on-night); }
 
   @media (max-width: 900px) {
     .pass-wrap { grid-template-columns: minmax(0, 1fr); }

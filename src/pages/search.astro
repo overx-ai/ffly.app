@@ -4,6 +4,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import AppStoreBadge from '../components/AppStoreBadge.astro';
 import { APP } from '../app';
+import { pageLink } from '../site-pages';
 import '../styles/search.css';
 ---
 <BaseLayout
@@ -78,6 +79,8 @@ import '../styles/search.css';
       </fieldset>
       <datalist id="places"></datalist>
     </form>
+
+    <p class="guide-link" set:html={`Read ${pageLink('guides/cheapest-order-to-visit-cities', 'how to find the cheapest order to visit cities')}.`} />
 
     <div id="problem" class="card problem" role="alert" hidden>
       <p id="problem-text"></p>
