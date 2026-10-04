@@ -1,4 +1,4 @@
-import { FARE_SOURCES, WEB_SEARCH } from '../app';
+import { WEB_SEARCH } from '../app';
 import {
   ACTIVE,
   NotFound,
@@ -60,8 +60,7 @@ const MESSAGES = {
   more: (n: number) => `${n} more ${plural(n, 'route', 'routes')} in the app`,
   removeCity: (name: string) => `Remove ${name}`,
   rank: (n: number) => `Route ${n}`,
-  sourceDown: (name: string) => `${name} prices unavailable right now.`,
-  sourcePartial: (name: string) => `Some ${name} prices unavailable right now.`,
+  coverage: "Some fares couldn't be checked right now.",
   trip: (start: string, cities: string, finish: string, from: string, to: string) =>
     `${start} to ${cities}${finish}. ${from} to ${to}.`,
   finishingIn: (name: string) => `, finishing in ${name}`,
@@ -387,13 +386,7 @@ function insightsLine(i: Insights): string {
 }
 
 function coverageLine(sources: SearchView['sources']): string {
-  return (sources ?? [])
-    .filter((s) => s.status !== 'ok')
-    .map((s) => {
-      const name = FARE_SOURCES[s.source] ?? s.source;
-      return s.status === 'unavailable' ? MESSAGES.sourceDown(name) : MESSAGES.sourcePartial(name);
-    })
-    .join(' ');
+  return (sources ?? []).some((s) => s.status !== 'ok') ? MESSAGES.coverage : '';
 }
 
 function fillRouteCard(card: HTMLElement, route: Route): HTMLElement {

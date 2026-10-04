@@ -47,8 +47,8 @@ nginx image, no k8s manifests, no DNS, and no Vercel rewrite. The API already al
 - **Results (Free, locked):** route 1 shows the city chain, nights and total price; routes 2+ show price and city
   count (exactly what the API returns: render only fields that are present, never invent them). Insights line
   when `insights` is present. `more_routes` and every locked route lead to the App Store upsell: `APP_STORE_URL`
-  when set, otherwise "Coming soon to the App Store". Source coverage: a quiet line naming sources that were
-  `partial|unavailable` ("Wizz Air prices unavailable right now").
+  when set, otherwise "Coming soon to the App Store". Source coverage: one quiet generic line when any source was
+  `partial|unavailable` ("Some fares couldn't be checked right now."), never naming a source.
 - **Errors, in plain words:** quota reached (429 or 402 `subscription_required`): "You've used today's free web
   searches. The app has more." City limit (402 `city_limit`): "The free web search takes up to N cities."
   `failed`, or the network is down: retry button. No raw server text shown.

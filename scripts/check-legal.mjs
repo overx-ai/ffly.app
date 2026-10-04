@@ -112,6 +112,14 @@ check(
   'vercel.json: CSP connect-src must allow the API host the search bundle calls (SERVICE.apiHost)',
 );
 
+// /search shows one generic coverage notice and never names a fare source.
+const COVERAGE_NOTICE = "Some fares couldn't be checked right now.";
+const FARE_SOURCE_NAMES = ['Ryanair', 'Wizz Air', 'airBaltic', 'Volotea', 'AZair', 'Aviasales', 'Travelpayouts'];
+check(bundle.includes(COVERAGE_NOTICE), `Search bundle: coverage notice "${COVERAGE_NOTICE}" missing`);
+for (const name of FARE_SOURCE_NAMES) {
+  check(!bundle.includes(name), `Search bundle: must not name the fare source ${name}`);
+}
+
 if (failures.length) {
   console.error(`check-legal: ${failures.length} failed\n- ${failures.join('\n- ')}`);
   process.exit(1);

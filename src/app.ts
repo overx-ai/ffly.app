@@ -86,16 +86,6 @@ export const WEB_SEARCH = {
   maxNights: 4,
 } as const;
 
-// Display names for the API's `sources[].source` ids.
-export const FARE_SOURCES: Readonly<Record<string, string>> = {
-  ryanair: 'Ryanair',
-  wizz: 'Wizz Air',
-  airbaltic: 'airBaltic',
-  azair: 'AZair',
-  volotea: 'Volotea',
-  aviasales: 'Aviasales',
-};
-
 export const EXTERNAL = {
   appleEula: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
   applePrivacy: 'https://www.apple.com/legal/privacy/',
