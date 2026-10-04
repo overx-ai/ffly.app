@@ -13,10 +13,10 @@ import { pathFor } from '../site-pages';
 import type { LegalDocument } from './types';
 
 // Every collected item here is one row of ios-ffly/Template/PrivacyInfo.xcprivacy and
-// docs/compliance/data-inventory.yaml. Not linked: Purchase History, Product Interaction, Device ID.
-// Linked: Search History and User ID, because every search carries the app user id and feedback can pair
-// that id with an email address, and Email Address (optional) and Customer Support, both from the feedback
-// form (ios-ffly spec 012). No tracking. Change one, change all three, and the App Store Connect privacy
+// docs/compliance/data-inventory.yaml. Not linked: Product Interaction, Device ID. Linked: Search History,
+// Purchase History and User ID, because every search carries the app user id, RevenueCat keeps purchases
+// under it and feedback can pair it with an email address, and Email Address (optional) and Customer
+// Support, both from the feedback form (ios-ffly spec 012). No tracking. Change one, change all three, and the App Store Connect privacy
 // answers. Retention figures come from the ffly API config (job_ttl_seconds, entitlement_ttl_seconds)
 // and are in SERVICE. Feedback facts come from 1B-bots shared/form-aggregator and are in FEEDBACK.
 
@@ -116,7 +116,8 @@ export const PRIVACY: LegalDocument = {
         receives your anonymous app user id and the App Store transaction details of your ${APP.proName} purchases
         (product, dates, status). It does not receive your name, email address or payment card. Our server asks
         RevenueCat only whether your app user id has active ${APP.proName} access. Apple and RevenueCat keep
-        purchase records as needed for entitlement, accounting, refunds and fraud prevention. See the
+        purchase records as needed for entitlement, accounting, refunds and fraud prevention. RevenueCat keeps
+        them under your app user id, so we treat your purchase history as data linked to you. See the
         ${externalLink(EXTERNAL.revenueCatPrivacy, 'RevenueCat Privacy Policy')}.</p>`,
     },
     {
@@ -218,11 +219,12 @@ export const PRIVACY: LegalDocument = {
       content: `
         <ul>
           <li><strong>Data used to track you:</strong> none.</li>
-          <li><strong>Data linked to you:</strong> Search History (trip searches, which carry the app user id), User
-          ID (the anonymous app user id), Email Address (Contact Info), only if you add one to feedback, and Customer
+          <li><strong>Data linked to you:</strong> Search History (trip searches, which carry the app user id),
+          Purchase History (${APP.proName} transactions, kept by Apple and RevenueCat under the app user id), User ID
+          (the anonymous app user id), Email Address (Contact Info), only if you add one to feedback, and Customer
           Support (User Content), the feedback you send.</li>
-          <li><strong>Data not linked to you:</strong> Purchase History (${APP.proName} transactions), Product
-          Interaction (usage events) and Device ID (IDFV and the random install id).</li>
+          <li><strong>Data not linked to you:</strong> Product Interaction (usage events) and Device ID (IDFV and the
+          random install id).</li>
         </ul>`,
     },
     {

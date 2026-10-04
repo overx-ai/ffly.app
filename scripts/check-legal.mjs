@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url';
 
 const DIST = fileURLToPath(new URL('../dist/', import.meta.url));
 
-const LINKED = ['Search History', 'User ID', 'Email Address', 'Customer Support'];
-const NOT_LINKED = ['Purchase History', 'Product Interaction', 'Device ID'];
+const LINKED = ['Search History', 'Purchase History', 'User ID', 'Email Address', 'Customer Support'];
+const NOT_LINKED = ['Product Interaction', 'Device ID'];
 
 const text = (html) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
