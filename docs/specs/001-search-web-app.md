@@ -53,8 +53,8 @@ nginx image, no k8s manifests, no DNS, and no Vercel rewrite. The API already al
   searches. The app has more." City limit (402 `city_limit`): "The free web search takes up to N cities."
   `failed`, or the network is down: retry button. No raw server text shown.
 - **Prices:** `Intl.NumberFormat` with the API's `currency`. Dates: `Intl.DateTimeFormat`, English.
-- **Ads (removed 2026-10-04, T-014; kept as the design for the future ads step):** `ADSENSE_CLIENT` and `ADSENSE_SLOTS` in `src/app.ts`, `undefined` for now. While undefined, nothing
-  ad-related renders and no third-party script loads. When set: fixed-height slots (no layout shift) beside the
+- **Ads (removed 2026-10-04, T-014; kept as the design for the future ads step):** none in code, and the CSP in
+  `vercel.json` blocks any third-party script. The future step: fixed-height slots (no layout shift) beside the
   form, under the progress card, and between result cards, loaded only after consent. The consent banner is
   part of that later step, not this spec.
 - **Privacy:** `/privacy` gains a short "Web search on ffly.app" section. What a web search sends (the trip
@@ -86,7 +86,7 @@ nginx image, no k8s manifests, no DNS, and no Vercel rewrite. The API already al
 - [ ] `npm run build` passes (Astro type-checks the script); `dist/search/index.html` exists and the sitemap lists `/search`.
 - [ ] A real search against production from a `ffly.app`-origin context returns Free routes and renders them, with a 4-city Warsaw→Budapest→… run as the smoke test.
 - [ ] Every other page still ships zero JS (`grep -L '<script' dist/**/index.html` except search).
-- [ ] No AdSense script or request while `ADSENSE_CLIENT` is undefined.
+- [ ] No ad script or request (no ad code ships; `npm test` checks the CSP).
 - [ ] One `/code` pass clean.
 
 ## As built (2026-10-03)
