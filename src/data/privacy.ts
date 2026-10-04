@@ -13,9 +13,9 @@ import { pathFor } from '../site-pages';
 import type { LegalDocument } from './types';
 
 // Every collected item here is one row of ios-ffly/Template/PrivacyInfo.xcprivacy and
-// docs/compliance/data-inventory.yaml. Not linked: Search History, User ID, Purchase History, Product
-// Interaction, Device ID. Linked: Email Address (optional) and Customer Support, both from the feedback
-// form (ios-ffly spec 012). No tracking. Change one, change all three, and the App Store Connect privacy
+// docs/compliance/data-inventory.yaml. Not linked: Search History, Purchase History, Product Interaction,
+// Device ID. Linked: Email Address (optional) and Customer Support, both from the feedback form (ios-ffly
+// spec 012), and User ID, because feedback can pair it with an email address. No tracking. Change one, change all three, and the App Store Connect privacy
 // answers. Retention figures come from the ffly API config (job_ttl_seconds, entitlement_ttl_seconds)
 // and are in SERVICE. Feedback facts come from 1B-bots shared/form-aggregator and are in FEEDBACK.
 
@@ -90,7 +90,9 @@ export const PRIVACY: LegalDocument = {
           <li>tell which feedback messages come from the same installation (Section 8).</li>
         </ul>
         <p>The subscription status (cached for about ${SERVICE.entitlementCacheMinutes} minutes) and the search
-        counters are held in the server's memory only and are lost when the server restarts.</p>`,
+        counters are held in the server's memory only and are lost when the server restarts.</p>
+        <p>On its own the id does not identify you. If you add an email address to feedback, the two travel
+        together, so we treat the app user id as data linked to you.</p>`,
     },
     {
       id: 'ip-address',
@@ -215,9 +217,9 @@ export const PRIVACY: LegalDocument = {
         <ul>
           <li><strong>Data used to track you:</strong> none.</li>
           <li><strong>Data linked to you:</strong> Email Address (Contact Info), only if you add one to feedback, and
-          Customer Support (User Content), the feedback you send.</li>
-          <li><strong>Data not linked to you:</strong> Search History (trip searches), User ID (the anonymous app
-          user id), Purchase History (${APP.proName} transactions), Product Interaction (usage events) and Device ID
+          Customer Support (User Content), the feedback you send, and User ID (the anonymous app user id), which
+          feedback can pair with that email address.</li>
+          <li><strong>Data not linked to you:</strong> Search History (trip searches), Purchase History (${APP.proName} transactions), Product Interaction (usage events) and Device ID
           (IDFV and the random install id).</li>
         </ul>`,
     },
