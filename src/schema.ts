@@ -23,7 +23,7 @@ export function appSchema() {
       'Finds the cheapest order and dates for a multi-city trip',
       'Schedule-aware routes that favour sensible flight times',
       `Fares from ${APP.airlines.join(', ')} and more`,
-      "Booking links to the airline's own website",
+      "Booking links open the airline's site or a booking site such as Aviasales",
     ],
   };
 }

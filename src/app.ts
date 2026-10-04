@@ -14,7 +14,7 @@ export const APP = {
   maxCities: 8,
   maxEnds: 3,
   savedTrips: 20,
-  airlines: ['Ryanair', 'Wizz Air', 'airBaltic'],
+  airlines: ['Ryanair', 'Wizz Air', 'airBaltic', 'Volotea'],
 } as const;
 
 // The priorities the API ranks by (1B-bots apps/ffly-api constants.PRIORITY_PRESETS labels).
@@ -92,6 +92,8 @@ export const FARE_SOURCES: Readonly<Record<string, string>> = {
   wizz: 'Wizz Air',
   airbaltic: 'airBaltic',
   azair: 'AZair',
+  volotea: 'Volotea',
+  aviasales: 'Aviasales',
 };
 
 export const EXTERNAL = {

@@ -43,8 +43,8 @@ export const SUPPORT_FAQ: readonly FaqItem[] = [
   {
     question: 'Why are prices indicative?',
     answer: `<p>ffly checks fares on airline and fare-search websites at a point in time. Fares change often and
-      may not include baggage or other fees, so always confirm the final price on the airline's site before you
-      book.</p>`,
+      may not include baggage or other fees, so always confirm the final price where you book: Book opens the
+      airline's site or a booking site such as Aviasales.</p>`,
   },
   {
     question: 'Why are some routes blurred?',
@@ -53,8 +53,8 @@ export const SUPPORT_FAQ: readonly FaqItem[] = [
   },
   {
     question: 'Is ffly a travel agent?',
-    answer: `<p>No. ffly is a search tool. It does not sell tickets and is not a party to your booking: you book
-      directly with the airline, under its terms.</p>`,
+    answer: `<p>No. ffly is a search tool. It does not sell tickets and is not a party to your booking. Book opens
+      the airline's site or a booking site such as Aviasales, and you book with that company, under its terms.</p>`,
   },
   {
     question: 'How do I delete my data?',

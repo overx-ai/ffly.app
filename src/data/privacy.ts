@@ -75,8 +75,10 @@ export const PRIVACY: LegalDocument = {
         memory only</strong>, never in a database, and are deleted after at most ${SERVICE.searchRetentionHours}
         hours, or sooner when the server restarts. Each search carries your anonymous app user id (Section 4), so
         we treat your searches as data linked to you.</p>
-        <p>Our server checks fares on third-party airline and fare-search websites by itself. Your device does not
-        contact those websites while a search runs, and they receive nothing from you through ffly.</p>`,
+        <p>Our server checks fares on third-party airline and fare-search websites by itself. One of those sources
+        is the Aviasales data API, provided through the Travelpayouts partner programme, which our server queries
+        for cached fares. Your device does not contact those websites or that API while a search runs, and they
+        receive nothing from you through ffly.</p>`,
     },
     {
       id: 'app-user-id',
@@ -209,9 +211,12 @@ export const PRIVACY: LegalDocument = {
       title: 'Booking Links and Third-Party Websites',
       content: `
         <p>Fares come from third-party airline and fare-search websites. When you tap <strong>Book</strong>, the
-        airline's or fare site's page opens in an in-app Safari browser. ffly cannot see what you browse or enter
-        there. Anything you do on that website, including booking and payment, is governed by that website's own
-        terms and privacy policy.</p>`,
+        airline's site or a booking site such as Aviasales opens in an in-app Safari browser. ffly cannot see what
+        you browse or enter there. Anything you do on that website, including booking and payment, is governed by
+        that website's own terms and privacy policy.</p>
+        <p>For some fares, <strong>Book</strong> opens aviasales.com, which sets its own cookies under its own
+        privacy policy. That link carries ffly's partner identifier so that Aviasales can attribute a booking to
+        ffly. It identifies ffly, not you.</p>`,
     },
     {
       id: 'app-store-labels',

@@ -18,11 +18,12 @@ import type { LegalDocument } from './types';
 export const TERMS: LegalDocument = {
   pageTitle: 'Terms of Use',
   description:
-    'Terms of Use for the ffly iPhone app: indicative fares, bookings made on airline sites, the ffly Pro weekly and yearly auto-renewable subscriptions, and the one-time Lifetime purchase.',
+    'Terms of Use for the ffly iPhone app: indicative fares, bookings made on airline or booking sites, partner links, the ffly Pro weekly and yearly auto-renewable subscriptions, and the one-time Lifetime purchase.',
   summaryTitle: 'The short version',
   summaryText: `ffly helps you plan cheap multi-city trips. It is a search tool, not a travel agent: fares come
-    from third-party airline and fare-search websites, prices are indicative, and you book directly on the
-    airline's or fare site's website. ${APP.proName} is available as a weekly or yearly auto-renewing subscription,
+    from third-party airline and fare-search websites, prices are indicative, and <strong>Book</strong> opens the
+    airline's site or a booking site such as Aviasales, where you book. Some booking links are partner links: ffly
+    may earn a commission, at no extra cost to you. ${APP.proName} is available as a weekly or yearly auto-renewing subscription,
     which you manage and cancel in your Apple ID account settings, or as a one-time ${APP.lifetimeName} purchase
     that does not renew.`,
   sections: [
@@ -52,10 +53,13 @@ export const TERMS: LegalDocument = {
       title: 'ffly Is Not a Travel Agent',
       content: `
         <p>ffly is an information tool. We are not a travel agent, tour operator or airline, we do not sell tickets,
-        and we are not a party to any booking you make. When you tap <strong>Book</strong>, the airline's or fare
-        site's page opens and any booking is made directly with that company under its own terms and conditions.
+        and we are not a party to any booking you make. When you tap <strong>Book</strong>, the airline's site or a
+        booking site such as Aviasales opens, and any booking is made with that company under its own terms and
+        conditions.
         That company alone is responsible for the flight, its price, fees, schedule changes, cancellations, refunds,
-        baggage and other conditions of carriage. Entry, visa and health requirements are your responsibility.</p>`,
+        baggage and other conditions of carriage. Entry, visa and health requirements are your responsibility.</p>
+        <p><strong>Partner links.</strong> Some booking links, such as those to Aviasales, are partner links. If you
+        book through one, ffly may earn a commission, at no extra cost to you.</p>`,
     },
     {
       id: 'prices',
@@ -69,8 +73,7 @@ export const TERMS: LegalDocument = {
           <li>Flight times, daylight and sleep figures are estimates.</li>
           <li>ffly does not cover every airline, airport or route, and a search may miss cheaper options.</li>
         </ul>
-        <p>Always confirm the price, times and conditions on the airline's or fare site's website before you
-        book.</p>`,
+        <p>Always confirm the price, times and conditions on the site you book on before you book.</p>`,
     },
     {
       id: 'free-and-pro',
