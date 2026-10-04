@@ -67,13 +67,14 @@ export const TERMS: LegalDocument = {
       content: `
         <ul>
           <li>Fares are collected from third-party websites at a point in time, and ${APP.proName} shows when each
-          fare was last checked. Prices and seat availability change often and may differ when you book.</li>
+          fare was last checked. Some fares are cached prices that may be a few days old. Prices and seat
+          availability change often and may differ when you book.</li>
           <li>Prices may not include baggage, seat selection, payment or other fees, and converted prices are
           approximate.</li>
           <li>Flight times, daylight and sleep figures are estimates.</li>
           <li>ffly does not cover every airline, airport or route, and a search may miss cheaper options.</li>
         </ul>
-        <p>Always confirm the price, times and conditions on the site you book on before you book.</p>`,
+        <p>Before you book, always confirm the price, times and conditions on the site you book on.</p>`,
     },
     {
       id: 'free-and-pro',

@@ -91,7 +91,8 @@ check(siteHeaders['Referrer-Policy'] === 'strict-origin-when-cross-origin', 'ver
 check(/immutable/.test(headersFor('/_astro/(.*)')['Cache-Control'] ?? ''), 'vercel.json: /_astro/ must be cached immutable');
 
 // The CSP has no 'unsafe-inline' for scripts: every executable script must load from a file.
-for (const file of readdirSync(DIST, { recursive: true }).filter((f) => f.endsWith('.html'))) {
+const htmlFiles = readdirSync(DIST, { recursive: true }).filter((f) => f.endsWith('.html'));
+for (const file of htmlFiles) {
   const html = readFileSync(`${DIST}${file}`, 'utf8');
   for (const [tag] of html.matchAll(/<script\b[^>]*>/g)) {
     check(/\ssrc=|type="application\/ld\+json"/.test(tag), `${file}: inline ${tag} is blocked by the CSP`);
@@ -112,12 +113,19 @@ check(
   'vercel.json: CSP connect-src must allow the API host the search bundle calls (SERVICE.apiHost)',
 );
 
-// /search shows one generic coverage notice and never names a fare source.
+// Only the legal pages name a fare source. Sources that are also carriers (Ryanair, Volotea...) are left out:
+// a carrier is shown wherever a flight is, so banning it would block legitimate UI.
 const COVERAGE_NOTICE = "Some fares couldn't be checked right now.";
-const FARE_SOURCE_NAMES = ['Ryanair', 'Wizz Air', 'airBaltic', 'Volotea', 'AZair', 'Aviasales', 'Travelpayouts'];
+const FARE_SOURCE_NAMES = ['AZair', 'Aviasales', 'Travelpayouts'];
+const LEGAL_FILES = ['privacy/index.html', 'terms/index.html'];
 check(bundle.includes(COVERAGE_NOTICE), `Search bundle: coverage notice "${COVERAGE_NOTICE}" missing`);
-for (const name of FARE_SOURCE_NAMES) {
-  check(!bundle.includes(name), `Search bundle: must not name the fare source ${name}`);
+const otherPages = htmlFiles
+  .filter((file) => !LEGAL_FILES.includes(file))
+  .map((file) => [file, readFileSync(`${DIST}${file}`, 'utf8')]);
+for (const [where, text] of [['Search bundle', bundle], ...otherPages]) {
+  for (const name of FARE_SOURCE_NAMES) {
+    check(!text.includes(name), `${where}: must not name the fare source ${name}`);
+  }
 }
 
 if (failures.length) {

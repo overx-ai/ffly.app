@@ -3,7 +3,7 @@ id: 001
 title: "ffly.app/search: the free web search on ffly API v1.2"
 status: done
 created: 2026-10-03
-updated: 2026-10-03
+updated: 2026-10-04
 repo: ffly-site
 tasks: [T1, T2, T3, T4]
 depends_on: []
@@ -102,7 +102,10 @@ nginx image, no k8s manifests, no DNS, and no Vercel rewrite. The API already al
   (anonymous web callers get 1 a day). The API reuses a `client_request_id` only while its job lives, so the
   resubmit keeps the original id.
 - Smoke test against production: a search from WAR over MAD, AMS and ROM (24 Oct–7 Nov, 2–4 nights) found 6
-  routes, the best at €227.22, after comparing 125 fares across 15 days. The coverage line named AZair (partial)
-  and Wizz Air (unavailable).
+  routes, the best at €227.22, after comparing 125 fares across 15 days. The coverage line then named AZair
+  (partial) and Wizz Air (unavailable).
+- 2026-10-04: the coverage line became one generic notice, because fare sources are named only in the legal
+  pages. `npm test` checks the notice ships and that no page but `/privacy` and `/terms`, and no bundle, names a
+  source that is not also a carrier (AZair, Aviasales, Travelpayouts).
 - "Zero JS on every other page" means zero *executable* scripts. Several pages already carried JSON-LD
   `<script type="application/ld+json">`.

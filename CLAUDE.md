@@ -66,7 +66,8 @@ Those repos are the source of truth for copy, colours and claims.
   that no route has them.
 - ffly is a search tool, not a travel agent; fares are indicative; Book opens "the airline's site or a booking
   site". Name a data source (Aviasales, Travelpayouts) only in `privacy.ts` and `terms.ts`, the legal
-  disclosures of the data source, cookies, partner identifier and commission; never in marketing or support copy.
+  disclosures of the data source, cookies, partner identifier and commission; never in marketing or support copy
+  (`npm test` checks every other page and the JS bundle). Airlines (carriers) may be named anywhere.
 - **No em dashes in published copy.** British spelling.
 
 ## Design

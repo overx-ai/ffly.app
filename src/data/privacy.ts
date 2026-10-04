@@ -77,8 +77,9 @@ export const PRIVACY: LegalDocument = {
         we treat your searches as data linked to you.</p>
         <p>Our server checks fares on third-party airline and fare-search websites by itself. One of those sources
         is the Aviasales data API, provided through the Travelpayouts partner programme, which our server queries
-        for cached fares. Your device does not contact those websites or that API while a search runs, and they
-        receive nothing from you through ffly.</p>`,
+        for cached fares. Your device does not contact those websites or that API while a search runs. Our server
+        sends them only the airports and dates it is checking, never your app user id, IP address or anything else
+        that identifies you.</p>`,
     },
     {
       id: 'app-user-id',
@@ -211,12 +212,13 @@ export const PRIVACY: LegalDocument = {
       title: 'Booking Links and Third-Party Websites',
       content: `
         <p>Fares come from third-party airline and fare-search websites. When you tap <strong>Book</strong>, the
-        airline's site or a booking site such as Aviasales opens in an in-app Safari browser. ffly cannot see what
-        you browse or enter there. Anything you do on that website, including booking and payment, is governed by
-        that website's own terms and privacy policy.</p>
-        <p>For some fares, <strong>Book</strong> opens aviasales.com, which sets its own cookies under its own
+        airline's site or a booking site such as Aviasales opens in an in-app Safari browser. ffly does not see the
+        passenger or payment details you enter there. Anything you do on that website, including booking and
+        payment, is governed by that website's own terms and privacy policy.</p>
+        <p>For some fares, <strong>Book</strong> opens aviasales.com, which may set its own cookies under its own
         privacy policy. That link carries ffly's partner identifier so that Aviasales can attribute a booking to
-        ffly. It identifies ffly, not you.</p>`,
+        ffly and pay ffly a commission, at no extra cost to you. The identifier is the same for every ffly user: it
+        identifies ffly, not you.</p>`,
     },
     {
       id: 'app-store-labels',
