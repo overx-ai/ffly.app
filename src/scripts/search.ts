@@ -50,6 +50,7 @@ const MESSAGES = {
   fetching: 'Checking fares',
   planning: 'Working out the best order',
   starting: 'Starting',
+  reconnecting: 'Reconnecting…',
   checks: (done: number, total: number) => `${done} of ${total} fare checks`,
   etaSoon: 'under a minute left',
   eta: (min: number) => `about ${min} min left`,
@@ -369,6 +370,11 @@ function renderProgress(view: Pick<SearchView, 'status' | 'done' | 'total' | 'et
   el.progress.hidden = false;
 }
 
+function renderReconnecting() {
+  el.progressStatus.textContent = MESSAGES.reconnecting;
+  el.progress.hidden = false;
+}
+
 function insightsLine(i: Insights): string {
   const lines: string[] = [];
   if (i.fares_compared && i.days_searched) {
@@ -468,6 +474,7 @@ async function poll(saved: Saved, resubmitted: boolean, failures = 0): Promise<v
   } catch (err) {
     if (!(err instanceof NotFound)) {
       if (failures >= WEB_SEARCH.pollRetries) return showProblem(MESSAGES.network, () => resume(saved, resubmitted));
+      renderReconnecting();
       pollTimer = setTimeout(() => poll(saved, resubmitted, failures + 1), WEB_SEARCH.pollRetryBaseMs * 2 ** failures);
       return;
     }

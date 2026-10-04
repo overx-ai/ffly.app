@@ -127,10 +127,12 @@ check(
 
 // Only the legal pages name a fare source. Sources that are also carriers (Ryanair, Volotea...) are left out:
 // a carrier is shown wherever a flight is, so banning it would block legitimate UI.
-const COVERAGE_NOTICE = "Some fares couldn't be checked right now.";
+const BUNDLE_COPY = { 'coverage notice': "Some fares couldn't be checked right now.", 'poll retry line': 'Reconnecting…' };
 const FARE_SOURCE_NAMES = ['AZair', 'Aviasales', 'Travelpayouts'];
 const LEGAL_FILES = ['privacy/index.html', 'terms/index.html'];
-check(bundle.includes(COVERAGE_NOTICE), `Search bundle: coverage notice "${COVERAGE_NOTICE}" missing`);
+for (const [what, copy] of Object.entries(BUNDLE_COPY)) {
+  check(bundle.includes(copy), `Search bundle: ${what} "${copy}" missing`);
+}
 const otherPages = htmlFiles
   .filter((file) => !LEGAL_FILES.includes(file))
   .map((file) => [file, copyText(readFileSync(`${DIST}${file}`, 'utf8'))]);
