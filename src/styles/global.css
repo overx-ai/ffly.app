@@ -1,6 +1,6 @@
 /* Tokens first, always. The complete LIGHT palette lives on bare :root; dark overrides in
-   the media query and again under [data-theme="dark"]. Never declare a colour only inside a
-   media block: it would be undefined in the un-stamped default state.
+   the media query. Never declare a colour only inside a media block: it would be undefined
+   whenever the query does not match.
    The app uses iOS semantic colours, so the site follows the system scheme as the app does.
    --brand is the app's AccentColor (light #006BE3, dark #4094FF); --grad is sampled from the
    corners of the app icon (design/icon/icon-a-gradient.png). */
@@ -47,7 +47,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root {
     --bg:        #090c1a;
     --bg-2:      #10142a;
     --raise:     rgba(232, 236, 255, 0.05);
@@ -63,17 +63,6 @@
 
     --shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
   }
-}
-
-/* Reserved for a future explicit toggle. Duplicated deliberately so a stamped
-   data-theme="dark" wins over a light OS preference. */
-:root[data-theme="dark"] {
-  --bg: #090c1a; --bg-2: #10142a;
-  --raise: rgba(232, 236, 255, 0.05);
-  --ink: #f5f7ff; --ink-2: #b7bdd3; --ink-3: #8a90a8;
-  --rule: rgba(232, 236, 255, 0.12); --rule-soft: rgba(232, 236, 255, 0.07);
-  --brand: #4094FF; --violet: #b07cff; --glow: rgba(110, 80, 255, 0.35);
-  --shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
 }
 
 *, *::before, *::after { box-sizing: border-box; }

@@ -69,8 +69,8 @@ Those repos are the source of truth for copy, colours and claims.
 
 ## Design
 - Follows the system colour scheme, as the app does (it uses iOS semantic colours). Light tokens
-  on bare `:root`, dark in the media query and `[data-theme="dark"]`. Never declare a colour only
-  inside a media block.
+  on bare `:root`, dark in the `prefers-color-scheme` media query; there is no theme toggle. Never
+  declare a colour only inside a media block.
 - `--brand` is the app's `AccentColor`; `--grad` is sampled from the icon
   (`ios-ffly/design/icon/icon-a-gradient.png`). System rounded display stack, no webfont.
 - `og:image:width/height` in `BaseLayout` match `public/og-image.jpg` (1200x675). Change both together.
