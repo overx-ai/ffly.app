@@ -42,7 +42,8 @@ export const SUPPORT_FAQ: readonly FaqItem[] = [
   },
   {
     question: 'Why are prices indicative?',
-    answer: `<p>ffly checks fares on airline and fare-search websites at a point in time. Fares change often and
+    answer: `<p>ffly checks fares on airline and fare-search websites at a point in time, and some fares come from a
+      cache and may be up to a week old. Fares change often and
       may not include baggage or other fees, so always confirm the final price where you book: Book opens the
       airline's site or a booking site.</p>`,
   },

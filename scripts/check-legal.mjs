@@ -36,6 +36,10 @@ function readPage(page) {
 const terms = readPage('terms');
 check(/through the ffly app or ffly\.app/.test(terms('acceptable-use')), 'Terms Acceptable Use must allow ffly.app');
 check(/web search/i.test(terms('free-and-pro')), 'Terms section 5 must describe the web search');
+// Cached partner fares carry no checked time (ffly-api spec 532), so no page may promise one for every fare.
+check(!/when each\s+fare was last checked/.test(terms('prices')), 'Terms: must not promise a checked time for every fare');
+check(/up to a week old/.test(terms('prices')), 'Terms: must say cached fares may be up to a week old');
+check(/at no extra cost/.test(terms('not-a-travel-agent')), 'Terms: partner links must disclose the commission');
 
 const privacy = readPage('privacy');
 const labels = privacy('app-store-labels');
@@ -51,6 +55,9 @@ for (const type of NOT_LINKED) {
   check(!linked.includes(type), `Privacy: ${type} must not be listed as linked`);
 }
 check(!/not linked to your identity/.test(privacy('searches')), 'Privacy: trip searches must not be called unlinked');
+check(/never your app user id/.test(privacy('searches')), 'Privacy: fare sources must be said to get no user id');
+check(/same for every ffly user/.test(privacy('booking-links')), 'Privacy: the partner identifier must be said to be ffly-wide');
+check(/at no extra cost/.test(privacy('booking-links')), 'Privacy: partner links must disclose the commission');
 
 const feedbackNum = readHtml('privacy').match(/id="feedback"[^>]*>\s*<h2[^>]*><span class="num"[^>]*>0*(\d+)</)?.[1];
 check(
@@ -122,11 +129,17 @@ check(bundle.includes(COVERAGE_NOTICE), `Search bundle: coverage notice "${COVER
 const otherPages = htmlFiles
   .filter((file) => !LEGAL_FILES.includes(file))
   .map((file) => [file, readFileSync(`${DIST}${file}`, 'utf8')]);
-for (const [where, text] of [['Search bundle', bundle], ...otherPages]) {
+const llms = readFileSync(`${DIST}llms.txt`, 'utf8');
+for (const [where, text] of [['Search bundle', bundle], ['llms.txt', llms], ...otherPages]) {
   for (const name of FARE_SOURCE_NAMES) {
-    check(!text.includes(name), `${where}: must not name the fare source ${name}`);
+    check(!new RegExp(name, 'i').test(text), `${where}: must not name the fare source ${name}`);
   }
 }
+// Book opens the airline's site or a booking site, so no page may promise the airline's own site.
+for (const [where, text] of [['llms.txt', llms], ...otherPages]) {
+  check(!/airline's own site|airline's site(?! or a booking site)/.test(text), `${where}: must not promise the airline's own site`);
+}
+check(!/live fares/.test(readHtml('search')), '/search: must not promise live fares');
 
 if (failures.length) {
   console.error(`check-legal: ${failures.length} failed\n- ${failures.join('\n- ')}`);

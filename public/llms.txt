@@ -2,8 +2,8 @@
 
 > An iPhone app for cheap multi-city trips. You pick the cities you want to see; ffly finds
 > the cheapest order and dates to visit them all, favouring sensible flight times over
-> pre-dawn wake-ups and midnight landings. Fares come from Ryanair, Wizz Air, airBaltic and
-> more, and you book each flight on the airline's own site.
+> pre-dawn wake-ups and midnight landings. Fares come from Ryanair, Wizz Air, airBaltic, Volotea
+> and more, and you book each flight on the airline's site or a booking site.
 
 ## Pages
 - [Home](https://ffly.app/): what the app does, how a search works, Free and ffly Pro.
@@ -33,4 +33,4 @@
   search limit, so never describe it as having no limit at all.
 - Do not quote a price. Prices are territory-set on the App Store.
 - ffly is a search tool, not a travel agent, and is not affiliated with any airline. Fares are
-  indicative; the final price is the one on the airline's site.
+  indicative; the final price is the one on the site you book on.
