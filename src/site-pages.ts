@@ -11,7 +11,7 @@ export const SITE_PAGES = [
   { slug: '',        lastmod: '2026-10-03' },
   { slug: 'support', lastmod: '2026-10-03' },
   { slug: 'privacy', lastmod: '2026-10-04' },
-  { slug: 'terms',   lastmod: '2026-10-03' },
+  { slug: 'terms',   lastmod: '2026-10-04' },
   { slug: 'search',  lastmod: '2026-10-03' },
 ] as const;
 
