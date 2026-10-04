@@ -66,9 +66,8 @@ export const TERMS: LegalDocument = {
       title: 'Prices and Information Are Indicative',
       content: `
         <ul>
-          <li>Fares are collected from third-party websites at a point in time, and ${APP.proName} shows when most
-          fares were last checked. Some fares are cached prices that may be up to a week old and show no checked
-          time. Prices and seat availability change often and may differ when you book.</li>
+          <li>Fares are collected from third-party websites at a point in time, and ${APP.proName} shows when a fare
+          was last checked, except for cached prices, which may be up to a week old and show no checked time. Prices and seat availability change often and may differ when you book.</li>
           <li>Prices may not include baggage, seat selection, payment or other fees, and converted prices are
           approximate.</li>
           <li>Flight times, daylight and sleep figures are estimates.</li>
