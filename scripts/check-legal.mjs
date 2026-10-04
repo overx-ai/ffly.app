@@ -1,4 +1,4 @@
-// Asserts legal facts in the built pages (run after `astro build`). Regressions: docs/bugs/001, 002.
+// Asserts legal and site facts in the built output (run after `astro build`). Regressions: docs/bugs/001, 002.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -17,9 +17,11 @@ function plainText(html) {
   return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+const readHtml = (page) => readFileSync(`${DIST}${page ? `${page}/` : ''}index.html`, 'utf8');
+
 // A missing section is itself a failure, so the "must not" checks cannot pass on an empty string.
 function readPage(page) {
-  const html = readFileSync(`${DIST}${page}/index.html`, 'utf8');
+  const html = readHtml(page);
   const found = html.matchAll(/<section class="block" id="([^"]+)"[^>]*>([\s\S]*?)<\/section>/g);
   const sections = new Map([...found].map(([, id, body]) => [id, plainText(body)]));
   return (id) => {
@@ -47,6 +49,17 @@ for (const type of NOT_LINKED) {
   check(!linked.includes(type), `Privacy: ${type} must not be listed as linked`);
 }
 check(!/not linked to your identity/.test(privacy('searches')), 'Privacy: trip searches must not be called unlinked');
+
+const DATED_PAGES = ['support', 'privacy', 'terms'];
+const displayDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
+const sitemap = readFileSync(`${DIST}sitemap.xml`, 'utf8');
+for (const [, loc, lastmod] of sitemap.matchAll(/<loc>([^<]+)<\/loc>\s*<lastmod>([^<]+)<\/lastmod>/g)) {
+  const page = new URL(loc).pathname.slice(1);
+  const stated = readHtml(page).match(/Last updated: ([^<]+)</)?.[1];
+  const expected = displayDate.format(new Date(lastmod));
+  if (DATED_PAGES.includes(page)) check(stated !== undefined, `/${page}: "Last updated" line missing`);
+  check(stated === undefined || stated === expected, `/${page}: "Last updated: ${stated}" must match lastmod ${lastmod}`);
+}
 
 if (failures.length) {
   console.error(`check-legal: ${failures.length} failed\n- ${failures.join('\n- ')}`);

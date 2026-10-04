@@ -7,7 +7,6 @@ export interface LegalSection {
 export interface LegalDocument {
   pageTitle: string;
   description: string;
-  lastUpdated: string;
   summaryTitle: string;
   summaryText: string;
   sections: readonly LegalSection[];

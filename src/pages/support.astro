@@ -4,7 +4,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SUPPORT, SUPPORT_FAQ } from '../data/support';
 import { CONTACT_EMAIL } from '../app';
-import { pathFor } from '../site-pages';
+import { lastUpdated, pathFor } from '../site-pages';
 import { breadcrumb, faqSchema } from '../schema';
 
 const site = Astro.site?.href.replace(/\/$/, '') ?? '';
@@ -45,7 +45,7 @@ const schemas = [
       ))}
     </div>
 
-    <p class="updated">Last updated: {SUPPORT.lastUpdated}</p>
+    <p class="updated">Last updated: {lastUpdated('support')}</p>
   </main>
   <Footer />
 </BaseLayout>

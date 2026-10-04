@@ -106,8 +106,6 @@ export const EXTERNAL = {
   vercelPrivacy: 'https://vercel.com/legal/privacy-policy',
 } as const;
 
-export const LEGAL_EFFECTIVE_DATE = 'October 4, 2026';
-
 export const mailto = (email: string) => `<a href="mailto:${email}">${email}</a>`;
 
 export const externalLink = (url: string, label: string = url) =>

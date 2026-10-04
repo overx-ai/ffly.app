@@ -2,7 +2,6 @@ import {
   APP,
   CONTACT_EMAIL,
   EXTERNAL,
-  LEGAL_EFFECTIVE_DATE,
   OPERATOR,
   SITE_HOST,
   WEB_SEARCH,
@@ -20,7 +19,6 @@ export const TERMS: LegalDocument = {
   pageTitle: 'Terms of Use',
   description:
     'Terms of Use for the ffly iPhone app: indicative fares, bookings made on airline sites, the ffly Pro weekly and yearly auto-renewable subscriptions, and the one-time Lifetime purchase.',
-  lastUpdated: LEGAL_EFFECTIVE_DATE,
   summaryTitle: 'The short version',
   summaryText: `ffly helps you plan cheap multi-city trips. It is a search tool, not a travel agent: fares come
     from third-party airline and fare-search websites, prices are indicative, and you book directly on the

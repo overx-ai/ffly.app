@@ -6,7 +6,6 @@ export const SUPPORT = {
   pageTitle: 'Support',
   description:
     'Help with ffly: restoring purchases, cancelling ffly Pro, why fares are indicative, blurred routes on the Free plan, and deleting your data.',
-  lastUpdated: 'October 3, 2026',
 } as const;
 
 export const SUPPORT_FAQ: readonly FaqItem[] = [

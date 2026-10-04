@@ -3,7 +3,6 @@ import {
   CONTACT_EMAIL,
   EXTERNAL,
   FEEDBACK,
-  LEGAL_EFFECTIVE_DATE,
   OPERATOR,
   SERVICE,
   SITE_HOST,
@@ -26,7 +25,6 @@ export const PRIVACY: LegalDocument = {
   pageTitle: 'Privacy Policy',
   description:
     'How the ffly iPhone app handles data: no account, no location, no ads, no tracking. Trip searches stay in server memory for up to 24 hours; analytics are anonymous.',
-  lastUpdated: LEGAL_EFFECTIVE_DATE,
   summaryTitle: 'The short version',
   summaryText: `ffly has no account and no sign-in. We do not collect your name, phone number or location, and
     we collect your email address only if you choose to add it to feedback you send. We do not use the advertising identifier (IDFA), we show no ads and we do not track you across

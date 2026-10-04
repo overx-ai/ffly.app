@@ -19,8 +19,9 @@ Those repos are the source of truth for copy, colours and claims.
 ## Critical conventions
 - **`/`, `/support`, `/privacy`, `/terms` are fixed URLs.** The app's `LegalLinks.swift` and the
   App Store listing (`fastlane/metadata/*/{marketing,support,privacy}_url.txt`) point at them.
-- **Register every page in `src/site-pages.ts`.** It drives the sitemap and the canonical tag.
-  Bump a page's `lastmod` only when its copy actually changed, never from the build clock.
+- **Register every page in `src/site-pages.ts`.** It drives the sitemap, the canonical tag and the
+  "Last updated" line, so a page's date lives only there. Bump a page's `lastmod` only when its copy
+  actually changed, never from the build clock.
 - **Canonical URLs are non-trailing** (`/support`, not `/support/`). Never link one.
 - **App facts live in `src/app.ts`**: limits, airlines, operator, publisher, API hosts,
   retention, external URLs. Do not hardcode any of them in a page.
