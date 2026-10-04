@@ -83,6 +83,12 @@ export const WEB_SEARCH = {
   maxNights: 4,
 } as const;
 
+// The articles at /guides (src/content/guides).
+export const GUIDES = {
+  wordsPerMinute: 230,
+  dateLocale: 'en-GB',
+} as const;
+
 export const EXTERNAL = {
   appleEula: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
   applePrivacy: 'https://www.apple.com/legal/privacy/',

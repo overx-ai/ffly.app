@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import { rehypeScrollTables, remarkDropTitle } from './src/markdown-plugins.mjs';
 
 // No integrations. @astrojs/sitemap crashes at build time against astro@4.16, and
 // src/pages/sitemap.xml.ts generates the same file from src/site-pages.ts, which also
@@ -9,5 +10,9 @@ export default defineConfig({
   trailingSlash: 'never',
   build: {
     inlineStylesheets: 'always',
+  },
+  markdown: {
+    remarkPlugins: [remarkDropTitle],
+    rehypePlugins: [rehypeScrollTables],
   },
 });

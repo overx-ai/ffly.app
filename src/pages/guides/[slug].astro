@@ -1,0 +1,16 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+import { getGuides, type Guide } from '../../guides';
+
+export async function getStaticPaths() {
+  return (await getGuides()).map((guide) => ({ params: { slug: guide.slug }, props: { guide } }));
+}
+
+interface Props { guide: Guide; }
+
+const { guide } = Astro.props;
+const { Content } = await guide.render();
+---
+<GuideLayout guide={guide}>
+  <Content />
+</GuideLayout>

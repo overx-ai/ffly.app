@@ -19,6 +19,8 @@ npm run preview
 | `/privacy` | `src/layouts/LegalLayout.astro` + `src/data/privacy.ts` |
 | `/terms` | `src/layouts/LegalLayout.astro` + `src/data/terms.ts` |
 | `/search` | `src/pages/search.astro` + `src/scripts/{ffly-api,search}.ts`, the free web search |
+| `/guides` | `src/pages/guides/index.astro` |
+| `/guides/{slug}` | `src/content/guides/{slug}.md` via `src/pages/guides/[slug].astro` + `src/layouts/GuideLayout.astro` |
 | `/404` | `src/pages/404.astro`, noindex |
 | `/sitemap.xml` | `src/pages/sitemap.xml.ts`, from `src/site-pages.ts` |
 | `/robots.txt`, `/llms.txt` | `public/` |
@@ -40,7 +42,7 @@ curl -sL https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/g
 npm run build && npm run preview -- --port 4329 &
 
 # 200, one H1 and one canonical on every page.
-for u in / /support /privacy /terms /search; do
+for u in / /support /privacy /terms /search /guides; do
   curl -s localhost:4329$u | grep -c '<h1\|rel="canonical"'; done   # 2 each
 
 # No trailing-slash internal links, no em dashes, no "unlimited", no prices in schema.

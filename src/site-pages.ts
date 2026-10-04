@@ -14,6 +14,9 @@ export const SITE_PAGES = [
   { slug: 'privacy', lastmod: '2026-10-04' },
   { slug: 'terms',   lastmod: '2026-10-04' },
   { slug: 'search',  lastmod: '2026-10-05' },
+  { slug: 'guides',  lastmod: '2026-10-05' },
+  { slug: 'guides/cheapest-order-to-visit-cities', lastmod: '2026-10-05' },
+  { slug: 'guides/multi-city-vs-one-way-tickets',  lastmod: '2026-10-05' },
 ] as const;
 
 export type Slug = (typeof SITE_PAGES)[number]['slug'];
@@ -21,9 +24,17 @@ export type Slug = (typeof SITE_PAGES)[number]['slug'];
 // The build's `site` (astro.config.mjs, PUBLIC_SITE_URL), with no trailing slash.
 export const siteOrigin = import.meta.env.SITE.replace(/\/$/, '');
 
+export const isSlug = (slug: string): slug is Slug => SITE_PAGES.some((page) => page.slug === slug);
+
+export const DEFAULT_OG_IMAGE = '/og-image.jpg';
+
 export const pathFor = (slug: Slug) => (slug ? `/${slug}` : '/');
+
+export const pageLink = (slug: Slug, label: string) => `<a href="${pathFor(slug)}">${label}</a>`;
 
 const displayDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
 
 export const lastUpdated = (slug: Slug) =>
   displayDate.format(new Date(SITE_PAGES.find((page) => page.slug === slug)!.lastmod));
+
+export const isoDate = (date: Date) => date.toISOString().slice(0, 10);

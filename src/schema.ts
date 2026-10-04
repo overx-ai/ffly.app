@@ -1,10 +1,17 @@
 import { APP, APP_STORE_URL, DEVELOPER, PUBLISHER } from './app';
-import { pathFor, siteOrigin, type Slug } from './site-pages';
+import type { HowTo } from './guide-markdown';
+import { DEFAULT_OG_IMAGE, isoDate, pathFor, siteOrigin, type Slug } from './site-pages';
 
 // No offers.price and no aggregateRating. Prices are territory-set and the app has no
 // ratings yet, so quoting either would be a claim the store does not back.
 
 const overx = { '@type': 'Organization', name: PUBLISHER.name, url: PUBLISHER.url };
+const developer = { '@type': 'Person', name: DEVELOPER, url: PUBLISHER.url };
+
+export interface Crumb {
+  name: string;
+  slug: Slug;
+}
 
 export function appSchema() {
   return {
@@ -16,7 +23,7 @@ export function appSchema() {
     url: `${siteOrigin}/`,
     image: `${siteOrigin}/icon-512.png`,
     ...(APP_STORE_URL ? { installUrl: APP_STORE_URL, downloadUrl: APP_STORE_URL } : {}),
-    author: { '@type': 'Person', name: DEVELOPER, url: PUBLISHER.url },
+    author: developer,
     creator: overx,
     publisher: overx,
     featureList: [
@@ -50,8 +57,8 @@ export function websiteSchema() {
   };
 }
 
-export function breadcrumb(name: string, slug: Slug) {
-  const items: { name: string; slug: Slug }[] = [{ name: 'Home', slug: '' }, { name, slug }];
+export function breadcrumb(name: string, slug: Slug, parent?: Crumb) {
+  const items: Crumb[] = [{ name: 'Home', slug: '' }, ...(parent ? [parent] : []), { name, slug }];
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -75,6 +82,42 @@ export function faqSchema(items: readonly { question: string; answer: string }[]
         '@type': 'Answer',
         text: it.answer.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim(),
       },
+    })),
+  };
+}
+
+export function articleSchema(article: {
+  headline: string;
+  description: string;
+  slug: Slug;
+  published: Date;
+  updated: Date;
+}) {
+  const url = `${siteOrigin}${pathFor(article.slug)}`;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.headline,
+    description: article.description,
+    image: `${siteOrigin}${DEFAULT_OG_IMAGE}`,
+    author: developer,
+    publisher: overx,
+    datePublished: isoDate(article.published),
+    dateModified: isoDate(article.updated),
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+  };
+}
+
+export function howToSchema(howTo: HowTo) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: howTo.name,
+    step: howTo.steps.map((step, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      name: step.name,
+      text: step.text,
     })),
   };
 }

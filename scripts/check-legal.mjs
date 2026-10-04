@@ -1,5 +1,5 @@
 // Asserts legal and site facts in the built output (run after `astro build`). Regressions: docs/bugs/001, 002, 003.
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const DIST = fileURLToPath(new URL('../dist/', import.meta.url));
@@ -70,13 +70,38 @@ check(
   'Support: the delete-my-data answer must link the privacy feedback section by its number',
 );
 
-const answers = [...readHtml('support').matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)]
-  .map(([, json]) => JSON.parse(json))
-  .filter((schema) => schema['@type'] === 'FAQPage')
+const jsonLd = (html) =>
+  [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(([, json]) => JSON.parse(json));
+const ofType = (schemas, type) => schemas.filter((schema) => schema['@type'] === type);
+
+const answers = ofType(jsonLd(readHtml('support')), 'FAQPage')
   .flatMap((faq) => faq.mainEntity.map((q) => q.acceptedAnswer.text));
 check(answers.length > 0, 'Support: FAQPage JSON-LD missing');
 for (const text of answers) {
   check(!/\s\s|\n|^\s|\s$/.test(text), `Support: FAQ JSON-LD answer keeps source whitespace: ${text.slice(0, 60)}`);
+}
+
+// Guides: FAQPage and HowTo are parsed from the markdown (src/guide-markdown.ts), so a heading edit can drop them.
+const GUIDE_FAQ_QUESTIONS = 5;
+const HOWTO_GUIDES = ['cheapest-order-to-visit-cities'];
+const guideNames = readdirSync(`${DIST}guides`, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
+const sitemap = readFileSync(`${DIST}sitemap.xml`, 'utf8');
+const resolves = (path) => existsSync(`${DIST}${path}`) || existsSync(`${DIST}${path}/index.html`);
+check(guideNames.length > 0, 'Guides: no guide pages in the build');
+for (const name of HOWTO_GUIDES) check(guideNames.includes(name), `Guides: ${name} missing from the build`);
+for (const name of guideNames) {
+  const page = `guides/${name}`;
+  const html = readHtml(page);
+  const schemas = jsonLd(html);
+  const faq = ofType(schemas, 'FAQPage');
+  check(faq.length === 1 && faq[0].mainEntity.length === GUIDE_FAQ_QUESTIONS, `${page}: FAQPage must have ${GUIDE_FAQ_QUESTIONS} questions`);
+  check((ofType(schemas, 'HowTo').length === 1) === HOWTO_GUIDES.includes(name), `${page}: HowTo only on ${HOWTO_GUIDES.join(', ')}`);
+  const lastmod = sitemap.match(new RegExp(`/${page}</loc>\\s*<lastmod>([^<]+)<`))?.[1];
+  check(lastmod !== undefined && ofType(schemas, 'Article')[0]?.dateModified === lastmod, `${page}: Article dateModified must equal its SITE_PAGES lastmod`);
+  check(readHtml('guides').includes(`href="/${page}"`), `/guides must list ${page}`);
+  for (const [, href] of html.matchAll(/href="(\/[^"#?]*)/g)) {
+    check(href === '/' || (!href.endsWith('/') && resolves(href.slice(1))), `${page}: link ${href} does not resolve`);
+  }
 }
 
 const vercel = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));

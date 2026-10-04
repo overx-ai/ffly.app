@@ -25,6 +25,11 @@ Those repos are the source of truth for copy, colours and claims.
   "Last updated" line, so a page's date lives only there. Bump a page's `lastmod` only when its copy
   actually changed, never from the build clock.
 - **Canonical URLs are non-trailing** (`/support`, not `/support/`). Never link one.
+- **Guides are markdown in `src/content/guides/`** (schema `src/content/config.ts`), rendered by
+  `GuideLayout.astro`. The markdown `# ` heading is the H1. `src/guide-markdown.ts` builds FAQPage from the
+  `## FAQ` section's `### question`s and HowTo from `### 1.`...`### N.` headings; `npm test` asserts both.
+  A new guide needs its `guides/{slug}` entry in `SITE_PAGES` (the build fails without it), with `lastmod`
+  equal to its frontmatter `updated`.
 - **App facts live in `src/app.ts`**: limits, airlines, operator, publisher, API hosts,
   retention, external URLs. Do not hardcode any of them in a page.
 - **One contact address: `CONTACT_EMAIL` (`support@overx.ai`)** for support, contact and privacy
