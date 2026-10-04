@@ -13,12 +13,13 @@ import { pathFor } from '../site-pages';
 import type { LegalDocument } from './types';
 
 // Every collected item here is one row of ios-ffly/Template/PrivacyInfo.xcprivacy and
-// docs/compliance/data-inventory.yaml. Not linked: Product Interaction, Device ID. Linked: Search History,
-// Purchase History and User ID, because every search carries the app user id, RevenueCat keeps purchases
-// under it and feedback can pair it with an email address, and Email Address (optional) and Customer
-// Support, both from the feedback form (ios-ffly spec 012). No tracking. Change one, change all three, and the App Store Connect privacy
-// answers. Retention figures come from the ffly API config (job_ttl_seconds, entitlement_ttl_seconds)
-// and are in SERVICE. Feedback facts come from 1B-bots shared/form-aggregator and are in FEEDBACK.
+// docs/compliance/data-inventory.yaml. Linked: Search History, Purchase History and User ID, because every
+// search carries the app user id, RevenueCat keeps purchases under it and feedback can pair it with an email
+// address; Email Address (optional) and Customer Support, both from the feedback form (ios-ffly spec 012).
+// Not linked: Product Interaction, Device ID. No tracking. Change one, change all three, and the App Store
+// Connect privacy answers. Retention figures come from the ffly API config (job_ttl_seconds,
+// entitlement_ttl_seconds) and are in SERVICE. Feedback facts come from 1B-bots shared/form-aggregator and
+// are in FEEDBACK.
 
 export const PRIVACY: LegalDocument = {
   pageTitle: 'Privacy Policy',
