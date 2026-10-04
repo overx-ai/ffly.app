@@ -18,7 +18,7 @@ export const SITE_PAGES = [
 
 export type Slug = (typeof SITE_PAGES)[number]['slug'];
 
-export const pathFor = (slug: string) => (slug ? `/${slug}` : '/');
+export const pathFor = (slug: Slug) => (slug ? `/${slug}` : '/');
 
 const displayDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
 
