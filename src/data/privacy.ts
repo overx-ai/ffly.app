@@ -13,9 +13,10 @@ import { pathFor } from '../site-pages';
 import type { LegalDocument } from './types';
 
 // Every collected item here is one row of ios-ffly/Template/PrivacyInfo.xcprivacy and
-// docs/compliance/data-inventory.yaml. Not linked: Search History, Purchase History, Product Interaction,
-// Device ID. Linked: Email Address (optional) and Customer Support, both from the feedback form (ios-ffly
-// spec 012), and User ID, because feedback can pair it with an email address. No tracking. Change one, change all three, and the App Store Connect privacy
+// docs/compliance/data-inventory.yaml. Not linked: Purchase History, Product Interaction, Device ID.
+// Linked: Search History and User ID, because every search carries the app user id and feedback can pair
+// that id with an email address, and Email Address (optional) and Customer Support, both from the feedback
+// form (ios-ffly spec 012). No tracking. Change one, change all three, and the App Store Connect privacy
 // answers. Retention figures come from the ffly API config (job_ttl_seconds, entitlement_ttl_seconds)
 // and are in SERVICE. Feedback facts come from 1B-bots shared/form-aggregator and are in FEEDBACK.
 
@@ -72,7 +73,8 @@ export const PRIVACY: LegalDocument = {
         </ul>
         <p>We use this only to compute your routes. The search and its results are kept <strong>in the server's
         memory only</strong>, never in a database, and are deleted after at most ${SERVICE.searchRetentionHours}
-        hours, or sooner when the server restarts. They are not linked to your identity.</p>
+        hours, or sooner when the server restarts. Each search carries your anonymous app user id (Section 4), so
+        we treat your searches as data linked to you.</p>
         <p>Our server checks fares on third-party airline and fare-search websites by itself. Your device does not
         contact those websites while a search runs, and they receive nothing from you through ffly.</p>`,
     },
@@ -216,11 +218,11 @@ export const PRIVACY: LegalDocument = {
       content: `
         <ul>
           <li><strong>Data used to track you:</strong> none.</li>
-          <li><strong>Data linked to you:</strong> Email Address (Contact Info), only if you add one to feedback, and
-          Customer Support (User Content), the feedback you send, and User ID (the anonymous app user id), which
-          feedback can pair with that email address.</li>
-          <li><strong>Data not linked to you:</strong> Search History (trip searches), Purchase History (${APP.proName} transactions), Product Interaction (usage events) and Device ID
-          (IDFV and the random install id).</li>
+          <li><strong>Data linked to you:</strong> Search History (trip searches, which carry the app user id), User
+          ID (the anonymous app user id), Email Address (Contact Info), only if you add one to feedback, and Customer
+          Support (User Content), the feedback you send.</li>
+          <li><strong>Data not linked to you:</strong> Purchase History (${APP.proName} transactions), Product
+          Interaction (usage events) and Device ID (IDFV and the random install id).</li>
         </ul>`,
     },
     {
@@ -253,8 +255,8 @@ export const PRIVACY: LegalDocument = {
       title: 'Your Choices and Rights',
       content: `
         <p>Depending on where you live, you may have the right to access, correct, delete or port your personal
-        data, and to object to or restrict its processing. ffly has no account, and apart from feedback the data we
-        receive is not linked to your identity, so we usually cannot tell which records are yours. Search data on
+        data, and to object to or restrict its processing. ffly has no account and never asks your name, so unless
+        you added your email address to feedback we usually cannot tell which records are yours. Search data on
         our server expires on its own within ${SERVICE.searchRetentionHours} hours.</p>
         <ul>
           <li>Delete trips in the Trips list, or delete the app to remove the data on your device.</li>

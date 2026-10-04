@@ -6,6 +6,7 @@ Website for **ffly**, at `ffly.app`. Astro 4, static, one dependency, zero clien
 npm install
 npm run dev      # localhost:4321
 npm run build    # -> dist/
+npm test         # build, then scripts/check-legal.mjs over dist (legal facts)
 npm run preview
 ```
 

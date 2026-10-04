@@ -36,9 +36,10 @@ Those repos are the source of truth for copy, colours and claims.
 
 ## Legal pages are one decision across repos
 - `/privacy` lists exactly the seven types in `ios-ffly/Template/PrivacyInfo.xcprivacy` and
-  `docs/compliance/data-inventory.yaml`: Search History, User ID, Purchase History, Product
-  Interaction, Device ID (not linked), and Email Address (optional) and Customer Support (linked, from
-  the feedback form, ios-ffly spec 012); none tracking. Change one, change all, plus the App Store
+  `docs/compliance/data-inventory.yaml`: Purchase History, Product Interaction, Device ID (not
+  linked), and Search History, User ID, Email Address (optional) and Customer Support (linked: every
+  search carries the app user id; the last two come from the feedback form, ios-ffly spec 012); none
+  tracking. Change one, change all, plus the App Store
   Connect privacy answers. Retention (24 h jobs, 10 min entitlement cache) is from the API config.
   Feedback goes to 1B-bots `shared/form-aggregator` (database, logs, Telegram chat), which has no
   retention job: never state a number of days for it. Its facts are `FEEDBACK` in `src/app.ts`.
