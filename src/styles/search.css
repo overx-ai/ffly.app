@@ -197,5 +197,3 @@
 }
 .search-page .upsell h2 { font-size: 1.5rem; }
 .search-page .upsell > p:not(.lbl) { color: var(--ink-2); }
-
-.search-page .ad-slot { min-height: 250px; }

@@ -12,7 +12,7 @@ Those repos are the source of truth for copy, colours and claims.
   `/search` (the free web search, `docs/specs/001-search-web-app.md`) ships one bundled script:
   `src/scripts/{ffly-api,search}.ts`, plain TypeScript, no framework, rendering via `textContent`/`<template>`
   only (never `innerHTML` with API data). It calls `FFLY_API_BASE` anonymously: `X-Platform: web`, never
-  `X-Client-Id`. Ads stay off while `ADSENSE_CLIENT` is `undefined` in `src/app.ts`.
+  `X-Client-Id`. No ads: the ad scaffolding was removed (T-014) until an ads step with consent is specced.
 - Deploy: `git push origin main`, then Vercel builds. `vercel.json` holds clean URLs, the
   security headers (CSP, nosniff, Referrer-Policy) and immutable caching of `/_astro/`; `npm test` checks
   them. The CSP allows no inline script and no third-party host but `api.overx.ai`: add any new one there.

@@ -3,7 +3,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import AppStoreBadge from '../components/AppStoreBadge.astro';
-import AdSlot from '../components/AdSlot.astro';
 import { APP } from '../app';
 import '../styles/search.css';
 ---
@@ -80,8 +79,6 @@ import '../styles/search.css';
       <datalist id="places"></datalist>
     </form>
 
-    <AdSlot position="form" />
-
     <div id="problem" class="card problem" role="alert" hidden>
       <p id="problem-text"></p>
       <button id="retry" class="btn btn-soon" type="button" hidden>Try again</button>
@@ -96,15 +93,12 @@ import '../styles/search.css';
       <p id="progress-detail" class="note"></p>
     </section>
 
-    <AdSlot position="progress" />
-
     <section id="results" class="results" aria-labelledby="results-title" aria-live="polite" hidden>
       <h2 id="results-title"></h2>
       <p id="results-trip" class="note"></p>
       <p id="results-empty" class="note" hidden>Try a wider travel window or a different number of nights.</p>
       <p id="insights" class="insights" hidden></p>
       <div id="best"></div>
-      <AdSlot position="results" />
       <ol id="others" class="others"></ol>
       <p id="more-routes" hidden><a href="#upsell"></a></p>
       <p id="coverage" class="quiet" hidden></p>

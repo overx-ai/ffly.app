@@ -94,12 +94,6 @@ export const FARE_SOURCES: Readonly<Record<string, string>> = {
   azair: 'AZair',
 };
 
-// TODO(owner): set both to switch the /search ad slots on. Until then nothing ad-related renders
-// and no AdSense script loads. Serving ads also needs the consent banner and a privacy update.
-export const ADSENSE_CLIENT: string | undefined = undefined;
-export type AdPosition = 'form' | 'progress' | 'results';
-export const ADSENSE_SLOTS: Record<AdPosition, string> | undefined = undefined;
-
 export const EXTERNAL = {
   appleEula: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
   applePrivacy: 'https://www.apple.com/legal/privacy/',

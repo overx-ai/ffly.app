@@ -16,8 +16,8 @@ supersedes: 1B-bots docs/specs/524-ffly-web.md (its nginx-SPA architecture; the 
 
 > **TL;DR** — Built. `ffly.app/search` is a static Astro page whose single bundled TypeScript `<script>` calls
 > `https://api.overx.ai/ffly` as an anonymous Free caller. You pick cities and dates, it shows live progress,
-> then the Free (redacted) routes with a "get the app for every route" upsell. Ad slots exist in code but render
-> nothing until an AdSense client id is set.
+> then the Free (redacted) routes with a "get the app for every route" upsell. The ad slots were removed on
+> 2026-10-04 (T-014) until an ads step with a consent banner is built.
 
 ## Why here, not `1B-bots/apps/ffly-web`
 The owner chose the path `ffly.app/search`. ffly.app is this Vercel site, so serving the page here needs no
@@ -53,7 +53,7 @@ nginx image, no k8s manifests, no DNS, and no Vercel rewrite. The API already al
   searches. The app has more." City limit (402 `city_limit`): "The free web search takes up to N cities."
   `failed`, or the network is down: retry button. No raw server text shown.
 - **Prices:** `Intl.NumberFormat` with the API's `currency`. Dates: `Intl.DateTimeFormat`, English.
-- **Ads:** `ADSENSE_CLIENT` and `ADSENSE_SLOTS` in `src/app.ts`, `undefined` for now. While undefined, nothing
+- **Ads (removed 2026-10-04, T-014; kept as the design for the future ads step):** `ADSENSE_CLIENT` and `ADSENSE_SLOTS` in `src/app.ts`, `undefined` for now. While undefined, nothing
   ad-related renders and no third-party script loads. When set: fixed-height slots (no layout shift) beside the
   form, under the progress card, and between result cards, loaded only after consent. The consent banner is
   part of that later step, not this spec.
