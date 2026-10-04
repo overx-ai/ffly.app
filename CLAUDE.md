@@ -13,7 +13,9 @@ Those repos are the source of truth for copy, colours and claims.
   `src/scripts/{ffly-api,search}.ts`, plain TypeScript, no framework, rendering via `textContent`/`<template>`
   only (never `innerHTML` with API data). It calls `FFLY_API_BASE` anonymously: `X-Platform: web`, never
   `X-Client-Id`. Ads stay off while `ADSENSE_CLIENT` is `undefined` in `src/app.ts`.
-- Deploy: `git push origin main`, then Vercel builds. `vercel.json` is clean URLs only.
+- Deploy: `git push origin main`, then Vercel builds. `vercel.json` holds clean URLs, the
+  security headers (CSP, nosniff, Referrer-Policy) and immutable caching of `/_astro/`; `npm test` checks
+  them. The CSP allows no inline script and no third-party host but `api.overx.ai`: add any new one there.
   Hosting and DNS: [docs/001-deployment.md](docs/001-deployment.md).
 
 ## Critical conventions

@@ -15,7 +15,8 @@ the domain stays on **Namecheap BasicDNS**, the apex is primary and `www` redire
   build `astro build`, output `dist`, no adapter, **no environment variables**
   (`astro.config.mjs` defaults `site` to `https://ffly.app`). Production branch `main`.
 - `vercel.json` supplies `cleanUrls` and `trailingSlash: false`, so `/support/` 308s to `/support`
-  and `dist/404.html` serves unknown paths.
+  and `dist/404.html` serves unknown paths. It also sets the CSP, `X-Content-Type-Options: nosniff`,
+  `Referrer-Policy` and a one-year immutable `Cache-Control` on the hashed `/_astro/` files.
 - Settings, Domains: add `ffly.app` and `www.ffly.app`; make **`ffly.app` primary** so `www`
   308s to the apex, matching the apex canonicals. (tryrefresher.app: `www` 308 to apex, verified
   2026-10-03.)
