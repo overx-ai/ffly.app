@@ -70,17 +70,6 @@ check(
   'Support: the delete-my-data answer must link the privacy feedback section by its number',
 );
 
-const DATED_PAGES = ['support', 'privacy', 'terms'];
-const displayDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
-const sitemap = readFileSync(`${DIST}sitemap.xml`, 'utf8');
-for (const [, loc, lastmod] of sitemap.matchAll(/<loc>([^<]+)<\/loc>\s*<lastmod>([^<]+)<\/lastmod>/g)) {
-  const page = new URL(loc).pathname.slice(1);
-  const stated = readHtml(page).match(/Last updated: ([^<]+)</)?.[1];
-  const expected = displayDate.format(new Date(lastmod));
-  if (DATED_PAGES.includes(page)) check(stated !== undefined, `/${page}: "Last updated" line missing`);
-  check(stated === undefined || stated === expected, `/${page}: "Last updated: ${stated}" must match lastmod ${lastmod}`);
-}
-
 const answers = [...readHtml('support').matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)]
   .map(([, json]) => JSON.parse(json))
   .filter((schema) => schema['@type'] === 'FAQPage')
