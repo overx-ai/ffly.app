@@ -161,7 +161,7 @@ const plans = [
           <figure class="card example" aria-label={`Example search: ${exampleRoute}`}>
             <p class="lbl">Example search</p>
             <h3>{exampleTitle}</h3>
-            <ol class="route">
+            <ol class="chain">
               {EXAMPLE_TRIP.stops.map((st) => (
                 <li>
                   <span class="city">{st.city}</span>
@@ -306,35 +306,6 @@ const plans = [
 
   .example { margin: 0; position: sticky; top: 88px; }
   .example h3 { font-size: 1.2rem; padding-block: var(--space-xs) var(--space-md); }
-  .route { list-style: none; margin: 0; padding: 0; }
-  .route li {
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    gap: var(--space-md);
-    padding: 6px 0 6px 24px;
-  }
-  .route li::before {
-    content: "";
-    position: absolute;
-    left: 4px;
-    top: 50%;
-    width: 10px;
-    height: 10px;
-    margin-top: -5px;
-    border-radius: 50%;
-    background: var(--grad);
-  }
-  .route li:not(:last-child)::after {
-    content: "";
-    position: absolute;
-    left: 8px;
-    top: calc(50% + 7px);
-    height: calc(100% - 14px);
-    border-left: 2px dotted var(--rule);
-  }
-  .city { font-family: var(--font-display); font-weight: 700; }
-  .nights { color: var(--ink-3); font-size: 14px; white-space: nowrap; }
   .total {
     display: flex;
     justify-content: space-between;
