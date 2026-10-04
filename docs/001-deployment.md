@@ -3,11 +3,11 @@
 How `ffly.app` goes live. Mirrors `tryrefresher.app`: Vercel builds from GitHub on every push,
 the domain stays on **Namecheap BasicDNS**, the apex is primary and `www` redirects to it.
 
-**Status (2026-10-03): not deployed.** No GitHub repo, no Vercel project, DNS untouched.
+**Status (2026-10-04): not deployed.** GitHub repo `overx-ai/ffly.app` (private) holds `main`; no Vercel project yet, DNS untouched.
 `ffly.app` still resolves to Namecheap parking (`162.255.119.203`).
 
 ## 1. GitHub
-- Create `overx-ai/ffly.app` (refresher is `overx-ai/tryRefresher.app`), then
+- Done 2026-10-04: `overx-ai/ffly.app`, private (refresher is `overx-ai/tryRefresher.app`, public), created with
   `git remote add origin git@github.com:overx-ai/ffly.app.git && git push -u origin main`.
 
 ## 2. Vercel project
