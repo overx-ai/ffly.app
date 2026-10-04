@@ -19,10 +19,9 @@ const noindex = slug === undefined;
 const canonical = noindex ? undefined : `${siteOrigin}${pathFor(slug)}`;
 // The home title already names the brand; suffixing it would render "ffly ... | ffly".
 const fullTitle = slug === '' ? title : `${title} | ${APP.name}`;
-const schemas =
-  slug === undefined ? structuredData
-  : slug === '' ? [websiteSchema(), ...structuredData]
-  : [...structuredData, breadcrumb(title, slug)];
+let schemas = structuredData;
+if (slug === '') schemas = [websiteSchema(), ...structuredData];
+else if (slug !== undefined) schemas = [...structuredData, breadcrumb(title, slug)];
 ---
 <!doctype html>
 <html lang="en">

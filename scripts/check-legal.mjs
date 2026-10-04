@@ -17,7 +17,9 @@ function plainText(html) {
   return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-const readHtml = (page) => readFileSync(`${DIST}${page ? `${page}/` : ''}index.html`, 'utf8');
+function readHtml(page) {
+  return readFileSync(`${DIST}${page ? `${page}/` : ''}index.html`, 'utf8');
+}
 
 // A missing section is itself a failure, so the "must not" checks cannot pass on an empty string.
 function readPage(page) {
@@ -77,8 +79,10 @@ for (const text of answers) {
 }
 
 const vercel = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
-const headersFor = (source) =>
-  Object.fromEntries(vercel.headers?.find((h) => h.source === source)?.headers.map((h) => [h.key, h.value]) ?? []);
+function headersFor(source) {
+  const rule = vercel.headers?.find((h) => h.source === source);
+  return Object.fromEntries(rule?.headers.map((h) => [h.key, h.value]) ?? []);
+}
 const siteHeaders = headersFor('/(.*)');
 const csp = siteHeaders['Content-Security-Policy'] ?? '';
 check(/default-src 'self'/.test(csp) && /frame-ancestors 'none'/.test(csp), 'vercel.json: CSP missing or incomplete');
