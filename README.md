@@ -1,6 +1,7 @@
 # ffly-site
 
-Website for **ffly**, at `ffly.app`. Astro 4, static, one dependency, zero client JavaScript.
+Website for **ffly**, at `ffly.app`. Astro 4, static, one dependency. Zero client JavaScript, except the
+free web search at `/search`.
 
 ```bash
 npm install
@@ -17,6 +18,7 @@ npm run preview
 | `/support` | `src/pages/support.astro` + `src/data/support.ts` |
 | `/privacy` | `src/layouts/LegalLayout.astro` + `src/data/privacy.ts` |
 | `/terms` | `src/layouts/LegalLayout.astro` + `src/data/terms.ts` |
+| `/search` | `src/pages/search.astro` + `src/scripts/{ffly-api,search}.ts`, the free web search |
 | `/404` | `src/pages/404.astro`, noindex |
 | `/sitemap.xml` | `src/pages/sitemap.xml.ts`, from `src/site-pages.ts` |
 | `/robots.txt`, `/llms.txt` | `public/` |
@@ -30,7 +32,7 @@ at those exact paths.
 npm run build && npm run preview -- --port 4329 &
 
 # 200, one H1 and one canonical on every page.
-for u in / /support /privacy /terms; do
+for u in / /support /privacy /terms /search; do
   curl -s localhost:4329$u | grep -c '<h1\|rel="canonical"'; done   # 2 each
 
 # No trailing-slash internal links, no em dashes, no "unlimited", no prices in schema.
