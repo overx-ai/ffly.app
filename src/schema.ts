@@ -70,7 +70,7 @@ export function faqSchema(items: readonly { question: string; answer: string }[]
       name: it.question,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: it.answer.replace(/<[^>]+>/g, ''),
+        text: it.answer.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim(),
       },
     })),
   };

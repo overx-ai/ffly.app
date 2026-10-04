@@ -67,6 +67,15 @@ for (const [, loc, lastmod] of sitemap.matchAll(/<loc>([^<]+)<\/loc>\s*<lastmod>
   check(stated === undefined || stated === expected, `/${page}: "Last updated: ${stated}" must match lastmod ${lastmod}`);
 }
 
+const answers = [...readHtml('support').matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)]
+  .map(([, json]) => JSON.parse(json))
+  .filter((schema) => schema['@type'] === 'FAQPage')
+  .flatMap((faq) => faq.mainEntity.map((q) => q.acceptedAnswer.text));
+check(answers.length > 0, 'Support: FAQPage JSON-LD missing');
+for (const text of answers) {
+  check(!/\s\s|\n|^\s|\s$/.test(text), `Support: FAQ JSON-LD answer keeps source whitespace: ${text.slice(0, 60)}`);
+}
+
 const vercel = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
 const headersFor = (source) =>
   Object.fromEntries(vercel.headers?.find((h) => h.source === source)?.headers.map((h) => [h.key, h.value]) ?? []);
