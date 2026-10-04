@@ -4,7 +4,7 @@ Website for **ffly**, at `ffly.app`. Astro 4, static, one dependency, zero clien
 
 ```bash
 npm install
-npm run dev      # localhost:4321
+npm run dev      # localhost:4321; add `-- --host` to reach it from a phone on the LAN
 npm run build    # -> dist/
 npm test         # build, then scripts/check-legal.mjs over dist (legal facts)
 npm run preview
