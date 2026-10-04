@@ -74,8 +74,12 @@ export class NotFound extends Error {}
 
 const headers = { 'X-Platform': WEB_SEARCH.platform };
 
+// A timeout rejects like a network error, so callers show their existing network message.
+// Safari before 16 has no AbortSignal.timeout; there the request simply runs without one.
+const timeout = () => AbortSignal.timeout?.(WEB_SEARCH.requestTimeoutMs);
+
 async function getJson<T>(path: string): Promise<T> {
-  const res = await fetch(`${FFLY_API_BASE}${path}`, { headers });
+  const res = await fetch(`${FFLY_API_BASE}${path}`, { headers, signal: timeout() });
   if (res.status === 404) throw new NotFound(path);
   if (!res.ok) throw new Error(`GET ${path}: ${res.status}`);
   return res.json() as Promise<T>;
@@ -90,6 +94,7 @@ export async function createSearch(request: SearchRequest): Promise<SubmitOutcom
     method: 'POST',
     headers: { ...headers, 'Content-Type': 'application/json' },
     body: JSON.stringify(request),
+    signal: timeout(),
   });
   const body = (await res.json().catch(() => ({}))) as { id?: unknown; reason?: unknown };
   switch (res.status) {

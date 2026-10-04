@@ -467,13 +467,17 @@ function resume(saved: Saved, resubmitted = false): Promise<void> {
   return poll(saved, resubmitted);
 }
 
-async function poll(saved: Saved, resubmitted: boolean): Promise<void> {
+async function poll(saved: Saved, resubmitted: boolean, failures = 0): Promise<void> {
   const searchAgain = () => submit(withNewRequestId(saved.request));
   let view: SearchView;
   try {
     view = await getSearch(saved.id);
   } catch (err) {
-    if (!(err instanceof NotFound)) return showProblem(MESSAGES.network, () => resume(saved, resubmitted));
+    if (!(err instanceof NotFound)) {
+      if (failures >= WEB_SEARCH.pollRetries) return showProblem(MESSAGES.network, () => resume(saved, resubmitted));
+      pollTimer = setTimeout(() => poll(saved, resubmitted, failures + 1), WEB_SEARCH.pollRetryBaseMs * 2 ** failures);
+      return;
+    }
     // Resubmit unasked only a search lost mid-run (an API restart): never spend a free search
     // re-running one already shown, nor one whose dates have passed.
     const current = saved.request.date_from >= isoDay(0);
