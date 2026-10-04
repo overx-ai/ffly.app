@@ -463,6 +463,7 @@ function renderResults(view: SearchView, request: SearchRequest) {
 function resume(saved: Saved, resubmitted = false): Promise<void> {
   clearOutcome();
   el.submit.disabled = true;
+  renderReconnecting();
   return poll(saved, resubmitted);
 }
 
