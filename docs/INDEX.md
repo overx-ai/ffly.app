@@ -5,6 +5,8 @@
 - [CLAUDE.md](../CLAUDE.md): rules for every session (fixed URLs, facts, legal coupling, copy rules)
 - [001 - Deployment](001-deployment.md): Vercel project, Namecheap DNS, go-live checks
 - [Spec 001 - Web search](specs/001-search-web-app.md): `/search`, the free web search on ffly API v1.2
+- [000 - Tasks](000-tasks.md): low-severity backlog from the 2026-10-04 audit
+- [Bugs](bugs/): 001 Terms vs the web search, 002 Search History linkage (2026-10-04 audit)
 - [Spec 002 - Privacy: feedback form](specs/002-privacy-feedback.md): `/privacy` Section 8, linked Email Address and Customer Support
 
 ## Documentation Tree
