@@ -1,5 +1,7 @@
+import { LOCALE } from './app';
+
 // Single source of truth for every indexable route.
-// Three consumers read it: BaseLayout (canonical, via pathFor), sitemap.xml.ts (<lastmod>) and
+// Three consumers read it: BaseLayout (canonical, via urlFor), sitemap.xml.ts (<lastmod>) and
 // each page's "Last updated" line (via lastUpdated), so they cannot drift. An unregistered page
 // is invisible to crawlers.
 //
@@ -30,11 +32,14 @@ export const DEFAULT_OG_IMAGE = '/og-image.jpg';
 
 export const pathFor = (slug: Slug) => (slug ? `/${slug}` : '/');
 
+export const urlFor = (slug: Slug) => `${siteOrigin}${pathFor(slug)}`;
+
 export const pageLink = (slug: Slug, label: string) => `<a href="${pathFor(slug)}">${label}</a>`;
 
-const displayDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
+const longDate = new Intl.DateTimeFormat(LOCALE, { dateStyle: 'long', timeZone: 'UTC' });
 
-export const lastUpdated = (slug: Slug) =>
-  displayDate.format(new Date(SITE_PAGES.find((page) => page.slug === slug)!.lastmod));
+export const formatDate = (date: Date) => longDate.format(date);
+
+export const lastUpdated = (slug: Slug) => formatDate(new Date(SITE_PAGES.find((page) => page.slug === slug)!.lastmod));
 
 export const isoDate = (date: Date) => date.toISOString().slice(0, 10);

@@ -1,7 +1,7 @@
 ---
 status: current
 created: 2026-10-04
-updated: 2026-10-04
+updated: 2026-10-05
 ---
 
 # 000 - Tasks
@@ -32,3 +32,5 @@ updated: 2026-10-04
 | T-018 | **Tautological lastmod check.** `check-legal.mjs:73-82` re-derives "Last updated" from the same `SITE_PAGES` source. Fix: delete the loop | ffly-site | low | - | audit 2026-10-04; done 2026-10-04 |
 | T-019 | **Nits.** `app.ts:49` `OPERATOR ='…'` missing space; `index.astro:10` airline list is `APP.airlines.join(', ')` | ffly-site | low | - | audit 2026-10-04; done 2026-10-04 |
 | T-020 | **Partner reporting unstated.** Privacy `#booking-links`: Travelpayouts reports bookings made through ffly's identifier to ffly. Confirm in the partner dashboard what it shows (expected: route, date, price, no person), then state it | ffly-site | low | - | audit 2026-10-04; needs Travelpayouts sign-up |
+| T-021 | **A guide marked draft would publish.** The guides collection drops `status:` and never checks it, so a draft registered in `SITE_PAGES` goes live. Fix: keep `status` in `src/content/config.ts` and filter or throw on `draft` | ffly-site | low | - | /code review 2026-10-05 |
+| T-022 | **Boarding-pass table at ≤520px scrolls but isn't focusable.** `.tbl` gets `overflow-x: auto` with no `tabindex`. Only blurred placeholders can overflow, so the impact is low | ffly-site | low | - | /code review 2026-10-05 |

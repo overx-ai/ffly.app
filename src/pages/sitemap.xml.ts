@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { SITE_PAGES, pathFor, siteOrigin } from '../site-pages';
+import { SITE_PAGES, urlFor } from '../site-pages';
 
 // Hand-rolled rather than @astrojs/sitemap so the sitemap and the head tags read from the
 // same manifest. No <priority> or <changefreq>: Google ignores both. <lastmod> is the one
@@ -7,7 +7,7 @@ import { SITE_PAGES, pathFor, siteOrigin } from '../site-pages';
 export const GET: APIRoute = () => {
   const urls = SITE_PAGES.map(
     ({ slug, lastmod }) =>
-      `  <url>\n    <loc>${siteOrigin}${pathFor(slug)}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`
+      `  <url>\n    <loc>${urlFor(slug)}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`
   ).join('\n');
 
   return new Response(

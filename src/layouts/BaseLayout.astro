@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import { APP, APP_STORE_ID } from '../app';
-import { DEFAULT_OG_IMAGE, pathFor, siteOrigin, type Slug } from '../site-pages';
+import { DEFAULT_OG_IMAGE, siteOrigin, urlFor, type Slug } from '../site-pages';
 import { breadcrumb, websiteSchema, type Crumb } from '../schema';
 
 interface Props {
@@ -30,9 +30,11 @@ const PRELOAD_FONTS = ['/fonts/bricolage-grotesque-latin.woff2', '/fonts/figtree
 
 // A page outside SITE_PAGES (the 404) has no slug, so it gets no canonical URL and stays out of search.
 const noindex = slug === undefined;
-const canonical = noindex ? undefined : `${siteOrigin}${pathFor(slug)}`;
+const canonical = noindex ? undefined : urlFor(slug);
 // The home title already names the brand; suffixing it would render "ffly ... | ffly".
 const fullTitle = slug === '' ? title : `${title} | ${APP.name}`;
+// set:html is unescaped, so "<" becomes \u003c: no string in the data can close the script element.
+const jsonLd = (schema: object) => JSON.stringify(schema).replace(/</g, '\\u003c');
 let schemas = structuredData;
 if (slug === '') schemas = [websiteSchema(), ...structuredData];
 else if (slug !== undefined) schemas = [...structuredData, breadcrumb(title, slug, parent)];
@@ -55,14 +57,14 @@ else if (slug !== undefined) schemas = [...structuredData, breadcrumb(title, slu
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={`${siteOrigin}${ogImage}`} />
-    <!-- Hardcoded to match public/og-image.jpg. Change both together. -->
+    {/* Hardcoded to match public/og-image.jpg. Change both together. */}
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="675" />
     <meta name="twitter:card" content="summary_large_image" />
 
     {APP_STORE_ID && <meta name="apple-itunes-app" content={`app-id=${APP_STORE_ID}`} />}
 
-    <!-- Raster icons only. An image/svg+xml icon would silently outrank every PNG. -->
+    {/* Raster icons only. An image/svg+xml icon would silently outrank every PNG. */}
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
@@ -73,7 +75,7 @@ else if (slug !== undefined) schemas = [...structuredData, breadcrumb(title, slu
     {PRELOAD_FONTS.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
 
     {schemas.map((s) => (
-      <script type="application/ld+json" set:html={JSON.stringify(s)} />
+      <script type="application/ld+json" set:html={jsonLd(s)} />
     ))}
   </head>
   <body>

@@ -33,7 +33,7 @@ at those exact paths.
 `scripts/europe-map.py`, which has no dependencies. Regenerate after changing its cities or viewport:
 
 ```bash
-curl -sL https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_land.geojson | python3 scripts/europe-map.py /dev/stdin > src/data/europe-map.json
+curl -sL https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_land.geojson | uv run scripts/europe-map.py /dev/stdin > src/data/europe-map.json
 ```
 
 ## Verification
@@ -45,11 +45,8 @@ npm run build && npm run preview -- --port 4329 &
 for u in / /support /privacy /terms /search /guides; do
   curl -s localhost:4329$u | grep -c '<h1\|rel="canonical"'; done   # 2 each
 
-# No trailing-slash internal links, no em dashes, no "unlimited", no prices in schema.
-grep -roh 'href="/[^"]*/"' dist ; echo "(empty is correct)"
-grep -rl -e "—" -e "&mdash;" --include='*.html' dist ; echo "(empty is correct)"
-grep -ril unlimited dist ; echo "(empty is correct)"
-grep -ro '"offers"\|"aggregateRating"' dist ; echo "(empty is correct)"
+# npm test already fails on trailing-slash or dead internal links, em dashes, "unlimited" and
+# offers/aggregateRating in JSON-LD. Fare figures are left to a human read:
 grep -rohE --include='*.html' '€ ?[0-9][0-9.,]*' dist   # only the labelled EXAMPLE_TRIP total
 ```
 

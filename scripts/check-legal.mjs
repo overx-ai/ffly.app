@@ -99,9 +99,6 @@ for (const name of guideNames) {
   const lastmod = sitemap.match(new RegExp(`/${page}</loc>\\s*<lastmod>([^<]+)<`))?.[1];
   check(lastmod !== undefined && ofType(schemas, 'Article')[0]?.dateModified === lastmod, `${page}: Article dateModified must equal its SITE_PAGES lastmod`);
   check(readHtml('guides').includes(`href="/${page}"`), `/guides must list ${page}`);
-  for (const [, href] of html.matchAll(/href="(\/[^"#?]*)/g)) {
-    check(href === '/' || (!href.endsWith('/') && resolves(href.slice(1))), `${page}: link ${href} does not resolve`);
-  }
 }
 
 const vercel = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
@@ -117,13 +114,18 @@ check(siteHeaders['Referrer-Policy'] === 'strict-origin-when-cross-origin', 'ver
 check(/immutable/.test(headersFor('/_astro/(.*)')['Cache-Control'] ?? ''), 'vercel.json: /_astro/ must be cached immutable');
 
 // The CSP has no 'unsafe-inline' for scripts: every executable script must load from a file.
-const htmlFiles = readdirSync(DIST, { recursive: true }).filter((f) => f.endsWith('.html'));
-for (const file of htmlFiles) {
-  const html = readFileSync(`${DIST}${file}`, 'utf8');
+const htmlPages = readdirSync(DIST, { recursive: true })
+  .filter((f) => f.endsWith('.html'))
+  .map((file) => [file, readFileSync(`${DIST}${file}`, 'utf8')]);
+for (const [file, html] of htmlPages) {
   for (const [tag] of html.matchAll(/<script\b[^>]*>/g)) {
     check(/\ssrc=|type="application\/ld\+json"/.test(tag), `${file}: inline ${tag} is blocked by the CSP`);
   }
   check(!/<[a-z][^>]*\son[a-z]+=/i.test(html), `${file}: inline event handlers are blocked by the CSP`);
+  for (const [, href] of html.matchAll(/href="(\/[^"#?]*)/g)) {
+    check(href === '/' || (!href.endsWith('/') && resolves(href.slice(1))), `${file}: link ${href} does not resolve`);
+  }
+  check(!/"(?:offers|aggregateRating)"/.test(JSON.stringify(jsonLd(html))), `${file}: JSON-LD must carry no offers or aggregateRating`);
 }
 
 const connectHosts = (csp.match(/connect-src ([^;]*)/)?.[1] ?? '')
@@ -153,17 +155,23 @@ for (const [what, copy] of Object.entries(BUNDLE_COPY)) {
 }
 // Inlined CSS is not copy, and words like "background" are CSS properties.
 const withoutCss = (html) => html.replace(/<style\b[\s\S]*?<\/style>/g, '').replace(/\sstyle="[^"]*"/g, '');
-const otherPages = htmlFiles
-  .filter((file) => !LEGAL_FILES.includes(file))
-  .map((file) => [file, copyText(withoutCss(readFileSync(`${DIST}${file}`, 'utf8')))]);
-const llms = copyText(readFileSync(`${DIST}llms.txt`, 'utf8'));
-for (const [where, text] of [['Search bundle', bundle], ['llms.txt', llms], ...otherPages]) {
+const llms = readFileSync(`${DIST}llms.txt`, 'utf8');
+// Copy rules for every published page, the legal ones included.
+for (const [where, text] of [['llms.txt', llms], ...htmlPages]) {
+  check(!/\u2014|&mdash;|&#8212;|&#x2014;/i.test(text), `${where}: no em dashes in published copy`);
+  check(!/unlimited/i.test(text), `${where}: Pro is never "unlimited"`);
+}
+const copyPages = [
+  ['llms.txt', copyText(llms)],
+  ...htmlPages.filter(([file]) => !LEGAL_FILES.includes(file)).map(([file, html]) => [file, copyText(withoutCss(html))]),
+];
+for (const [where, text] of [['Search bundle', bundle], ...copyPages]) {
   for (const [pattern, what] of LEGAL_ONLY) {
     check(!pattern.test(text), `${where}: must not name ${what}`);
   }
 }
 // Book opens the airline's site or a booking site, so no page may promise the airline's own site.
-for (const [where, text] of [['llms.txt', llms], ...otherPages]) {
+for (const [where, text] of copyPages) {
   check(!/airline's (?:own )?(?:web)?site(?! or a booking site)/i.test(text), `${where}: must not promise the airline's own site`);
 }
 check(!/live fares/i.test(copyText(readHtml('search'))), '/search: must not promise live fares');

@@ -22,7 +22,6 @@
 
 .search-head { display: flex; flex-direction: column; gap: var(--space-md); }
 .search-head h1 { font-size: clamp(2.4rem, 6vw, 3.4rem); letter-spacing: -0.04em; }
-.search-head .lead { color: var(--ink-2); font-size: clamp(17px, 1.6vw, 19px); }
 
 .search-page .note { color: var(--ink-2); font-size: 14px; }
 .search-page .hint { color: var(--ink-2); font-size: 13px; line-height: 1.4; }

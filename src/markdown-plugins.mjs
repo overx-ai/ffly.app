@@ -6,6 +6,7 @@ export function remarkDropTitle() {
 }
 
 // A focusable scroll box, so a wide table scrolls sideways on a phone instead of widening the page.
+// A focusable element needs a role and a name for screen readers, hence the labelled region.
 export function rehypeScrollTables() {
   const wrap = (node) => {
     node.children?.forEach((child, i) => {
@@ -13,7 +14,7 @@ export function rehypeScrollTables() {
         node.children[i] = {
           type: 'element',
           tagName: 'div',
-          properties: { className: ['table-scroll'], tabIndex: 0 },
+          properties: { className: ['table-scroll'], tabIndex: 0, role: 'region', ariaLabel: 'Scrollable table' },
           children: [child],
         };
       } else {

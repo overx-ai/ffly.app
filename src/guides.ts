@@ -1,5 +1,4 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { GUIDES } from './app';
 import { isSlug, type Slug } from './site-pages';
 
 export type Guide = CollectionEntry<'guides'>;
@@ -16,7 +15,3 @@ export function guidePageSlug(guide: Guide): Slug {
   if (!isSlug(slug)) throw new Error(`${slug} is not registered in SITE_PAGES`);
   return slug;
 }
-
-const guideDate = new Intl.DateTimeFormat(GUIDES.dateLocale, { dateStyle: 'long', timeZone: 'UTC' });
-
-export const formatGuideDate = (date: Date) => guideDate.format(date);

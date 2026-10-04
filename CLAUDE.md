@@ -61,9 +61,12 @@ Those repos are the source of truth for copy, colours and claims.
 ## Copy rules
 - **Never "unlimited".** Pro has a daily fair-use cap. The Pro line is
   "Every route in full, and no 3-search limit".
-- **No prices**, in copy or JSON-LD (`offers`). No ratings or download counts. The one fare figure on
-  the site is `EXAMPLE_TRIP` (a real live search, ios-ffly spec 001), always labelled "Example search"
-  with its date and "not a price or saving you will get". Never restate it as a saving.
+- **No prices**, in copy or JSON-LD (`offers`). No ratings or download counts. Fare figures appear only
+  as real example searches, and each one carries its date and a "not a price you'll get" caveat:
+  - `EXAMPLE_TRIP` on the home page (a live search, ios-ffly spec 001), labelled "Example search";
+  - the dated searches the guides quote, recorded in `seo/experience.md` with their raw results.
+
+  Never restate an example as a saving.
 - **The value section follows `ios-ffly/docs/specs/002-value-story.md`**, and its "Never" column is
   binding: no invented or unmeasured numbers, no fear or guilt copy, no fake discounts or urgency,
   no medical claims about sleep, no claim that one priority is the right way to travel.
@@ -76,7 +79,8 @@ Those repos are the source of truth for copy, colours and claims.
 - **Value, not mechanics**, outside the legal pages: no cache, Keychain, RevenueCat, server, background,
   bundle id, nor search limits such as "up to 8" cities. `LEGAL_ONLY` in `scripts/check-legal.mjs` bans them
   on every other page, in `llms.txt` and in the JS bundle.
-- **No em dashes in published copy.** British spelling.
+- **No em dashes in published copy.** British spelling, and `LOCALE` (`en-GB`) for every date and number.
+  `npm test` fails on an em dash or "unlimited" on any page or in `llms.txt`.
 
 ## Design
 - Follows the system colour scheme, as the app does (it uses iOS semantic colours). Light tokens

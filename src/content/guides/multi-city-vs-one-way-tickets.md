@@ -98,7 +98,7 @@ I care about this part most. Land after midnight and you pay for a hotel bed you
 
 ### Check what the fare includes
 
-Budget fares often don't include a cabin bag or checked luggage. Add the bags you need to every leg before comparing totals, and confirm the final price on the airline's site.
+Budget fares often don't include a cabin bag or checked luggage. Add the bags you need to every leg before comparing totals, and confirm the final price where you book.
 
 ### Book the hard legs first
 

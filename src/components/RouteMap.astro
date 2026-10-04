@@ -34,7 +34,7 @@ const cy = loop.reduce((sum, p) => sum + p[1], 0) / loop.length;
 
 // Each leg is a quadratic arc bowed away from the trip's centroid, so the loop reads as a ring
 // and the legs never cross.
-const legs = stops.slice(0, -1).map((a, i) => {
+const legs = loop.map((a, i) => {
   const b = stops[i + 1];
   const mx = (a[0] + b[0]) / 2;
   const my = (a[1] + b[1]) / 2;
@@ -54,23 +54,24 @@ const legs = stops.slice(0, -1).map((a, i) => {
     2 * (1 - t) * (c[0] - a[0]) + 2 * t * (b[0] - c[0]),
     2 * (1 - t) * (c[1] - a[1]) + 2 * t * (b[1] - c[1]),
   ];
-  const [ax, ay] = at(ARROW_T);
-  const [tx, ty] = tangent(ARROW_T);
+  const pose = (t: number) => {
+    const [x, y] = at(t);
+    const [tx, ty] = tangent(t);
+    return `translate(${fmt(x)},${fmt(y)}) rotate(${fmt((Math.atan2(ty, tx) * 180) / Math.PI)})`;
+  };
   const [bx, by] = at(BADGE_T);
   let length = 0;
-  for (let i = 1, prev = a; i <= LENGTH_SAMPLES; i++) {
-    const q = at(i / LENGTH_SAMPLES);
+  for (let step = 1, prev = a; step <= LENGTH_SAMPLES; step++) {
+    const q = at(step / LENGTH_SAMPLES);
     length += Math.hypot(q[0] - prev[0], q[1] - prev[1]);
     prev = q;
   }
-  const [mx2, my2] = at(0.5);
-  const [tx2, ty2] = tangent(0.5);
   return {
     start: `M${fmt(a[0])},${fmt(a[1])}`,
     curve: `Q${fmt(c[0])},${fmt(c[1])} ${fmt(b[0])},${fmt(b[1])}`,
-    arrow: `translate(${fmt(ax)},${fmt(ay)}) rotate(${fmt((Math.atan2(ty, tx) * 180) / Math.PI)})`,
+    arrow: pose(ARROW_T),
     badge: [fmt(bx + nx * BADGE_OFFSET), fmt(by + ny * BADGE_OFFSET)] as const,
-    mid: `translate(${fmt(mx2)},${fmt(my2)}) rotate(${fmt((Math.atan2(ty2, tx2) * 180) / Math.PI)})`,
+    mid: pose(0.5),
     length,
   };
 });

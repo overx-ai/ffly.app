@@ -3,9 +3,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import NoBreak from '../../components/NoBreak.astro';
-import { isoDate, pathFor } from '../../site-pages';
+import { formatDate, isoDate, pathFor } from '../../site-pages';
 import { parseGuide } from '../../guide-markdown';
-import { GUIDES_INDEX, formatGuideDate, getGuides, guidePageSlug } from '../../guides';
+import { GUIDES_INDEX, getGuides, guidePageSlug } from '../../guides';
 
 const guides = (await getGuides()).map((guide) => ({
   ...guide.data,
@@ -28,7 +28,7 @@ const guides = (await getGuides()).map((guide) => ({
         <li>
           <h2><a href={g.href}><NoBreak text={g.title} /></a></h2>
           <p>{g.description}</p>
-          <p class="meta"><time datetime={isoDate(g.published)}>{formatGuideDate(g.published)}</time> · {g.minutes} min read</p>
+          <p class="meta"><time datetime={isoDate(g.published)}>{formatDate(g.published)}</time> · {g.minutes} min read</p>
         </li>
       ))}
     </ul>
@@ -37,7 +37,6 @@ const guides = (await getGuides()).map((guide) => ({
 </BaseLayout>
 
 <style>
-  .lead { color: var(--ink-2); font-size: clamp(17px, 1.6vw, 19px); padding-top: var(--space-md); }
   .list { list-style: none; margin: var(--space-2xl) 0 0; padding: 0; }
   .list li { border-top: 1px solid var(--rule); padding-block: var(--space-lg); display: flex; flex-direction: column; gap: var(--space-sm); }
   .list li:last-child { border-bottom: 1px solid var(--rule); }

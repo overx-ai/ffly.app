@@ -10,7 +10,7 @@ const home = pathFor('');
       <span>{APP.name}</span>
     </a>
     <nav aria-label="Main">
-      <!-- Absolute, not bare fragments: the ids live on the home page only. -->
+      {/* Absolute, not bare fragments: the ids live on the home page only. */}
       <a href={`${home}#why`}>Why {APP.name}</a>
       <a href={`${home}#plans`}>Free and Pro</a>
       <a href={pathFor('search')}>Try on the web</a>

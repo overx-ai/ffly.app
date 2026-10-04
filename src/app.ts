@@ -43,6 +43,9 @@ export const APP_STORE_URL = APP_STORE_ID ? `https://apps.apple.com/app/id${APP_
 // The domain as named in copy. Not the build's `site` (astro.config.mjs), which PUBLIC_SITE_URL overrides.
 export const SITE_HOST = 'ffly.app';
 
+// British English throughout: dates, numbers and lists.
+export const LOCALE = 'en-GB';
+
 export const OPERATOR = 'Yauheni Malashchytski, trading as OverX AI';
 export const DEVELOPER = 'Yauheni Malashchytski';
 export const PUBLISHER = { name: 'OverX AI', label: 'overx.ai', url: 'https://overx.ai' } as const;
@@ -76,7 +79,7 @@ export const WEB_SEARCH = {
   pollRetries: 3,
   pollRetryBaseMs: 2000,
   storageKey: 'ffly.search',
-  locale: 'en-GB',
+  locale: LOCALE,
   startInDays: 21,
   windowDays: 7,
   minNights: 2,
@@ -86,7 +89,6 @@ export const WEB_SEARCH = {
 // The articles at /guides (src/content/guides).
 export const GUIDES = {
   wordsPerMinute: 230,
-  dateLocale: 'en-GB',
 } as const;
 
 export const EXTERNAL = {

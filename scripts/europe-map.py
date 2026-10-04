@@ -69,8 +69,10 @@ def area(ring):
 
 
 def main(src):
+    with open(src) as f:
+        features = json.load(f)['features']
     rings = []
-    for feature in json.load(open(src))['features']:
+    for feature in features:
         geom = feature['geometry']
         polys = geom['coordinates'] if geom['type'] == 'MultiPolygon' else [geom['coordinates']]
         for poly in polys:

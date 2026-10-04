@@ -6,16 +6,14 @@ import StoreCtas from '../components/StoreCtas.astro';
 import RouteMap from '../components/RouteMap.astro';
 import BoardingPass from '../components/BoardingPass.astro';
 import { APP, EXAMPLE_TRIP, PRIORITIES, WEB_SEARCH } from '../app';
-import { pageLink, pathFor } from '../site-pages';
+import { formatDate, pageLink, pathFor } from '../site-pages';
 import { appSchema, faqSchema, organizationSchema } from '../schema';
 import type { FaqItem } from '../data/types';
 
 const airlines = APP.airlines.join(', ');
 const priorities = PRIORITIES.map((p, i) => (i ? p.toLowerCase() : p));
 const listOf = (items: readonly string[]) => `${items.slice(0, -1).join(', ')} or ${items.at(-1)}`;
-const searchedOn = new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeZone: 'UTC' }).format(
-  new Date(EXAMPLE_TRIP.searchedOn),
-);
+const searchedOn = formatDate(new Date(EXAMPLE_TRIP.searchedOn));
 const caveat = `Example search on live fares, ${searchedOn}. Not a price or saving you will get: fares change and your trip will differ.`;
 const webSearches = WEB_SEARCH.freeSearchesPerDay === 1 ? 'once a day' : `${WEB_SEARCH.freeSearchesPerDay} times a day`;
 

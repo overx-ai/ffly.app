@@ -1,12 +1,14 @@
 import { APP, APP_STORE_URL, DEVELOPER, PUBLISHER } from './app';
 import type { HowTo } from './guide-markdown';
-import { DEFAULT_OG_IMAGE, isoDate, pathFor, siteOrigin, type Slug } from './site-pages';
+import { DEFAULT_OG_IMAGE, isoDate, siteOrigin, urlFor, type Slug } from './site-pages';
 
 // No offers.price and no aggregateRating. Prices are territory-set and the app has no
 // ratings yet, so quoting either would be a claim the store does not back.
 
 const overx = { '@type': 'Organization', name: PUBLISHER.name, url: PUBLISHER.url };
 const developer = { '@type': 'Person', name: DEVELOPER, url: PUBLISHER.url };
+const homeUrl = urlFor('');
+const appIcon = `${siteOrigin}/icon-512.png`;
 
 export interface Crumb {
   name: string;
@@ -20,8 +22,8 @@ export function appSchema() {
     name: APP.storeName,
     operatingSystem: `iOS ${APP.minimumOs} or later`,
     applicationCategory: 'TravelApplication',
-    url: `${siteOrigin}/`,
-    image: `${siteOrigin}/icon-512.png`,
+    url: homeUrl,
+    image: appIcon,
     ...(APP_STORE_URL ? { installUrl: APP_STORE_URL, downloadUrl: APP_STORE_URL } : {}),
     author: developer,
     creator: overx,
@@ -41,8 +43,8 @@ export function organizationSchema() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: APP.name,
-    url: `${siteOrigin}/`,
-    logo: `${siteOrigin}/icon-512.png`,
+    url: homeUrl,
+    logo: appIcon,
     parentOrganization: overx,
   };
 }
@@ -52,7 +54,7 @@ export function websiteSchema() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: APP.name,
-    url: `${siteOrigin}/`,
+    url: homeUrl,
     creator: overx,
   };
 }
@@ -66,7 +68,7 @@ export function breadcrumb(name: string, slug: Slug, parent?: Crumb) {
       '@type': 'ListItem',
       position: i + 1,
       name: it.name,
-      item: `${siteOrigin}${pathFor(it.slug)}`,
+      item: urlFor(it.slug),
     })),
   };
 }
@@ -93,7 +95,6 @@ export function articleSchema(article: {
   published: Date;
   updated: Date;
 }) {
-  const url = `${siteOrigin}${pathFor(article.slug)}`;
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -104,7 +105,7 @@ export function articleSchema(article: {
     publisher: overx,
     datePublished: isoDate(article.published),
     dateModified: isoDate(article.updated),
-    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': urlFor(article.slug) },
   };
 }
 

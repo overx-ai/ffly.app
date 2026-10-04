@@ -5,10 +5,10 @@ import Footer from '../components/Footer.astro';
 import NoBreak from '../components/NoBreak.astro';
 import StoreCtas from '../components/StoreCtas.astro';
 import { APP, DEVELOPER } from '../app';
-import { isoDate, pathFor } from '../site-pages';
+import { formatDate, isoDate, pathFor } from '../site-pages';
 import { articleSchema, faqSchema, howToSchema, type Crumb } from '../schema';
 import { parseGuide } from '../guide-markdown';
-import { GUIDES_INDEX, formatGuideDate, guidePageSlug, type Guide } from '../guides';
+import { GUIDES_INDEX, guidePageSlug, type Guide } from '../guides';
 
 interface Props { guide: Guide; }
 
@@ -44,7 +44,7 @@ const structuredData = [
       <h1><NoBreak text={h1} /></h1>
       <p class="byline">
         <span>By {DEVELOPER} ·</span>
-        <span><time datetime={isoDate(published)}>{formatGuideDate(published)}</time> ·</span>
+        <span><time datetime={isoDate(published)}>{formatDate(published)}</time> ·</span>
         <span>{minutes} min read</span>
       </p>
       <div class="prose"><slot /></div>

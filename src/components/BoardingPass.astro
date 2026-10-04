@@ -1,5 +1,5 @@
 ---
-import { APP, EXAMPLE_TRIP } from '../app';
+import { APP, EXAMPLE_TRIP, LOCALE } from '../app';
 
 interface Props {
   caption: string;
@@ -7,7 +7,7 @@ interface Props {
 
 const { caption } = Astro.props;
 
-// Stand-ins under the blur, shaped like the Pro fields they hide. Never shown unblurred.
+// Stand-ins under the blur, shaped like the Pro fields they hide, reused in turn on a longer trip. Never shown unblurred.
 const BLURRED = [
   { day: '14 OCT', time: '06:40', flight: 'FR 1234' },
   { day: '16 OCT', time: '11:15', flight: 'V7 1702' },
@@ -22,10 +22,10 @@ const first = stops[0];
 const last = stops[stops.length - 1];
 const visits = stops.filter((s) => 'nights' in s);
 const nights = visits.reduce((sum, s) => sum + ('nights' in s ? s.nights : 0), 0);
-const searched = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' })
+const searched = new Intl.DateTimeFormat(LOCALE, { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' })
   .format(new Date(EXAMPLE_TRIP.searchedOn))
   .toUpperCase();
-const legs = stops.slice(0, -1).map((from, i) => ({ from, to: stops[i + 1], hidden: BLURRED[i] }));
+const legs = stops.slice(0, -1).map((from, i) => ({ from, to: stops[i + 1], hidden: BLURRED[i % BLURRED.length] }));
 const route = stops.map((s) => s.code).join('-');
 
 // Decorative barcode: bar widths from a tiny LCG seeded by the route, so it is stable across builds.
