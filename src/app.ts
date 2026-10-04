@@ -43,7 +43,10 @@ export const EXAMPLE_TRIP = {
 export const APP_STORE_ID: string | undefined = undefined;
 export const APP_STORE_URL = APP_STORE_ID ? `https://apps.apple.com/app/id${APP_STORE_ID}` : undefined;
 
-export const OPERATOR = 'Yauheni Malashchytski, trading as OverX AI';
+// The domain as named in copy. Not the build's `site` (astro.config.mjs), which PUBLIC_SITE_URL overrides.
+export const SITE_HOST = 'ffly.app';
+
+export const OPERATOR ='Yauheni Malashchytski, trading as OverX AI';
 export const DEVELOPER = 'Yauheni Malashchytski';
 export const PUBLISHER = { name: 'OverX AI', label: 'overx.ai', url: 'https://overx.ai' } as const;
 

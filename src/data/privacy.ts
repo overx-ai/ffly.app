@@ -6,6 +6,7 @@ import {
   LEGAL_EFFECTIVE_DATE,
   OPERATOR,
   SERVICE,
+  SITE_HOST,
   externalLink,
   mailto,
 } from '../app';
@@ -221,7 +222,7 @@ export const PRIVACY: LegalDocument = {
         <ul>
           <li><strong>Data used to track you:</strong> none.</li>
           <li><strong>Data linked to you:</strong> Search History (trip searches, which carry the app user id),
-          Purchase History (${APP.proName} transactions, kept by Apple and RevenueCat under the app user id), User ID
+          Purchase History (${APP.proName} transactions, kept by RevenueCat under the app user id), User ID
           (the anonymous app user id), Email Address (Contact Info), only if you add one to feedback, and Customer
           Support (User Content), the feedback you send.</li>
           <li><strong>Data not linked to you:</strong> Product Interaction (usage events) and Device ID (IDFV and the
@@ -289,7 +290,7 @@ export const PRIVACY: LegalDocument = {
     },
     {
       id: 'web-search',
-      title: 'Web Search on ffly.app',
+      title: `Web Search on ${SITE_HOST}`,
       content: `
         <p>The <a href="${pathFor('search')}">web search</a> on this website sends your search from your browser
         straight to the ffly API over HTTPS: the start and finish places, the cities you want to visit, the date

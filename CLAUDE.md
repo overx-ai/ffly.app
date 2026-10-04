@@ -75,7 +75,7 @@ Those repos are the source of truth for copy, colours and claims.
 - Hyphenated words in large headings go in `<span class="nw">` so they do not break at the hyphen.
 
 ## Workflows
-- Verify: `npm run build`, then the checks in README "Verification".
+- Verify: `npm test` (build, then `scripts/check-legal.mjs`), then the checks in README "Verification".
 - Preview: `npm run preview`, read every page at 390px and 1280px in both colour schemes.
 
 ## Code comments

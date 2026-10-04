@@ -1,4 +1,14 @@
-import { APP, CONTACT_EMAIL, EXTERNAL, LEGAL_EFFECTIVE_DATE, OPERATOR, WEB_SEARCH, externalLink, mailto } from '../app';
+import {
+  APP,
+  CONTACT_EMAIL,
+  EXTERNAL,
+  LEGAL_EFFECTIVE_DATE,
+  OPERATOR,
+  SITE_HOST,
+  WEB_SEARCH,
+  externalLink,
+  mailto,
+} from '../app';
 import { pathFor } from '../site-pages';
 import type { LegalDocument } from './types';
 
@@ -76,9 +86,10 @@ export const TERMS: LegalDocument = {
           and no ${APP.freeSearches}-search limit, as a weekly or yearly subscription (Section 6) or a one-time
           ${APP.lifetimeName} purchase (Section 7). Pro is subject to fair use: a daily search limit protects the
           service and the websites we check fares on.</li>
-          <li><strong>Web search:</strong> searches at <a href="${pathFor('search')}">ffly.app/search</a> are free,
-          limited to ${WEB_SEARCH.freeSearchesPerDay} per day per network, and show the cities, nights and total
-          price of the top route, and only the price and number of cities of the other routes.</li>
+          <li><strong>Web search:</strong> searches at
+          <a href="${pathFor('search')}">${SITE_HOST}${pathFor('search')}</a> are free, limited to
+          ${WEB_SEARCH.freeSearchesPerDay} per day per network, and show the cities, nights and total price of the
+          top route, and only the price and number of cities of the other routes.</li>
         </ul>
         <p>We may change the features of Free and ${APP.proName} over time.</p>`,
     },
@@ -126,7 +137,7 @@ export const TERMS: LegalDocument = {
       content: `
         <p>You agree not to:</p>
         <ul>
-          <li>access the ffly API other than through the ffly app or ffly.app, or scrape, crawl or resell ffly's results;</li>
+          <li>access the ffly API other than through the ffly app or ${SITE_HOST}, or scrape, crawl or resell ffly's results;</li>
           <li>work around search limits, the Free tier's hidden results, or any security measure;</li>
           <li>reverse engineer the app, except where the law allows it;</li>
           <li>use ffly for any unlawful purpose or in a way that could harm ffly, its users or the websites it
