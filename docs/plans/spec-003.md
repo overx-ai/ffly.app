@@ -1,9 +1,17 @@
 ---
 item: docs/specs/003-search-home-table-nudges.md
 kind: spec
+status: done
 created: 2026-10-05
-lane: go
+updated: 2026-10-05
+lane: dash
 ---
+
+# Plan - Spec 003
+
+> **TL;DR** - How spec 003 was built: one `SearchForm.astro` on `/` and `/search` over small DOM-free modules
+> covered by vitest. Deviations below are binding until the owner overrides them; ads stay off, and the CSP
+> gains the ad hosts only with `ADSENSE_CLIENT`.
 
 ## Approach
 One search widget, `SearchForm.astro` (form + AppSide + progress + results + templates + the one bundled
@@ -89,7 +97,8 @@ CLAUDE.md's "one dependency"; vitest is dev-only). Copy, cookie names/TTLs, scro
 ## Deviations
 - "Up to 8 cities in the app" nudge row reads "More cities in the app", and the rotation line "Add more cities to
   a trip in the app": `MECHANICS` in check-legal bans "up to 8" on every page and in the bundle (kept).
-- Legal copy names "an advertising partner" and "a consent tool", never Google; the CSP lists Google hosts.
+- Legal copy names "an advertising partner" and "a consent tool", never Google. The CSP gains the Google hosts (`AD_CSP` in check-legal) only in the change that sets
+  `ADSENSE_CLIENT` (sweep review: no wider CSP before ads are on).
 - Ads paragraphs in `/privacy` (summary, sharing, legal bases, website) are conditional on `ADSENSE_CLIENT`, so
   the published policy says "no ads" until the id is set, then describes ads after consent.
 - `#2251CC` is the primitive `--navy-blue` at the top of `global.css` (a navy tint), used only by the light map.

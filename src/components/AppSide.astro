@@ -13,7 +13,7 @@ const visits = EXAMPLE_TRIP.stops.filter((s) => 'nights' in s);
       <p class="phone-route">{EXAMPLE_TRIP.stops.map((s) => s.code).join(' → ')}</p>
       <ol class="chain">
         {visits.map((s) => (
-          <li><span class="city">{s.city}</span><span class="nights">{'nights' in s ? `${s.nights} nights` : ''}</span></li>
+          <li><span class="city">{s.city}</span><span class="nights">{`${s.nights} nights`}</span></li>
         ))}
       </ol>
     </div>

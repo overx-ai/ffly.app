@@ -139,7 +139,9 @@ for (const [file, html] of htmlPages) {
 }
 
 // Ads (spec 003): no consent or ad script while ADSENSE_CLIENT is unset, and AdSense never before the consent message.
-const adsOff = /export const ADSENSE_CLIENT\b[^=]*=\s*undefined\s*;/.test(readFileSync(new URL('../src/app.ts', import.meta.url), 'utf8'));
+const adsenseClient = readFileSync(new URL('../src/app.ts', import.meta.url), 'utf8').match(/export const ADSENSE_CLIENT\b[^=]*=\s*([^;]+);/)?.[1].trim();
+check(adsenseClient !== undefined, 'src/app.ts: the ADSENSE_CLIENT declaration was not found, so the ads checks cannot run');
+const adsOff = adsenseClient === 'undefined';
 const AD_SCRIPT = 'pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
 const CONSENT_SCRIPT = 'fundingchoicesmessages.google.com/i/';
 for (const [file, html] of htmlPages) {
@@ -151,9 +153,21 @@ for (const [file, html] of htmlPages) {
     check(ad < 0 || (consent >= 0 && consent < ad), `${file}: the consent message must load before AdSense`);
   }
 }
-const scriptSrc = csp.match(/script-src ([^;]*)/)?.[1] ?? '';
-for (const host of ['pagead2.googlesyndication.com', 'fundingchoicesmessages.google.com']) {
-  check(scriptSrc.includes(`https://${host}`), `vercel.json: CSP script-src must allow ${host}`);
+// The CSP opens to the ad and consent hosts in the same change that sets ADSENSE_CLIENT, never before.
+const AD_CSP = {
+  'script-src': ['pagead2.googlesyndication.com', 'fundingchoicesmessages.google.com', 'tpc.googlesyndication.com', 'partner.googleadservices.com', 'www.googletagservices.com', 'ep2.adtrafficquality.google'],
+  'connect-src': ['pagead2.googlesyndication.com', 'fundingchoicesmessages.google.com', 'ep1.adtrafficquality.google'],
+  'frame-src': ['googleads.g.doubleclick.net', 'tpc.googlesyndication.com', 'fundingchoicesmessages.google.com', 'www.google.com', 'ep2.adtrafficquality.google'],
+  'img-src': ['pagead2.googlesyndication.com', 'tpc.googlesyndication.com', 'googleads.g.doubleclick.net', 'www.google.com', 'fundingchoicesmessages.google.com'],
+};
+for (const [directive, hosts] of Object.entries(AD_CSP)) {
+  const sources = csp.match(new RegExp(`${directive} ([^;]*)`))?.[1].split(' ') ?? [];
+  for (const host of hosts) {
+    check(
+      sources.includes(`https://${host}`) !== adsOff,
+      `vercel.json: CSP ${directive} must ${adsOff ? 'not allow' : 'allow'} ${host} while ADSENSE_CLIENT is ${adsOff ? 'unset' : 'set'}`,
+    );
+  }
 }
 check(/shows no ads/.test(website) === adsOff, 'Privacy: #website must say "shows no ads" exactly while ADSENSE_CLIENT is unset');
 

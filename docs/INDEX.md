@@ -11,6 +11,7 @@
 - [Spec 002 - Privacy: feedback form](specs/002-privacy-feedback.md): `/privacy` Section 8, linked Email Address and Customer Support
 - [Spec 003 - Search on home, results table, nudges](specs/003-search-home-table-nudges.md): `#search` on `/`, custom controls, cookies, notifications, consent-gated ads, light/dark map
 - [PINS](PINS.md): the ffly API contract version the site codes against
+- [Plan - Spec 003](plans/spec-003.md): how spec 003 was built, and its binding deviations
 
 ## Documentation Tree
 ```

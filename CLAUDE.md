@@ -21,8 +21,9 @@ Those repos are the source of truth for copy, colours and claims.
   and then AdSense; `/privacy` switches its ad copy on the same constant.
 - Deploy: `git push origin main`, then Vercel builds. `vercel.json` holds clean URLs, the
   security headers (CSP, nosniff, Referrer-Policy) and immutable caching of `/_astro/`; `npm test` checks
-  them. The CSP allows no inline script and no third-party host but `api.overx.ai` and the Google ad and
-  consent hosts: add any new one there.
+  them. The CSP allows no inline script and no third-party host but `api.overx.ai`: add any new one there.
+  The ad and consent hosts (`AD_CSP` in `scripts/check-legal.mjs`) go in only with `ADSENSE_CLIENT`; `npm test`
+  fails if the CSP and the constant disagree.
   Hosting and DNS: [docs/001-deployment.md](docs/001-deployment.md).
 
 ## Critical conventions

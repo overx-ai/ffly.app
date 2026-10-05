@@ -1,0 +1,13 @@
+---
+interface Props {
+  id: string;
+  placeholder: string;
+  describedBy?: string;
+}
+
+const { id, placeholder, describedBy } = Astro.props;
+---
+<div class="combo">
+  <input id={id} type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls={`${id}-list`} aria-describedby={describedBy} autocomplete="off" spellcheck="false" placeholder={placeholder} />
+  <ul id={`${id}-list`} class="listbox" role="listbox" aria-labelledby={`${id}-label`} hidden></ul>
+</div>

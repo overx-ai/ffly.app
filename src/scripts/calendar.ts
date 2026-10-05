@@ -22,6 +22,12 @@ const MONTHS_SHOWN = 2;
 
 const isoOf = (date: Date) => date.toISOString().slice(0, 10);
 const parse = (iso: string) => Date.parse(`${iso}T00:00:00Z`);
+const firstOf = (year: number, month: number) => new Date(Date.UTC(year, month, 1));
+
+function monthAt(year: number, month: number) {
+  const first = firstOf(year, month);
+  return { year: first.getUTCFullYear(), month: first.getUTCMonth() };
+}
 
 export const addDays = (iso: string, days: number) => isoOf(new Date(parse(iso) + days * DAY_MS));
 export const daysBetween = (from: string, to: string) => Math.round((parse(to) - parse(from)) / DAY_MS);
@@ -33,7 +39,7 @@ export function localToday(now = new Date()): string {
 
 // Weeks run Monday to Sunday (en-GB), padded with the neighbouring months' days.
 export function monthGrid(year: number, month: number): Day[][] {
-  const first = new Date(Date.UTC(year, month, 1));
+  const first = firstOf(year, month);
   const lead = (first.getUTCDay() + WEEK - 1) % WEEK;
   const start = addDays(isoOf(first), -lead);
   const length = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
@@ -107,6 +113,10 @@ export class RangePicker {
         this.close();
       }
     });
+    o.dialog.addEventListener('focusout', (event) => {
+      const next = event.relatedTarget as Node | null;
+      if (next && !o.dialog.contains(next) && !o.trigger.contains(next)) this.close(false);
+    });
     document.addEventListener('pointerdown', (event) => {
       const target = event.target as Node;
       if (!o.dialog.hidden && !o.dialog.contains(target) && !o.trigger.contains(target)) this.close(false);
@@ -150,12 +160,11 @@ export class RangePicker {
     if (step === undefined) return;
     event.preventDefault();
     const target = addDays(this.focusDay, step);
-    if (target < localToday()) return;
+    // A disabled day cannot take focus, and the re-render would drop it to the page.
+    if (dayState(target, this.draft, localToday(), this.o.maxDays()).disabled) return;
     this.focusDay = target;
-    const { year, month } = this.view;
-    const firstShown = isoOf(new Date(Date.UTC(year, month, 1)));
-    const lastShown = isoOf(new Date(Date.UTC(year, month + MONTHS_SHOWN, 0)));
-    if (target < firstShown || target > lastShown) {
+    const { first, last } = this.shown();
+    if (target < first || target > last) {
       this.showMonthOf(target, step < 0 ? MONTHS_SHOWN - 1 : 0);
     } else {
       this.render();
@@ -163,15 +172,24 @@ export class RangePicker {
     this.focus();
   }
 
+  private shown() {
+    const { year, month } = this.view;
+    return { first: isoOf(firstOf(year, month)), last: isoOf(new Date(Date.UTC(year, month + MONTHS_SHOWN, 0))) };
+  }
+
   private showMonthOf(iso: string, position = 0) {
-    const date = new Date(Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1 - position, 1));
-    this.view = { year: date.getUTCFullYear(), month: date.getUTCMonth() };
-    this.render();
+    this.showMonth(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1 - position);
   }
 
   private shift(months: number) {
-    const date = new Date(Date.UTC(this.view.year, this.view.month + months, 1));
-    this.view = { year: date.getUTCFullYear(), month: date.getUTCMonth() };
+    this.showMonth(this.view.year, this.view.month + months);
+  }
+
+  private showMonth(year: number, month: number) {
+    this.view = monthAt(year, month);
+    // Keep one day in view tabbable after paging months.
+    const { first, last } = this.shown();
+    if (this.focusDay < first || this.focusDay > last) this.focusDay = first > localToday() ? first : localToday();
     this.render();
   }
 
@@ -183,10 +201,10 @@ export class RangePicker {
     const today = localToday();
     const thisMonth = today.slice(0, 7);
     const { year, month } = this.view;
-    this.o.prev.disabled = isoOf(new Date(Date.UTC(year, month, 1))).slice(0, 7) <= thisMonth;
+    this.o.prev.disabled = this.shown().first.slice(0, 7) <= thisMonth;
     const tables = Array.from({ length: MONTHS_SHOWN }, (_, i) => {
-      const first = new Date(Date.UTC(year, month + i, 1));
-      return this.monthTable(first.getUTCFullYear(), first.getUTCMonth(), today);
+      const shown = monthAt(year, month + i);
+      return this.monthTable(shown.year, shown.month, today);
     });
     this.o.months.replaceChildren(...tables);
   }
@@ -195,7 +213,7 @@ export class RangePicker {
     const table = document.createElement('table');
     table.className = 'cal-month';
     const caption = table.createCaption();
-    caption.textContent = monthTitle.format(new Date(Date.UTC(year, month, 1)));
+    caption.textContent = monthTitle.format(firstOf(year, month));
     const head = table.createTHead().insertRow();
     for (const name of WEEKDAYS) {
       const th = document.createElement('th');

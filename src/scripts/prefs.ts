@@ -56,15 +56,19 @@ function first<T>(candidates: [Source, T | undefined][], fallback: T): Filled<T>
   return { value: fallback, source: 'default' };
 }
 
+type Read<T> = (raw: string | null | undefined) => T | undefined;
+
 export function fillPrefs(query: URLSearchParams, cookies: Map<string, string>, isPlace: (code: string) => boolean): Prefs {
-  const one = (raw: string | null | undefined) => codesOf(raw, isPlace)[0];
-  const many = (raw: string | null | undefined) => {
+  const one: Read<string> = (raw) => codesOf(raw, isPlace)[0];
+  const many: Read<string[]> = (raw) => {
     const codes = codesOf(raw, isPlace);
     return codes.length ? [...new Set(codes)] : undefined;
   };
+  const fill = <T>(key: keyof typeof QUERY, read: Read<T>, fallback: T) =>
+    first([['query', read(query.get(QUERY[key]))], ['cookie', read(cookies.get(PREFS[key].cookie))]], fallback);
   return {
-    from: first([['query', one(query.get(QUERY.from))], ['cookie', one(cookies.get(PREFS.from.cookie))]], undefined),
-    back: first([['query', one(query.get(QUERY.back))], ['cookie', one(cookies.get(PREFS.back.cookie))]], undefined),
-    cities: first([['query', many(query.get(QUERY.cities))], ['cookie', many(cookies.get(PREFS.cities.cookie))]], []),
+    from: fill<string | undefined>('from', one, undefined),
+    back: fill<string | undefined>('back', one, undefined),
+    cities: fill('cities', many, []),
   };
 }

@@ -29,6 +29,7 @@ interface Saved {
 }
 
 type Field = 'from' | 'back' | 'cities';
+type PlaceField = Exclude<Field, 'cities'>;
 
 const MINUTE_S = 60;
 
@@ -81,9 +82,9 @@ const MESSAGES = {
   gains: (list: string) => `Against booking the cheapest next flight each time: ${list}.`,
   savedLess: (amount: string) => `${amount} less`,
   earlyStarts: (n: number) => `${n} fewer early ${plural(n, 'start', 'starts')}`,
-  sleepGained: (h: number) => `${h} h more sleep`,
+  sleepGained: (h: string) => `${h} h more sleep`,
   lateLandings: (n: number) => `${n} fewer midnight ${plural(n, 'landing', 'landings')}`,
-  daylightGained: (h: number) => `${h} h more daylight`,
+  daylightGained: (h: string) => `${h} h more daylight`,
 } as const;
 
 const byId = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -143,8 +144,7 @@ const clone = (id: string) => byId<HTMLTemplateElement>(id).content.firstElement
 let meta: Meta;
 let money: Intl.NumberFormat;
 let names = new Map<string, string>();
-let start: string | undefined;
-let back: string | undefined;
+const picked: Record<PlaceField, string | undefined> = { from: undefined, back: undefined };
 let cities: string[] = [];
 let nights: Nights = { min: WEB_SEARCH.minNights, max: WEB_SEARCH.maxNights };
 let retryAction: (() => void) | undefined;
@@ -171,6 +171,10 @@ const picker = new RangePicker({
   maxDays: () => meta.limits.max_window_days,
   format: ({ from, to }) => `${formatDay(from)} – ${formatDay(to)}`,
 });
+
+function setTexts(root: ParentNode, texts: Record<string, string>) {
+  for (const [selector, text] of Object.entries(texts)) part(root, selector).textContent = text;
+}
 
 function finishOf(request: SearchRequest): string | undefined {
   const end = request.ends[0];
@@ -204,6 +208,14 @@ function storage(): Storage | undefined {
 
 const save = (saved: Saved) => storage()?.setItem(WEB_SEARCH.storageKey, JSON.stringify(saved));
 
+function parseJson(raw: string): unknown {
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return undefined;
+  }
+}
+
 const isText = (value: unknown): value is string => typeof value === 'string';
 const isTextList = (value: unknown): value is string[] => Array.isArray(value) && value.every(isText);
 
@@ -227,12 +239,7 @@ function isSaved(value: unknown): value is Saved {
 function load(): Saved | undefined {
   const raw = storage()?.getItem(WEB_SEARCH.storageKey);
   if (!raw) return undefined;
-  let saved: unknown;
-  try {
-    saved = JSON.parse(raw);
-  } catch {
-    saved = undefined;
-  }
+  const saved = parseJson(raw);
   if (isSaved(saved)) return saved;
   storage()?.removeItem(WEB_SEARCH.storageKey);
   return undefined;
@@ -259,7 +266,7 @@ function placeBox(input: HTMLInputElement, list: HTMLElement, onPick: (place: Pl
     list,
     options: (query) =>
       matchPlaces(meta.places, query, {
-        exclude: new Set([...cities, ...(input === el.city ? [start, back] : [])].filter(isText)),
+        exclude: new Set([...cities, ...(input === el.city ? [picked.from, picked.back] : [])].filter(isText)),
         limit: WEB_SEARCH.placeMatches,
       }),
     renderOption: placeOption,
@@ -269,14 +276,9 @@ function placeBox(input: HTMLInputElement, list: HTMLElement, onPick: (place: Pl
   });
 }
 
-function setStart(code: string | undefined) {
-  start = code;
-  el.from.value = code ? nameOf(code) : '';
-}
-
-function setBack(code: string | undefined) {
-  back = code;
-  el.back.value = code ? nameOf(code) : '';
+function setPlace(field: PlaceField, code: string | undefined) {
+  picked[field] = code;
+  el[field].value = code ? nameOf(code) : '';
 }
 
 function renderCities() {
@@ -333,8 +335,8 @@ function setupForm(cookies: Map<string, string>) {
   names = new Map(meta.places.map((p) => [p.code, p.name]));
   money = new Intl.NumberFormat(WEB_SEARCH.locale, { style: 'currency', currency: meta.currency });
   const prefs = fillPrefs(new URLSearchParams(location.search), cookies, (code) => names.has(code));
-  setStart(prefs.from.value);
-  setBack(prefs.back.value);
+  setPlace('from', prefs.from.value);
+  setPlace('back', prefs.back.value);
   cities = prefs.cities.value.slice(0, maxCities());
   for (const field of ['from', 'back', 'cities'] as const) remembered(field, prefs[field].source === 'cookie');
   renderCities();
@@ -343,8 +345,8 @@ function setupForm(cookies: Map<string, string>) {
 }
 
 function fillForm(r: SearchRequest) {
-  setStart(r.start);
-  setBack(finishOf(r));
+  setPlace('from', r.start);
+  setPlace('back', finishOf(r));
   cities = r.cities.slice(0, maxCities());
   renderCities();
   picker.set({ from: r.date_from, to: r.date_to });
@@ -353,9 +355,9 @@ function fillForm(r: SearchRequest) {
 }
 
 function readForm(): Trip | string {
-  const from = start ?? resolvePlace(el.from.value);
+  const from = picked.from ?? resolvePlace(el.from.value);
   if (!from) return MESSAGES.start;
-  const end = el.back.value.trim() ? (back ?? resolvePlace(el.back.value)) : from;
+  const end = el.back.value.trim() ? (picked.back ?? resolvePlace(el.back.value)) : from;
   if (!end) return MESSAGES.end;
   if (!cities.length) return MESSAGES.noCities;
   if (cities.length > maxCities()) return MESSAGES.cityLimit(maxCities());
@@ -423,9 +425,9 @@ function insightsLine(i: Insights): string {
   const gains = [
     i.saved_eur != null && MESSAGES.savedLess(formatMoney(i.saved_eur)),
     i.early_starts_avoided != null && MESSAGES.earlyStarts(i.early_starts_avoided),
-    i.sleep_saved_h != null && MESSAGES.sleepGained(i.sleep_saved_h),
+    i.sleep_saved_h != null && MESSAGES.sleepGained(countFormat.format(i.sleep_saved_h)),
     i.hotel_nights_saved != null && MESSAGES.lateLandings(i.hotel_nights_saved),
-    i.daylight_gained_h != null && MESSAGES.daylightGained(i.daylight_gained_h),
+    i.daylight_gained_h != null && MESSAGES.daylightGained(countFormat.format(i.daylight_gained_h)),
   ].filter((g): g is string => Boolean(g));
   if (gains.length) lines.push(MESSAGES.gains(listOf.format(gains)));
   return lines.join(' ');
@@ -450,15 +452,17 @@ function legRows(row: RouteRow): HTMLElement[] {
   return row.legs.map((leg, i) => {
     const tr = clone('leg-row-template');
     tr.id = `route-${row.rank}-leg-${i}`;
-    part(tr, '.leg-day').textContent = leg.day;
-    part(tr, '.leg-time').textContent = leg.time;
-    part(tr, '.leg-from').textContent = leg.from;
-    part(tr, '.leg-from-code').textContent = leg.fromCode;
-    part(tr, '.leg-to').textContent = leg.to;
-    part(tr, '.leg-to-code').textContent = leg.toCode;
-    part(tr, '.leg-carrier').textContent = leg.carrier;
-    part(tr, '.leg-stops').textContent = MESSAGES.stops(leg.stops);
-    part(tr, '.leg-price').textContent = leg.price;
+    setTexts(tr, {
+      '.leg-day': leg.day,
+      '.leg-time': leg.time,
+      '.leg-from': leg.from,
+      '.leg-from-code': leg.fromCode,
+      '.leg-to': leg.to,
+      '.leg-to-code': leg.toCode,
+      '.leg-carrier': leg.carrier,
+      '.leg-stops': MESSAGES.stops(leg.stops),
+      '.leg-price': leg.price,
+    });
     const book = part<HTMLAnchorElement>(tr, '.book');
     if (leg.link) {
       book.href = leg.link;
@@ -473,18 +477,18 @@ function legRows(row: RouteRow): HTMLElement[] {
 function renderRow(row: RouteRow): HTMLElement[] {
   if (row.kind === 'locked') {
     const tr = clone('locked-row-template');
-    part(tr, '.rank').textContent = String(row.rank);
-    part(tr, '.locked-text').textContent = MESSAGES.lockedRow(row.nCities);
-    part(tr, '.total').textContent = row.total;
+    setTexts(tr, { '.rank': String(row.rank), '.locked-text': MESSAGES.lockedRow(row.nCities), '.total': row.total });
     return [tr];
   }
   const tr = clone('route-row-template');
-  part(tr, '.rank').textContent = String(row.rank);
-  part(tr, '.route').textContent = row.route;
-  part(tr, '.dates').textContent = row.dates;
-  part(tr, '.nights').textContent = row.nights;
-  part(tr, '.flights').textContent = row.flights ? String(row.flights) : '';
-  part(tr, '.total').textContent = row.total;
+  setTexts(tr, {
+    '.rank': String(row.rank),
+    '.route': row.route,
+    '.dates': row.dates,
+    '.nights': row.nights,
+    '.flights': row.flights ? String(row.flights) : '',
+    '.total': row.total,
+  });
   part(tr, '.warn-chips').replaceChildren(
     ...row.warnings.map((w) => {
       const chip = clone('warn-template');
@@ -514,10 +518,9 @@ function renderRow(row: RouteRow): HTMLElement[] {
 }
 
 function pushAds() {
-  if (adsPushed) return;
-  adsPushed = true;
   const slots = el.results.querySelectorAll('ins.adsbygoogle');
-  if (!slots.length) return;
+  if (adsPushed || !slots.length) return;
+  adsPushed = true;
   const w = window as unknown as { adsbygoogle?: object[] };
   w.adsbygoogle ??= [];
   for (const _ of slots) w.adsbygoogle.push({});
@@ -572,9 +575,10 @@ async function poll(saved: Saved, resubmitted: boolean, failures = 0): Promise<v
     pollTimer = setTimeout(() => poll(saved, resubmitted), WEB_SEARCH.pollMs);
     return;
   }
-  if (!saved.finished) routesReady({ Notification: globalThis.Notification, doc: document, focus: () => window.focus() });
+  const firstSeen = !saved.finished;
   save({ ...saved, finished: true });
   if (view.status === 'failed') return showProblem(MESSAGES.failed, searchAgain);
+  if (firstSeen) routesReady({ Notification: globalThis.Notification, doc: document, focus: () => window.focus() });
   renderResults(view, saved.request);
 }
 
@@ -628,24 +632,19 @@ function showRotation(cookies: Map<string, string>) {
 const cityBox = placeBox(el.city, el.cityList, (p) => addCity(p.code), () =>
   cities.length >= maxCities() ? NUDGES.cityCap : undefined,
 );
-placeBox(el.from, el.fromList, (p) => {
-  setStart(p.code);
-  remembered('from', false);
-});
-placeBox(el.back, el.backList, (p) => {
-  setBack(p.code);
-  remembered('back', false);
-});
-
-for (const [input, field] of [[el.from, 'from'], [el.back, 'back']] as const) {
+for (const [field, list] of [['from', el.fromList], ['back', el.backList]] as const) {
+  const input = el[field];
+  placeBox(input, list, (p) => {
+    setPlace(field, p.code);
+    remembered(field, false);
+  });
   input.addEventListener('input', () => {
-    if (field === 'from') start = undefined;
-    else back = undefined;
+    picked[field] = undefined;
     remembered(field, false);
   });
   input.addEventListener('change', () => {
-    const code = (field === 'from' ? start : back) ?? resolvePlace(input.value);
-    if (code) (field === 'from' ? setStart : setBack)(code);
+    const code = picked[field] ?? resolvePlace(input.value);
+    if (code) setPlace(field, code);
   });
 }
 
@@ -699,16 +698,17 @@ el.form.addEventListener('input', () => {
 
 el.retry.addEventListener('click', () => retryAction?.());
 
-el.notifyYes.addEventListener('click', () => {
+function closeNotifyAsk() {
   askedToNotify = true;
   el.notifyAsk.hidden = true;
+}
+
+el.notifyYes.addEventListener('click', () => {
+  closeNotifyAsk();
   void ask(globalThis.Notification);
 });
 
-el.notifyNo.addEventListener('click', () => {
-  askedToNotify = true;
-  el.notifyAsk.hidden = true;
-});
+el.notifyNo.addEventListener('click', closeNotifyAsk);
 
 async function init(): Promise<void> {
   clearOutcome();

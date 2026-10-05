@@ -2,6 +2,7 @@
 import AppSide from './AppSide.astro';
 import AdSlot from './AdSlot.astro';
 import AppStoreBadge from './AppStoreBadge.astro';
+import PlaceCombo from './PlaceCombo.astro';
 import { APP, APP_ONLY_OPTIONS, APP_STORE_URL, NUDGES } from '../app';
 import '../styles/search.css';
 
@@ -25,17 +26,11 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
         <div class="pair">
           <div class="field">
             <label id="from-label" for="from">From <span class="remembered" data-remembered="from" hidden>Remembered</span></label>
-            <div class="combo">
-              <input id="from" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="from-list" autocomplete="off" spellcheck="false" placeholder="Type a city" />
-              <ul id="from-list" class="listbox" role="listbox" aria-labelledby="from-label" hidden></ul>
-            </div>
+            <PlaceCombo id="from" placeholder="Type a city" />
           </div>
           <div class="field">
             <label id="back-label" for="back">Back to <span class="remembered" data-remembered="back" hidden>Remembered</span></label>
-            <div class="combo">
-              <input id="back" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="back-list" aria-describedby="back-hint" autocomplete="off" spellcheck="false" placeholder="Same as From" />
-              <ul id="back-list" class="listbox" role="listbox" aria-labelledby="back-label" hidden></ul>
-            </div>
+            <PlaceCombo id="back" placeholder="Same as From" describedBy="back-hint" />
             <p id="back-hint" class="hint">Leave empty to come back where you start.</p>
           </div>
         </div>
@@ -46,10 +41,7 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
             <span class="remembered" data-remembered="cities" hidden>Remembered</span>
           </label>
           <ul id="cities" class="chips" aria-label="Cities to visit"></ul>
-          <div class="combo">
-            <input id="city" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="city-list" aria-describedby="city-hint" autocomplete="off" spellcheck="false" placeholder="Add a city" />
-            <ul id="city-list" class="listbox" role="listbox" aria-labelledby="city-label" hidden></ul>
-          </div>
+          <PlaceCombo id="city" placeholder="Add a city" describedBy="city-hint" />
           <p id="city-hint" class="hint">Pick each city from the list. {APP.name} works out the order.</p>
         </div>
 

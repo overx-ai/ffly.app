@@ -91,9 +91,9 @@ describe('routeRows', () => {
 });
 
 describe('safeLink', () => {
-  it('passes http(s) links through as they are and refuses anything else', () => {
+  it('passes https links through as they are and refuses anything else', () => {
     expect(safeLink('https://example.com/a?marker=1&x=2')).toBe('https://example.com/a?marker=1&x=2');
-    expect(safeLink('http://example.com/')).toBe('http://example.com/');
+    expect(safeLink('http://example.com/')).toBeUndefined();
     expect(safeLink('javascript:alert(1)')).toBeUndefined();
     expect(safeLink('not a url')).toBeUndefined();
     expect(safeLink(null)).toBeUndefined();

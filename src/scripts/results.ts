@@ -48,12 +48,11 @@ export function warningsOf(legs: Leg[]): Warn[] {
   return WARNS.filter((w) => found.has(w));
 }
 
-// The API's partner link is used as-is; anything but http(s) is refused so a bad value cannot run script.
+// The API's partner link is used as-is; anything but https is refused so a bad value cannot run script.
 export function safeLink(url: string | null | undefined): string | undefined {
   if (!url) return undefined;
   try {
-    const { protocol } = new URL(url);
-    return protocol === 'https:' || protocol === 'http:' ? url : undefined;
+    return new URL(url).protocol === 'https:' ? url : undefined;
   } catch {
     return undefined;
   }
@@ -72,12 +71,18 @@ const legRow = (leg: Leg, f: Format): LegRow => ({
   link: safeLink(leg.link),
 });
 
+function kindOf(route: Route): RouteRow['kind'] {
+  if (route.legs?.length) return 'full';
+  if (route.places?.length) return 'partial';
+  return 'locked';
+}
+
 function routeRow(route: Route, rank: number, f: Format): RouteRow {
   const legs = route.legs ?? [];
   const days = legs.map((l) => l.day).filter((d): d is string => Boolean(d));
   return {
     rank,
-    kind: legs.length ? 'full' : route.places?.length ? 'partial' : 'locked',
+    kind: kindOf(route),
     route: (route.places ?? []).map(f.name).join(' → '),
     dates: days.length ? `${f.day(days[0])} – ${f.day(days[days.length - 1])}` : '',
     nights: route.nights?.join(' · ') ?? '',
