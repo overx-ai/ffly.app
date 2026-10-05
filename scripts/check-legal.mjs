@@ -225,11 +225,10 @@ check(
 check(/runs no analytics/.test(website) !== gaOn, 'Privacy: #website must say "runs no analytics" exactly while GA_MEASUREMENT_ID is unset');
 
 // Every localized page: self-canonical, html lang, and one reciprocal hreflang cluster shared with the sitemap.
-check(LANGS.length === 8 && LANGS[0].prefix === '', 'src/i18n/locales.ts: expected 8 languages, English first at the root');
+const langRows = source('src/i18n/locales.ts').match(/\{ code: '/g)?.length ?? 0;
+check(LANGS.length > 1 && LANGS.length === langRows && LANGS[0].prefix === '', 'src/i18n/locales.ts: every LANGS row must parse, English first at the root');
 check(LOCALIZED_SLUGS.length > 0, 'src/site-pages.ts: LOCALIZED_SLUGS not found');
-const homePath = (lang) => (lang.prefix ? `/${lang.prefix}` : '/');
 const pagePath = (slug, lang) => `/${[lang.prefix, slug].filter(Boolean).join('/')}`;
-const pageDir = (path) => path.slice(1);
 const canonicalOf = (html) => html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
 const headAlternates = (html) =>
   [...html.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)].map(([, hreflang, href]) => `${hreflang} ${href}`);
@@ -247,7 +246,8 @@ for (const slug of LOCALIZED_SLUGS) {
   const cluster = [...LANGS.map((lang) => `${lang.hreflang} ${urlOf(lang)}`), `${X_DEFAULT} ${urlOf(LANGS[0])}`].sort();
   for (const lang of LANGS) {
     const where = pagePath(slug, lang);
-    const file = `${pageDir(where) ? `${pageDir(where)}/` : ''}index.html`;
+    const dir = where.slice(1);
+    const file = dir ? `${dir}/index.html` : 'index.html';
     localizedFiles.add(file);
     if (!isFile(`${DIST}${file}`)) {
       check(false, `${where}: localized page missing from the build`);
@@ -269,7 +269,8 @@ for (const slug of LOCALIZED_SLUGS) {
 }
 for (const [file, html] of htmlPages) {
   const lang = LANGS.find((l) => l.prefix && file.startsWith(`${l.prefix}/`)) ?? LANGS[0];
-  if (html.includes('<header')) check(html.includes(`href="${homePath(lang)}#search"`), `${file}: the header must link ${homePath(lang)}#search`);
+  const searchLink = `${pagePath('', lang)}#search`;
+  if (html.includes('<header')) check(html.includes(`href="${searchLink}"`), `${file}: the header must link ${searchLink}`);
   check(!/\bundefined\b|\[object Object\]/.test(withoutCss(html)), `${file}: a literal "undefined" or "[object Object]" leaked into the page`);
   if (!localizedFiles.has(file)) {
     check(!/<link rel="alternate" hreflang=|og:locale/.test(html), `${file}: an English-only page must carry no hreflang alternates or og:locale`);

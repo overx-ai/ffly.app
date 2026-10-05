@@ -8,7 +8,7 @@ import BoardingPass from '../components/BoardingPass.astro';
 import SearchForm from '../components/SearchForm.astro';
 import { APP, EXAMPLE_TRIP, WEB_SEARCH } from '../app';
 import { useLang, type Lang } from '../i18n';
-import { formatDate, hreflangOf, pageLink, pathFor } from '../site-pages';
+import { formatDate, hreflangOf, pageLink, pathFor, type Slug } from '../site-pages';
 import { appSchema, faqSchema, organizationSchema } from '../schema';
 import type { FaqItem } from '../data/types';
 
@@ -17,7 +17,7 @@ interface Props { lang: Lang; }
 const { lang } = Astro.props;
 const { t, fmt } = useLang(lang);
 const { home } = t;
-const guideLink = (slug: Parameters<typeof pageLink>[0], label: string) => pageLink(slug, label, lang);
+const guideLink = (slug: Slug, label: string) => pageLink(slug, label, lang);
 const caveat = fmt.text(home.caveat, { date: formatDate(new Date(EXAMPLE_TRIP.searchedOn), lang) });
 const [fineBefore, fineAfter] = home.plans.fine.split('{link}');
 

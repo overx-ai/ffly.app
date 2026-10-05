@@ -321,6 +321,8 @@ a:hover { text-decoration-color: currentColor; }
   padding: var(--space-sm) var(--space-md); border-radius: var(--radius-sm);
 }
 .skip-link:focus { left: var(--space-md); top: var(--space-md); z-index: 10; }
+/* Focused from script (consent banner closed), not a control: no ring around the whole page. */
+#main:focus { outline: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

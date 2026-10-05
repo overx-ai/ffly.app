@@ -27,7 +27,7 @@ const {
   structuredData = [],
   lang = DEFAULT_LANG,
 } = Astro.props;
-const { t, tag } = useLang(lang);
+const { t } = useLang(lang);
 const locale = localeOf(lang);
 
 // Match --bg in src/styles/global.css (light :root, dark media block).
@@ -47,7 +47,7 @@ if (slug === '') schemas = [websiteSchema(lang), ...structuredData];
 else if (slug !== undefined) schemas = [...structuredData, breadcrumb(title, slug, parent, lang)];
 ---
 <!doctype html>
-<html lang={tag}>
+<html lang={locale.tag}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

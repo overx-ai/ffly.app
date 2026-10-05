@@ -1,7 +1,7 @@
 ---
 id: 004
 title: "ffly.app in eight languages, and analytics behind consent"
-status: in-progress
+status: done
 created: 2026-10-05
 updated: 2026-10-05
 repo: ffly-site
@@ -14,9 +14,9 @@ source: owner, 2026-10-05: "fully localize the site for the main european langua
 
 # 004 - ffly.app in eight languages, and analytics behind consent
 
-> **TL;DR** - Home, `/search` and `/guides` get German, French, Spanish, Italian, Dutch, Polish and Portuguese versions
-> under `/de` … `/pt`, self-canonical with reciprocal hreflang; legal pages, support and guide articles stay English.
-> Google Analytics loads only after a visitor accepts the consent banner. Owner: set GA4 retention and signals.
+> **TL;DR** - Home, `/search` and `/guides` now have German, French, Spanish, Italian, Dutch, Polish and Portuguese
+> versions under `/de` … `/pt`, self-canonical with reciprocal hreflang; legal pages, support and guide articles stay
+> English. Google Analytics loads only after Accept in the consent banner. Owner: set GA4 retention, keep signals off.
 
 ## Requirements
 1. **Languages:** en (root, unchanged, `en-GB` formats), de, fr, es, it, nl, pl, pt-PT. Paths `/de` `/fr` `/es` `/it` `/nl` `/pl` `/pt`.

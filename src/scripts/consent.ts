@@ -1,5 +1,5 @@
 import { GA_MEASUREMENT_ID, GTAG_SCRIPT } from '../app';
-import { analyticsCookies, choiceCookie, expiryCookies, mustReload, readChoice, shouldShowBanner, type Choice } from './consent-state';
+import { CHOICES, analyticsCookies, choiceCookie, expiryCookies, mustReload, readChoice, shouldShowBanner, type Choice } from './consent-state';
 
 declare global {
   interface Window {
@@ -35,18 +35,30 @@ function start(id: string) {
   let choice = readChoice(document.cookie);
   let opener: HTMLElement | undefined;
 
+  // Hiding the banner drops the focus of a keyboard user: hand it to what opened the banner, or on first load
+  // to the page itself, so the next Tab continues in the page rather than leaving it.
+  const restoreFocus = () => {
+    if (opener) return opener.focus();
+    const main = document.getElementById('main');
+    if (!main) return;
+    main.tabIndex = -1;
+    main.focus({ preventScroll: true });
+  };
+
   const choose = (next: Choice) => {
     const previous = choice;
+    const hadFocus = banner.contains(document.activeElement);
     document.cookie = choiceCookie(next);
     choice = next;
     banner.hidden = true;
-    opener?.focus();
+    if (hadFocus) restoreFocus();
     if (mustReload(previous, next)) location.reload();
     else if (next === 'granted' && previous !== 'granted') loadAnalytics(id);
   };
 
-  banner.querySelector('[data-consent="granted"]')?.addEventListener('click', () => choose('granted'));
-  banner.querySelector('[data-consent="denied"]')?.addEventListener('click', () => choose('denied'));
+  for (const option of CHOICES) {
+    banner.querySelector(`[data-consent="${option}"]`)?.addEventListener('click', () => choose(option));
+  }
   for (const button of document.querySelectorAll<HTMLElement>('[data-consent-open]')) {
     button.addEventListener('click', () => {
       opener = button;
