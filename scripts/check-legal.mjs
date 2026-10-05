@@ -152,8 +152,22 @@ for (const [file, html] of htmlPages) {
   check(!/"(?:offers|aggregateRating)"/.test(JSON.stringify(jsonLd(html))), `${file}: JSON-LD must carry no offers or aggregateRating`);
 }
 
+// A constant's initialiser in src/app.ts, or undefined when its declaration is missing.
+const appConstant = (name) => source('src/app.ts').match(new RegExp(`export const ${name}\\b[^=]*=\\s*([^;]+);`))?.[1].trim();
+function cspAgrees(hosts, on, constant) {
+  for (const [directive, list] of Object.entries(hosts)) {
+    const sources = csp.match(new RegExp(`${directive} ([^;]*)`))?.[1].split(' ') ?? [];
+    for (const host of list) {
+      check(
+        sources.includes(`https://${host}`) === on,
+        `vercel.json: CSP ${directive} must ${on ? 'allow' : 'not allow'} ${host} while ${constant} is ${on ? 'set' : 'unset'}`,
+      );
+    }
+  }
+}
+
 // Ads (spec 003): no consent or ad script while ADSENSE_CLIENT is unset, and AdSense never before the consent message.
-const adsenseClient = readFileSync(new URL('../src/app.ts', import.meta.url), 'utf8').match(/export const ADSENSE_CLIENT\b[^=]*=\s*([^;]+);/)?.[1].trim();
+const adsenseClient = appConstant('ADSENSE_CLIENT');
 check(adsenseClient !== undefined, 'src/app.ts: the ADSENSE_CLIENT declaration was not found, so the ads checks cannot run');
 const adsOff = adsenseClient === 'undefined';
 const AD_SCRIPT = 'pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
@@ -174,16 +188,41 @@ const AD_CSP = {
   'frame-src': ['googleads.g.doubleclick.net', 'tpc.googlesyndication.com', 'fundingchoicesmessages.google.com', 'www.google.com', 'ep2.adtrafficquality.google'],
   'img-src': ['pagead2.googlesyndication.com', 'tpc.googlesyndication.com', 'googleads.g.doubleclick.net', 'www.google.com', 'fundingchoicesmessages.google.com'],
 };
-for (const [directive, hosts] of Object.entries(AD_CSP)) {
-  const sources = csp.match(new RegExp(`${directive} ([^;]*)`))?.[1].split(' ') ?? [];
-  for (const host of hosts) {
-    check(
-      sources.includes(`https://${host}`) !== adsOff,
-      `vercel.json: CSP ${directive} must ${adsOff ? 'not allow' : 'allow'} ${host} while ADSENSE_CLIENT is ${adsOff ? 'unset' : 'set'}`,
-    );
-  }
-}
+cspAgrees(AD_CSP, !adsOff, 'ADSENSE_CLIENT');
 check(/shows no ads/.test(website) === adsOff, 'Privacy: #website must say "shows no ads" exactly while ADSENSE_CLIENT is unset');
+
+// Analytics (spec 004): gtag.js only ever loads from the bundled consent module after Accept, never from page HTML.
+const gaId = appConstant('GA_MEASUREMENT_ID');
+check(gaId !== undefined, 'src/app.ts: the GA_MEASUREMENT_ID declaration was not found, so the analytics checks cannot run');
+const gaOn = gaId !== undefined && gaId !== 'undefined';
+const GA_CSP = {
+  'script-src': ['www.googletagmanager.com'],
+  'connect-src': ['*.google-analytics.com', '*.analytics.google.com', '*.googletagmanager.com'],
+  'img-src': ['*.google-analytics.com', '*.googletagmanager.com'],
+};
+cspAgrees(GA_CSP, gaOn, 'GA_MEASUREMENT_ID');
+for (const [file, html] of htmlPages) {
+  check(!/googletagmanager|gtag\(/.test(html), `${file}: Google Analytics must load only from the consent module, never from the page`);
+  const [banner = '', inner = ''] = html.match(/<div id="consent"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/) ?? [];
+  if (!gaOn) {
+    check(!banner && !html.includes('data-consent-open'), `${file}: no consent banner or Cookie settings while GA_MEASUREMENT_ID is unset`);
+    continue;
+  }
+  check(/^<div[^>]*\brole="region"[^>]*\shidden\b/.test(banner), `${file}: the consent banner must be a region, hidden until the script shows it`);
+  check(
+    inner.includes('data-consent="granted"') && inner.includes('data-consent="denied"'),
+    `${file}: the consent banner needs both an accept and a reject button`,
+  );
+  check(inner.includes('href="/privacy#website"'), `${file}: the consent banner must link /privacy#website`);
+  if (html.includes('<footer')) check(html.includes('data-consent-open'), `${file}: the footer must carry Cookie settings`);
+}
+const legalBases = privacy('legal-bases');
+check(
+  (/analytics provider/.test(website) && /Cookie settings/.test(website) && /withdraw your consent/.test(website) &&
+    /measure visits to this website only with your consent/.test(legalBases)) === gaOn,
+  'Privacy: #website must cover analytics consent and Cookie settings, and #legal-bases consent, exactly while GA_MEASUREMENT_ID is set',
+);
+check(/runs no analytics/.test(website) !== gaOn, 'Privacy: #website must say "runs no analytics" exactly while GA_MEASUREMENT_ID is unset');
 
 // Every localized page: self-canonical, html lang, and one reciprocal hreflang cluster shared with the sitemap.
 check(LANGS.length === 8 && LANGS[0].prefix === '', 'src/i18n/locales.ts: expected 8 languages, English first at the root');
@@ -252,6 +291,7 @@ check(
   connectHosts.some((host) => bundle.includes(`"${host}"`)),
   'vercel.json: CSP connect-src must allow the API host the search bundle calls (SERVICE.apiHost)',
 );
+check(bundle.includes('googletagmanager.com/gtag/js') === gaOn, 'Bundle: the consent module must carry gtag.js exactly while GA_MEASUREMENT_ID is set');
 
 // No page names a vendor (Apple aside) or describes how ffly works inside; the legal pages name recipients by
 // category. Fare sources that are also carriers (Ryanair, Volotea...) are left out: a carrier is shown wherever a

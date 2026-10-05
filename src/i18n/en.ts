@@ -301,6 +301,15 @@ const en = {
     },
   },
 
+  consent: {
+    label: 'Cookie choice',
+    text: "We'd like to measure visits to improve this site. Nothing is measured unless you accept.",
+    accept: 'Accept',
+    reject: 'Reject',
+    privacy: 'Privacy',
+    settings: 'Cookie settings',
+  },
+
   schema: {
     home: 'Home',
     featureList: [

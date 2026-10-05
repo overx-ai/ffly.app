@@ -1,5 +1,5 @@
 ---
-import { CONTACT_EMAIL, DEVELOPER, PUBLISHER } from '../app';
+import { CONTACT_EMAIL, DEVELOPER, GA_MEASUREMENT_ID, PUBLISHER } from '../app';
 import { DEFAULT_LANG, LANGS, useLang, type Lang } from '../i18n';
 import { hreflangOf, isLocalized, pathFor, type Slug } from '../site-pages';
 
@@ -9,7 +9,8 @@ interface Props {
 }
 
 const { lang = DEFAULT_LANG, slug } = Astro.props;
-const { footer } = useLang(lang).t.common;
+const { t } = useLang(lang);
+const { footer } = t.common;
 const year = new Date().getFullYear();
 // The same page in each language where it has one; otherwise each language's home.
 const switchTo: Slug = slug !== undefined && isLocalized(slug) ? slug : '';
@@ -26,6 +27,7 @@ const pageLinks = [
       {pageLinks.map((link) => (
         <a href={pathFor(link.slug, lang)} hreflang={hreflangOf(link.slug, lang)}>{link.label}</a>
       ))}
+      {GA_MEASUREMENT_ID && <button type="button" data-consent-open>{t.consent.settings}</button>}
       <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
       <span>&copy; {year} {DEVELOPER}</span>
       <span>{footer.createdBy} <a href={PUBLISHER.url} rel="noopener">{PUBLISHER.label}</a></span>
@@ -58,7 +60,15 @@ const pageLinks = [
   }
   .links > * { min-height: 44px; display: inline-flex; align-items: center; gap: 0.3em; }
   .links a { color: var(--ink-2); text-decoration: none; }
-  .links a:hover { color: var(--ink); }
+  .links button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+  .links a:hover, .links button:hover { color: var(--ink); }
   .links span a { text-decoration: underline; }
   .langs { font-size: 13px; }
   .langs [aria-current] { color: var(--ink); font-weight: 600; }

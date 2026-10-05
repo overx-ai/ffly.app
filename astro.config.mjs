@@ -11,6 +11,10 @@ export default defineConfig({
   build: {
     inlineStylesheets: 'always',
   },
+  // Astro inlines a hoisted script under this size, and the CSP blocks inline scripts.
+  vite: {
+    build: { assetsInlineLimit: 0 },
+  },
   markdown: {
     remarkPlugins: [remarkDropTitle],
     rehypePlugins: [rehypeScrollTables],

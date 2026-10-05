@@ -1,14 +1,16 @@
 # ffly-site (ffly.app)
 
 Marketing, support and legal site for **ffly** (`ai.overx.ffly`), the iPhone app for cheap
-multi-city trips. Astro 4, static output, deployed on Vercel. Client JavaScript only in the search widget (`/` and `/search`).
+multi-city trips. Astro 4, static output, deployed on Vercel. Client JavaScript only in the search widget (`/` and `/search`) and the consent banner (every page).
 
 The app source lives at `../../0E-extensions/ios-ffly`, the API at `1B-bots` `apps/ffly-api`.
 Those repos are the source of truth for copy, colours and claims.
 
 ## Tech Stack
 - Astro 4, `output: 'static'`, `trailingSlash: 'never'`. **One dependency: `astro`**, plus `vitest` (dev only) for `tests/`.
-- **Zero client JavaScript, except the search widget.** Theme switching is pure CSS, the FAQ is `<details>`.
+- **Zero client JavaScript, except the search widget and the consent module.** Theme switching is pure CSS, the
+  FAQ is `<details>`. `ConsentBanner.astro` (in `BaseLayout`, every page) loads `src/scripts/consent.ts`, whose logic
+  is the DOM-free, tested `consent-state.ts`.
   `SearchForm.astro` (specs 001 and 003) sits on `/` under `#search` and on `/search`, and ships one bundled
   script: `src/scripts/search.ts` over small DOM-free modules (`ffly-api`, `combobox`, `calendar`, `prefs`,
   `nudges`, `results`, `notify`, `scroll`) that `tests/` covers. Plain TypeScript, no framework, custom controls
@@ -16,12 +18,19 @@ Those repos are the source of truth for copy, colours and claims.
   `innerHTML` with API data). It calls `FFLY_API_BASE` (contract pinned in `docs/PINS.md`) anonymously:
   `X-Platform: web`, never `X-Client-Id`, and never priority, filters or schedule. Its cookies and scroll time live
   in `src/app.ts`, its copy in `src/i18n/en.ts` (`widget.script`, shipped in SearchForm's `data-i18n` attribute).
+- **Analytics only after consent.** GA4 loads only after Accept in the first-party banner (spec 004): `GA_MEASUREMENT_ID`
+  and `CONSENT` in `src/app.ts`, `GA_CSP` in `scripts/check-legal.mjs`. gtag is defined in `consent.ts` and `gtag/js`
+  injected only after Accept (Consent Mode v2 basic, ad storage and signals off); no page HTML may reference it, and
+  the footer "Cookie settings" reopens the banner. Unset `GA_MEASUREMENT_ID` and the banner, the control, the CSP
+  hosts and the `/privacy` analytics copy all go. When ads go on, AdSense in the EEA needs a Google-certified CMP, so
+  that step replaces this banner with Google's consent message, covering analytics too.
 - **Ads only after consent.** While `ADSENSE_CLIENT` in `src/app.ts` is undefined, no consent or ad script loads
   and `AdSlot` renders nothing (`npm test` asserts it). Set it, and `AD_SLOTS`, to load Google's consent message
   and then AdSense; `/privacy` switches its ad copy on the same constant.
 - Deploy: `git push origin main`, then Vercel builds. `vercel.json` holds clean URLs, the
   security headers (CSP, nosniff, Referrer-Policy) and immutable caching of `/_astro/`; `npm test` checks
-  them. The CSP allows no inline script and no third-party host but `api.overx.ai`: add any new one there.
+  them. The CSP allows no inline script and no third-party host but `api.overx.ai` and the analytics hosts
+  (`GA_CSP`, only while `GA_MEASUREMENT_ID` is set): add any new one there.
   The ad and consent hosts (`AD_CSP` in `scripts/check-legal.mjs`) go in only with `ADSENSE_CLIENT`; `npm test`
   fails if the CSP and the constant disagree.
   Hosting and DNS: [docs/001-deployment.md](docs/001-deployment.md).

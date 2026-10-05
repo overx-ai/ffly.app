@@ -87,7 +87,10 @@ export const PREFS = {
   nudge: { cookie: 'ffly_nudge', days: 365 },
 } as const;
 
-export type Pref = (typeof PREFS)[keyof typeof PREFS];
+export interface Pref {
+  readonly cookie: string;
+  readonly days: number;
+}
 
 export const WEB_NOTIFY = {
   icon: '/icon-192.png',
@@ -104,6 +107,13 @@ export const AD_SIZES = {
 } as const;
 export const CONSENT_SCRIPT = (client: string) => `https://fundingchoicesmessages.google.com/i/${client.replace(/^ca-/, '')}?ers=1`;
 export const ADSENSE_SCRIPT = (client: string) => `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`;
+
+// Google Analytics 4, loaded only after Accept in the consent banner (src/scripts/consent.ts). Undefined turns
+// off the banner, the footer "Cookie settings" control and analytics; /privacy switches its copy on it too.
+export const GA_MEASUREMENT_ID: string | undefined = 'G-JYLD2DWSJG';
+// The visitor's choice, `granted` or `denied`, for every page of the site.
+export const CONSENT = { cookie: 'ffly_consent', days: 182 } as const satisfies Pref;
+export const GTAG_SCRIPT = (id: string) => `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
 
 // The articles at /guides (src/content/guides).
 export const GUIDES = {

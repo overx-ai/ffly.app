@@ -1,4 +1,18 @@
-import { ADSENSE_CLIENT, APP, CONTACT_EMAIL, EXTERNAL, FEEDBACK, OPERATOR, PREFS, SERVICE, SITE_HOST, externalLink, mailto } from '../app';
+import {
+  ADSENSE_CLIENT,
+  APP,
+  CONSENT,
+  CONTACT_EMAIL,
+  EXTERNAL,
+  FEEDBACK,
+  GA_MEASUREMENT_ID,
+  OPERATOR,
+  PREFS,
+  SERVICE,
+  SITE_HOST,
+  externalLink,
+  mailto,
+} from '../app';
 import { pathFor } from '../site-pages';
 import type { LegalDocument } from './types';
 
@@ -9,8 +23,20 @@ import type { LegalDocument } from './types';
 // (ios-ffly spec 012). Not linked: Product Interaction, Device ID. No tracking. Change one, change all three,
 // and the App Store Connect privacy answers. Recipients are named by category only, Apple excepted
 // (scripts/check-legal.mjs bans vendor names and mechanics on every page).
-// The website's ad copy follows ADSENSE_CLIENT: "no ads" until it is set, ads after consent once it is.
+// The website's ad copy follows ADSENSE_CLIENT: "no ads" until it is set, ads after consent once it is. Its
+// analytics copy follows GA_MEASUREMENT_ID the same way.
 const ADS = Boolean(ADSENSE_CLIENT);
+const ANALYTICS = Boolean(GA_MEASUREMENT_ID);
+const CONSENT_MONTHS = Math.round(CONSENT.days / 30);
+
+const LEGAL_BASES = [
+  'we use your searches, installation identifier and purchase status to provide the service you ask for (performance of a contract)',
+  'we use analytics, search limits and your IP address for our legitimate interests in improving ffly, keeping it fair and protecting it from abuse',
+  'we use feedback and any email address you add for our legitimate interest in answering you and fixing what you report',
+  'we remember your search choices on this website for our legitimate interest in sparing you from typing them again',
+  ...(ANALYTICS ? ['we measure visits to this website only with your consent, which you can withdraw at any time'] : []),
+  ...(ADS ? ['we show personalised ads on this website only with your consent'] : []),
+];
 
 export const PRIVACY: LegalDocument = {
   pageTitle: 'Privacy Policy',
@@ -18,7 +44,7 @@ export const PRIVACY: LegalDocument = {
   summaryTitle: 'The short version',
   summaryText: `ffly has no account and no sign-in. We don't collect your name, phone number or location, and we
     get your email address only if you add it to feedback. ${ADS ? 'The app shows no ads, this website shows ads only after you choose, and we' : 'We show no ads and'}
-    don't track you across other apps or websites. To find routes, we receive the trip you search for, and we delete it within
+    don't track you across other apps or websites.${ANALYTICS ? ' This website measures visits only if you agree.' : ''} To find routes, we receive the trip you search for, and we delete it within
     ${SERVICE.searchRetentionHours} hours. We collect anonymous usage analytics to improve the app. Apple handles
     payments. We never sell your data.`,
   sections: [
@@ -165,15 +191,7 @@ export const PRIVACY: LegalDocument = {
       content: `
         <p>Where the GDPR or similar laws apply:</p>
         <ul>
-          <li>we use your searches, installation identifier and purchase status to provide the service you ask
-          for (performance of a contract);</li>
-          <li>we use analytics, search limits and your IP address for our legitimate interests in improving ffly,
-          keeping it fair and protecting it from abuse;</li>
-          <li>we use feedback and any email address you add for our legitimate interest in answering you and fixing
-          what you report;</li>
-          <li>we remember your search choices on this website for our legitimate interest in sparing you from typing
-          them again${ADS ? `;</li>
-          <li>we show personalised ads on this website only with your consent` : ''}.</li>
+          ${LEGAL_BASES.map((basis, i) => `<li>${basis}${i < LEGAL_BASES.length - 1 ? ';' : '.'}</li>`).join('\n          ')}
         </ul>
         <p>You can object to processing based on legitimate interests at any time.</p>`,
     },
@@ -188,7 +206,9 @@ export const PRIVACY: LegalDocument = {
           (Section 8).</li>
           <li><strong>Our hosting providers</strong> run ffly and this website for us.</li>
           <li><strong>A booking partner</strong> receives what you do on its site once you open a partner link
-          (Section 10).</li>${ADS ? `
+          (Section 10).</li>${ANALYTICS ? `
+          <li><strong>An analytics provider</strong> measures visits to this website, only if you agree
+          (Section 17).</li>` : ''}${ADS ? `
           <li><strong>An advertising partner and its consent tool</strong> show ads on this website and ask for
           your choice first (Section 17).</li>` : ''}
         </ul>
@@ -217,7 +237,9 @@ export const PRIVACY: LegalDocument = {
           totals or deleted.</li>
           <li>Apple and our subscription provider keep purchase records as needed for refunds, accounting and
           fraud prevention.</li>
-          <li>Our hosting provider keeps visit logs for this website briefly.</li>
+          <li>Our hosting provider keeps visit logs for this website briefly.</li>${ANALYTICS ? `
+          <li>Website analytics, if you agreed to them, are kept only as long as we need them to understand how
+          this website is used, then deleted.</li>` : ''}
         </ul>`,
     },
     {
@@ -251,7 +273,18 @@ export const PRIVACY: LegalDocument = {
         not personalised, which the partner may still measure and limit where the law allows. You can change your
         choice at any time from the link the consent tool adds to the page. The advertising partner and the consent
         tool receive your IP address and details of your browser and device, and may set their own cookies.</p>`
-          : '<p>This website shows no ads and runs no analytics.</p>'}
+          : '<p>This website shows no ads.</p>'}
+        ${ANALYTICS
+          ? `<p>If you agree, this website uses an analytics provider to measure visits, so we can see what helps and
+        improve the site. It measures the pages you visit, how you use the site, your device and browser type, and
+        your approximate location, worked out from your IP address. The analytics provider receives your IP address
+        and details of your browser and device, and sets its own cookies to tell visits apart. We don't use this for
+        advertising, and it builds no profile of you across other websites.</p>
+        <p>Nothing is measured until you choose <strong>Accept</strong> in the banner, and if you choose
+        <strong>Reject</strong>, nothing loads. This website remembers your choice in a cookie for about
+        ${CONSENT_MONTHS} months. To change it or withdraw your consent, choose <strong>Cookie settings</strong> at the
+        bottom of any page. Withdrawing removes the analytics cookies.</p>`
+          : '<p>This website runs no analytics.</p>'}
         <p>Our hosting provider receives your IP address and basic details of each visit to deliver the page and
         protect the site.</p>`,
     },

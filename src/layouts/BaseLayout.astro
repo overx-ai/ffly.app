@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import ConsentBanner from '../components/ConsentBanner.astro';
 import { ADSENSE_CLIENT, ADSENSE_SCRIPT, APP, APP_STORE_ID, CONSENT_SCRIPT } from '../app';
 import { DEFAULT_LANG, LANGS, localeOf, useLang, type Lang } from '../i18n';
 import { DEFAULT_OG_IMAGE, alternates, siteOrigin, urlFor, type Slug } from '../site-pages';
@@ -95,5 +96,6 @@ else if (slug !== undefined) schemas = [...structuredData, breadcrumb(title, slu
   <body>
     <a class="skip-link" href="#main">{t.common.skipLink}</a>
     <slot />
+    <ConsentBanner lang={lang} />
   </body>
 </html>
