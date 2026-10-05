@@ -1,7 +1,11 @@
 # ffly-site
 
 Website for **ffly**, at `ffly.app`. Astro 4, static, one dependency (plus `vitest`, dev only). Zero client
-JavaScript, except the free web search widget on `/` (`#search`) and `/search`.
+JavaScript, except the free web search widget on `/` (`#search`) and `/search`, and the consent banner.
+
+Eight languages (spec 004): English at the root, and German, French, Spanish, Italian, Dutch, Polish and
+Portuguese under `/de` `/fr` `/es` `/it` `/nl` `/pl` `/pt`. Only the home page, `/search` and `/guides` are
+localized; support, privacy, terms, the guide articles and the 404 are English only.
 
 ```bash
 npm install
@@ -14,12 +18,13 @@ npm run preview
 ## Pages
 | Route | Source |
 |---|---|
-| `/` | `src/pages/index.astro`, the search under `#search` (`src/components/SearchForm.astro`) |
+| `/` | `src/pages/index.astro` + `src/views/Home.astro`, the search under `#search` (`src/components/SearchForm.astro`) |
 | `/support` | `src/pages/support.astro` + `src/data/support.ts` |
 | `/privacy` | `src/layouts/LegalLayout.astro` + `src/data/privacy.ts` |
 | `/terms` | `src/layouts/LegalLayout.astro` + `src/data/terms.ts` |
-| `/search` | `src/pages/search.astro` + `src/components/SearchForm.astro` + `src/scripts/*.ts`, the free web search |
-| `/guides` | `src/pages/guides/index.astro` |
+| `/search` | `src/pages/search.astro` + `src/views/Search.astro` + `src/components/SearchForm.astro` + `src/scripts/*.ts`, the free web search |
+| `/guides` | `src/pages/guides/index.astro` + `src/views/GuidesIndex.astro` |
+| `/{lang}`, `/{lang}/search`, `/{lang}/guides` | `src/pages/[lang]/*.astro`, the same views with `src/i18n/{lang}.ts` |
 | `/guides/{slug}` | `src/content/guides/{slug}.md` via `src/pages/guides/[slug].astro` + `src/layouts/GuideLayout.astro` |
 | `/404` | `src/pages/404.astro`, noindex |
 | `/sitemap.xml` | `src/pages/sitemap.xml.ts`, from `src/site-pages.ts` |
@@ -45,12 +50,28 @@ npm run build && npm run preview -- --port 4329 &
 for u in / /support /privacy /terms /search /guides; do
   curl -s localhost:4329$u | grep -c '<h1\|rel="canonical"'; done   # 2 each
 
-# npm test already fails on trailing-slash or dead internal links, em dashes, "unlimited" and
-# offers/aggregateRating in JSON-LD. Fare figures are left to a human read:
-grep -rohE --include='*.html' '€ ?[0-9][0-9.,]*' dist   # only the labelled EXAMPLE_TRIP total
+# npm test already fails on trailing-slash or dead internal links, em dashes, "unlimited" in any of the
+# eight languages, offers/aggregateRating in JSON-LD, non-reciprocal hreflang and a head that differs from
+# the sitemap. Fare figures are left to a human read:
+grep -rohE --include='*.html' '€ ?[0-9][0-9.,]*' dist   # only the labelled EXAMPLE_TRIP totals
+
+# Canonicals and hreflang: a localized page is self-canonical with 8 alternates plus x-default -> the root;
+# an English-only page has its canonical and no alternates.
+curl -s localhost:4329/de/search | grep -oE '<link rel="(canonical|alternate)"[^>]*>'   # 1 + 9
+curl -s localhost:4329/support   | grep -oE '<link rel="(canonical|alternate)"[^>]*>'   # 1
+curl -s localhost:4329/sitemap.xml | grep -c 'xhtml:link'                              # 9 per localized URL
+curl -sI localhost:4329/ -H 'Accept-Language: de' | head -1                            # 200, never a redirect
 ```
 
-Then read every page at 390px and 1280px in both colour schemes.
+Consent, in a private window with DevTools open on the Network tab:
+1. Load any page: the banner shows, and no request goes to `googletagmanager.com` or `google-analytics.com`.
+2. Reject: the banner closes, `ffly_consent=denied`, and still nothing goes to Google after a reload.
+3. Footer "Cookie settings", then Accept: `gtag/js` loads, `collect` requests carry `gcs=G101` (ad storage
+   denied, analytics granted), and the choice holds on `/de` and `/support` (one cookie, `Path=/`).
+4. "Cookie settings", then Reject: the `_ga*` cookies are deleted.
+
+Then read every page at 390px and 1280px in both colour schemes, and `/de` and `/pl` (the longest strings)
+with `/de/search` and `/pl/search`.
 
 ## Deploy
 Vercel, from `main`. See [docs/001-deployment.md](docs/001-deployment.md).

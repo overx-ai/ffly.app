@@ -10,6 +10,7 @@
 - [Bugs](bugs/): 001 Terms vs the web search, 002 Search History linkage (2026-10-04 audit)
 - [Spec 002 - Privacy: feedback form](specs/002-privacy-feedback.md): `/privacy` Section 8, linked Email Address and Customer Support
 - [Spec 003 - Search on home, results table, nudges](specs/003-search-home-table-nudges.md): `#search` on `/`, custom controls, cookies, notifications, consent-gated ads, light/dark map
+- [Spec 004 - Eight languages, analytics behind consent](specs/004-localization-and-analytics.md): `/de` … `/pt` for home, `/search` and `/guides`, canonicals and hreflang, GA4 after Accept
 - [PINS](PINS.md): the ffly API contract version the site codes against
 - [Plan - Spec 003](plans/spec-003.md): how spec 003 was built, and its binding deviations
 
@@ -20,7 +21,7 @@ README.md (overview + verification)
 ├── docs/001-deployment.md (host + DNS)
 │   ├── vercel.json
 │   └── src/site-pages.ts (the URLs the deploy must serve)
-└── docs/002-design-and-guides.md (palette, map, pass, guides)
+└── docs/002-design-and-guides.md (palette, map, pass, languages, guides)
     └── seo/ (product fence, experience, keywords, published)
 ```
 
@@ -36,4 +37,4 @@ README.md (overview + verification)
 - none
 
 ---
-*Last updated: 2026-10-05 (redesign, guides, seo/)*
+*Last updated: 2026-10-05 (redesign, guides, seo/, languages)*

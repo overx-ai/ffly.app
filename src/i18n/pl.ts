@@ -87,7 +87,8 @@ const pl = {
       },
       pro: {
         line: 'Każda trasa w całości i koniec z limitem <span class="nw">{n} wyszukiwań</span>',
-        body: `Na każdą podróż po darmowych wyszukiwaniach. Subskrypcja tygodniowa lub roczna albo jednorazowy zakup ${APP.lifetimeName}; ceny znajdziesz w aplikacji.`,
+        lifetimeName: 'Dożywotnio',
+        body: 'Na każdą podróż po darmowych wyszukiwaniach. Subskrypcja tygodniowa lub roczna albo plan „{lifetime}” kupowany jednorazowo; ceny znajdziesz w aplikacji.',
       },
       promise: 'W aplikacji nie ma reklam. Nie sprzedajemy twoich danych.',
       fine: 'Subskrypcje odnawiają się automatycznie, jeśli nie zostaną anulowane co najmniej 24 godziny przed końcem okresu. Szczegóły: {link}.',
@@ -170,7 +171,7 @@ const pl = {
   },
 
   map: {
-    startFinish: 'początek i koniec',
+    startFinish: 'wylot i powrót',
     label: 'Przykładowe wyszukiwanie na mapie Europy: {route}. Loty łącznie: {total}.',
     then: ', potem ',
   },

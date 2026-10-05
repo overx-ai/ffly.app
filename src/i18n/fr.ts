@@ -75,7 +75,8 @@ const fr = {
       },
       pro: {
         line: 'Chaque itinéraire en entier, sans la limite de <span class="nw">{n} recherches</span>',
-        body: `Pour tous les voyages après vos recherches gratuites. À la semaine, à l’année ou en achat unique ${APP.lifetimeName}, au prix indiqué dans l’app.`,
+        lifetimeName: 'À vie',
+        body: 'Pour tous les voyages après vos recherches gratuites. À la semaine, à l’année ou « {lifetime} » en achat unique, au prix indiqué dans l’app.',
       },
       promise: 'Pas de publicité dans l’app. Nous ne vendons pas vos données.',
       fine: 'Les abonnements se renouvellent automatiquement sauf résiliation au moins 24 heures avant la fin de la période. Voir les {link}.',

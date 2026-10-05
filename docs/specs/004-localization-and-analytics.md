@@ -106,7 +106,7 @@ source: owner, 2026-10-05: "fully localize the site for the main european langua
 | T7 | Dutch dictionary `src/i18n/nl.ts` | dev | T2 | done | src/i18n/nl.ts |
 | T8 | Polish dictionary `src/i18n/pl.ts` | dev | T2 | done | src/i18n/pl.ts |
 | T9 | Portuguese (Portugal) dictionary `src/i18n/pt.ts` | dev | T2 | done | src/i18n/pt.ts |
-| T10 | Per-language "unlimited" bans in check-legal, `llms.txt` language list, CLAUDE.md / README / design doc updates, visual pass (de, pl at 390 and 1280 px, both schemes) | dev | T3, T4, T5, T6, T7, T8, T9 | open | scripts/check-legal.mjs, public/llms.txt, CLAUDE.md, README.md, docs/002-design-and-guides.md |
+| T10 | Per-language "unlimited" bans in check-legal, `llms.txt` language list, CLAUDE.md / README / design doc updates, visual pass (de, pl at 390 and 1280 px, both schemes) | dev | T3, T4, T5, T6, T7, T8, T9 | done | scripts/check-legal.mjs, public/llms.txt, CLAUDE.md, README.md, docs/002-design-and-guides.md |
 
 ## Acceptance Criteria
 - [ ] `/de`, `/fr`, `/es`, `/it`, `/nl`, `/pl`, `/pt` (+ `/search`, `/guides` under each) are built, fully translated, with `<html lang>` set.

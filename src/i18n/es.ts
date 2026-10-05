@@ -80,7 +80,8 @@ const es = {
       },
       pro: {
         line: 'Todas las rutas completas y sin el límite de <span class="nw">{n} búsquedas</span>',
-        body: `Para cada viaje después de tus búsquedas gratis. Semanal, anual o un pago único ${APP.lifetimeName}, con el precio en la app.`,
+        lifetimeName: 'Vitalicio',
+        body: 'Para cada viaje después de tus búsquedas gratis. Semanal, anual o {lifetime} (pago único), con el precio en la app.',
       },
       promise: 'Sin anuncios en la app. No vendemos tus datos.',
       fine: 'Las suscripciones se renuevan automáticamente salvo que las canceles al menos 24 horas antes de que acabe el periodo. Consulta las {link}.',

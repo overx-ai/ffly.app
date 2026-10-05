@@ -36,8 +36,18 @@ Gold is never darkened: a dark gold reads as brown, and the owner rejected it. I
 | Boarding pass | `src/components/BoardingPass.astro` | `EXAMPLE_TRIP` in full: the route, nights and total, plus illustrative dates, departure times and flight numbers (`FLIGHTS`), said so in the caption. |
 | Store CTAs | `src/components/StoreCtas.astro` | App Store badge plus "Try a search free on the web". |
 | Guides | `src/content/guides/*.md`, `src/layouts/GuideLayout.astro`, `src/guide-markdown.ts` | Each guide gets Article, FAQPage (from `## FAQ`) and HowTo (from `### 1.`…`### N.`) JSON-LD. |
-| Fonts | `public/fonts/` | Self-hosted Bricolage Grotesque, Figtree and IBM Plex Mono (Latin subset). |
+| Fonts | `public/fonts/` | Self-hosted Bricolage Grotesque, Figtree and IBM Plex Mono, latin and latin-ext subsets split by `unicode-range`, so Polish ą ę ł ń ś ź ż stay in the brand fonts. |
+| Consent banner | `src/components/ConsentBanner.astro`, `src/scripts/consent{,-state}.ts` | Fixed to the bottom of every page, `hidden` until no choice is stored. Accept and Reject have equal weight. The footer "Cookie settings" reopens it. |
 | Icon and share image | `public/icon-*`, `public/og-image.jpg` | The Night "from-to" icon (ios-ffly `design/icon/icon-e-night.png`). |
+
+## Languages (spec 004)
+English is at the root. German, French, Spanish, Italian, Dutch, Polish and Portuguese (Portugal) are under `/de` … `/pt`.
+- **Dictionaries:** `src/i18n/en.ts` is the source, nested by surface (`common`, `home`, `search`, `widget`, `pass`, `map`, `guides`, `consent`, `schema`). Each `src/i18n/{lang}.ts` `satisfies Dict`, so a missing key fails `tsc` and the build. `src/i18n/locales.ts` holds one row per language: code, prefix, `hreflang`, BCP-47 `tag`, `og:locale` and native name. `useLang(lang)` returns `{ t, tag, fmt }`, where `fmt` fills `{name}` placeholders, picks plurals with `Intl.PluralRules` (Polish needs `few` and `many`), and formats dates and money in that `tag`.
+- **Pages:** the bodies are `src/views/{Home,Search,GuidesIndex}.astro` with a `lang` prop. `src/pages/{index,search,guides/index}.astro` render English, and `src/pages/[lang]/*` render the other seven via `getStaticPaths`. Every other page is English only.
+- **URLs:** `src/site-pages.ts` (`LOCALIZED_SLUGS`, `pathFor`, `alternates`) feeds the canonical, the hreflang set (8 languages plus `x-default` → the root), the sitemap's `xhtml:link` alternates and the footer language switcher. English-only pages have no alternates, and their switcher points at each language's home. There is no redirect by browser language.
+- **Search widget:** one bundle serves every language. `SearchForm` writes that language's `widget.script` strings into a `data-i18n` JSON attribute, because the CSP allows no inline script. `search.ts` reads it with `document.documentElement.lang`, and the DOM-free modules take messages and locale as arguments.
+- **Shared terms** come from the app's own translations (ios-ffly `Scripts/l10n/{lang}.json`): plan names such as Lifetime (`home.plans.pro.lifetimeName`), "Book", the priorities. German uses "du", as the app does. City names stay English, as in the app and the API.
+- **Copy rules hold in every language.** `scripts/check-legal.mjs` bans "unlimited" in all eight languages (`UNLIMITED`), em dashes, mechanics and vendors on every page, and carriers on the localized pages.
 
 ## SEO pipeline (`seo/`)
 - `product.md` is the fence for what the product does and doesn't do. `experience.md` holds the owner's first-person facts and the measured example searches. `banned.md` lists anti-slop phrases. `keywords.md` and `clusters.md` hold the backlog. `published.md` lists live URLs.

@@ -75,7 +75,8 @@ const it = {
       },
       pro: {
         line: 'Ogni itinerario completo, senza il limite di <span class="nw">{n} ricerche</span>',
-        body: `Per ogni viaggio dopo le ricerche gratuite. Settimanale, annuale o con l’acquisto singolo ${APP.lifetimeName}, con i prezzi indicati nell’app.`,
+        lifetimeName: 'A vita',
+        body: 'Per ogni viaggio dopo le ricerche gratuite. Settimanale, annuale o {lifetime} (acquisto singolo), con i prezzi indicati nell’app.',
       },
       promise: 'Nessuna pubblicità nell’app. Non vendiamo i tuoi dati.',
       fine: 'Gli abbonamenti si rinnovano automaticamente se non vengono disdetti almeno 24 ore prima della fine del periodo. Consulta le {link}.',

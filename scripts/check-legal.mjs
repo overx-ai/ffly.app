@@ -342,10 +342,21 @@ for (const [file, html] of htmlPages.filter(([, html]) => html.includes('id="sea
   check(JSON.stringify(shape(text)) === JSON.stringify(shape(englishWidget)), `${file}: the widget strings must have the keys of English`);
 }
 const llms = readFileSync(`${DIST}llms.txt`, 'utf8');
+// Pro has a daily fair-use cap, so no language may call it unlimited. Exact phrases, so "sem o limite de 3" passes.
+const UNLIMITED = [
+  'unlimited',
+  'unbegrenzt', 'unbeschränkt', 'grenzenlos',
+  'illimité', 'sans limite',
+  'ilimitad', 'sin límite',
+  'illimitat', 'senza limit',
+  'onbeperkt', 'ongelimiteerd', 'onbegrensd',
+  'nieograniczon', 'bez limitu', 'bez ogranicze',
+  'sem limite',
+].map((term) => [bannedTerm(term), term]);
 // Copy rules for every published page, the legal ones included.
 for (const [where, text] of [['llms.txt', llms], ...htmlPages]) {
   check(!/\u2014|&mdash;|&#8212;|&#x2014;/i.test(text), `${where}: no em dashes in published copy`);
-  check(!/unlimited/i.test(text), `${where}: Pro is never "unlimited"`);
+  for (const [pattern, term] of UNLIMITED) check(!pattern.test(text), `${where}: Pro is never "unlimited" (${term})`);
 }
 const copyPages = [['llms.txt', copyText(llms)], ...htmlPages.map(([file, html]) => [file, copyText(withoutCss(html))])];
 const banScans = [['Search bundle', bundle, MECHANICS], ...copyPages.map(([where, text]) => [where, text, COPY_BANS])];

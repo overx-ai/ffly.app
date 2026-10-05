@@ -75,7 +75,8 @@ const pt = {
       },
       pro: {
         line: 'Todos os itinerários completos e sem o limite de <span class="nw">{n} pesquisas</span>',
-        body: `Para todas as viagens depois das pesquisas gratuitas. Semanal, anual ou ${APP.lifetimeName}, uma compra única, com preços indicados na app.`,
+        lifetimeName: 'Vitalício',
+        body: 'Para todas as viagens depois das pesquisas gratuitas. Semanal, anual ou {lifetime}, uma compra única, com preços indicados na app.',
       },
       promise: 'Sem anúncios na app. Não vendemos os seus dados.',
       fine: 'As subscrições renovam-se automaticamente, a menos que sejam canceladas pelo menos 24 horas antes do fim do período. Consulte os {link}.',

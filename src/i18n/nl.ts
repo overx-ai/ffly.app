@@ -75,7 +75,8 @@ const nl = {
       },
       pro: {
         line: 'Elke route volledig, en geen limiet van <span class="nw">{n} zoekopdrachten</span>',
-        body: `Voor elke reis na je gratis zoekopdrachten. Wekelijks, jaarlijks of een eenmalige aankoop van ${APP.lifetimeName}, met de prijzen in de app.`,
+        lifetimeName: 'Levenslang',
+        body: 'Voor elke reis na je gratis zoekopdrachten. Wekelijks, jaarlijks of {lifetime} (eenmalige aankoop), met de prijzen in de app.',
       },
       promise: 'Geen advertenties in de app. We verkopen je gegevens niet.',
       fine: 'Abonnementen worden automatisch verlengd, tenzij je minstens 24 uur voor het einde van de periode opzegt. Zie de {link}.',

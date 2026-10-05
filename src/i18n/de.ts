@@ -75,7 +75,8 @@ const de = {
       },
       pro: {
         line: 'Jede Route vollständig, ohne das Limit von <span class="nw">{n} Suchen</span>',
-        body: `Für jede Reise nach deinen kostenlosen Suchen. Wöchentlich, jährlich oder einmalig als ${APP.lifetimeName}-Kauf, Preise in der App.`,
+        lifetimeName: 'Lebenslang',
+        body: 'Für jede Reise nach deinen kostenlosen Suchen. Wöchentlich, jährlich oder „{lifetime}“ als Einmalkauf, Preise in der App.',
       },
       promise: 'Keine Werbung in der App. Wir verkaufen deine Daten nicht.',
       fine: 'Abos verlängern sich automatisch, wenn du nicht mindestens 24 Stunden vor Ende des Zeitraums kündigst. Mehr dazu in den {link}.',

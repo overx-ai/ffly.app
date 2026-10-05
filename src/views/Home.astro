@@ -41,7 +41,7 @@ const plans = [
   {
     name: APP.proName,
     line: fmt.text(home.plans.pro.line, { n: APP.freeSearches }),
-    body: home.plans.pro.body,
+    body: fmt.text(home.plans.pro.body, { lifetime: home.plans.pro.lifetimeName }),
     pro: true,
   },
 ];

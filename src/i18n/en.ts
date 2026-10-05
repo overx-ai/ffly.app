@@ -81,7 +81,8 @@ const en = {
       },
       pro: {
         line: 'Every route in full, and no <span class="nw">{n}-search</span> limit',
-        body: `For every trip after your free searches. Weekly, yearly or a one-time ${APP.lifetimeName} purchase, priced in the app.`,
+        lifetimeName: 'Lifetime',
+        body: 'For every trip after your free searches. Weekly, yearly or a one-time {lifetime} purchase, priced in the app.',
       },
       promise: "No ads in the app. We don't sell your data.",
       fine: 'Subscriptions renew automatically unless cancelled at least 24 hours before the period ends. See the {link}.',

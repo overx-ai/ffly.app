@@ -59,6 +59,18 @@ Those repos are the source of truth for copy, colours and claims.
 - Operator string is `Yauheni Malashchytski, trading as OverX AI`, copied from vocele-web.
 - Footer of every page carries "Created by overx.ai" linking to `https://overx.ai` (followed).
 
+## Languages (spec 004)
+- en at the root; de, fr, es, it, nl, pl, pt (pt-PT) under `/de` … `/pt`. Rows in `src/i18n/locales.ts`.
+- Localized: `/`, `/search`, `/guides` only (views in `src/views`, routes in `src/pages/[lang]`).
+  Support, privacy, terms, guide articles and the 404 stay English at the root.
+- Every page self-canonical. Localized pages: reciprocal hreflang for all 8 plus `x-default` → root, same
+  set in the sitemap (`alternates()` in `src/site-pages.ts`). English-only pages: no alternates.
+- Never redirect by browser language or IP.
+- Copy lives in `src/i18n/{lang}.ts`, each `satisfies Dict`; never hardcode copy in a view.
+- Shared terms (plan names, Book, priorities) come from ios-ffly `Scripts/l10n/{lang}.json`; German says "du".
+- City names stay English. Polish plurals need `few` and `many`.
+- Every copy rule holds in every language; `check-legal` bans "unlimited" in all eight (`UNLIMITED`).
+
 ## Legal pages are one decision across repos
 - `/privacy` lists exactly the seven types in `ios-ffly/Template/PrivacyInfo.xcprivacy` and
   `docs/compliance/data-inventory.yaml`: Product Interaction, Device ID (not linked), and Search
@@ -108,7 +120,7 @@ Those repos are the source of truth for copy, colours and claims.
   except the API host, its URL and "HTTPS", in the JS bundle.
 - **No em dashes in published copy.** British spelling, and each language's `tag` in `src/i18n/locales.ts`
   (`en-GB` for English) for every date and number.
-  `npm test` fails on an em dash or "unlimited" on any page or in `llms.txt`.
+  `npm test` fails on an em dash or "unlimited" (any language) on any page or in `llms.txt`.
 
 ## Design
 - Follows the system colour scheme, as the app does (it uses iOS semantic colours). Light tokens

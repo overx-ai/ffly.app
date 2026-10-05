@@ -16,6 +16,12 @@
 - [Terms](https://ffly.app/terms): not a travel agent, indicative fares, the ffly Pro
   auto-renewable subscription terms, Apple's Standard EULA.
 
+## Languages
+- The home page, web search and guides list are also in German (https://ffly.app/de), French
+  (https://ffly.app/fr), Spanish (https://ffly.app/es), Italian (https://ffly.app/it), Dutch
+  (https://ffly.app/nl), Polish (https://ffly.app/pl) and Portuguese (https://ffly.app/pt), each
+  with /search and /guides under it. Support, privacy, terms and the guide articles are in English.
+
 ## Guides
 - [Guides](https://ffly.app/guides): articles on planning a cheap trip to several cities.
 - [The cheapest order to visit cities on a multi-city trip](https://ffly.app/guides/cheapest-order-to-visit-cities):
