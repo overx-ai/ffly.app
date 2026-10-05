@@ -12,7 +12,7 @@ const home = pathFor('', lang);
 <header>
   <div class="container bar">
     <a class="brand" href={home}>
-      <img src="/icon-64.webp" width="32" height="32" alt="" />
+      <img src="/mark-128.webp" srcset="/mark-128.webp 1x, /mark-256.webp 2x" width="44" height="44" alt="" />
       <span>{APP.name}</span>
     </a>
     <nav aria-label={nav.label}>
@@ -53,7 +53,7 @@ const home = pathFor('', lang);
     min-height: 44px;
     text-decoration: none;
   }
-  .brand img { border-radius: 8px; }
+  .brand img { border-radius: 11px; }
   nav { display: flex; align-items: center; gap: var(--space-lg); }
   nav a {
     color: var(--ink-2);

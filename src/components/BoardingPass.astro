@@ -51,7 +51,7 @@ for (let x = 0; x < BARCODE.width; ) {
     aria-label={pass.label}
   >
     <div class="band">
-      <b><img src="/icon-64.webp" width="22" height="22" alt="" />{APP.name}</b>
+      <b><img src="/mark-128.webp" srcset="/mark-128.webp 1x, /mark-256.webp 2x" width="28" height="28" alt="" />{APP.name}</b>
       <span>{pass.band} · <span class="gold">{fmt.text(pass.routeOf, { n: EXAMPLE_TRIP.routesFound })}</span></span>
     </div>
     <div class="main">
