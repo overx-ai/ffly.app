@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FFLY_API_BASE } from '../src/app';
-import { buildRequest, canLookup, createSearch, lookupShared } from '../src/scripts/ffly-api';
+import { buildRequest, canLookup, createSearch, endLimit, lookupShared, type Meta } from '../src/scripts/ffly-api';
 
 const trip = {
   start: 'WAW',
-  end: 'VNO',
+  ends: ['VNO'],
   cities: ['MAD', 'AMS'],
   dateFrom: '2026-11-01',
   dateTo: '2026-11-08',
@@ -28,6 +28,36 @@ describe('buildRequest', () => {
     for (const key of ['priority', 'max_stops_per_leg', 'max_stops_total', 'schedule', 'excluded', 'pinned']) {
       expect(request).not.toHaveProperty(key);
     }
+  });
+
+  it('sends every place to finish in order, or the start when there is none', () => {
+    expect(buildRequest({ ...trip, ends: ['VNO', 'FCO'] }, 'a').ends).toEqual(['VNO', 'FCO']);
+    expect(buildRequest({ ...trip, ends: [] }, 'a').ends).toEqual(['WAW']);
+  });
+
+  it('copies the lists, so a later edit of the form cannot change a sent request', () => {
+    const ends = ['VNO'];
+    const request = buildRequest({ ...trip, ends }, 'a');
+    ends.push('FCO');
+    expect(request.ends).toEqual(['VNO']);
+  });
+});
+
+describe('endLimit', () => {
+  const meta = (tierEnds: number | undefined, maxEnds = 3) =>
+    ({
+      limits: { max_cities: 8, max_ends: maxEnds, max_nights: 14, max_window_days: 42 },
+      tier_limits: { max_cities: 4, searches_per_day: 1, ...(tierEnds === undefined ? {} : { max_ends: tierEnds }) },
+    }) as Meta;
+
+  it('takes the tier cap, never above the product cap', () => {
+    expect(endLimit(meta(1))).toBe(1);
+    expect(endLimit(meta(2))).toBe(2);
+    expect(endLimit(meta(5))).toBe(3);
+  });
+
+  it('is 1 when an older API does not say', () => {
+    expect(endLimit(meta(undefined))).toBe(1);
   });
 });
 
@@ -75,6 +105,8 @@ describe('lookupShared', () => {
     expect(url).toBe(
       `${FFLY_API_BASE}/searches/shared?start=WAW&ends=VNO&cities=MAD,AMS&date_from=2026-11-01&date_to=2026-11-08&min_nights=2&max_nights=4`,
     );
+    await lookupShared(buildRequest({ ...trip, ends: ['VNO', 'FCO'] }, 'id-1'));
+    expect((fetch.mock.calls[1] as unknown as [string])[0]).toContain('&ends=VNO,FCO&');
     expect(init.headers).toEqual({ 'X-Platform': 'web' });
   });
 

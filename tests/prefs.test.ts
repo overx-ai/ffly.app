@@ -5,6 +5,7 @@ import {
   clearCookie,
   cookieString,
   fillPrefs,
+  finishOf,
   parseCookies,
   sameSearch,
   savedCookies,
@@ -30,10 +31,15 @@ describe('cookies', () => {
   });
 
   it('stores the places of a trip and never its dates', () => {
-    const cookies = savedCookies({ start: 'WAW', end: 'VNO', cities: ['MAD', 'AMS'] });
+    const cookies = savedCookies({ start: 'WAW', ends: ['VNO'], cities: ['MAD', 'AMS'] });
     expect(cookies).toEqual([cookieString(PREFS.from, 'WAW'), cookieString(PREFS.back, 'VNO'), cookieString(PREFS.cities, 'MAD,AMS')]);
     expect(cookies.join(';')).not.toMatch(/20\d\d-/);
-    expect(savedCookies({ start: 'WAW', end: 'WAW', cities: ['MAD'] })[1]).toBe(clearCookie(PREFS.back));
+    expect(savedCookies({ start: 'WAW', ends: ['WAW'], cities: ['MAD'] })[1]).toBe(clearCookie(PREFS.back));
+    expect(savedCookies({ start: 'WAW', ends: [], cities: ['MAD'] })[1]).toBe(clearCookie(PREFS.back));
+  });
+
+  it('stores several places to finish as one list', () => {
+    expect(savedCookies({ start: 'WAW', ends: ['VNO', 'FCO'], cities: ['MAD'] })[1]).toBe(cookieString(PREFS.back, 'VNO,FCO'));
   });
 });
 
@@ -44,12 +50,12 @@ describe('fillPrefs', () => {
     const filled = fillPrefs(new URLSearchParams('from=waw&cities=MAD,AMS'), cookies, isPlace);
     expect(filled.from).toEqual({ value: 'WAW', source: 'query' });
     expect(filled.cities).toEqual({ value: ['MAD', 'AMS'], source: 'query' });
-    expect(filled.back).toEqual({ value: 'WAW', source: 'cookie' });
+    expect(filled.back).toEqual({ value: ['WAW'], source: 'cookie' });
 
     const empty = fillPrefs(new URLSearchParams(), new Map(), isPlace);
     expect(empty).toEqual({
       from: { value: undefined, source: 'default' },
-      back: { value: undefined, source: 'default' },
+      back: { value: [], source: 'default' },
       cities: { value: [], source: 'default' },
       dates: { value: undefined, source: 'default' },
       nights: { value: undefined, source: 'default' },
@@ -60,6 +66,14 @@ describe('fillPrefs', () => {
     const filled = fillPrefs(new URLSearchParams('from=XXX&cities=ZZZ,MAD'), cookies, isPlace);
     expect(filled.from).toEqual({ value: 'VNO', source: 'cookie' });
     expect(filled.cities).toEqual({ value: ['MAD'], source: 'query' });
+  });
+
+  it('reads one or several places to finish, in order, without unknown codes or repeats', () => {
+    const back = (query: string, cookie = '') => fillPrefs(new URLSearchParams(query), parseCookies(cookie), isPlace).back;
+    expect(back('back=WAW')).toEqual({ value: ['WAW'], source: 'query' });
+    expect(back('back=vno,WAW')).toEqual({ value: ['VNO', 'WAW'], source: 'query' });
+    expect(back('back=XXX,VNO,VNO,FCO')).toEqual({ value: ['VNO', 'FCO'], source: 'query' });
+    expect(back('back=XXX', 'ffly_back=FCO%2CWAW')).toEqual({ value: ['FCO', 'WAW'], source: 'cookie' });
   });
 });
 
@@ -95,11 +109,25 @@ describe('share links', () => {
     client_request_id: 'id-1',
   };
   const roundTrip = { ...request, ends: ['WAW'] };
+  const twoEnds = { ...request, ends: ['VNO', 'FCO'] };
+  const startAmongEnds = { ...request, ends: ['WAW', 'VNO'] };
 
   it('writes every parameter, cities comma-separated, and omits back when it is the start', () => {
     expect(shareQuery(request)).toBe('from=WAW&back=VNO&cities=MAD,AMS&dates=2026-11-01..2026-11-08&nights=2-4');
     expect(shareQuery(roundTrip)).toBe('from=WAW&cities=MAD,AMS&dates=2026-11-01..2026-11-08&nights=2-4');
     expect(shareQuery({ ...request, ends: [] })).toBe(shareQuery(roundTrip));
+  });
+
+  it('writes several places to finish comma-separated, in order', () => {
+    expect(shareQuery(twoEnds)).toBe('from=WAW&back=VNO,FCO&cities=MAD,AMS&dates=2026-11-01..2026-11-08&nights=2-4');
+    expect(shareQuery(startAmongEnds)).toContain('&back=WAW,VNO&');
+  });
+
+  it('names the finish only when it is more than the start', () => {
+    expect(finishOf(request)).toEqual(['VNO']);
+    expect(finishOf(roundTrip)).toEqual([]);
+    expect(finishOf({ ...request, ends: [] })).toEqual([]);
+    expect(finishOf(startAmongEnds)).toEqual(['WAW', 'VNO']);
   });
 
   it('builds the URL on the current path and keeps the hash', () => {
@@ -108,7 +136,7 @@ describe('share links', () => {
   });
 
   it('round-trips through fillPrefs into the same search', () => {
-    for (const r of [request, roundTrip]) {
+    for (const r of [request, roundTrip, twoEnds, startAmongEnds]) {
       const prefs = fillPrefs(new URLSearchParams(shareQuery(r)), parseCookies('ffly_back=FCO'), isPlace);
       const shared = sharedRequest(prefs, 'id-2');
       expect(shared).toEqual({ ...r, client_request_id: 'id-2' });
@@ -129,5 +157,7 @@ describe('share links', () => {
     expect(sameSearch(request, { ...request, client_request_id: 'other' })).toBe(true);
     expect(sameSearch(request, { ...request, max_nights: 5 })).toBe(false);
     expect(sameSearch(request, roundTrip)).toBe(false);
+    expect(sameSearch(twoEnds, { ...twoEnds, ends: ['FCO', 'VNO'] })).toBe(false);
+    expect(sameSearch(twoEnds, request)).toBe(false);
   });
 });

@@ -13,12 +13,12 @@ Those repos are the source of truth for copy, colours and claims.
   is the DOM-free, tested `consent-state.ts`.
   `SearchForm.astro` (specs 001 and 003) sits on `/` under `#search` and on `/search`, and ships one bundled
   script: `src/scripts/search.ts` over small DOM-free modules (`ffly-api`, `combobox`, `calendar`, `prefs`,
-  `nudges`, `results`, `notify`, `scroll`, `ticker`) that `tests/` covers. Plain TypeScript, no framework, custom controls
+  `nudges`, `results`, `notify`, `scroll`, `ticker`, `places`) that `tests/` covers. Plain TypeScript, no framework, custom controls
   only (no `<select>`, `<datalist>`, date or number input), rendering via `textContent`/`<template>` only (never
   `innerHTML` with API data). It calls `FFLY_API_BASE` (contract pinned in `docs/PINS.md`) anonymously:
   `X-Platform: web`, never `X-Client-Id`, and never priority, filters or schedule. Its cookies and scroll time live
   in `src/app.ts`, its copy in `src/i18n/en.ts` (`widget.script`, shipped in SearchForm's `data-i18n` attribute).
-- **Shareable searches (spec 005).** The URL carries the whole trip: `from`, `back` (omitted when it is `from`),
+- **Shareable searches (spec 005).** The URL carries the whole trip: `from`, `back` (omitted when it is just `from`),
   `cities` (comma-separated, as in the app's share link), `dates=YYYY-MM-DD..YYYY-MM-DD`, `nights=min-max`
   (`shareQuery` in `prefs.ts`, written with `replaceState` on submit and on results). A complete link with a future
   `date_from` asks `GET /searches/shared` (API ≥ 1.5.0, no quota): a finished hit renders with "Searched {date}" and
@@ -26,6 +26,9 @@ Those repos are the source of truth for copy, colours and claims.
   free search is spent unasked. The results table is always on the page (empty state, placeholders).
   `AppStrip.astro` (`#app-side`) rotates the nudges every `WEB_SEARCH.nudgeMs` (`ticker.ts`), paused on hover, focus,
   a hidden tab or off screen, never under reduced motion; its dots stop it.
+- **Back to (spec 006)** is a chip list like Cities, capped by `/meta` `tier_limits.max_ends` (`endLimit`; at 1 it is
+  the old single field), sent as `ends` and as `back=A,B` in the URL and cookie; chip rules live in `places.ts`.
+  Every place field has a clear button shown by CSS only while it has text (`PlaceCombo`).
 - **Analytics only after consent.** GA4 loads only after Accept in the first-party banner (spec 004): `GA_MEASUREMENT_ID`
   and `CONSENT` in `src/app.ts`, `GA_CSP` in `scripts/check-legal.mjs`. gtag is defined in `consent.ts` and `gtag/js`
   injected only after Accept (Consent Mode v2 basic, ad storage and signals off); no page HTML may reference it, and

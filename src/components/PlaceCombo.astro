@@ -2,12 +2,14 @@
 interface Props {
   id: string;
   placeholder: string;
+  clear: string;
   describedBy?: string;
 }
 
-const { id, placeholder, describedBy } = Astro.props;
+const { id, placeholder, clear, describedBy } = Astro.props;
 ---
 <div class="combo">
   <input id={id} type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls={`${id}-list`} aria-describedby={describedBy} autocomplete="off" spellcheck="false" placeholder={placeholder} />
+  <button type="button" class="combo-clear" aria-label={clear}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg></button>
   <ul id={`${id}-list`} class="listbox" role="listbox" aria-labelledby={`${id}-label`} hidden></ul>
 </div>

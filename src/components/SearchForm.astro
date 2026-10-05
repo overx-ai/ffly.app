@@ -34,11 +34,18 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
       <div class="trip-row">
         <div class="field">
           <label id="from-label" for="from">{w.from} <span class="remembered" data-remembered="from" hidden>{w.remembered}</span></label>
-          <PlaceCombo id="from" placeholder={w.typeCity} />
+          <PlaceCombo id="from" placeholder={w.typeCity} clear={w.clear} />
         </div>
         <div class="field">
-          <label id="back-label" for="back">{w.back} <span class="remembered" data-remembered="back" hidden>{w.remembered}</span></label>
-          <PlaceCombo id="back" placeholder={w.sameAsFrom} describedBy="back-hint" />
+          <label id="back-label" for="back">
+            <span id="back-one">{w.back}</span><span id="back-any" hidden>{w.backAny}</span>
+            <span id="ends-count" class="count" hidden></span>
+            <span class="remembered" data-remembered="back" hidden>{w.remembered}</span>
+          </label>
+          <div class="place-box">
+            <ul id="ends" class="chips" aria-label={w.back} data-placeholder={w.addCity} hidden></ul>
+            <PlaceCombo id="back" placeholder={w.sameAsFrom} describedBy="back-hint" clear={w.clear} />
+          </div>
           <p id="back-hint" class="sr-only">{w.backHint}</p>
         </div>
         <div class="field">
@@ -76,6 +83,7 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
             ))}
           </div>
         </fieldset>
+        <p id="ends-hint" class="hint" hidden>{w.backMany}</p>
       </div>
 
       <div class="cities-row">
@@ -84,9 +92,9 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
             {w.cities} <span id="city-count" class="count"></span>
             <span class="remembered" data-remembered="cities" hidden>{w.remembered}</span>
           </label>
-          <div class="city-box">
+          <div class="place-box">
             <ul id="cities" class="chips" aria-label={w.cities}></ul>
-            <PlaceCombo id="city" placeholder={w.addCity} describedBy="city-hint" />
+            <PlaceCombo id="city" placeholder={w.addCity} describedBy="city-hint" clear={w.clear} />
           </div>
           <p id="city-hint" class="sr-only">{w.cityHint}</p>
         </div>

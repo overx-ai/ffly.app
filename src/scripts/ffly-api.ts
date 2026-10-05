@@ -15,13 +15,15 @@ export interface Meta {
   places: Place[];
   currency: string;
   limits: { max_cities: number; max_ends: number; max_nights: number; max_window_days: number };
-  tier_limits: { max_cities: number; searches_per_day: number | null };
+  tier_limits: { max_cities: number; max_ends?: number; searches_per_day: number | null };
   free_searches_left: number | null;
 }
 
+export const endLimit = (meta: Pick<Meta, 'limits' | 'tier_limits'>) => Math.min(meta.tier_limits.max_ends ?? 1, meta.limits.max_ends);
+
 export interface Trip {
   start: string;
-  end: string;
+  ends: string[];
   cities: string[];
   dateFrom: string;
   dateTo: string;
@@ -93,7 +95,7 @@ export interface SearchView {
 // The web sends the trip only: priority, filters (stops, excluded, pinned) and schedule are app-only (422 app_only).
 export const buildRequest = (trip: Trip, clientRequestId: string): SearchRequest => ({
   start: trip.start,
-  ends: [trip.end],
+  ends: trip.ends.length ? [...trip.ends] : [trip.start],
   cities: [...trip.cities],
   date_from: trip.dateFrom,
   date_to: trip.dateTo,

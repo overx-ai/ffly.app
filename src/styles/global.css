@@ -99,6 +99,7 @@
   --navy-land:    #18224B;
   --navy-edge:    #26325E;
   --navy-blue:    #2251CC;
+  --navy-dusk:    #1A3888;
   --gold:         #F2C14E;
   --gold-tint:    #FCEFCB;
   --red:          #D93A2B;
@@ -109,6 +110,7 @@
   --bg:       var(--navy-mist);
   --surface:  var(--white);
   --fill:     var(--navy-fill);
+  --range:    var(--navy-fill);
   --rule:     var(--navy-line);
   --ink:      var(--navy-ink);
   --ink-2:    var(--navy-mute);
@@ -150,6 +152,7 @@
     --bg:       var(--navy-deep);
     --surface:  var(--navy-raised);
     --fill:     var(--navy-land);
+    --range:    var(--navy-dusk);
     --rule:     var(--navy-edge);
     --ink:      var(--navy-mist);
     --ink-2:    var(--navy-haze);

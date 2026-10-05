@@ -9,6 +9,7 @@ import {
   buildRequest,
   canLookup,
   createSearch,
+  endLimit,
   getMeta,
   getSearch,
   lookupShared,
@@ -22,7 +23,8 @@ import {
 } from './ffly-api';
 import { ask, canAsk, routesReady } from './notify';
 import { appHintLine, rotation } from './nudges';
-import { cookieString, fillPrefs, parseCookies, sameSearch, savedCookies, sharedRequest, shareUrl, type Prefs } from './prefs';
+import { addPlace, removePlace } from './places';
+import { cookieString, fillPrefs, finishOf, parseCookies, sameSearch, savedCookies, sharedRequest, shareUrl, type Prefs } from './prefs';
 import { routeRows, type RouteRow, type Warn } from './results';
 import { glideLinks } from './scroll';
 import { Ticker } from './ticker';
@@ -34,7 +36,7 @@ interface Saved {
 }
 
 type Field = 'from' | 'back' | 'cities';
-type PlaceField = Exclude<Field, 'cities'>;
+type ListName = 'cities' | 'ends';
 
 const MINUTE_S = 60;
 
@@ -58,6 +60,11 @@ const el = {
   fromList: byId('from-list'),
   back: byId<HTMLInputElement>('back'),
   backList: byId('back-list'),
+  backOne: byId('back-one'),
+  backAny: byId('back-any'),
+  ends: byId<HTMLUListElement>('ends'),
+  endsCount: byId('ends-count'),
+  endsHint: byId('ends-hint'),
   city: byId<HTMLInputElement>('city'),
   cityList: byId('city-list'),
   cities: byId<HTMLUListElement>('cities'),
@@ -109,8 +116,8 @@ const clone = (id: string) => byId<HTMLTemplateElement>(id).content.firstElement
 let meta: Meta;
 let money: Intl.NumberFormat;
 let names = new Map<string, string>();
-const picked: Record<PlaceField, string | undefined> = { from: undefined, back: undefined };
-let cities: string[] = [];
+let pickedFrom: string | undefined;
+const lists: Record<ListName, string[]> = { cities: [], ends: [] };
 let nights: Nights = { min: WEB_SEARCH.minNights, max: WEB_SEARCH.maxNights };
 let retryAction: (() => void) | undefined;
 let pollTimer: ReturnType<typeof setTimeout> | undefined;
@@ -119,9 +126,12 @@ let adsPushed = false;
 
 const nameOf = (code: string) => names.get(code) ?? code;
 const maxCities = () => Math.min(meta.tier_limits.max_cities, meta.limits.max_cities);
+const maxEnds = () => endLimit(meta);
+const severalEnds = () => maxEnds() > 1;
 const formatMoney = (amount: number) => money.format(amount);
 
 const listOf = new Intl.ListFormat(LOCALE, { type: 'conjunction' });
+const anyOf = new Intl.ListFormat(LOCALE, { type: 'disjunction' });
 const dayFormat = new Intl.DateTimeFormat(LOCALE, { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
 const countFormat = new Intl.NumberFormat(LOCALE);
 const searchedFormat = new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
@@ -143,11 +153,6 @@ const picker = new RangePicker({
 
 function setTexts(root: ParentNode, texts: Record<string, string>) {
   for (const [selector, text] of Object.entries(texts)) part(root, selector).textContent = text;
-}
-
-function finishOf(request: SearchRequest): string | undefined {
-  const end = request.ends[0];
-  return end && end !== request.start ? end : undefined;
 }
 
 function showText(node: HTMLElement, text: string) {
@@ -230,52 +235,123 @@ function placeNotice(text: string): HTMLElement {
   return row;
 }
 
-function placeBox(input: HTMLInputElement, list: HTMLElement, onPick: (place: Place) => void, notice?: () => string | undefined) {
-  return new Combobox({
+const comboOf = (input: HTMLInputElement) => input.closest<HTMLElement>('.combo')!;
+const boxes = new Map<HTMLInputElement, Combobox>();
+
+type Codes = () => (string | undefined)[];
+
+function placeBox(input: HTMLInputElement, list: HTMLElement, exclude: Codes, onPick: (place: Place) => void, notice?: () => string | undefined) {
+  const box = new Combobox({
     input,
     list,
     options: (query) =>
-      matchPlaces(meta.places, query, {
-        exclude: new Set([...cities, ...(input === el.city ? [picked.from, picked.back] : [])].filter(isText)),
-        limit: WEB_SEARCH.placeMatches,
-      }),
+      matchPlaces(meta.places, query, { exclude: new Set(exclude().filter(isText)), limit: WEB_SEARCH.placeMatches }),
     renderOption: placeOption,
     renderNotice: placeNotice,
     notice,
     onPick,
   });
+  boxes.set(input, box);
+  return box;
 }
 
-function setPlace(field: PlaceField, code: string | undefined) {
-  picked[field] = code;
-  el[field].value = code ? nameOf(code) : '';
+function setFrom(code: string | undefined) {
+  pickedFrom = code;
+  el.from.value = code ? nameOf(code) : '';
 }
 
-function renderCities() {
-  const max = maxCities();
-  el.cities.replaceChildren(
-    ...cities.map((code) => {
+interface ChipList {
+  chips: HTMLUListElement;
+  input: HTMLInputElement;
+  count: HTMLElement;
+  max: () => number;
+  exclude: Codes;
+  remembered: Field;
+  rendered?: () => void;
+}
+
+const BACK_PLACEHOLDER = el.back.placeholder;
+
+// With a cap of 1 (the API's web tier until it allows more) Back to stays one plain field, as before chips existed.
+function renderEnds() {
+  const several = severalEnds();
+  const ends = lists.ends;
+  for (const node of [el.ends, el.endsCount, el.endsHint]) node.hidden = !several;
+  el.backOne.hidden = ends.length > 1;
+  el.backAny.hidden = ends.length < 2;
+  if (!several) {
+    el.back.value = ends[0] ? nameOf(ends[0]) : '';
+    return;
+  }
+  comboOf(el.back).hidden = ends.length >= maxEnds();
+  el.back.placeholder = ends.length ? el.ends.dataset.placeholder! : BACK_PLACEHOLDER;
+  el.back.setAttribute('aria-describedby', 'back-hint ends-hint');
+}
+
+const LISTS: Record<ListName, ChipList> = {
+  cities: {
+    chips: el.cities,
+    input: el.city,
+    count: el.cityCount,
+    max: maxCities,
+    exclude: () => [pickedFrom, ...lists.ends],
+    remembered: 'cities',
+  },
+  ends: {
+    chips: el.ends,
+    input: el.back,
+    count: el.endsCount,
+    max: maxEnds,
+    exclude: () => lists.cities,
+    remembered: 'back',
+    rendered: renderEnds,
+  },
+};
+
+// A chip list hides its own picks from its options; a single field (cap 1) may pick its value again.
+const taken = (name: ListName) => [...LISTS[name].exclude(), ...(LISTS[name].max() > 1 ? lists[name] : [])];
+
+function renderList(name: ListName) {
+  const list = LISTS[name];
+  const codes = lists[name];
+  list.chips.replaceChildren(
+    ...codes.map((code) => {
       const chip = clone('chip-template');
       part(chip, '.chip-name').textContent = nameOf(code);
       const remove = part<HTMLButtonElement>(chip, '.chip-remove');
       remove.setAttribute('aria-label', fill(MESSAGES.removeCity, { name: nameOf(code) }));
       remove.addEventListener('click', () => {
-        cities = cities.filter((c) => c !== code);
-        remembered('cities', false);
-        renderCities();
-        el.city.focus();
+        lists[name] = removePlace(lists[name], code);
+        remembered(list.remembered, false);
+        renderList(name);
+        list.input.focus();
       });
       return chip;
     }),
   );
-  el.cityCount.textContent = fill(MESSAGES.cityCount, { n: cities.length, max });
+  list.count.textContent = fill(MESSAGES.cityCount, { n: codes.length, max: list.max() });
+  list.rendered?.();
 }
 
-function addCity(code: string) {
-  if (!cities.includes(code) && cities.length < maxCities()) cities.push(code);
-  el.city.value = '';
-  remembered('cities', false);
-  renderCities();
+function addTo(name: ListName, code: string) {
+  const list = LISTS[name];
+  if (list.exclude().includes(code)) {
+    el.formError.textContent = MESSAGES.overlap;
+    return;
+  }
+  lists[name] = addPlace(lists[name], code, list.max());
+  list.input.value = '';
+  remembered(list.remembered, false);
+  renderList(name);
+  // A full list hides its input (Back to), so focus moves to the last chip instead of being lost.
+  if (comboOf(list.input).hidden) part<HTMLButtonElement>(list.chips, 'li:last-child .chip-remove').focus();
+}
+
+function setLists(ends: string[], cities: string[]) {
+  lists.ends = ends.slice(0, maxEnds());
+  lists.cities = cities.slice(0, maxCities());
+  renderList('ends');
+  renderList('cities');
 }
 
 function renderNights() {
@@ -306,14 +382,12 @@ function setupForm(cookies: Map<string, string>): Prefs {
   money = new Intl.NumberFormat(LOCALE, { style: 'currency', currency: meta.currency });
   const limits = { maxNights: meta.limits.max_nights, maxWindowDays: meta.limits.max_window_days };
   const prefs = fillPrefs(new URLSearchParams(location.search), cookies, (code) => names.has(code), limits);
-  setPlace('from', prefs.from.value);
-  setPlace('back', prefs.back.value);
-  cities = prefs.cities.value.slice(0, maxCities());
+  setFrom(prefs.from.value);
+  setLists(prefs.back.value, prefs.cities.value);
   for (const field of ['from', 'back', 'cities'] as const) remembered(field, prefs[field].source === 'cookie');
   const dates = prefs.dates.value;
   if (dates && dates.from >= localToday()) picker.set(dates);
   if (prefs.nights.value) nights = prefs.nights.value;
-  renderCities();
   renderNights();
   renderQuota();
   return prefs;
@@ -321,23 +395,30 @@ function setupForm(cookies: Map<string, string>): Prefs {
 
 function fillForm(r: SearchRequest) {
   for (const field of ['from', 'back', 'cities'] as const) remembered(field, false);
-  setPlace('from', r.start);
-  setPlace('back', finishOf(r));
-  cities = r.cities.slice(0, maxCities());
-  renderCities();
+  setFrom(r.start);
+  setLists(finishOf(r), r.cities);
   picker.set({ from: r.date_from, to: r.date_to });
   nights = { min: r.min_nights, max: r.max_nights };
   renderNights();
 }
 
+// Text typed in Back to but never picked counts when it names a place; with a cap of 1 the field's text is the pick.
+function readEnds(): string[] | undefined {
+  const typed = el.back.value.trim();
+  if (!typed || (!severalEnds() && lists.ends.length)) return lists.ends;
+  const code = resolvePlace(typed);
+  return code ? addPlace(lists.ends, code, maxEnds()) : undefined;
+}
+
 function readForm(): Trip | string {
-  const from = picked.from ?? resolvePlace(el.from.value);
+  const from = pickedFrom ?? resolvePlace(el.from.value);
   if (!from) return MESSAGES.start;
-  const end = el.back.value.trim() ? (picked.back ?? resolvePlace(el.back.value)) : from;
-  if (!end) return MESSAGES.end;
+  const ends = readEnds();
+  if (!ends) return MESSAGES.end;
+  const cities = lists.cities;
   if (!cities.length) return MESSAGES.noCities;
   if (cities.length > maxCities()) return count(MESSAGES.cityLimit, maxCities());
-  if (cities.includes(from) || cities.includes(end)) return MESSAGES.overlap;
+  if ([from, ...ends].some((code) => cities.includes(code))) return MESSAGES.overlap;
 
   const { from: dateFrom, to: dateTo } = picker.range;
   if (!dateFrom || !dateTo) return MESSAGES.dates;
@@ -348,7 +429,7 @@ function readForm(): Trip | string {
   const limit = meta.limits.max_nights;
   if (nights.min < 1 || nights.max > limit || nights.min > nights.max) return fill(MESSAGES.nights, { max: limit });
 
-  return { start: from, end, cities: [...cities], dateFrom, dateTo, minNights: nights.min, maxNights: nights.max };
+  return { start: from, ends, cities: [...cities], dateFrom, dateTo, minNights: nights.min, maxNights: nights.max };
 }
 
 const withNewRequestId = (request: SearchRequest): SearchRequest => ({ ...request, client_request_id: crypto.randomUUID() });
@@ -437,7 +518,7 @@ function tripLine(r: SearchRequest): string {
   return fill(MESSAGES.trip, {
     start: nameOf(r.start),
     cities: listOf.format(r.cities.map(nameOf)),
-    finish: finish ? fill(MESSAGES.finishingIn, { name: nameOf(finish) }) : '',
+    finish: finish.length ? fill(MESSAGES.finishingIn, { name: anyOf.format(finish.map(nameOf)) }) : '',
     from: formatDay(r.date_from),
     to: formatDay(r.date_to),
   });
@@ -720,24 +801,38 @@ function setupStrip(cookies: Map<string, string>) {
   ).observe(el.strip);
 }
 
-const cityBox = placeBox(el.city, el.cityList, (p) => addCity(p.code), () =>
-  cities.length >= maxCities() ? TEXT.nudges.cityCap : undefined,
+const cityBox = placeBox(
+  el.city,
+  el.cityList,
+  () => taken('cities'),
+  (p) => addTo('cities', p.code),
+  () => (lists.cities.length >= maxCities() ? TEXT.nudges.cityCap : undefined),
 );
-for (const [field, list] of [['from', el.fromList], ['back', el.backList]] as const) {
-  const input = el[field];
-  placeBox(input, list, (p) => {
-    setPlace(field, p.code);
-    remembered(field, false);
-  });
-  input.addEventListener('input', () => {
-    picked[field] = undefined;
-    remembered(field, false);
-  });
-  input.addEventListener('change', () => {
-    const code = picked[field] ?? resolvePlace(input.value);
-    if (code) setPlace(field, code);
-  });
-}
+placeBox(el.from, el.fromList, () => lists.cities, (p) => {
+  setFrom(p.code);
+  remembered('from', false);
+});
+placeBox(el.back, el.backList, () => taken('ends'), (p) => addTo('ends', p.code));
+
+el.from.addEventListener('input', () => {
+  pickedFrom = undefined;
+  remembered('from', false);
+});
+el.from.addEventListener('change', () => {
+  const code = pickedFrom ?? resolvePlace(el.from.value);
+  if (code) setFrom(code);
+});
+// Only the single field takes its text as the pick; a chip list adds on a pick, so leaving it never adds a chip.
+el.back.addEventListener('input', () => {
+  if (severalEnds()) return;
+  lists.ends = [];
+  remembered('back', false);
+});
+el.back.addEventListener('change', () => {
+  if (severalEnds() || lists.ends.length) return;
+  const code = resolvePlace(el.back.value);
+  if (code) addTo('ends', code);
+});
 
 el.city.addEventListener('keydown', (event) => {
   if (event.key !== 'Enter' || event.defaultPrevented) return;
@@ -745,7 +840,7 @@ el.city.addEventListener('keydown', (event) => {
   if (!el.city.value.trim()) return;
   const code = resolvePlace(el.city.value);
   if (code) {
-    addCity(code);
+    addTo('cities', code);
     cityBox.close();
   } else {
     el.formError.textContent = MESSAGES.pickCity;
@@ -754,6 +849,15 @@ el.city.addEventListener('keydown', (event) => {
 
 el.fields.addEventListener('click', (event) => {
   const target = event.target as Element;
+  const clear = target.closest('.combo-clear');
+  if (clear) {
+    const input = part<HTMLInputElement>(clear.closest('.combo')!, 'input');
+    input.value = '';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.focus();
+    boxes.get(input)?.close();
+    return;
+  }
   const step = target.closest<HTMLButtonElement>('[data-step]');
   const stepper = step?.closest<HTMLElement>('.stepper');
   if (step && stepper) {

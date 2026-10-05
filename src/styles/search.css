@@ -40,6 +40,8 @@
   gap: 12px var(--space-md);
   align-items: end;
 }
+/* Back to chips can wrap its field onto a second line; the other fields keep their labels level with it. */
+.search-form .trip-row:has(#ends:not([hidden], :empty)) { align-items: start; }
 .search-form .cities-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px var(--space-md); align-items: end; }
 .search-form .cities-row .btn { min-height: 40px; padding: 0 28px; white-space: nowrap; }
 .search-form .field > label,
@@ -144,8 +146,29 @@
 
 .search-form svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; flex: none; }
 
-.search-form .city-box { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.search-form .city-box .combo { flex: 1 1 12em; min-width: 10em; }
+.search-form .place-box { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.search-form .place-box .combo { flex: 1 1 10em; min-width: 9em; }
+
+/* The clear button shows only while its input has text. */
+.search-form .combo input[type="text"] { padding-right: 40px; }
+.search-form .combo-clear {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.search-form .combo-clear:hover { color: var(--ink); background: var(--fill); }
+.search-form .combo input:placeholder-shown ~ .combo-clear { display: none; }
 .search-form .chips,
 .search-form .locked-chips { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; }
 .search-form .chips { flex-wrap: wrap; }
@@ -216,7 +239,7 @@
 .search-form .cal-month button:hover:not(:disabled) { background: var(--fill); }
 .search-form .cal-month button:disabled { color: var(--ink-2); opacity: 0.4; cursor: default; }
 .search-form .cal-month .today { text-decoration: underline 2px var(--gold); text-underline-offset: 4px; }
-.search-form .cal-month .in-range { background: var(--fill); border-radius: 0; }
+.search-form .cal-month .in-range { background: var(--range); border-radius: 0; }
 .search-form .cal-month .start,
 .search-form .cal-month .end { background: var(--gold); color: var(--on-gold); font-weight: 700; border-radius: var(--radius-sm); }
 
@@ -261,6 +284,7 @@
 }
 .search-form .locked-chip svg { width: 14px; height: 14px; }
 .search-form .locked-chip[aria-pressed="true"] { border-style: solid; border-color: var(--accent); color: var(--ink); }
+.search-form #ends-hint { grid-column: 1 / -1; margin-top: -4px; }
 .search-form .chip-nudge,
 .search-ui .queue-nudge { border-left: 3px solid var(--gold); padding-left: 12px; font-weight: 600; }
 
@@ -400,6 +424,7 @@
 
 @media (max-width: 900px) {
   .search-form .trip-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .search-form .trip-row > .field:nth-child(n + 3) { order: 1; }
 }
 
 @media (max-width: 900px), (pointer: coarse) {
@@ -409,12 +434,15 @@
   .search-form .steppers { min-height: 44px; }
   .search-form .chip { min-height: 44px; }
   .search-form .chip-remove { min-width: 44px; min-height: 42px; }
+  .search-form .combo input[type="text"] { padding-right: 48px; }
+  .search-form .combo-clear { right: 0; width: 44px; height: 44px; }
   .search-form .stepper button { width: 44px; height: 44px; }
   .search-form .locked-chip { min-height: 44px; }
 }
 
 @media (max-width: 560px) {
-  .search-form .trip-row > :nth-child(n + 3) { grid-column: 1 / -1; }
+  .search-form .trip-row > :nth-child(n + 3),
+  .search-form .trip-row:has(#ends:not([hidden], :empty)) > :nth-child(-n + 2) { grid-column: 1 / -1; }
   .search-form .cities-row { grid-template-columns: minmax(0, 1fr); }
   .search-form .cities-row .btn { width: 100%; }
   .search-form .app-row { flex-wrap: wrap; }

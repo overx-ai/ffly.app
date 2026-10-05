@@ -16,7 +16,7 @@ export interface Dates {
 
 export interface Prefs {
   from: Filled<string | undefined>;
-  back: Filled<string | undefined>;
+  back: Filled<string[]>;
   cities: Filled<string[]>;
   dates: Filled<Dates | undefined>;
   nights: Filled<Nights | undefined>;
@@ -27,7 +27,7 @@ export interface Limits {
   maxWindowDays: number;
 }
 
-// The app's share link opens the web search with ?from=&cities=&back= (place codes, cities comma-separated);
+// The app's share link opens the web search with ?from=&cities=&back= (place codes, lists comma-separated);
 // a web search adds dates=YYYY-MM-DD..YYYY-MM-DD and nights=min-max, which are read from the query only.
 const QUERY = { from: 'from', back: 'back', cities: 'cities', dates: 'dates', nights: 'nights' } as const;
 const DATES = /^(\d{4}-\d{2}-\d{2})\.\.(\d{4}-\d{2}-\d{2})$/;
@@ -55,10 +55,15 @@ export function parseCookies(header: string): Map<string, string> {
   return cookies;
 }
 
-export function savedCookies(trip: { start: string; end: string; cities: string[] }): string[] {
+// No ends, or only the start, is a round trip: the link and the cookie leave "back" out.
+export const finishOf = ({ start, ends }: { start: string; ends: string[] }): string[] =>
+  ends.length === 1 && ends[0] === start ? [] : ends;
+
+export function savedCookies(trip: { start: string; ends: string[]; cities: string[] }): string[] {
+  const finish = finishOf(trip);
   return [
     cookieString(PREFS.from, trip.start),
-    trip.end === trip.start ? clearCookie(PREFS.back) : cookieString(PREFS.back, trip.end),
+    finish.length ? cookieString(PREFS.back, finish.join(',')) : clearCookie(PREFS.back),
     cookieString(PREFS.cities, trip.cities.join(',')),
   ];
 }
@@ -106,7 +111,7 @@ export function fillPrefs(
     first([['query', read(query.get(QUERY[key]))], ['cookie', read(cookies.get(PREFS[key].cookie))]], fallback);
   return {
     from: fill<string | undefined>('from', one, undefined),
-    back: fill<string | undefined>('back', one, undefined),
+    back: fill('back', many, []),
     cities: fill('cities', many, []),
     dates: first([['query', readDates(query.get(QUERY.dates), limits)]], undefined),
     nights: first([['query', readNights(query.get(QUERY.nights), limits)]], undefined),
@@ -114,10 +119,10 @@ export function fillPrefs(
 }
 
 export function shareQuery(r: SearchRequest): string {
-  const back = r.ends[0];
+  const finish = finishOf(r);
   return commaQuery([
     [QUERY.from, r.start],
-    ...(back && back !== r.start ? [[QUERY.back, back] as [string, string]] : []),
+    ...(finish.length ? [[QUERY.back, finish.join(',')] as [string, string]] : []),
     [QUERY.cities, r.cities.join(',')],
     [QUERY.dates, `${r.date_from}..${r.date_to}`],
     [QUERY.nights, `${r.min_nights}-${r.max_nights}`],
@@ -134,7 +139,7 @@ export function sharedRequest(prefs: Prefs, clientRequestId: string): SearchRequ
   if (from.source !== 'query' || cities.source !== 'query' || !from.value || !dates.value || !nights.value) return undefined;
   return {
     start: from.value,
-    ends: [back.source === 'query' && back.value ? back.value : from.value],
+    ends: back.source === 'query' && back.value.length ? back.value : [from.value],
     cities: cities.value,
     date_from: dates.value.from,
     date_to: dates.value.to,
