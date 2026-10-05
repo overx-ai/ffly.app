@@ -7,12 +7,13 @@ interface Props {
 
 const { caption } = Astro.props;
 
-// Stand-ins under the blur, shaped like the Pro fields they hide, reused in turn on a longer trip. Never shown unblurred.
-const BLURRED = [
-  { day: '14 OCT', time: '06:40', flight: 'FR 1234' },
-  { day: '16 OCT', time: '11:15', flight: 'V7 1702' },
-  { day: '18 OCT', time: '18:30', flight: 'FR 6345' },
-  { day: '22 OCT', time: '09:05', flight: 'W6 1458' },
+// Illustrative flight details for the promo pass (the example search kept no legs): days follow the nights,
+// times stay sensible. Reused in turn on a longer trip.
+const FLIGHTS = [
+  { day: '14 OCT', time: '10:05', flight: 'FR 1062' },
+  { day: '16 OCT', time: '09:40', flight: 'KL 1705' },
+  { day: '18 OCT', time: '11:25', flight: 'HV 5401' },
+  { day: '22 OCT', time: '13:50', flight: 'W6 1452' },
 ];
 const BARCODE = { width: 196, height: 46 };
 const LCG = { multiplier: 1103515245, increment: 12345 };
@@ -25,7 +26,7 @@ const nights = visits.reduce((sum, s) => sum + ('nights' in s ? s.nights : 0), 0
 const searched = new Intl.DateTimeFormat(LOCALE, { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' })
   .format(new Date(EXAMPLE_TRIP.searchedOn))
   .toUpperCase();
-const legs = stops.slice(0, -1).map((from, i) => ({ from, to: stops[i + 1], hidden: BLURRED[i % BLURRED.length] }));
+const legs = stops.slice(0, -1).map((from, i) => ({ from, to: stops[i + 1], flight: FLIGHTS[i % FLIGHTS.length] }));
 const route = stops.map((s) => s.code).join('-');
 
 // Decorative barcode: bar widths from a tiny LCG seeded by the route, so it is stable across builds.
@@ -42,7 +43,7 @@ for (let x = 0; x < BARCODE.width; ) {
   <div
     class="pass"
     role="group"
-    aria-label={`Example boarding pass: Free shows the route, nights and total; dates, flight times and flight numbers are in ${APP.proName}`}
+    aria-label="Example boarding pass: the route, nights, flights and total"
   >
     <div class="band">
       <b><img src="/icon-64.webp" width="22" height="22" alt="" />{APP.name}</b>
@@ -66,13 +67,13 @@ for (let x = 0; x < BARCODE.width; ) {
             <tr><th>Leg</th><th>Nights</th><th>Date</th><th class="col-departs">Departs</th><th class="col-flight">Flight</th></tr>
           </thead>
           <tbody>
-            {legs.map((leg, i) => (
+            {legs.map((leg) => (
               <tr>
                 <td class="leg">{leg.from.code} → {leg.to.code} <span>{leg.to.city}</span></td>
                 <td>{'nights' in leg.to ? leg.to.nights : 'End'}</td>
-                <td><span class="hid" aria-hidden="true">{leg.hidden.day}</span>{i === 0 && <span class="lock">PRO</span>}</td>
-                <td class="col-departs"><span class="hid" aria-hidden="true">{leg.hidden.time}</span></td>
-                <td class="col-flight"><span class="hid" aria-hidden="true">{leg.hidden.flight}</span></td>
+                <td class="mono">{leg.flight.day}</td>
+                <td class="col-departs mono">{leg.flight.time}</td>
+                <td class="col-flight mono">{leg.flight.flight}</td>
               </tr>
             ))}
           </tbody>
@@ -87,7 +88,7 @@ for (let x = 0; x < BARCODE.width; ) {
       </svg>
     </div>
   </div>
-  <figcaption>{caption} Blurred fields are what {APP.proName} fills in.</figcaption>
+  <figcaption>{caption} Flight dates, times and numbers are illustrative.</figcaption>
 </figure>
 
 <style>
@@ -176,18 +177,7 @@ for (let x = 0; x < BARCODE.width; ) {
   td { padding: 7px 6px 7px 0; border-top: 1px solid var(--paper-rule); white-space: nowrap; }
   td.leg { font: 600 13.5px var(--font-mono); }
   td.leg span { color: var(--paper-mute); font-weight: 400; font-family: var(--font-body); }
-  .hid { filter: blur(4.5px); user-select: none; font-family: var(--font-mono); }
-  .lock {
-    display: inline-block;
-    font: 700 10px var(--font-mono);
-    letter-spacing: 0.08em;
-    background: var(--navy);
-    color: var(--gold);
-    border-radius: 5px;
-    padding: 2px 6px;
-    margin-left: 4px;
-    vertical-align: 1px;
-  }
+  .mono { font-family: var(--font-mono); }
   .stub {
     border-left: 2px dashed var(--paper-rule);
     padding: 18px 18px 20px;
