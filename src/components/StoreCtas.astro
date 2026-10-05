@@ -4,22 +4,10 @@ import { pathFor } from '../site-pages';
 ---
 <div class="ctas">
   <AppStoreBadge />
-  <a class="web" href={pathFor('search')}>Try a search free on the web</a>
+  <a class="btn" href={`${pathFor('')}#search`}>Search routes free</a>
 </div>
 
 <style>
-  /* A parent on a dark band sets --web-ink, as it sets --store-bg for the badge. */
-  .ctas { display: flex; flex-wrap: wrap; gap: 12px 22px; align-items: center; }
-  .web {
-    font-weight: 700;
-    font-size: 15px;
-    color: var(--web-ink, var(--ink));
-    border-bottom: 2px solid var(--gold);
-    text-decoration: none;
-    padding-bottom: 2px;
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-  }
-  .web:hover { text-decoration: none; border-bottom-color: var(--web-ink, var(--ink)); }
+  .ctas { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .btn { font-size: 15px; padding: 12px 20px; }
 </style>

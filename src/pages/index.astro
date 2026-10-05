@@ -5,6 +5,7 @@ import Footer from '../components/Footer.astro';
 import StoreCtas from '../components/StoreCtas.astro';
 import RouteMap from '../components/RouteMap.astro';
 import BoardingPass from '../components/BoardingPass.astro';
+import SearchForm from '../components/SearchForm.astro';
 import { APP, EXAMPLE_TRIP, PRIORITIES, WEB_SEARCH } from '../app';
 import { formatDate, pageLink, pathFor } from '../site-pages';
 import { appSchema, faqSchema, organizationSchema } from '../schema';
@@ -52,13 +53,13 @@ const values = [
 const plans = [
   {
     name: 'Free',
-    line: `Your first ${APP.freeSearches} searches`,
-    body: 'The cities in the cheapest order, the nights in each and the total price.',
+    line: `Your first ${APP.freeSearches} searches, in full`,
+    body: 'Every route with its dates, flight times, airlines and booking links.',
   },
   {
     name: APP.proName,
     line: `Every route in full, and no <span class="nw">${APP.freeSearches}-search</span> limit`,
-    body: `Dates, flight times, airlines and booking links for every route. Weekly, yearly or a one-time ${APP.lifetimeName} purchase, priced in the app.`,
+    body: `For every trip after your free searches. Weekly, yearly or a one-time ${APP.lifetimeName} purchase, priced in the app.`,
     pro: true,
   },
 ];
@@ -78,7 +79,7 @@ const faq: FaqItem[] = [
   },
   {
     question: `Is ${APP.name} free?`,
-    answer: `Your first ${APP.freeSearches} searches in the app are free, and you can try a search on the web ${webSearches}. ${APP.proName} shows every route in full.`,
+    answer: `Your first ${APP.freeSearches} searches in the app are free and in full, and you can try a search on the web ${webSearches}. ${APP.proName} is for every trip after.`,
   },
   {
     question: `Does ${APP.name} sell tickets?`,
@@ -121,6 +122,11 @@ const faq: FaqItem[] = [
       </div>
     </section>
 
+    <section class="sect container" id="search" tabindex="-1" aria-labelledby="search-title">
+      <h2 id="search-title">Search routes free</h2>
+      <SearchForm />
+    </section>
+
     <section class="sect container" id="why">
       <h2>What a good route gives back</h2>
       <div class="vals">
@@ -135,7 +141,7 @@ const faq: FaqItem[] = [
     </section>
 
     <section class="sect container" id="plans">
-      <h2>Free shows the trip. Pro fills in the boarding pass.</h2>
+      <h2>{APP.freeSearches} full searches free in the app; Pro for every trip after.</h2>
       <div class="pass-wrap">
         <BoardingPass caption={caveat} />
         <div class="plans">
@@ -146,7 +152,7 @@ const faq: FaqItem[] = [
               <p>{p.body}</p>
             </div>
           ))}
-          <p class="promise">No ads. We don't sell your data.</p>
+          <p class="promise">No ads in the app. We don't sell your data.</p>
           <p class="fine">
             Subscriptions renew automatically unless cancelled at least 24 hours before the period ends. See the
             <a href={pathFor('terms')}>Terms of Use</a>.
@@ -210,6 +216,8 @@ const faq: FaqItem[] = [
   .hero-map figcaption { font-size: 13px; color: var(--ink-2); margin-top: 4px; max-width: 70ch; }
 
   .sect { padding-block: clamp(48px, 7vw, 88px); border-top: 1px solid var(--rule); scroll-margin-top: var(--header-offset); }
+  #search { scroll-margin-top: var(--header-height); }
+  #search:focus { outline: none; }
   .sect h2 {
     font-size: clamp(30px, 4.2vw, 52px);
     line-height: 1;
@@ -271,7 +279,6 @@ const faq: FaqItem[] = [
     color: var(--on-night);
     --store-bg: var(--on-night);
     --store-ink: var(--night);
-    --web-ink: var(--on-night);
   }
   .close-inner {
     padding-block: clamp(56px, 9vw, 112px);

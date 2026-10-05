@@ -1,0 +1,237 @@
+---
+import AppSide from './AppSide.astro';
+import AdSlot from './AdSlot.astro';
+import AppStoreBadge from './AppStoreBadge.astro';
+import { APP, APP_ONLY_OPTIONS, APP_STORE_URL, NUDGES } from '../app';
+import '../styles/search.css';
+
+const openApp = APP_STORE_URL ?? '#app-side';
+const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" height="10" rx="2"/>';
+---
+<div class="search-ui">
+  <noscript>
+    <div class="card notice">
+      <p>The web search needs JavaScript. The {APP.name} app runs the same search on iPhone.</p>
+      <AppStoreBadge />
+    </div>
+  </noscript>
+
+  <div class="search-grid">
+    <form id="search-form" class="card search-form" novalidate>
+      <p id="search-loading" class="note">Loading cities…</p>
+      <fieldset id="search-fields" class="fields" disabled>
+        <legend class="sr-only">Your trip</legend>
+
+        <div class="pair">
+          <div class="field">
+            <label id="from-label" for="from">From <span class="remembered" data-remembered="from" hidden>Remembered</span></label>
+            <div class="combo">
+              <input id="from" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="from-list" autocomplete="off" spellcheck="false" placeholder="Type a city" />
+              <ul id="from-list" class="listbox" role="listbox" aria-labelledby="from-label" hidden></ul>
+            </div>
+          </div>
+          <div class="field">
+            <label id="back-label" for="back">Back to <span class="remembered" data-remembered="back" hidden>Remembered</span></label>
+            <div class="combo">
+              <input id="back" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="back-list" aria-describedby="back-hint" autocomplete="off" spellcheck="false" placeholder="Same as From" />
+              <ul id="back-list" class="listbox" role="listbox" aria-labelledby="back-label" hidden></ul>
+            </div>
+            <p id="back-hint" class="hint">Leave empty to come back where you start.</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label id="city-label" for="city">
+            Cities to visit <span id="city-count" class="count"></span>
+            <span class="remembered" data-remembered="cities" hidden>Remembered</span>
+          </label>
+          <ul id="cities" class="chips" aria-label="Cities to visit"></ul>
+          <div class="combo">
+            <input id="city" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="city-list" aria-describedby="city-hint" autocomplete="off" spellcheck="false" placeholder="Add a city" />
+            <ul id="city-list" class="listbox" role="listbox" aria-labelledby="city-label" hidden></ul>
+          </div>
+          <p id="city-hint" class="hint">Pick each city from the list. {APP.name} works out the order.</p>
+        </div>
+
+        <div class="pair">
+          <div class="field">
+            <span id="window-label" class="field-label">Travel window</span>
+            <div class="popover-anchor">
+              <button id="window" type="button" class="picker" aria-haspopup="dialog" aria-expanded="false" aria-controls="calendar" aria-labelledby="window-label window-text">
+                <span id="window-text"></span>
+              </button>
+              <div id="calendar" class="calendar" role="dialog" aria-labelledby="window-label" hidden>
+                <div class="cal-nav">
+                  <button id="cal-prev" type="button" aria-label="Previous month">&lsaquo;</button>
+                  <p class="hint">Pick the first day, then the last.</p>
+                  <button id="cal-next" type="button" aria-label="Next month">&rsaquo;</button>
+                </div>
+                <div id="cal-months" class="cal-months"></div>
+              </div>
+            </div>
+          </div>
+
+          <fieldset class="field">
+            <legend class="field-label">Nights in each city</legend>
+            <div class="steppers">
+              {[
+                { key: 'min', label: 'At least' },
+                { key: 'max', label: 'At most' },
+              ].map((s) => (
+                <div class="stepper" data-nights={s.key}>
+                  <span id={`${s.key}-nights-label`}>{s.label}</span>
+                  <button type="button" data-step="-1" aria-label={`${s.label}: fewer nights`}>&minus;</button>
+                  <output id={`${s.key}-nights`} aria-labelledby={`${s.key}-nights-label`} aria-live="polite"></output>
+                  <button type="button" data-step="1" aria-label={`${s.label}: more nights`}>+</button>
+                </div>
+              ))}
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="field">
+          <span class="field-label">In the app</span>
+          <ul class="locked-chips">
+            {APP_ONLY_OPTIONS.map((o) => (
+              <li>
+                <button type="button" class="locked-chip" data-nudge={o.nudge} aria-pressed="false" aria-controls="chip-nudge">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" set:html={LOCK} />
+                  {o.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+          <p id="chip-nudge" class="chip-nudge" aria-live="polite" hidden></p>
+        </div>
+
+        <p id="form-error" class="form-error" role="alert"></p>
+        <button id="submit" class="btn" type="submit">Find routes</button>
+        <p id="quota-note" class="note"></p>
+      </fieldset>
+    </form>
+
+    <AppSide />
+  </div>
+
+  <div id="problem" class="card problem" role="alert" hidden>
+    <p id="problem-text"></p>
+    <button id="retry" class="btn btn-soon" type="button" hidden>Try again</button>
+  </div>
+
+  <section id="progress" class="card progress" aria-labelledby="progress-title" hidden>
+    <p id="progress-title" class="lbl">Searching</p>
+    <p id="progress-status" class="status" aria-live="polite"></p>
+    <div id="progress-bar" class="bar" role="progressbar" aria-labelledby="progress-title" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <span id="progress-fill"></span>
+    </div>
+    <p id="progress-detail" class="note"></p>
+    <p class="queue-nudge">{NUDGES.queue}</p>
+    <div id="notify-ask" class="notify-ask" hidden>
+      <p>Get a notification when your routes are ready?</p>
+      <div class="notify-buttons">
+        <button id="notify-yes" type="button" class="btn">Notify me</button>
+        <button id="notify-no" type="button" class="btn btn-soon">Not now</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="results" class="results" aria-labelledby="results-title" aria-live="polite" hidden>
+    <h2 id="results-title"></h2>
+    <p id="results-trip" class="note"></p>
+    <p id="results-empty" class="note" hidden>Try a wider travel window or a different number of nights.</p>
+    <p id="insights" class="insights" hidden></p>
+    <p id="app-hint" class="app-hint" hidden></p>
+    <div class="table-wrap">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Route</th>
+            <th scope="col">Dates</th>
+            <th scope="col">Nights</th>
+            <th scope="col">Flights</th>
+            <th scope="col">Watch out</th>
+            <th scope="col">Total</th>
+            <th scope="col"><span class="sr-only">Details</span></th>
+          </tr>
+        </thead>
+        <tbody id="route-rows"></tbody>
+      </table>
+    </div>
+    <p id="more-routes" hidden><a href="#app-side"></a></p>
+    <p class="quiet">
+      Book opens the airline's site or a booking site. A booking partner may pay {APP.name} a commission if you book
+      through its link, at no extra cost to you. Fares are indicative: confirm the price where you book.
+    </p>
+    <p id="coverage" class="quiet" hidden></p>
+    <AdSlot slot="searchResults" size="banner" />
+  </section>
+
+  <section id="upsell" class="card upsell" aria-labelledby="upsell-title" hidden>
+    <p class="lbl">{APP.name} for iPhone</p>
+    <h2 id="upsell-title">Every route in full, in the app</h2>
+    <p>{APP.proName} shows the dates, flight times, airlines and booking links for every route.</p>
+    <AppStoreBadge />
+  </section>
+</div>
+
+<template id="place-option-template">
+  <li class="place" role="option"><span class="place-name"></span><span class="place-airports"></span><code class="place-code"></code></li>
+</template>
+
+<template id="place-notice-template">
+  <li class="place place-notice" role="option" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true" set:html={LOCK} /><span class="notice-text"></span></li>
+</template>
+
+<template id="chip-template">
+  <li class="chip"><span class="chip-name"></span><button type="button" class="chip-remove">&times;</button></li>
+</template>
+
+<template id="route-row-template">
+  <tr class="route-row">
+    <td class="rank" data-label="#"></td>
+    <td class="route" data-label="Route"></td>
+    <td class="dates" data-label="Dates"></td>
+    <td class="nights" data-label="Nights"></td>
+    <td class="flights" data-label="Flights"></td>
+    <td class="warn" data-label="Watch out"><ul class="warn-chips"></ul></td>
+    <td class="total" data-label="Total"></td>
+    <td class="details"><button type="button" class="details-toggle" aria-expanded="false">Details</button></td>
+  </tr>
+</template>
+
+<template id="warn-template">
+  <li class="warn-chip"></li>
+</template>
+
+<template id="leg-row-template">
+  <tr class="leg-row" hidden>
+    <td colspan="8">
+      <div class="leg">
+        <span class="leg-day"></span>
+        <span class="leg-time"></span>
+        <span class="leg-path"><span class="leg-from"></span> <code class="leg-from-code"></code> &rarr; <span class="leg-to"></span> <code class="leg-to-code"></code></span>
+        <span class="leg-carrier"></span>
+        <span class="leg-stops"></span>
+        <span class="leg-price"></span>
+        <a class="btn book" target="_blank" rel="sponsored noopener">Book</a>
+      </div>
+    </td>
+  </tr>
+</template>
+
+<template id="locked-row-template">
+  <tr class="locked-row">
+    <td class="rank" data-label="#"></td>
+    <td class="locked-cell" colspan="5">
+      <span class="blurred" aria-hidden="true">City → City → City · 00 Mon – 00 Mon</span>
+      <span class="locked-text"></span>
+    </td>
+    <td class="total" data-label="Total"></td>
+    <td class="details"><a class="open-app" href={openApp}>Open in app</a></td>
+  </tr>
+</template>
+
+<script>
+  import '../scripts/search';
+</script>

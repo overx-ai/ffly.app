@@ -1,4 +1,4 @@
-import { APP, CONTACT_EMAIL, EXTERNAL, FEEDBACK, OPERATOR, SERVICE, SITE_HOST, externalLink, mailto } from '../app';
+import { ADSENSE_CLIENT, APP, CONTACT_EMAIL, EXTERNAL, FEEDBACK, OPERATOR, PREFS, SERVICE, SITE_HOST, externalLink, mailto } from '../app';
 import { pathFor } from '../site-pages';
 import type { LegalDocument } from './types';
 
@@ -9,14 +9,16 @@ import type { LegalDocument } from './types';
 // (ios-ffly spec 012). Not linked: Product Interaction, Device ID. No tracking. Change one, change all three,
 // and the App Store Connect privacy answers. Recipients are named by category only, Apple excepted
 // (scripts/check-legal.mjs bans vendor names and mechanics on every page).
+// The website's ad copy follows ADSENSE_CLIENT: "no ads" until it is set, ads after consent once it is.
+const ADS = Boolean(ADSENSE_CLIENT);
 
 export const PRIVACY: LegalDocument = {
   pageTitle: 'Privacy Policy',
   description: `How the ffly iPhone app handles your data: no account, no location, no ads, no tracking. Your searches are deleted within ${SERVICE.searchRetentionHours} hours.`,
   summaryTitle: 'The short version',
   summaryText: `ffly has no account and no sign-in. We don't collect your name, phone number or location, and we
-    get your email address only if you add it to feedback. We show no ads and don't track you across other apps
-    or websites. To find routes, we receive the trip you search for, and we delete it within
+    get your email address only if you add it to feedback. ${ADS ? 'The app shows no ads, this website shows ads only after you choose, and we' : 'We show no ads and'}
+    don't track you across other apps or websites. To find routes, we receive the trip you search for, and we delete it within
     ${SERVICE.searchRetentionHours} hours. We collect anonymous usage analytics to improve the app. Apple handles
     payments. We never sell your data.`,
   sections: [
@@ -168,7 +170,10 @@ export const PRIVACY: LegalDocument = {
           <li>we use analytics, search limits and your IP address for our legitimate interests in improving ffly,
           keeping it fair and protecting it from abuse;</li>
           <li>we use feedback and any email address you add for our legitimate interest in answering you and fixing
-          what you report.</li>
+          what you report;</li>
+          <li>we remember your search choices on this website for our legitimate interest in sparing you from typing
+          them again${ADS ? `;</li>
+          <li>we show personalised ads on this website only with your consent` : ''}.</li>
         </ul>
         <p>You can object to processing based on legitimate interests at any time.</p>`,
     },
@@ -183,10 +188,12 @@ export const PRIVACY: LegalDocument = {
           (Section 8).</li>
           <li><strong>Our hosting providers</strong> run ffly and this website for us.</li>
           <li><strong>A booking partner</strong> receives what you do on its site once you open a partner link
-          (Section 10).</li>
+          (Section 10).</li>${ADS ? `
+          <li><strong>An advertising partner and its consent tool</strong> show ads on this website and ask for
+          your choice first (Section 17).</li>` : ''}
         </ul>
         <p>Our providers handle data only on our behalf. We may also disclose data when the law requires it. We
-        don't sell data or share it with advertisers or data brokers.</p>`,
+        don't sell data or share it with data brokers.${ADS ? '' : ' We share nothing with advertisers.'}</p>`,
     },
     {
       id: 'security',
@@ -217,18 +224,36 @@ export const PRIVACY: LegalDocument = {
       id: 'web-search',
       title: `Web Search on ${SITE_HOST}`,
       content: `
-        <p>The <a href="${pathFor('search')}">web search</a> sends us your places, dates, nights and priority. It
-        sends no app identifier, and your search isn't stored with your IP address. We use your IP address only to
-        count your free web searches for the day.</p>
-        <p>Your browser remembers your latest search until you close the tab, so reloading the page keeps it. The
-        web search sets no cookies, runs no analytics and shows no ads.</p>`,
+        <p>You can search on the home page and on the <a href="${pathFor('search')}">web search</a> page. A web
+        search sends us your places, dates and nights. It sends no app identifier, and your search isn't stored
+        with your IP address. We use your IP address only to count your free web searches for the day.</p>
+        <p>Your browser remembers your latest search until you close the tab, so reloading the page keeps it.</p>
+        <p>If you choose <strong>Notify me</strong>, your browser asks whether ${SITE_HOST} may send you
+        notifications, and tells you when your routes are ready while the tab is open. Nothing is asked until you
+        choose it, the notification comes from your browser itself, and you can turn it off in your browser's
+        settings.</p>
+        <p>Results show <strong>Book</strong> links, which open the airline's site or a booking site in a new tab.
+        A booking partner's site may set its own cookies, and its link carries ffly's partner identifier, the same
+        for every ffly user, so the partner can pay ffly a commission if you book, at no extra cost to you
+        (Section 10).</p>`,
     },
     {
       id: 'website',
       title: 'This Website',
       content: `
-        <p>This website sets no cookies and runs no analytics. Our hosting provider receives your IP address and
-        basic details of each visit to deliver the page and protect the site.</p>`,
+        <p>This website remembers where you start and come back to for ${PREFS.from.days} days, and the cities you
+        picked for ${PREFS.cities.days} days, so the search is filled in next time. It also remembers which tip
+        about the app it showed you last. It does this with small cookies that only this website reads. It never
+        remembers your travel dates. You can delete these cookies in your browser at any time.</p>
+        ${ADS
+          ? `<p>This website shows ads from an advertising partner. Before any ad loads, a consent tool asks whether
+        you agree to personalised ads, and remembers your choice. If you don't agree, you may still see ads that are
+        not personalised, which the partner may still measure and limit where the law allows. You can change your
+        choice at any time from the link the consent tool adds to the page. The advertising partner and the consent
+        tool receive your IP address and details of your browser and device, and may set their own cookies.</p>`
+          : '<p>This website shows no ads and runs no analytics.</p>'}
+        <p>Our hosting provider receives your IP address and basic details of each visit to deliver the page and
+        protect the site.</p>`,
     },
     {
       id: 'rights',

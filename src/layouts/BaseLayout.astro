@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { APP, APP_STORE_ID } from '../app';
+import { ADSENSE_CLIENT, ADSENSE_SCRIPT, APP, APP_STORE_ID, CONSENT_SCRIPT } from '../app';
 import { DEFAULT_OG_IMAGE, siteOrigin, urlFor, type Slug } from '../site-pages';
 import { breadcrumb, websiteSchema, type Crumb } from '../schema';
 
@@ -73,6 +73,10 @@ else if (slug !== undefined) schemas = [...structuredData, breadcrumb(title, slu
     <meta name="theme-color" content={THEME_COLOR.light} media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content={THEME_COLOR.dark} media="(prefers-color-scheme: dark)" />
     {PRELOAD_FONTS.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
+
+    {/* Google's certified consent message first, then AdSense, which waits for its consent signal. */}
+    {ADSENSE_CLIENT && <script async src={CONSENT_SCRIPT(ADSENSE_CLIENT)} />}
+    {ADSENSE_CLIENT && <script async src={ADSENSE_SCRIPT(ADSENSE_CLIENT)} crossorigin="anonymous" />}
 
     {schemas.map((s) => (
       <script type="application/ld+json" set:html={jsonLd(s)} />

@@ -25,8 +25,9 @@ The owner wanted the site to stop looking AI-generated and to stop leaking imple
 | gold | `#F2C14E` (fills only) | `#F2C14E` (accent and text) | CTA fills with navy text, underlines, route |
 | red | `#D93A2B` | `#FF6B5E` | stamp, errors, attention |
 | neutrals | navy tints `#F4F6FB`, `#E3E8F2`, `#5A6482` | `#A7B0CC` | backgrounds, secondary text |
+| navy blue | `#2251CC` | (gold) | light map legs, badges and notes |
 
-Gold is never darkened: a dark gold reads as brown, and the owner rejected it. In light mode, gold never appears as text. The hero map is always a night map, in both themes.
+Gold is never darkened: a dark gold reads as brown, and the owner rejected it. In light mode, gold never appears as text. The hero map follows the colour scheme (spec 003): mist and white with navy-blue legs in light, the night map in dark.
 
 ## Components
 | Piece | File | Notes |

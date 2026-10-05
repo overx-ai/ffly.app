@@ -1,21 +1,28 @@
 # ffly-site (ffly.app)
 
 Marketing, support and legal site for **ffly** (`ai.overx.ffly`), the iPhone app for cheap
-multi-city trips. Astro 4, static output, deployed on Vercel. Client JavaScript only on `/search`.
+multi-city trips. Astro 4, static output, deployed on Vercel. Client JavaScript only in the search widget (`/` and `/search`).
 
 The app source lives at `../../0E-extensions/ios-ffly`, the API at `1B-bots` `apps/ffly-api`.
 Those repos are the source of truth for copy, colours and claims.
 
 ## Tech Stack
-- Astro 4, `output: 'static'`, `trailingSlash: 'never'`. **One dependency: `astro`.**
-- **Zero client JavaScript, except `/search`.** Theme switching is pure CSS, the FAQ is `<details>`.
-  `/search` (the free web search, `docs/specs/001-search-web-app.md`) ships one bundled script:
-  `src/scripts/{ffly-api,search}.ts`, plain TypeScript, no framework, rendering via `textContent`/`<template>`
-  only (never `innerHTML` with API data). It calls `FFLY_API_BASE` anonymously: `X-Platform: web`, never
-  `X-Client-Id`. No ads: the ad scaffolding was removed (T-014) until an ads step with consent is specced.
+- Astro 4, `output: 'static'`, `trailingSlash: 'never'`. **One dependency: `astro`**, plus `vitest` (dev only) for `tests/`.
+- **Zero client JavaScript, except the search widget.** Theme switching is pure CSS, the FAQ is `<details>`.
+  `SearchForm.astro` (specs 001 and 003) sits on `/` under `#search` and on `/search`, and ships one bundled
+  script: `src/scripts/search.ts` over small DOM-free modules (`ffly-api`, `combobox`, `calendar`, `prefs`,
+  `nudges`, `results`, `notify`, `scroll`) that `tests/` covers. Plain TypeScript, no framework, custom controls
+  only (no `<select>`, `<datalist>`, date or number input), rendering via `textContent`/`<template>` only (never
+  `innerHTML` with API data). It calls `FFLY_API_BASE` (contract pinned in `docs/PINS.md`) anonymously:
+  `X-Platform: web`, never `X-Client-Id`, and never priority, filters or schedule. Its cookies, nudge copy and
+  scroll time live in `src/app.ts`.
+- **Ads only after consent.** While `ADSENSE_CLIENT` in `src/app.ts` is undefined, no consent or ad script loads
+  and `AdSlot` renders nothing (`npm test` asserts it). Set it, and `AD_SLOTS`, to load Google's consent message
+  and then AdSense; `/privacy` switches its ad copy on the same constant.
 - Deploy: `git push origin main`, then Vercel builds. `vercel.json` holds clean URLs, the
   security headers (CSP, nosniff, Referrer-Policy) and immutable caching of `/_astro/`; `npm test` checks
-  them. The CSP allows no inline script and no third-party host but `api.overx.ai`: add any new one there.
+  them. The CSP allows no inline script and no third-party host but `api.overx.ai` and the Google ad and
+  consent hosts: add any new one there.
   Hosting and DNS: [docs/001-deployment.md](docs/001-deployment.md).
 
 ## Critical conventions
@@ -98,10 +105,11 @@ Those repos are the source of truth for copy, colours and claims.
   primitives at the top of `src/styles/global.css`; no other hue, no gradients. **Gold stays yellow**
   (`#F2C14E`, tint `#FCEFCB`), never darkened. On a light background gold is only a fill (with navy text),
   an underline of 2px or more, or a highlight; light-mode links and accents are navy. Dark mode may use
-  gold as text and accent. Red is for the boarding-pass stamp and errors only.
-- The home hero map is always a night map, in both schemes. Its geometry is computed at build time in
-  `src/components/RouteMap.astro` from `src/data/europe-map.json` (regenerate: README); the fly is SVG
-  `<animateMotion>`, so the home page ships no JavaScript. Label offsets there are hand-placed for
+  gold as text and accent. Red is for the boarding-pass stamp, errors and the results' "Watch out" chips only.
+- The home hero map follows the colour scheme: mist sea, white land, `--navy-blue` legs and a navy fly in
+  light, the night set in dark, all as custom properties in `src/components/RouteMap.astro`. Its geometry is
+  computed at build time there from `src/data/europe-map.json` (regenerate: README); the fly is SVG
+  `<animateMotion>`, so the map needs no JavaScript. Label offsets there are hand-placed for
   `EXAMPLE_TRIP`: a new example needs new ones, and a new city needs a point in `scripts/europe-map.py`.
 - Fonts are self-hosted latin woff2 in `public/fonts/`: Bricolage Grotesque (display), Figtree (body),
   IBM Plex Mono (data).
@@ -110,7 +118,7 @@ Those repos are the source of truth for copy, colours and claims.
 - Hyphenated words in large headings go in `<span class="nw">` so they do not break at the hyphen.
 
 ## Workflows
-- Verify: `npm test` (build, then `scripts/check-legal.mjs`), then the checks in README "Verification".
+- Verify: `npm test` (vitest, build, then `scripts/check-legal.mjs`), then the checks in README "Verification".
 - Preview: `npm run preview`, read every page at 390px and 1280px in both colour schemes.
 
 ## Code comments

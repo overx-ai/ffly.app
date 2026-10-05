@@ -11,9 +11,9 @@ const home = pathFor('');
     </a>
     <nav aria-label="Main">
       {/* Absolute, not bare fragments: the ids live on the home page only. */}
-      <a href={`${home}#why`}>Why {APP.name}</a>
-      <a href={`${home}#plans`}>Free and Pro</a>
-      <a href={pathFor('search')}>Try on the web</a>
+      <a class="wide" href={`${home}#why`}>Why {APP.name}</a>
+      <a class="wide" href={`${home}#plans`}>Free and Pro</a>
+      <a href={`${home}#search`}>Search</a>
       <a href={pathFor('support')}>Support</a>
     </nav>
   </div>
@@ -60,6 +60,6 @@ const home = pathFor('');
   nav a:hover { color: var(--ink); }
   @media (max-width: 760px) {
     nav { gap: var(--space-md); }
-    nav a[href*="#"] { display: none; }
+    nav .wide { display: none; }
   }
 </style>

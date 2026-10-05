@@ -52,6 +52,7 @@
   --navy-haze:    #A7B0CC;
   --navy-land:    #18224B;
   --navy-edge:    #26325E;
+  --navy-blue:    #2251CC;
   --gold:         #F2C14E;
   --gold-tint:    #FCEFCB;
   --red:          #D93A2B;
@@ -93,6 +94,7 @@
   --max-width-prose: 720px;
   --gutter: clamp(16px, 5vw, 48px);
   --header-offset: 88px;
+  --header-height: 65px;
 
   color-scheme: light dark;
 }
@@ -234,7 +236,7 @@ a:hover { text-decoration-color: currentColor; }
 .faq details > div { padding-top: var(--space-sm); color: var(--ink-2); }
 .faq details > div p + p { padding-top: var(--space-sm); }
 
-/* A route as a chain of stops: the /search best route. */
+/* A route as a chain of stops: the app panel beside the search. */
 .chain { list-style: none; margin: 0; padding: 0; }
 .chain li {
   position: relative;

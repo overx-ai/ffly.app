@@ -66,6 +66,12 @@ for (const type of NOT_LINKED) {
 check(!/not linked to your identity/.test(privacy('searches')), 'Privacy: trip searches must not be called unlinked');
 check(/nothing that identifies you/.test(privacy('searches')), 'Privacy: fare sources must be said to get nothing that identifies you');
 check(/same for every ffly user/.test(privacy('booking-links')), 'Privacy: the partner identifier must be said to be ffly-wide');
+// Spec 003: the web search remembers places in functional cookies, never dates; notifications only on request.
+const website = privacy('website');
+check(/cookies/.test(website) && /never remembers your travel dates/.test(website), 'Privacy: #website must cover the search cookies and say dates are never kept');
+const webSearch = privacy('web-search');
+check(/Notify me/.test(webSearch) && /notification/.test(webSearch), 'Privacy: #web-search must cover notifications');
+check(/booking partner/.test(webSearch) && /at no extra cost/.test(webSearch), 'Privacy: #web-search must cover partner booking links');
 check(/at no extra cost/.test(privacy('booking-links')), 'Privacy: partner links must disclose the commission');
 
 const feedbackNum = readHtml('privacy').match(/id="feedback"[^>]*>\s*<h2[^>]*><span class="num"[^>]*>0*(\d+)</)?.[1];
@@ -132,6 +138,31 @@ for (const [file, html] of htmlPages) {
   check(!/"(?:offers|aggregateRating)"/.test(JSON.stringify(jsonLd(html))), `${file}: JSON-LD must carry no offers or aggregateRating`);
 }
 
+// Ads (spec 003): no consent or ad script while ADSENSE_CLIENT is unset, and AdSense never before the consent message.
+const adsOff = /export const ADSENSE_CLIENT\b[^=]*=\s*undefined\s*;/.test(readFileSync(new URL('../src/app.ts', import.meta.url), 'utf8'));
+const AD_SCRIPT = 'pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+const CONSENT_SCRIPT = 'fundingchoicesmessages.google.com/i/';
+for (const [file, html] of htmlPages) {
+  if (adsOff) {
+    check(!/googlesyndication|fundingchoicesmessages|adsbygoogle/.test(html), `${file}: an ad or consent script loads while ADSENSE_CLIENT is unset`);
+  } else {
+    const ad = html.indexOf(AD_SCRIPT);
+    const consent = html.indexOf(CONSENT_SCRIPT);
+    check(ad < 0 || (consent >= 0 && consent < ad), `${file}: the consent message must load before AdSense`);
+  }
+}
+const scriptSrc = csp.match(/script-src ([^;]*)/)?.[1] ?? '';
+for (const host of ['pagead2.googlesyndication.com', 'fundingchoicesmessages.google.com']) {
+  check(scriptSrc.includes(`https://${host}`), `vercel.json: CSP script-src must allow ${host}`);
+}
+check(/shows no ads/.test(website) === adsOff, 'Privacy: #website must say "shows no ads" exactly while ADSENSE_CLIENT is unset');
+
+// The search lives on the home page under #search, and the header Search item points at it from every page.
+check(/<section[^>]*\bid="search"/.test(readHtml('')), 'Home: the #search section is missing');
+for (const [file, html] of htmlPages) {
+  if (html.includes('<header')) check(html.includes('href="/#search"'), `${file}: the header must link /#search`);
+}
+
 const connectHosts = (csp.match(/connect-src ([^;]*)/)?.[1] ?? '')
   .split(' ')
   .filter((src) => src.startsWith('https://'))
@@ -157,9 +188,11 @@ const MECHANICS = [
   ...['up to 8', 'up to 3 places', 'must or a maybe'].map((phrase) => [phrase, `the mechanics phrase "${phrase}"`]),
 ].map(([term, what]) => [bannedTerm(term), what]);
 // The search bundle builds the API URL and every page links https:// URLs, so these are banned in copy only.
+// Only the hosts the bundle calls are the API: the ad hosts in connect-src appear in script tags once ads are on.
+const apiHosts = connectHosts.filter((host) => bundle.includes(host));
 const COPY_BANS = [
   ...MECHANICS,
-  ...connectHosts.map((host) => [bannedTerm(host), `the API host ${host}`]),
+  ...apiHosts.map((host) => [bannedTerm(host), `the API host ${host}`]),
   [bannedTerm('overx.ai/'), 'an API URL under overx.ai/'],
   [/\bHTTPS(?!:\/\/)/i, 'the technical term "HTTPS"'],
 ];

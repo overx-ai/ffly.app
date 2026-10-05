@@ -171,42 +171,75 @@ const description = `Example search on a map of Europe: ${EXAMPLE_TRIP.stops
 </svg>
 
 <style>
-  /* Always a night map, in both colour schemes: an object on the page, like the boarding pass. */
+  /* Follows the colour scheme: a mist and white map in light, the night map in dark. The fly is the app
+     icon's fly, so its eyes stay red in both. */
   .map {
+    --map-sea: var(--navy-mist);
+    --map-land: var(--white);
+    --map-coast: var(--navy-line);
+    --map-grat: var(--navy-fill);
+    --map-grat-text: var(--navy-mute);
+    --map-leg: var(--navy-blue);
+    --map-on-leg: var(--white);
+    --map-pin: var(--navy);
+    --map-label: var(--navy-ink);
+    --map-halo: var(--white);
+    --map-note: var(--navy-blue);
+    --map-fly: var(--navy);
+    --map-fly-line: var(--white);
+    --map-fly-eng: var(--navy-raised);
+    --map-fly-eye: var(--red);
     width: 100%;
     height: auto;
     display: block;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
   }
-  .sea { fill: var(--navy-deep); }
-  .land { fill: var(--navy-land); }
-  .grat line { stroke: var(--navy-edge); stroke-width: 1; }
-  .grat text { fill: var(--navy-haze); font: 500 9.5px var(--font-mono); }
-  .leg { fill: none; stroke: var(--gold); stroke-width: 3.4; stroke-linecap: round; stroke-dasharray: 0 8; }
-  .arrow { fill: var(--gold); }
-  .badge circle { fill: var(--gold); }
-  .badge text { fill: var(--on-gold); font: 700 11px var(--font-mono); text-anchor: middle; dominant-baseline: central; }
-  .pin .dot { fill: var(--white); }
-  .pin .ring { fill: none; stroke: var(--white); stroke-width: 1.5; opacity: 0.4; }
+  @media (prefers-color-scheme: dark) {
+    .map {
+      --map-sea: var(--navy-deep);
+      --map-land: var(--navy-land);
+      --map-coast: var(--navy-land);
+      --map-grat: var(--navy-edge);
+      --map-grat-text: var(--navy-haze);
+      --map-leg: var(--gold);
+      --map-on-leg: var(--on-gold);
+      --map-pin: var(--white);
+      --map-label: var(--white);
+      --map-halo: var(--navy-deep);
+      --map-note: var(--gold);
+      --map-fly: var(--white);
+      --map-fly-line: var(--navy);
+      --map-fly-eng: var(--navy-line);
+    }
+  }
+  .sea { fill: var(--map-sea); }
+  .land { fill: var(--map-land); stroke: var(--map-coast); stroke-width: 0.8; }
+  .grat line { stroke: var(--map-grat); stroke-width: 1; }
+  .grat text { fill: var(--map-grat-text); font: 500 9.5px var(--font-mono); }
+  .leg { fill: none; stroke: var(--map-leg); stroke-width: 3.4; stroke-linecap: round; stroke-dasharray: 0 8; }
+  .arrow { fill: var(--map-leg); }
+  .badge circle { fill: var(--map-leg); }
+  .badge text { fill: var(--map-on-leg); font: 700 11px var(--font-mono); text-anchor: middle; dominant-baseline: central; }
+  .pin .dot { fill: var(--map-pin); }
+  .pin .ring { fill: none; stroke: var(--map-pin); stroke-width: 1.5; opacity: 0.4; }
   .pin text {
-    fill: var(--white);
+    fill: var(--map-label);
     font: 700 15px var(--font-body);
     paint-order: stroke;
-    stroke: var(--navy-deep);
+    stroke: var(--map-halo);
     stroke-width: 4px;
     stroke-linejoin: round;
   }
-  .pin .note { fill: var(--gold); font: 600 11.5px var(--font-mono); }
+  .pin .note { fill: var(--map-note); font: 600 11.5px var(--font-mono); }
   /* The map scales to about half size on a phone, so its labels grow to stay readable. */
   @media (max-width: 560px) {
     .pin text { font-size: 19px; }
     .pin .note { font-size: 14px; }
   }
-  /* The fly is the app icon's fly, so it keeps the icon's colours in both schemes. */
-  .fly .w { fill: var(--white); stroke: var(--navy); stroke-width: 0.9; stroke-linejoin: round; }
-  .fly .eng { fill: var(--navy-line); stroke: var(--navy); stroke-width: 0.6; }
-  .fly .eye { fill: var(--red); }
+  .fly .w { fill: var(--map-fly); stroke: var(--map-fly-line); stroke-width: 0.9; stroke-linejoin: round; }
+  .fly .eng { fill: var(--map-fly-eng); stroke: var(--map-fly-line); stroke-width: 0.6; }
+  .fly .eye { fill: var(--map-fly-eye); }
   .fly-static { display: none; }
   @media (prefers-reduced-motion: reduce) {
     .fly-anim { display: none; }

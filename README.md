@@ -1,24 +1,24 @@
 # ffly-site
 
-Website for **ffly**, at `ffly.app`. Astro 4, static, one dependency. Zero client JavaScript, except the
-free web search at `/search`.
+Website for **ffly**, at `ffly.app`. Astro 4, static, one dependency (plus `vitest`, dev only). Zero client
+JavaScript, except the free web search widget on `/` (`#search`) and `/search`.
 
 ```bash
 npm install
 npm run dev      # localhost:4321; add `-- --host` to reach it from a phone on the LAN
 npm run build    # -> dist/
-npm test         # build, then scripts/check-legal.mjs over dist (legal facts)
+npm test         # vitest (tests/), build, then scripts/check-legal.mjs over dist (legal facts)
 npm run preview
 ```
 
 ## Pages
 | Route | Source |
 |---|---|
-| `/` | `src/pages/index.astro` |
+| `/` | `src/pages/index.astro`, the search under `#search` (`src/components/SearchForm.astro`) |
 | `/support` | `src/pages/support.astro` + `src/data/support.ts` |
 | `/privacy` | `src/layouts/LegalLayout.astro` + `src/data/privacy.ts` |
 | `/terms` | `src/layouts/LegalLayout.astro` + `src/data/terms.ts` |
-| `/search` | `src/pages/search.astro` + `src/scripts/{ffly-api,search}.ts`, the free web search |
+| `/search` | `src/pages/search.astro` + `src/components/SearchForm.astro` + `src/scripts/*.ts`, the free web search |
 | `/guides` | `src/pages/guides/index.astro` |
 | `/guides/{slug}` | `src/content/guides/{slug}.md` via `src/pages/guides/[slug].astro` + `src/layouts/GuideLayout.astro` |
 | `/404` | `src/pages/404.astro`, noindex |

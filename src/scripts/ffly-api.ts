@@ -1,22 +1,31 @@
 import { FFLY_API_BASE, WEB_SEARCH } from '../app';
 
-// Wire shapes of ffly API contract 1.2.0 (1B-bots apps/ffly-api/contract/openapi.json), only the
-// fields this page reads. Free routes are redacted server-side, so most route fields are optional.
+// Wire shapes of ffly API contract 1.3.0 (1B-bots apps/ffly-api/contract/openapi.json, spec 533), only the
+// fields this page reads. The web channel gets routes 1-3 in full and a locked tail, so most fields are optional.
 
 export interface Place {
   code: string;
   name: string;
   top: boolean;
+  airports?: string[] | null;
 }
 
 export interface Meta {
   places: Place[];
   currency: string;
   limits: { max_cities: number; max_ends: number; max_nights: number; max_window_days: number };
-  priorities: Record<string, { label: string; hint: string }>;
-  default_priority: string;
   tier_limits: { max_cities: number; searches_per_day: number | null };
   free_searches_left: number | null;
+}
+
+export interface Trip {
+  start: string;
+  end: string;
+  cities: string[];
+  dateFrom: string;
+  dateTo: string;
+  minNights: number;
+  maxNights: number;
 }
 
 export interface SearchRequest {
@@ -27,9 +36,22 @@ export interface SearchRequest {
   date_to: string;
   min_nights: number;
   max_nights: number;
-  priority: string;
-  max_stops_per_leg?: number;
   client_request_id: string;
+}
+
+export interface Leg {
+  from_place: string;
+  to_place: string;
+  stops: number;
+  origin?: string | null;
+  dest?: string | null;
+  day?: string | null;
+  price?: number | null;
+  carrier?: string | null;
+  link?: string | null;
+  dep?: string | null;
+  arr?: string | null;
+  flags?: string[] | null;
 }
 
 export interface Route {
@@ -38,6 +60,7 @@ export interface Route {
   n_cities: number;
   places?: string[] | null;
   nights?: number[] | null;
+  legs?: Leg[] | null;
 }
 
 export interface Insights {
@@ -62,13 +85,26 @@ export interface SearchView {
   insights?: Insights | null;
   sources?: { source: string; status: 'ok' | 'partial' | 'unavailable' }[] | null;
   more_routes?: number;
+  app_hint?: { price: number } | null;
 }
+
+// The web sends the trip only: priority, filters (stops, excluded, pinned) and schedule are app-only (422 app_only).
+export const buildRequest = (trip: Trip, clientRequestId: string): SearchRequest => ({
+  start: trip.start,
+  ends: [trip.end],
+  cities: [...trip.cities],
+  date_from: trip.dateFrom,
+  date_to: trip.dateTo,
+  min_nights: trip.minNights,
+  max_nights: trip.maxNights,
+  client_request_id: clientRequestId,
+});
 
 export const ACTIVE: readonly SearchStatus[] = ['fetching', 'planning'];
 
 export type SubmitOutcome =
   | { kind: 'created'; id: string }
-  | { kind: 'quota' | 'city_limit' | 'invalid' | 'busy' | 'error' };
+  | { kind: 'quota' | 'city_limit' | 'invalid' | 'app_only' | 'busy' | 'web_unavailable' | 'error' };
 
 export class NotFound extends Error {}
 
@@ -105,9 +141,9 @@ export async function createSearch(request: SearchRequest): Promise<SubmitOutcom
     case 429:
       return { kind: 'quota' };
     case 422:
-      return { kind: 'invalid' };
+      return { kind: body.reason === 'app_only' ? 'app_only' : 'invalid' };
     case 503:
-      return { kind: 'busy' };
+      return { kind: body.reason === 'web_unavailable' ? 'web_unavailable' : 'busy' };
     default:
       return { kind: 'error' };
   }

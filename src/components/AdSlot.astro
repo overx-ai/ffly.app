@@ -1,0 +1,28 @@
+---
+import { ADSENSE_CLIENT, AD_SIZES, AD_SLOTS } from '../app';
+
+interface Props {
+  slot: keyof typeof AD_SLOTS;
+  size: Exclude<keyof typeof AD_SIZES, 'mobile'>;
+}
+
+const { slot, size } = Astro.props;
+const unit = AD_SLOTS[slot];
+const wide = AD_SIZES[size];
+// A banner swaps to the mobile size on a phone; both are reserved up front so nothing shifts.
+const narrow = size === 'banner' ? AD_SIZES.mobile : wide;
+const style = `--ad-w:${wide.width}px;--ad-h:${wide.height}px;--ad-w-m:${narrow.width}px;--ad-h-m:${narrow.height}px`;
+---
+{ADSENSE_CLIENT && unit && (
+  <div class="ad" style={style}>
+    <ins class="adsbygoogle" data-ad-client={ADSENSE_CLIENT} data-ad-slot={unit}></ins>
+  </div>
+)}
+
+<style>
+  .ad { display: flex; justify-content: center; }
+  .ad ins { display: inline-block; width: var(--ad-w); height: var(--ad-h); }
+  @media (max-width: 760px) {
+    .ad ins { width: var(--ad-w-m); height: var(--ad-h-m); }
+  }
+</style>

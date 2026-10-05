@@ -1,7 +1,7 @@
 ---
 id: 003
 title: "ffly.app: search on the home page, a results table with booking links, app nudges, remembered choices, consent and ads, notifications, light/dark map"
-status: approved
+status: done
 created: 2026-10-05
 updated: 2026-10-05
 repo: ffly-site
@@ -102,18 +102,18 @@ Only Night-palette tokens are used (`global.css`).
 ## Tasks (TDD: each lands its failing test first)
 | ID | Description | Status |
 |---|---|---|
-| T1 | Add `vitest` (devDependency; Node 20 has no type stripping) + `npm test` runs it before the build checks | open |
-| T2 | `combobox.ts` matcher + keyboard state machine (unit) and component | open |
-| T3 | Date-range popover + nights steppers (unit for range logic) | open |
-| T4 | `prefs.ts` cookie read/write, TTLs, fill precedence query → cookie → default (unit) | open |
-| T5 | `SearchForm.astro` shared by `/` `#search` and `/search`; `scroll.ts` (unit for easing + reduced motion) | open |
-| T6 | `AppSide.astro` + `nudges.ts` rotation (unit) + copy in `app.ts` | open |
-| T7 | Results table model (route/leg rows, warn chips, locked tail) (unit) + template render | open |
-| T8 | `notify.ts` soft ask → permission → notification on hidden tab (unit with a fake Notification) | open |
-| T9 | Consent + `AdSlot` gated by `ADSENSE_CLIENT`; CSP; privacy rewrite; `check-legal.mjs` assertions (no ad script without the ID, privacy facts, `#search` anchor) | open |
-| T10 | API 1.3.0 types + PINS row; drop priority/filters from the web request | open |
-| T11 | RouteMap light/dark tokens; CLAUDE.md rule update | open |
-| T12 | Home `#plans` copy; Playwright pass at 390 and 1280 px in both schemes | open |
+| T1 | Add `vitest` (devDependency; Node 20 has no type stripping) + `npm test` runs it before the build checks | done |
+| T2 | `combobox.ts` matcher + keyboard state machine (unit) and component | done |
+| T3 | Date-range popover + nights steppers (unit for range logic) | done |
+| T4 | `prefs.ts` cookie read/write, TTLs, fill precedence query → cookie → default (unit) | done |
+| T5 | `SearchForm.astro` shared by `/` `#search` and `/search`; `scroll.ts` (unit for easing + reduced motion) | done |
+| T6 | `AppSide.astro` + `nudges.ts` rotation (unit) + copy in `app.ts` | done |
+| T7 | Results table model (route/leg rows, warn chips, locked tail) (unit) + template render | done |
+| T8 | `notify.ts` soft ask → permission → notification on hidden tab (unit with a fake Notification) | done |
+| T9 | Consent + `AdSlot` gated by `ADSENSE_CLIENT`; CSP; privacy rewrite; `check-legal.mjs` assertions (no ad script without the ID, privacy facts, `#search` anchor) | done |
+| T10 | API 1.3.0 types + PINS row; drop priority/filters from the web request | done |
+| T11 | RouteMap light/dark tokens; CLAUDE.md rule update | done |
+| T12 | Home `#plans` copy; Playwright pass at 390 and 1280 px in both schemes | done |
 
 ## Acceptance
 - `npm test` green (vitest + build + `check-legal`).

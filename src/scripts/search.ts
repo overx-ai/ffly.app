@@ -1,17 +1,26 @@
-import { WEB_SEARCH } from '../app';
+import { NUDGES, PREFS, WEB_SEARCH } from '../app';
+import { RangePicker, addDays, daysBetween, localToday, stepNights, type Nights } from './calendar';
+import { Combobox, matchPlaces } from './combobox';
 import {
   ACTIVE,
   NotFound,
+  buildRequest,
   createSearch,
   getMeta,
   getSearch,
   type Insights,
   type Meta,
-  type Route,
+  type Place,
   type SearchRequest,
   type SearchView,
   type SubmitOutcome,
+  type Trip,
 } from './ffly-api';
+import { ask, canAsk, routesReady } from './notify';
+import { appHintLine, rotation } from './nudges';
+import { cookieString, fillPrefs, parseCookies, savedCookies } from './prefs';
+import { routeRows, type RouteRow, type Warn } from './results';
+import { glideLinks } from './scroll';
 
 interface Saved {
   id: string;
@@ -19,30 +28,30 @@ interface Saved {
   finished?: boolean;
 }
 
-const OPTION_CODE = /\(([A-Z0-9]{3})\)$/;
+type Field = 'from' | 'back' | 'cities';
+
 const MINUTE_S = 60;
 
 const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
 
 const MESSAGES = {
-  topPick: (priority: string) => `Top pick: ${priority}`,
   start: 'Choose where you start from the list.',
-  end: 'Choose where you finish from the list, or leave it empty.',
+  end: 'Choose where you come back to from the list, or leave it empty.',
   noCities: 'Add at least one city to visit.',
-  overlap: 'A city to visit cannot also be where you start or finish.',
+  overlap: 'A city to visit cannot also be where you start or come back to.',
   dates: 'Choose the dates of your travel window.',
   past: 'Your travel window cannot start in the past.',
   window: (max: number) => `Your travel window can be 1 to ${max} days long.`,
   nights: (max: number) => `Nights in each city go from 1 to ${max}, and the least cannot be more than the most.`,
   cityLimit: (max: number) => `The free web search takes up to ${max} cities.`,
   cityCount: (n: number, max: number) => `${n} of ${max}`,
-  addCity: 'Add a city',
-  cityFull: 'That is the most for a web search',
   pickCity: 'Pick each city from the list.',
   quota: "You've used today's free web searches. The app has more.",
   left: (n: number) => `${n} free web ${plural(n, 'search', 'searches')} left today.`,
   invalid: 'Some trip details were not accepted. Check them and try again.',
+  appOnly: 'That option is only in the app.',
   busy: 'ffly is busy right now. Try again in a minute.',
+  webUnavailable: "The web search isn't available right now. Try again later, or search in the app.",
   network: 'Could not reach ffly. Check your connection and try again.',
   failed: 'This search did not finish. Try again in a moment.',
   expired: 'This search has expired. Run it again.',
@@ -56,15 +65,18 @@ const MESSAGES = {
   eta: (min: number) => `about ${min} min left`,
   found: (n: number) => `${n} ${plural(n, 'route', 'routes')} found`,
   none: 'No route fits this trip',
-  nightCount: (n: number) => `${n} ${plural(n, 'night', 'nights')}`,
-  cities: (n: number) => `${n} ${plural(n, 'city', 'cities')}`,
   more: (n: number) => `${n} more ${plural(n, 'route', 'routes')} in the app`,
   removeCity: (name: string) => `Remove ${name}`,
-  rank: (n: number) => `Route ${n}`,
+  lockedRow: (n: number) => `${n} ${plural(n, 'city', 'cities')} · dates and flights in the app`,
+  stops: (n: number) => (n ? `${n} ${plural(n, 'stop', 'stops')}` : 'Direct'),
+  book: (from: string, to: string) => `Book ${from} to ${to}`,
+  details: 'Details',
+  hide: 'Hide',
+  warn: { stops: 'Stops', early: 'Early start', late: 'Late arrival' } satisfies Record<Warn, string>,
   coverage: "Some fares couldn't be checked right now.",
   trip: (start: string, cities: string, finish: string, from: string, to: string) =>
     `${start} to ${cities}${finish}. ${from} to ${to}.`,
-  finishingIn: (name: string) => `, finishing in ${name}`,
+  finishingIn: (name: string) => `, back to ${name}`,
   compared: (fares: string, days: number) => `Compared ${fares} fares across ${days} days.`,
   gains: (list: string) => `Against booking the cheapest next flight each time: ${list}.`,
   savedLess: (amount: string) => `${amount} less`,
@@ -81,21 +93,28 @@ const el = {
   form: byId<HTMLFormElement>('search-form'),
   fields: byId<HTMLFieldSetElement>('search-fields'),
   loading: byId('search-loading'),
-  places: byId<HTMLDataListElement>('places'),
-  start: byId<HTMLInputElement>('start'),
-  end: byId<HTMLInputElement>('end'),
+  from: byId<HTMLInputElement>('from'),
+  fromList: byId('from-list'),
+  back: byId<HTMLInputElement>('back'),
+  backList: byId('back-list'),
   city: byId<HTMLInputElement>('city'),
+  cityList: byId('city-list'),
   cities: byId<HTMLUListElement>('cities'),
   cityCount: byId('city-count'),
-  dateFrom: byId<HTMLInputElement>('date-from'),
-  dateTo: byId<HTMLInputElement>('date-to'),
-  minNights: byId<HTMLInputElement>('min-nights'),
-  maxNights: byId<HTMLInputElement>('max-nights'),
-  priorities: byId('priorities'),
-  direct: byId<HTMLInputElement>('direct'),
+  window: byId<HTMLButtonElement>('window'),
+  windowText: byId('window-text'),
+  calendar: byId('calendar'),
+  calMonths: byId('cal-months'),
+  calPrev: byId<HTMLButtonElement>('cal-prev'),
+  calNext: byId<HTMLButtonElement>('cal-next'),
+  minNights: byId<HTMLOutputElement>('min-nights'),
+  maxNights: byId<HTMLOutputElement>('max-nights'),
+  chipNudge: byId('chip-nudge'),
   formError: byId('form-error'),
   submit: byId<HTMLButtonElement>('submit'),
   quotaNote: byId('quota-note'),
+  nudge: byId('nudge'),
+  nudgeDots: byId('nudge-dots'),
   problem: byId('problem'),
   problemText: byId('problem-text'),
   retry: byId<HTMLButtonElement>('retry'),
@@ -104,13 +123,16 @@ const el = {
   progressBar: byId('progress-bar'),
   progressFill: byId('progress-fill'),
   progressDetail: byId('progress-detail'),
+  notifyAsk: byId('notify-ask'),
+  notifyYes: byId<HTMLButtonElement>('notify-yes'),
+  notifyNo: byId<HTMLButtonElement>('notify-no'),
   results: byId('results'),
   resultsTitle: byId('results-title'),
   resultsTrip: byId('results-trip'),
   resultsEmpty: byId('results-empty'),
   insights: byId('insights'),
-  best: byId('best'),
-  others: byId<HTMLOListElement>('others'),
+  appHint: byId('app-hint'),
+  routeRows: byId('route-rows'),
   more: byId('more-routes'),
   coverage: byId('coverage'),
   upsell: byId('upsell'),
@@ -121,27 +143,34 @@ const clone = (id: string) => byId<HTMLTemplateElement>(id).content.firstElement
 let meta: Meta;
 let money: Intl.NumberFormat;
 let names = new Map<string, string>();
+let start: string | undefined;
+let back: string | undefined;
 let cities: string[] = [];
+let nights: Nights = { min: WEB_SEARCH.minNights, max: WEB_SEARCH.maxNights };
 let retryAction: (() => void) | undefined;
 let pollTimer: ReturnType<typeof setTimeout> | undefined;
+let askedToNotify = false;
+let adsPushed = false;
 
 const nameOf = (code: string) => names.get(code) ?? code;
-const optionLabel = (code: string) => `${nameOf(code)} (${code})`;
 const maxCities = () => Math.min(meta.tier_limits.max_cities, meta.limits.max_cities);
+const formatMoney = (amount: number) => money.format(amount);
 
 const listOf = new Intl.ListFormat(WEB_SEARCH.locale, { type: 'conjunction' });
-const dayFormat = new Intl.DateTimeFormat(WEB_SEARCH.locale, { day: 'numeric', month: 'short', timeZone: 'UTC' });
+const dayFormat = new Intl.DateTimeFormat(WEB_SEARCH.locale, { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
 const countFormat = new Intl.NumberFormat(WEB_SEARCH.locale);
 const formatDay = (iso: string) => dayFormat.format(new Date(`${iso}T00:00:00Z`));
 
-function isoDay(offsetDays: number): string {
-  const d = new Date();
-  d.setDate(d.getDate() + offsetDays);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
-const daysBetween = (from: string, to: string) => (Date.parse(to) - Date.parse(from)) / 86_400_000;
+const picker = new RangePicker({
+  trigger: el.window,
+  label: el.windowText,
+  dialog: el.calendar,
+  months: el.calMonths,
+  prev: el.calPrev,
+  next: el.calNext,
+  maxDays: () => meta.limits.max_window_days,
+  format: ({ from, to }) => `${formatDay(from)} – ${formatDay(to)}`,
+});
 
 function finishOf(request: SearchRequest): string | undefined {
   const end = request.ends[0];
@@ -156,10 +185,13 @@ function showText(node: HTMLElement, text: string) {
 function resolvePlace(raw: string): string | undefined {
   const text = raw.trim();
   if (!text) return undefined;
-  const code = text.match(OPTION_CODE)?.[1] ?? text.toUpperCase();
-  if (names.has(code)) return code;
+  if (names.has(text.toUpperCase())) return text.toUpperCase();
   const lower = text.toLowerCase();
   return meta.places.find((p) => p.name.toLowerCase() === lower)?.code;
+}
+
+function remembered(field: Field, on: boolean) {
+  for (const tag of document.querySelectorAll<HTMLElement>(`[data-remembered="${field}"]`)) tag.hidden = !on;
 }
 
 function storage(): Storage | undefined {
@@ -188,7 +220,6 @@ function isSaved(value: unknown): value is Saved {
     isText(r.date_to) &&
     Number.isInteger(r.min_nights) &&
     Number.isInteger(r.max_nights) &&
-    isText(r.priority) &&
     isText(r.client_request_id)
   );
 }
@@ -207,6 +238,47 @@ function load(): Saved | undefined {
   return undefined;
 }
 
+function placeOption(place: Place): HTMLElement {
+  const row = clone('place-option-template');
+  part(row, '.place-name').textContent = place.name;
+  const airports = place.airports && place.airports.length > 1 ? place.airports.join(' · ') : '';
+  showText(part(row, '.place-airports'), airports);
+  part(row, '.place-code').textContent = place.code;
+  return row;
+}
+
+function placeNotice(text: string): HTMLElement {
+  const row = clone('place-notice-template');
+  part(row, '.notice-text').textContent = text;
+  return row;
+}
+
+function placeBox(input: HTMLInputElement, list: HTMLElement, onPick: (place: Place) => void, notice?: () => string | undefined) {
+  return new Combobox({
+    input,
+    list,
+    options: (query) =>
+      matchPlaces(meta.places, query, {
+        exclude: new Set([...cities, ...(input === el.city ? [start, back] : [])].filter(isText)),
+        limit: WEB_SEARCH.placeMatches,
+      }),
+    renderOption: placeOption,
+    renderNotice: placeNotice,
+    notice,
+    onPick,
+  });
+}
+
+function setStart(code: string | undefined) {
+  start = code;
+  el.from.value = code ? nameOf(code) : '';
+}
+
+function setBack(code: string | undefined) {
+  back = code;
+  el.back.value = code ? nameOf(code) : '';
+}
+
 function renderCities() {
   const max = maxCities();
   el.cities.replaceChildren(
@@ -217,6 +289,7 @@ function renderCities() {
       remove.setAttribute('aria-label', MESSAGES.removeCity(nameOf(code)));
       remove.addEventListener('click', () => {
         cities = cities.filter((c) => c !== code);
+        remembered('cities', false);
         renderCities();
         el.city.focus();
       });
@@ -224,54 +297,24 @@ function renderCities() {
     }),
   );
   el.cityCount.textContent = MESSAGES.cityCount(cities.length, max);
-  const full = cities.length >= max;
-  el.city.disabled = full;
-  el.city.placeholder = full ? MESSAGES.cityFull : MESSAGES.addCity;
 }
 
-function addCity(): boolean {
-  const code = resolvePlace(el.city.value);
-  if (!code) return false;
+function addCity(code: string) {
   if (!cities.includes(code) && cities.length < maxCities()) cities.push(code);
   el.city.value = '';
+  remembered('cities', false);
   renderCities();
-  return true;
 }
 
-function setupForm() {
-  names = new Map(meta.places.map((p) => [p.code, p.name]));
-  money = new Intl.NumberFormat(WEB_SEARCH.locale, { style: 'currency', currency: meta.currency });
-  const ordered = [...meta.places].sort((a, b) => Number(b.top) - Number(a.top));
-  el.places.replaceChildren(
-    ...ordered.map((p) => {
-      const option = document.createElement('option');
-      option.value = optionLabel(p.code);
-      return option;
-    }),
-  );
-
-  el.priorities.replaceChildren(
-    ...Object.entries(meta.priorities).map(([key, p]) => {
-      const choice = clone('priority-template');
-      const radio = part<HTMLInputElement>(choice, 'input');
-      radio.value = key;
-      radio.checked = key === meta.default_priority;
-      part(choice, '.choice-label').textContent = p.label;
-      part(choice, '.choice-hint').textContent = p.hint;
-      return choice;
-    }),
-  );
-
-  el.dateFrom.min = isoDay(0);
-  el.dateTo.min = isoDay(1);
-  el.dateFrom.value = isoDay(WEB_SEARCH.startInDays);
-  el.dateTo.value = isoDay(WEB_SEARCH.startInDays + WEB_SEARCH.windowDays);
-  for (const input of [el.minNights, el.maxNights]) input.max = String(meta.limits.max_nights);
-  el.minNights.value = String(WEB_SEARCH.minNights);
-  el.maxNights.value = String(WEB_SEARCH.maxNights);
-
-  renderCities();
-  renderQuota();
+function renderNights() {
+  const limit = meta?.limits.max_nights ?? nights.max;
+  el.minNights.value = String(nights.min);
+  el.maxNights.value = String(nights.max);
+  for (const stepper of document.querySelectorAll<HTMLElement>('.stepper')) {
+    const value = nights[stepper.dataset.nights as keyof Nights];
+    part<HTMLButtonElement>(stepper, '[data-step="-1"]').disabled = value <= 1;
+    part<HTMLButtonElement>(stepper, '[data-step="1"]').disabled = value >= limit;
+  }
 }
 
 function renderQuota() {
@@ -281,56 +324,53 @@ function renderQuota() {
   else el.quotaNote.textContent = MESSAGES.quota;
 }
 
-function fillForm(r: SearchRequest) {
-  const finish = finishOf(r);
-  el.start.value = optionLabel(r.start);
-  el.end.value = finish ? optionLabel(finish) : '';
-  cities = r.cities.slice(0, maxCities());
-  renderCities();
-  el.dateFrom.value = r.date_from;
-  el.dateTo.value = r.date_to;
-  el.minNights.value = String(r.min_nights);
-  el.maxNights.value = String(r.max_nights);
-  for (const radio of el.priorities.querySelectorAll<HTMLInputElement>('input')) radio.checked = radio.value === r.priority;
-  el.direct.checked = r.max_stops_per_leg === 0;
+function defaultWindow() {
+  const from = addDays(localToday(), WEB_SEARCH.startInDays);
+  return { from, to: addDays(from, WEB_SEARCH.windowDays) };
 }
 
-function readForm(): SearchRequest | string {
-  const start = resolvePlace(el.start.value);
-  if (!start) return MESSAGES.start;
-  const end = el.end.value.trim() ? resolvePlace(el.end.value) : start;
+function setupForm(cookies: Map<string, string>) {
+  names = new Map(meta.places.map((p) => [p.code, p.name]));
+  money = new Intl.NumberFormat(WEB_SEARCH.locale, { style: 'currency', currency: meta.currency });
+  const prefs = fillPrefs(new URLSearchParams(location.search), cookies, (code) => names.has(code));
+  setStart(prefs.from.value);
+  setBack(prefs.back.value);
+  cities = prefs.cities.value.slice(0, maxCities());
+  for (const field of ['from', 'back', 'cities'] as const) remembered(field, prefs[field].source === 'cookie');
+  renderCities();
+  renderNights();
+  renderQuota();
+}
+
+function fillForm(r: SearchRequest) {
+  setStart(r.start);
+  setBack(finishOf(r));
+  cities = r.cities.slice(0, maxCities());
+  renderCities();
+  picker.set({ from: r.date_from, to: r.date_to });
+  nights = { min: r.min_nights, max: r.max_nights };
+  renderNights();
+}
+
+function readForm(): Trip | string {
+  const from = start ?? resolvePlace(el.from.value);
+  if (!from) return MESSAGES.start;
+  const end = el.back.value.trim() ? (back ?? resolvePlace(el.back.value)) : from;
   if (!end) return MESSAGES.end;
   if (!cities.length) return MESSAGES.noCities;
   if (cities.length > maxCities()) return MESSAGES.cityLimit(maxCities());
-  if (cities.includes(start) || cities.includes(end)) return MESSAGES.overlap;
+  if (cities.includes(from) || cities.includes(end)) return MESSAGES.overlap;
 
-  const from = el.dateFrom.value;
-  const to = el.dateTo.value;
-  if (!from || !to) return MESSAGES.dates;
-  if (from < isoDay(0)) return MESSAGES.past;
-  const span = daysBetween(from, to);
+  const { from: dateFrom, to: dateTo } = picker.range;
+  if (!dateFrom || !dateTo) return MESSAGES.dates;
+  if (dateFrom < localToday()) return MESSAGES.past;
+  const span = daysBetween(dateFrom, dateTo);
   if (!(span > 0 && span <= meta.limits.max_window_days)) return MESSAGES.window(meta.limits.max_window_days);
 
-  const min = el.minNights.valueAsNumber;
-  const max = el.maxNights.valueAsNumber;
-  const maxNights = meta.limits.max_nights;
-  if (!Number.isInteger(min) || !Number.isInteger(max) || min < 1 || max > maxNights || min > max) {
-    return MESSAGES.nights(maxNights);
-  }
+  const limit = meta.limits.max_nights;
+  if (nights.min < 1 || nights.max > limit || nights.min > nights.max) return MESSAGES.nights(limit);
 
-  const priority = el.priorities.querySelector<HTMLInputElement>('input:checked')?.value ?? meta.default_priority;
-  return {
-    start,
-    ends: [end],
-    cities: [...cities],
-    date_from: from,
-    date_to: to,
-    min_nights: min,
-    max_nights: max,
-    priority,
-    ...(el.direct.checked ? { max_stops_per_leg: 0 } : {}),
-    client_request_id: crypto.randomUUID(),
-  };
+  return { start: from, end, cities: [...cities], dateFrom, dateTo, minNights: nights.min, maxNights: nights.max };
 }
 
 const withNewRequestId = (request: SearchRequest): SearchRequest => ({ ...request, client_request_id: crypto.randomUUID() });
@@ -381,7 +421,7 @@ function insightsLine(i: Insights): string {
     lines.push(MESSAGES.compared(countFormat.format(i.fares_compared), i.days_searched));
   }
   const gains = [
-    i.saved_eur != null && MESSAGES.savedLess(money.format(i.saved_eur)),
+    i.saved_eur != null && MESSAGES.savedLess(formatMoney(i.saved_eur)),
     i.early_starts_avoided != null && MESSAGES.earlyStarts(i.early_starts_avoided),
     i.sleep_saved_h != null && MESSAGES.sleepGained(i.sleep_saved_h),
     i.hotel_nights_saved != null && MESSAGES.lateLandings(i.hotel_nights_saved),
@@ -395,36 +435,6 @@ function coverageLine(sources: SearchView['sources']): string {
   return sources?.some((s) => s.status !== 'ok') ? MESSAGES.coverage : '';
 }
 
-function fillRouteCard(card: HTMLElement, route: Route): HTMLElement {
-  part(card, '.price').textContent = money.format(route.price);
-  part(card, '.locked').hidden = !route.locked;
-  return card;
-}
-
-function bestCard(route: Route, priority: string | undefined): HTMLElement {
-  const card = clone('best-template');
-  const label = priority ? meta.priorities[priority]?.label : undefined;
-  if (label) part(card, '.lbl').textContent = MESSAGES.topPick(label);
-  const places = route.places ?? [];
-  part(card, '.chain').replaceChildren(
-    ...places.map((code, i) => {
-      const stop = clone('stop-template');
-      part(stop, '.city').textContent = nameOf(code);
-      const nights = route.nights?.[i - 1];
-      if (i > 0 && i < places.length - 1 && nights != null) part(stop, '.nights').textContent = MESSAGES.nightCount(nights);
-      return stop;
-    }),
-  );
-  return fillRouteCard(card, route);
-}
-
-function routeCard(route: Route, rank: number): HTMLElement {
-  const card = clone('route-template');
-  part(card, '.rank').textContent = MESSAGES.rank(rank);
-  part(card, '.cities').textContent = MESSAGES.cities(route.n_cities);
-  return fillRouteCard(card, route);
-}
-
 function tripLine(r: SearchRequest): string {
   const finish = finishOf(r);
   return MESSAGES.trip(
@@ -436,28 +446,100 @@ function tripLine(r: SearchRequest): string {
   );
 }
 
+function legRows(row: RouteRow): HTMLElement[] {
+  return row.legs.map((leg, i) => {
+    const tr = clone('leg-row-template');
+    tr.id = `route-${row.rank}-leg-${i}`;
+    part(tr, '.leg-day').textContent = leg.day;
+    part(tr, '.leg-time').textContent = leg.time;
+    part(tr, '.leg-from').textContent = leg.from;
+    part(tr, '.leg-from-code').textContent = leg.fromCode;
+    part(tr, '.leg-to').textContent = leg.to;
+    part(tr, '.leg-to-code').textContent = leg.toCode;
+    part(tr, '.leg-carrier').textContent = leg.carrier;
+    part(tr, '.leg-stops').textContent = MESSAGES.stops(leg.stops);
+    part(tr, '.leg-price').textContent = leg.price;
+    const book = part<HTMLAnchorElement>(tr, '.book');
+    if (leg.link) {
+      book.href = leg.link;
+      book.setAttribute('aria-label', MESSAGES.book(leg.from, leg.to));
+    } else {
+      book.remove();
+    }
+    return tr;
+  });
+}
+
+function renderRow(row: RouteRow): HTMLElement[] {
+  if (row.kind === 'locked') {
+    const tr = clone('locked-row-template');
+    part(tr, '.rank').textContent = String(row.rank);
+    part(tr, '.locked-text').textContent = MESSAGES.lockedRow(row.nCities);
+    part(tr, '.total').textContent = row.total;
+    return [tr];
+  }
+  const tr = clone('route-row-template');
+  part(tr, '.rank').textContent = String(row.rank);
+  part(tr, '.route').textContent = row.route;
+  part(tr, '.dates').textContent = row.dates;
+  part(tr, '.nights').textContent = row.nights;
+  part(tr, '.flights').textContent = row.flights ? String(row.flights) : '';
+  part(tr, '.total').textContent = row.total;
+  part(tr, '.warn-chips').replaceChildren(
+    ...row.warnings.map((w) => {
+      const chip = clone('warn-template');
+      chip.textContent = MESSAGES.warn[w];
+      return chip;
+    }),
+  );
+  const legs = legRows(row);
+  const toggle = part<HTMLButtonElement>(tr, '.details-toggle');
+  if (!legs.length) {
+    toggle.remove();
+    return [tr];
+  }
+  toggle.setAttribute('aria-controls', legs.map((l) => l.id).join(' '));
+  const flip = () => {
+    const open = toggle.getAttribute('aria-expanded') !== 'true';
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.textContent = open ? MESSAGES.hide : MESSAGES.details;
+    tr.classList.toggle('open', open);
+    for (const leg of legs) leg.hidden = !open;
+  };
+  toggle.addEventListener('click', flip);
+  tr.addEventListener('click', (event) => {
+    if (!(event.target as Element).closest('button, a')) flip();
+  });
+  return [tr, ...legs];
+}
+
+function pushAds() {
+  if (adsPushed) return;
+  adsPushed = true;
+  const slots = el.results.querySelectorAll('ins.adsbygoogle');
+  if (!slots.length) return;
+  const w = window as unknown as { adsbygoogle?: object[] };
+  w.adsbygoogle ??= [];
+  for (const _ of slots) w.adsbygoogle.push({});
+}
+
 function renderResults(view: SearchView, request: SearchRequest) {
-  const [first, ...rest] = view.routes;
-  el.resultsTitle.textContent = first ? MESSAGES.found(view.routes.length) : MESSAGES.none;
+  const { rows, more } = routeRows(view, { name: nameOf, money: formatMoney, day: formatDay });
+  el.resultsTitle.textContent = rows.length ? MESSAGES.found(rows.length) : MESSAGES.none;
   el.resultsTrip.textContent = tripLine(request);
-  el.resultsEmpty.hidden = Boolean(first);
-
+  el.resultsEmpty.hidden = rows.length > 0;
   showText(el.insights, view.insights ? insightsLine(view.insights) : '');
-
-  el.best.replaceChildren();
-  if (first) el.best.append(first.places ? bestCard(first, request.priority) : routeCard(first, 1));
-  el.others.replaceChildren(...rest.map((route, i) => routeCard(route, i + 2)));
-
-  const more = view.more_routes ?? 0;
+  showText(el.appHint, appHintLine(view.app_hint, view.routes[0]?.price, formatMoney) ?? '');
+  el.routeRows.replaceChildren(...rows.flatMap(renderRow));
   part(el.more, 'a').textContent = MESSAGES.more(more);
   el.more.hidden = more <= 0;
-
   showText(el.coverage, coverageLine(view.sources));
 
   el.progress.hidden = true;
   el.results.hidden = false;
-  el.upsell.hidden = !(more > 0 || view.routes.some((r) => r.locked));
+  el.upsell.hidden = !(more > 0 || rows.some((r) => r.kind !== 'full'));
   el.submit.disabled = false;
+  pushAds();
 }
 
 function resume(saved: Saved, resubmitted = false): Promise<void> {
@@ -481,7 +563,7 @@ async function poll(saved: Saved, resubmitted: boolean, failures = 0): Promise<v
     }
     // Resubmit unasked only a search lost mid-run (an API restart): never spend a free search
     // re-running one already shown, nor one whose dates have passed.
-    const current = saved.request.date_from >= isoDay(0);
+    const current = saved.request.date_from >= localToday();
     if (!resubmitted && !saved.finished && current) return submit(saved.request, true);
     return showProblem(MESSAGES.expired, current ? searchAgain : undefined);
   }
@@ -490,6 +572,7 @@ async function poll(saved: Saved, resubmitted: boolean, failures = 0): Promise<v
     pollTimer = setTimeout(() => poll(saved, resubmitted), WEB_SEARCH.pollMs);
     return;
   }
+  if (!saved.finished) routesReady({ Notification: globalThis.Notification, doc: document, focus: () => window.focus() });
   save({ ...saved, finished: true });
   if (view.status === 'failed') return showProblem(MESSAGES.failed, searchAgain);
   renderResults(view, saved.request);
@@ -524,39 +607,89 @@ async function submit(request: SearchRequest, resubmitted = false): Promise<void
       return showProblem(MESSAGES.cityLimit(maxCities()), undefined, true);
     case 'invalid':
       return showProblem(MESSAGES.invalid);
+    case 'app_only':
+      return showProblem(MESSAGES.appOnly, undefined, true);
     case 'busy':
       return showProblem(MESSAGES.busy, retry);
+    case 'web_unavailable':
+      return showProblem(MESSAGES.webUnavailable, retry, true);
     case 'error':
       return showProblem(MESSAGES.network, retry);
   }
 }
 
-el.city.addEventListener('input', () => {
-  if (OPTION_CODE.test(el.city.value)) addCity();
+function showRotation(cookies: Map<string, string>) {
+  const { index, next } = rotation(cookies.get(PREFS.nudge.cookie), NUDGES.rotation.length);
+  el.nudge.textContent = NUDGES.rotation[index];
+  [...el.nudgeDots.children].forEach((dot, i) => dot.classList.toggle('on', i === index));
+  document.cookie = cookieString(PREFS.nudge, String(next));
+}
+
+const cityBox = placeBox(el.city, el.cityList, (p) => addCity(p.code), () =>
+  cities.length >= maxCities() ? NUDGES.cityCap : undefined,
+);
+placeBox(el.from, el.fromList, (p) => {
+  setStart(p.code);
+  remembered('from', false);
+});
+placeBox(el.back, el.backList, (p) => {
+  setBack(p.code);
+  remembered('back', false);
 });
 
-el.city.addEventListener('keydown', (event) => {
-  if (event.key !== 'Enter') return;
-  event.preventDefault();
-  if (el.city.value.trim() && !addCity()) el.formError.textContent = MESSAGES.pickCity;
-});
-
-for (const input of [el.start, el.end]) {
+for (const [input, field] of [[el.from, 'from'], [el.back, 'back']] as const) {
+  input.addEventListener('input', () => {
+    if (field === 'from') start = undefined;
+    else back = undefined;
+    remembered(field, false);
+  });
   input.addEventListener('change', () => {
-    const code = resolvePlace(input.value);
-    if (code) input.value = optionLabel(code);
+    const code = (field === 'from' ? start : back) ?? resolvePlace(input.value);
+    if (code) (field === 'from' ? setStart : setBack)(code);
   });
 }
 
+el.city.addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter' || event.defaultPrevented) return;
+  event.preventDefault();
+  if (!el.city.value.trim()) return;
+  const code = resolvePlace(el.city.value);
+  if (code) {
+    addCity(code);
+    cityBox.close();
+  } else {
+    el.formError.textContent = MESSAGES.pickCity;
+  }
+});
+
+el.fields.addEventListener('click', (event) => {
+  const target = event.target as Element;
+  const step = target.closest<HTMLButtonElement>('[data-step]');
+  const stepper = step?.closest<HTMLElement>('.stepper');
+  if (step && stepper) {
+    nights = stepNights(nights, stepper.dataset.nights as keyof Nights, Number(step.dataset.step), meta.limits.max_nights);
+    renderNights();
+    return;
+  }
+  const chip = target.closest<HTMLButtonElement>('.locked-chip');
+  if (!chip) return;
+  const pressed = chip.getAttribute('aria-pressed') !== 'true';
+  for (const other of el.fields.querySelectorAll('.locked-chip')) other.setAttribute('aria-pressed', 'false');
+  chip.setAttribute('aria-pressed', String(pressed));
+  showText(el.chipNudge, pressed ? (chip.dataset.nudge ?? '') : '');
+});
+
 el.form.addEventListener('submit', (event) => {
   event.preventDefault();
-  const request = readForm();
-  if (typeof request === 'string') {
-    el.formError.textContent = request;
+  const trip = readForm();
+  if (typeof trip === 'string') {
+    el.formError.textContent = trip;
     return;
   }
   el.formError.textContent = '';
-  void submit(request);
+  for (const cookie of savedCookies(trip)) document.cookie = cookie;
+  el.notifyAsk.hidden = askedToNotify || !canAsk(globalThis.Notification);
+  void submit(buildRequest(trip, crypto.randomUUID()));
   el.progress.scrollIntoView({ block: 'start' });
 });
 
@@ -566,6 +699,17 @@ el.form.addEventListener('input', () => {
 
 el.retry.addEventListener('click', () => retryAction?.());
 
+el.notifyYes.addEventListener('click', () => {
+  askedToNotify = true;
+  el.notifyAsk.hidden = true;
+  void ask(globalThis.Notification);
+});
+
+el.notifyNo.addEventListener('click', () => {
+  askedToNotify = true;
+  el.notifyAsk.hidden = true;
+});
+
 async function init(): Promise<void> {
   clearOutcome();
   try {
@@ -573,7 +717,7 @@ async function init(): Promise<void> {
   } catch {
     return showProblem(MESSAGES.metaDown, () => void init());
   }
-  setupForm();
+  setupForm(parseCookies(document.cookie));
   el.loading.hidden = true;
   el.fields.disabled = false;
 
@@ -584,4 +728,8 @@ async function init(): Promise<void> {
   }
 }
 
+glideLinks('search');
+showRotation(parseCookies(document.cookie));
+picker.set(defaultWindow());
+renderNights();
 void init();

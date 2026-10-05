@@ -65,7 +65,7 @@ export const FEEDBACK = {
   queuedDays: 7,
 } as const;
 
-// The web search at /search (src/scripts/search.ts), an anonymous Free caller of FFLY_API_BASE.
+// The web search on / (#search) and /search (src/scripts/search.ts), an anonymous Free caller of FFLY_API_BASE.
 export const WEB_SEARCH = {
   platform: 'web',
   freeSearchesPerDay: 1,
@@ -79,7 +79,67 @@ export const WEB_SEARCH = {
   windowDays: 7,
   minNights: 2,
   maxNights: 4,
+  placeMatches: 8,
+  earlyBefore: '07:00',
+  lateFrom: '23:00',
 } as const;
+
+// The hero button and the header "Search" glide to #search over this long (instant under reduced motion).
+export const SCROLL_MS = 1200;
+
+// First-party functional cookies of the web search. Dates are never stored.
+export const PREFS = {
+  from: { cookie: 'ffly_from', days: 365 },
+  back: { cookie: 'ffly_back', days: 365 },
+  cities: { cookie: 'ffly_cities', days: 30 },
+  nudge: { cookie: 'ffly_nudge', days: 365 },
+} as const;
+
+export type Pref = (typeof PREFS)[keyof typeof PREFS];
+
+// Owner rule: name no source, airline or mechanics; never a city count ("up to 8" is a banned mechanics phrase).
+export const NUDGES = {
+  priceLine: 'Prices in the app are often cheaper.',
+  queue: 'In the app your search skips the queue.',
+  cityCap: 'More cities in the app',
+  appHint: (from: string, less: string) => `Same trip in the app: from ${from}, ${less} less.`,
+  rotation: [
+    'Choose the hours you like to fly, in the app.',
+    'In the app your search skips the queue.',
+    `${APP.freeSearches} full searches free in the app.`,
+    'Share a trip as a boarding pass from the app.',
+    'Add more cities to a trip in the app.',
+    'Your trips are saved in the app.',
+  ],
+} as const;
+
+// Options the web search leaves to the app, shown as locked chips that swap in their own nudge.
+export const APP_ONLY_OPTIONS = [
+  { label: 'Flight hours', nudge: 'Choose the hours you like to fly, in the app.' },
+  { label: 'Direct flights only', nudge: 'Keep a trip to direct flights in the app.' },
+  { label: 'More cities', nudge: 'Add more cities to a trip in the app.' },
+  { label: 'Be there on a date', nudge: 'Pin a city to the day you need to be there, in the app.' },
+  { label: 'Skip a flight', nudge: "Leave out a flight you don't want and search again, in the app." },
+] as const;
+
+export const WEB_NOTIFY = {
+  title: 'Your routes are ready',
+  body: 'See the best order and dates for your trip.',
+  tabTitle: `(1) Routes ready · ${APP.name}`,
+  icon: '/icon-192.png',
+} as const;
+
+// TODO(owner): set the AdSense publisher id (ca-pub-...) and the ad unit ids to turn ads on. While the client
+// id is undefined, no consent or ad script loads and every AdSlot renders nothing.
+export const ADSENSE_CLIENT: string | undefined = undefined;
+export const AD_SLOTS: Record<'searchResults', string | undefined> = { searchResults: undefined };
+export const AD_SIZES = {
+  banner: { width: 728, height: 90 },
+  rectangle: { width: 300, height: 250 },
+  mobile: { width: 320, height: 100 },
+} as const;
+export const CONSENT_SCRIPT = (client: string) => `https://fundingchoicesmessages.google.com/i/${client.replace(/^ca-/, '')}?ers=1`;
+export const ADSENSE_SCRIPT = (client: string) => `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`;
 
 // The articles at /guides (src/content/guides).
 export const GUIDES = {

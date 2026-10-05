@@ -9,6 +9,8 @@
 - [000 - Tasks](000-tasks.md): low-severity backlog from the 2026-10-04 audit
 - [Bugs](bugs/): 001 Terms vs the web search, 002 Search History linkage (2026-10-04 audit)
 - [Spec 002 - Privacy: feedback form](specs/002-privacy-feedback.md): `/privacy` Section 8, linked Email Address and Customer Support
+- [Spec 003 - Search on home, results table, nudges](specs/003-search-home-table-nudges.md): `#search` on `/`, custom controls, cookies, notifications, consent-gated ads, light/dark map
+- [PINS](PINS.md): the ffly API contract version the site codes against
 
 ## Documentation Tree
 ```
