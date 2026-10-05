@@ -297,7 +297,8 @@ check(bundle.includes('googletagmanager.com/gtag/js') === gaOn, 'Bundle: the con
 // category. Fare sources that are also carriers (Ryanair, Volotea...) are left out: a carrier is shown wherever a
 // flight is, so banning it would block legitimate UI.
 const WIDGET_COPY = { 'coverage notice': ['messages', 'coverage'], 'poll retry line': ['messages', 'reconnecting'] };
-const bannedTerm = (term) => new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i');
+// Lookbehind rather than \b: \b is ASCII-only, so it would find "server" inside the French "réserver".
+const bannedTerm = (term) => new RegExp(`(?<![\\p{L}\\p{N}])${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'iu');
 const MECHANICS = [
   ...['AZair', 'Aviasales', 'Travelpayouts', 'RevenueCat', 'Telegram', 'Vercel'].map((name) => [name, `the vendor ${name}`]),
   ...['cache', 'Keychain', 'server', 'memory', 'database', 'restart', 'endpoint', 'background', 'bundle id', 'install id', 'request id', 'ai.overx.ffly']
@@ -323,8 +324,13 @@ const widgetText = (html) => {
     return undefined;
   }
 };
+// A plural object is one leaf: Polish adds few/many forms that English does not need.
+const PLURAL_FORMS = ['zero', 'one', 'two', 'few', 'many', 'other'];
+const isPlural = (value) => typeof value.other === 'string' && Object.keys(value).every((k) => PLURAL_FORMS.includes(k));
 const shape = (value) =>
-  value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).map(([k, v]) => [k, shape(v)])) : typeof value;
+  !value || typeof value !== 'object' ? typeof value
+    : isPlural(value) ? 'plural'
+    : Object.fromEntries(Object.entries(value).map(([k, v]) => [k, shape(v)]));
 const englishWidget = widgetText(readHtml('search'));
 check(englishWidget !== undefined, '/search: the widget data-i18n payload is missing or not JSON');
 for (const [what, keys] of Object.entries(WIDGET_COPY)) {

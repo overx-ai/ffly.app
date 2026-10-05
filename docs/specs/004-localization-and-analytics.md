@@ -99,13 +99,13 @@ source: owner, 2026-10-05: "fully localize the site for the main european langua
 |----|-------------|-------|------------|--------|-------|
 | T1 | i18n core: `src/i18n/{locales,en,index}.ts`, move all non-legal copy into `en.ts` (English output byte-identical in wording), `src/views/*`, `[lang]` routes, `site-pages` locale paths and alternates, `BaseLayout` lang, canonical and hreflang, sitemap alternates, `schema.ts` `inLanguage`, per-language `Intl`, `data-i18n` for the widget, footer language switcher, latin-ext fonts, check-legal per-language and canonical checks, vitest updates. Temporary `de`…`pt` dicts may be English copies so the build passes | dev | - | done | src/i18n/*, src/views/*, src/pages/**, src/site-pages.ts, src/layouts/*, src/components/*, src/scripts/*, src/schema.ts, src/app.ts, src/styles/global.css, public/fonts/*, scripts/check-legal.mjs, tests/* |
 | T2 | Consent banner + GA4 behind consent: `GA_MEASUREMENT_ID` and `CONSENT` in `app.ts`, `ConsentBanner.astro`, `consent-state.ts` (tested) + `consent.ts`, footer "Cookie settings", CSP + `GA_CSP` check, privacy `#website` rewrite, consent strings in `en.ts` | dev | T1 | done | src/components/ConsentBanner.astro, src/scripts/consent*.ts, src/layouts/BaseLayout.astro, src/components/Footer.astro, src/app.ts, src/data/privacy.ts, src/i18n/en.ts, vercel.json, scripts/check-legal.mjs, tests/consent.test.ts |
-| T3 | German dictionary `src/i18n/de.ts` | dev | T2 | open | src/i18n/de.ts |
-| T4 | French dictionary `src/i18n/fr.ts` | dev | T2 | open | src/i18n/fr.ts |
-| T5 | Spanish dictionary `src/i18n/es.ts` | dev | T2 | open | src/i18n/es.ts |
-| T6 | Italian dictionary `src/i18n/it.ts` | dev | T2 | open | src/i18n/it.ts |
-| T7 | Dutch dictionary `src/i18n/nl.ts` | dev | T2 | open | src/i18n/nl.ts |
-| T8 | Polish dictionary `src/i18n/pl.ts` | dev | T2 | open | src/i18n/pl.ts |
-| T9 | Portuguese (Portugal) dictionary `src/i18n/pt.ts` | dev | T2 | open | src/i18n/pt.ts |
+| T3 | German dictionary `src/i18n/de.ts` | dev | T2 | done | src/i18n/de.ts |
+| T4 | French dictionary `src/i18n/fr.ts` | dev | T2 | done | src/i18n/fr.ts |
+| T5 | Spanish dictionary `src/i18n/es.ts` | dev | T2 | done | src/i18n/es.ts |
+| T6 | Italian dictionary `src/i18n/it.ts` | dev | T2 | done | src/i18n/it.ts |
+| T7 | Dutch dictionary `src/i18n/nl.ts` | dev | T2 | done | src/i18n/nl.ts |
+| T8 | Polish dictionary `src/i18n/pl.ts` | dev | T2 | done | src/i18n/pl.ts |
+| T9 | Portuguese (Portugal) dictionary `src/i18n/pt.ts` | dev | T2 | done | src/i18n/pt.ts |
 | T10 | Per-language "unlimited" bans in check-legal, `llms.txt` language list, CLAUDE.md / README / design doc updates, visual pass (de, pl at 390 and 1280 px, both schemes) | dev | T3, T4, T5, T6, T7, T8, T9 | open | scripts/check-legal.mjs, public/llms.txt, CLAUDE.md, README.md, docs/002-design-and-guides.md |
 
 ## Acceptance Criteria
