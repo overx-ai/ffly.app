@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FFLY_API_BASE } from '../src/app';
-import { buildRequest, canLookup, createSearch, endLimit, lookupShared, type Meta } from '../src/scripts/ffly-api';
+import { buildRequest, canLookup, createSearch, endLimit, lookupShared, searchedAt, type Meta } from '../src/scripts/ffly-api';
 
 const trip = {
   start: 'WAW',
@@ -91,7 +91,7 @@ describe('lookupShared', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   const request = buildRequest(trip, 'id-1');
-  const view = { id: 'job-1', status: 'done', done: 3, total: 3, eta_s: null, routes: [], searched_at: '2026-10-05T10:00:00Z' };
+  const view = { id: 'job-1', status: 'done', done: 3, total: 3, eta_s: null, routes: [], searched_at: 1791194400 };
   const stub = (impl: () => Promise<Response>) => {
     const fetch = vi.fn(impl);
     vi.stubGlobal('fetch', fetch);
@@ -140,5 +140,16 @@ describe('canLookup', () => {
     expect(canLookup(request, '2026-10-31')).toBe(true);
     expect(canLookup(request, '2026-11-01')).toBe(true);
     expect(canLookup(request, '2026-11-02')).toBe(false);
+  });
+});
+
+describe('searchedAt', () => {
+  it('reads the contract’s epoch seconds', () => {
+    expect(searchedAt(1791236677.38)?.toISOString()).toBe('2026-10-05T21:44:37.380Z');
+  });
+  it('is undefined when absent or not a time', () => {
+    expect(searchedAt(null)).toBeUndefined();
+    expect(searchedAt(undefined)).toBeUndefined();
+    expect(searchedAt(Number.NaN)).toBeUndefined();
   });
 });

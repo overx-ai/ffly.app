@@ -13,6 +13,7 @@ import {
   getMeta,
   getSearch,
   lookupShared,
+  searchedAt,
   type Insights,
   type Meta,
   type Place,
@@ -625,9 +626,9 @@ function renderResults(view: SearchView, request: SearchRequest) {
   pushAds();
 }
 
-function searchedLine(at: string | null | undefined): string {
-  const date = at ? new Date(at) : undefined;
-  return date && !Number.isNaN(date.getTime()) ? fill(MESSAGES.searchedOn, { date: searchedFormat.format(date) }) : '';
+function searchedLine(at: number | null | undefined): string {
+  const date = searchedAt(at);
+  return date ? fill(MESSAGES.searchedOn, { date: searchedFormat.format(date) }) : '';
 }
 
 // A stored result someone shared: shown as it was found, with its time and a way to run it afresh.
