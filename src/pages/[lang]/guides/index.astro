@@ -1,0 +1,7 @@
+---
+import GuidesIndex from '../../../views/GuidesIndex.astro';
+import { langPaths } from '../../../i18n/paths';
+
+export const getStaticPaths = langPaths;
+---
+<GuidesIndex lang={Astro.props.lang} />

@@ -5,17 +5,12 @@
 export const APP = {
   name: 'ffly',
   storeName: 'ffly',
-  subtitle: 'Cheap multi-city trips',
   proName: 'ffly Pro',
   lifetimeName: 'Lifetime',
   minimumOs: '17.0',
   freeSearches: 3,
   savedTrips: 20,
-  airlines: ['Ryanair', 'Wizz Air', 'airBaltic', 'Volotea'],
 } as const;
-
-// The priorities the API ranks by (1B-bots apps/ffly-api constants.PRIORITY_PRESETS labels).
-export const PRIORITIES = ['Best schedule', 'Balanced', 'Cheapest'] as const;
 
 // A real search, not a promise: ios-ffly docs/specs/001 "Verification (2026-10-02)", the default
 // trip against the live API. Always shown labelled as an example; never restate it as a saving.
@@ -24,7 +19,8 @@ export const EXAMPLE_TRIP = {
   start: 'Warsaw',
   finish: 'Warsaw or Vilnius',
   routesFound: 6,
-  bestTotal: '€129.62',
+  bestTotal: 129.62,
+  currency: 'EUR',
   stops: [
     { city: 'Warsaw', code: 'WAW' },
     { city: 'Madrid', code: 'MAD', nights: 2 },
@@ -42,9 +38,6 @@ export const APP_STORE_URL = APP_STORE_ID ? `https://apps.apple.com/app/id${APP_
 
 // The domain as named in copy. Not the build's `site` (astro.config.mjs), which PUBLIC_SITE_URL overrides.
 export const SITE_HOST = 'ffly.app';
-
-// British English throughout: dates, numbers and lists.
-export const LOCALE = 'en-GB';
 
 export const OPERATOR = 'Yauheni Malashchytski, trading as OverX AI';
 export const DEVELOPER = 'Yauheni Malashchytski';
@@ -74,7 +67,6 @@ export const WEB_SEARCH = {
   pollRetries: 3,
   pollRetryBaseMs: 2000,
   storageKey: 'ffly.search',
-  locale: LOCALE,
   startInDays: 21,
   windowDays: 7,
   minNights: 2,
@@ -97,35 +89,7 @@ export const PREFS = {
 
 export type Pref = (typeof PREFS)[keyof typeof PREFS];
 
-// Owner rule: name no source, airline or mechanics; never a city count ("up to 8" is a banned mechanics phrase).
-export const NUDGES = {
-  priceLine: 'Prices in the app are often cheaper.',
-  queue: 'In the app your search skips the queue.',
-  cityCap: 'More cities in the app',
-  appHint: (from: string, less: string) => `Same trip in the app: from ${from}, ${less} less.`,
-  rotation: [
-    'Choose the hours you like to fly, in the app.',
-    'In the app your search skips the queue.',
-    `${APP.freeSearches} full searches free in the app.`,
-    'Share a trip as a boarding pass from the app.',
-    'Add more cities to a trip in the app.',
-    'Your trips are saved in the app.',
-  ],
-} as const;
-
-// Options the web search leaves to the app, shown as locked chips that swap in their own nudge.
-export const APP_ONLY_OPTIONS = [
-  { label: 'Flight hours', nudge: 'Choose the hours you like to fly, in the app.' },
-  { label: 'Direct flights only', nudge: 'Keep a trip to direct flights in the app.' },
-  { label: 'More cities', nudge: 'Add more cities to a trip in the app.' },
-  { label: 'Be there on a date', nudge: 'Pin a city to the day you need to be there, in the app.' },
-  { label: 'Skip a flight', nudge: "Leave out a flight you don't want and search again, in the app." },
-] as const;
-
 export const WEB_NOTIFY = {
-  title: 'Your routes are ready',
-  body: 'See the best order and dates for your trip.',
-  tabTitle: `(1) Routes ready · ${APP.name}`,
   icon: '/icon-192.png',
 } as const;
 

@@ -1,0 +1,269 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import StoreCtas from '../components/StoreCtas.astro';
+import RouteMap from '../components/RouteMap.astro';
+import BoardingPass from '../components/BoardingPass.astro';
+import SearchForm from '../components/SearchForm.astro';
+import { APP, EXAMPLE_TRIP, WEB_SEARCH } from '../app';
+import { useLang, type Lang } from '../i18n';
+import { formatDate, hreflangOf, pageLink, pathFor } from '../site-pages';
+import { appSchema, faqSchema, organizationSchema } from '../schema';
+import type { FaqItem } from '../data/types';
+
+interface Props { lang: Lang; }
+
+const { lang } = Astro.props;
+const { t, fmt } = useLang(lang);
+const { home } = t;
+const guideLink = (slug: Parameters<typeof pageLink>[0], label: string) => pageLink(slug, label, lang);
+const caveat = fmt.text(home.caveat, { date: formatDate(new Date(EXAMPLE_TRIP.searchedOn), lang) });
+const [fineBefore, fineAfter] = home.plans.fine.split('{link}');
+
+const ICONS = {
+  money: '<circle cx="12" cy="12" r="9"/><path d="M15 8.5a3.5 3.5 0 1 0 0 7M8 11h5M8 13.5h5"/>',
+  time: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  sleep: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+  fit: '<path d="M4 7h10M4 12h16M4 17h7"/><circle cx="17" cy="7" r="2"/><circle cx="14" cy="17" r="2"/>',
+};
+
+// Copy source of truth: ios-ffly docs/specs/002-value-story.md. Its "Never" column binds every line:
+// no invented numbers, no saving the search did not measure, no fear copy, no medical claims.
+const values = (Object.keys(ICONS) as (keyof typeof ICONS)[]).map((key) => ({ icon: ICONS[key], ...home.why.values[key] }));
+
+const plans = [
+  {
+    name: home.plans.free.name,
+    line: fmt.plural(home.plans.free.line, APP.freeSearches),
+    body: home.plans.free.body,
+  },
+  {
+    name: APP.proName,
+    line: fmt.text(home.plans.pro.line, { n: APP.freeSearches }),
+    body: home.plans.pro.body,
+    pro: true,
+  },
+];
+
+const { faq: q } = home;
+const faq: FaqItem[] = [
+  q.whatIs,
+  { question: q.different.question, answer: fmt.text(q.different.answer, { link: guideLink('guides/cheapest-order-to-visit-cities', t.common.guideLinks.cheapestOrder) }) },
+  q.airlines,
+  {
+    question: q.free.question,
+    answer: fmt.plural(q.free.answer, APP.freeSearches, { perDay: fmt.plural(q.free.perDay, WEB_SEARCH.freeSearchesPerDay) }),
+  },
+  { question: q.tickets.question, answer: fmt.text(q.tickets.answer, { link: guideLink('guides/multi-city-vs-one-way-tickets', t.common.guideLinks.multiCity) }) },
+  q.android,
+];
+---
+<BaseLayout
+  title={home.title}
+  description={home.description}
+  slug=""
+  lang={lang}
+  structuredData={[appSchema(lang), organizationSchema(), faqSchema(faq, lang)]}
+>
+  <Header lang={lang} />
+
+  <main id="main">
+    <section class="hero container">
+      <div class="hero-grid">
+        <div class="pitch">
+          <h1>{home.h1}</h1>
+          <p class="sub">{home.sub}</p>
+          <StoreCtas lang={lang} />
+        </div>
+        <figure class="hero-map">
+          <RouteMap lang={lang} />
+          <div class="legend">
+            <span>{fmt.plural(home.legend, EXAMPLE_TRIP.routesFound)}</span>
+            <b>{fmt.money(EXAMPLE_TRIP.bestTotal, EXAMPLE_TRIP.currency)}</b>
+          </div>
+          <figcaption>{caveat}</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sect container" id="search" tabindex="-1" aria-labelledby="search-title">
+      <h2 id="search-title">{t.common.searchFree}</h2>
+      <SearchForm lang={lang} />
+    </section>
+
+    <section class="sect container" id="why">
+      <h2>{home.why.title}</h2>
+      <div class="vals">
+        {values.map((v) => (
+          <article>
+            <svg viewBox="0 0 24 24" aria-hidden="true" set:html={v.icon} />
+            <h3>{v.title}</h3>
+            <p>{v.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="sect container" id="plans">
+      <h2>{fmt.plural(home.plans.title, APP.freeSearches)}</h2>
+      <div class="pass-wrap">
+        <BoardingPass caption={caveat} lang={lang} />
+        <div class="plans">
+          {plans.map((p) => (
+            <div class:list={['plan', { pro: p.pro }]}>
+              <p class="plan-name">{p.name}</p>
+              <h3 set:html={p.line} />
+              <p>{p.body}</p>
+            </div>
+          ))}
+          <p class="promise">{home.plans.promise}</p>
+          <p class="fine">
+            {fineBefore}<a href={pathFor('terms', lang)} hreflang={hreflangOf('terms', lang)}>{home.plans.termsLink}</a>{fineAfter}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sect container" id="faq">
+      <h2>{home.faq.title}</h2>
+      <div class="faq home-faq">
+        {faq.map((item) => (
+          <details>
+            <summary>{item.question}</summary>
+            <div><p set:html={item.answer} /></div>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <section class="close">
+      <div class="container close-inner">
+        <h2>{home.close}</h2>
+        <StoreCtas lang={lang} />
+      </div>
+    </section>
+  </main>
+
+  <Footer lang={lang} slug="" />
+</BaseLayout>
+
+<style>
+  .hero { padding-block: var(--space-xl) var(--space-3xl); }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(20px, 4vw, 56px);
+    align-items: center;
+  }
+  h1 {
+    font-size: clamp(42px, 6.4vw, 84px);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+  }
+  .sub { font-size: clamp(17px, 1.6vw, 20px); color: var(--ink-2); max-width: 36ch; margin: 20px 0 28px; }
+
+  .hero-map { margin: 0; min-width: 0; }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 6px 18px;
+    border-top: 1px solid var(--rule);
+    padding-top: 12px;
+    margin-top: 4px;
+  }
+  .legend span { font-size: 14px; color: var(--ink-2); }
+  .legend b { font: 800 30px var(--font-display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .hero-map figcaption { font-size: 13px; color: var(--ink-2); margin-top: 4px; max-width: 70ch; }
+
+  .sect { padding-block: clamp(48px, 7vw, 88px); border-top: 1px solid var(--rule); scroll-margin-top: var(--header-offset); }
+  #search { scroll-margin-top: var(--header-height); }
+  #search:focus { outline: none; }
+  .sect h2 {
+    font-size: clamp(30px, 4.2vw, 52px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin-bottom: 30px;
+    max-width: 20ch;
+  }
+
+  .vals {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(24px, 3vw, 40px) clamp(28px, 5vw, 72px);
+  }
+  .vals article { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; align-items: start; }
+  .vals svg {
+    grid-row: span 2;
+    width: 34px;
+    height: 34px;
+    stroke: var(--accent);
+    stroke-width: 1.8;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .vals h3 { font-size: 22px; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; }
+  .vals p { color: var(--ink-2); }
+
+  .pass-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: clamp(24px, 4vw, 48px);
+    align-items: start;
+  }
+  .plans { display: flex; flex-direction: column; gap: 22px; }
+  .plan { display: flex; flex-direction: column; gap: 6px; padding-left: 16px; border-left: 3px solid var(--rule); }
+  .plan.pro { border-left-color: var(--gold); }
+  .plan-name {
+    font: 700 13px var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .pro .plan-name { color: var(--accent); }
+  .plan h3 { font-size: 24px; line-height: 1.1; }
+  .plan p:last-child { color: var(--ink-2); }
+  .promise { font: 700 18px var(--font-display); margin-top: 6px; }
+  .fine { font-size: 13px; color: var(--ink-2); }
+
+  .home-faq {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 48px;
+    max-width: none;
+  }
+  .home-faq details:last-child { border-bottom: 0; }
+
+  .close {
+    background: var(--night);
+    color: var(--on-night);
+    --store-bg: var(--on-night);
+    --store-ink: var(--night);
+  }
+  .close-inner {
+    padding-block: clamp(56px, 9vw, 112px);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+  }
+  .close h2 {
+    font-size: clamp(34px, 5.2vw, 66px);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    max-width: 15ch;
+  }
+
+  @media (max-width: 900px) {
+    .pass-wrap { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 760px) {
+    .hero-grid, .vals, .home-faq { grid-template-columns: minmax(0, 1fr); }
+    .hero-map { order: -1; }
+    .hero { padding-top: var(--space-md); }
+  }
+</style>

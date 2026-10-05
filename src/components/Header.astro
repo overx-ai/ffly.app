@@ -1,7 +1,13 @@
 ---
 import { APP } from '../app';
-import { pathFor } from '../site-pages';
-const home = pathFor('');
+import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
+import { hreflangOf, pathFor } from '../site-pages';
+
+interface Props { lang?: Lang; }
+
+const { lang = DEFAULT_LANG } = Astro.props;
+const { nav } = useLang(lang).t.common;
+const home = pathFor('', lang);
 ---
 <header>
   <div class="container bar">
@@ -9,12 +15,12 @@ const home = pathFor('');
       <img src="/icon-64.webp" width="32" height="32" alt="" />
       <span>{APP.name}</span>
     </a>
-    <nav aria-label="Main">
+    <nav aria-label={nav.label}>
       {/* Absolute, not bare fragments: the ids live on the home page only. */}
-      <a class="wide" href={`${home}#why`}>Why {APP.name}</a>
-      <a class="wide" href={`${home}#plans`}>Free and Pro</a>
-      <a href={`${home}#search`}>Search</a>
-      <a href={pathFor('support')}>Support</a>
+      <a class="wide" href={`${home}#why`}>{nav.why}</a>
+      <a class="wide" href={`${home}#plans`}>{nav.plans}</a>
+      <a href={`${home}#search`}>{nav.search}</a>
+      <a href={pathFor('support', lang)} hreflang={hreflangOf('support', lang)}>{nav.support}</a>
     </nav>
   </div>
 </header>

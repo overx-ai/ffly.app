@@ -1,5 +1,3 @@
-import { LOCALE } from '../app';
-
 export interface Day {
   iso: string;
   day: number;
@@ -37,7 +35,7 @@ export function localToday(now = new Date()): string {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
-// Weeks run Monday to Sunday (en-GB), padded with the neighbouring months' days.
+// Weeks run Monday to Sunday, as in every language the site speaks, padded with the neighbouring months' days.
 export function monthGrid(year: number, month: number): Day[][] {
   const first = firstOf(year, month);
   const lead = (first.getUTCDay() + WEEK - 1) % WEEK;
@@ -72,11 +70,16 @@ export function stepNights(nights: Nights, which: keyof Nights, delta: number, l
   return which === 'min' ? { min: value, max: Math.max(nights.max, value) } : { min: Math.min(nights.min, value), max: value };
 }
 
-const monthTitle = new Intl.DateTimeFormat(LOCALE, { month: 'long', year: 'numeric', timeZone: 'UTC' });
-const fullDay = new Intl.DateTimeFormat(LOCALE, { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
-const weekday = new Intl.DateTimeFormat(LOCALE, { weekday: 'short', timeZone: 'UTC' });
 const MONDAY = '2024-01-01';
-const WEEKDAYS = Array.from({ length: WEEK }, (_, i) => weekday.format(new Date(parse(addDays(MONDAY, i)))));
+
+export function calendarText(locale: string) {
+  const weekday = new Intl.DateTimeFormat(locale, { weekday: 'short', timeZone: 'UTC' });
+  return {
+    monthTitle: new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' }),
+    fullDay: new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }),
+    weekdays: Array.from({ length: WEEK }, (_, i) => weekday.format(new Date(parse(addDays(MONDAY, i))))),
+  };
+}
 
 const KEY_STEP: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -WEEK, ArrowDown: WEEK };
 
@@ -89,6 +92,7 @@ export interface PickerOptions {
   next: HTMLButtonElement;
   maxDays: () => number;
   format: (range: Required<Range>) => string;
+  locale: string;
 }
 
 // A two-month range popover with a roving tabindex: arrows move a day or a week, Enter picks, Esc cancels.
@@ -97,8 +101,10 @@ export class RangePicker {
   private draft: Range = {};
   private view = { year: 0, month: 0 };
   private focusDay = '';
+  private readonly text: ReturnType<typeof calendarText>;
 
   constructor(private readonly o: PickerOptions) {
+    this.text = calendarText(o.locale);
     o.trigger.addEventListener('click', () => (o.dialog.hidden ? this.open() : this.close()));
     o.prev.addEventListener('click', () => this.shift(-1));
     o.next.addEventListener('click', () => this.shift(1));
@@ -213,9 +219,9 @@ export class RangePicker {
     const table = document.createElement('table');
     table.className = 'cal-month';
     const caption = table.createCaption();
-    caption.textContent = monthTitle.format(firstOf(year, month));
+    caption.textContent = this.text.monthTitle.format(firstOf(year, month));
     const head = table.createTHead().insertRow();
-    for (const name of WEEKDAYS) {
+    for (const name of this.text.weekdays) {
       const th = document.createElement('th');
       th.scope = 'col';
       th.textContent = name;
@@ -232,7 +238,7 @@ export class RangePicker {
         button.type = 'button';
         button.dataset.iso = day.iso;
         button.textContent = String(day.day);
-        button.setAttribute('aria-label', fullDay.format(new Date(parse(day.iso))));
+        button.setAttribute('aria-label', this.text.fullDay.format(new Date(parse(day.iso))));
         button.setAttribute('aria-pressed', String(state.inRange));
         button.disabled = state.disabled;
         button.tabIndex = day.iso === this.focusDay ? 0 : -1;

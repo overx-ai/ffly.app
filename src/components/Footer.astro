@@ -1,23 +1,46 @@
 ---
-import { APP, CONTACT_EMAIL, DEVELOPER, PUBLISHER } from '../app';
-import { pathFor } from '../site-pages';
+import { CONTACT_EMAIL, DEVELOPER, PUBLISHER } from '../app';
+import { DEFAULT_LANG, LANGS, useLang, type Lang } from '../i18n';
+import { hreflangOf, isLocalized, pathFor, type Slug } from '../site-pages';
+
+interface Props {
+  lang?: Lang;
+  slug?: Slug;
+}
+
+const { lang = DEFAULT_LANG, slug } = Astro.props;
+const { footer } = useLang(lang).t.common;
 const year = new Date().getFullYear();
+// The same page in each language where it has one; otherwise each language's home.
+const switchTo: Slug = slug !== undefined && isLocalized(slug) ? slug : '';
+const pageLinks = [
+  { slug: 'guides', label: footer.guides },
+  { slug: 'support', label: footer.support },
+  { slug: 'privacy', label: footer.privacy },
+  { slug: 'terms', label: footer.terms },
+] as const satisfies readonly { slug: Slug; label: string }[];
 ---
 <footer>
   <div class="container">
-    <nav class="links" aria-label="Footer">
-      <a href={pathFor('guides')}>Guides</a>
-      <a href={pathFor('support')}>Support</a>
-      <a href={pathFor('privacy')}>Privacy</a>
-      <a href={pathFor('terms')}>Terms</a>
+    <nav class="links" aria-label={footer.label}>
+      {pageLinks.map((link) => (
+        <a href={pathFor(link.slug, lang)} hreflang={hreflangOf(link.slug, lang)}>{link.label}</a>
+      ))}
       <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
       <span>&copy; {year} {DEVELOPER}</span>
-      <span>Created by <a href={PUBLISHER.url} rel="noopener">{PUBLISHER.label}</a></span>
+      <span>{footer.createdBy} <a href={PUBLISHER.url} rel="noopener">{PUBLISHER.label}</a></span>
     </nav>
-    <p class="fine">
-      {APP.name} is a search tool, not a travel agent, and is not affiliated with any airline. Fares are
-      indicative: confirm the final price on the site you book on.
-    </p>
+    <nav class="links langs" aria-label={footer.languages}>
+      {LANGS.map((l) => (
+        <a
+          href={pathFor(switchTo, l.code)}
+          lang={l.tag}
+          hreflang={l.hreflang}
+          aria-current={l.code === lang && slug === switchTo ? 'page' : undefined}
+        >{l.name}</a>
+      ))}
+    </nav>
+    <p class="fine">{footer.disclaimer}</p>
   </div>
 </footer>
 
@@ -37,6 +60,8 @@ const year = new Date().getFullYear();
   .links a { color: var(--ink-2); text-decoration: none; }
   .links a:hover { color: var(--ink); }
   .links span a { text-decoration: underline; }
+  .langs { font-size: 13px; }
+  .langs [aria-current] { color: var(--ink); font-weight: 600; }
   .fine {
     font-size: 13px;
     line-height: 1.55;

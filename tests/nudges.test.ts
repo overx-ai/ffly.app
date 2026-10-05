@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { NUDGES } from '../src/app';
+import en from '../src/i18n/en';
 import { appHintLine, rotation } from '../src/scripts/nudges';
+
+const NUDGES = en.widget.script.nudges;
 
 const euro = (n: number) => `€${n.toFixed(2)}`;
 
@@ -27,9 +29,9 @@ describe('rotation', () => {
 
 describe('appHintLine', () => {
   it('states the app price and the difference only when the app is cheaper', () => {
-    expect(appHintLine({ price: 100 }, 130, euro)).toBe('Same trip in the app: from €100.00, €30.00 less.');
-    expect(appHintLine({ price: 130 }, 130, euro)).toBeUndefined();
-    expect(appHintLine(null, 130, euro)).toBeUndefined();
-    expect(appHintLine({ price: 100 }, undefined, euro)).toBeUndefined();
+    expect(appHintLine({ price: 100 }, 130, euro, NUDGES.appHint)).toBe('Same trip in the app: from €100.00, €30.00 less.');
+    expect(appHintLine({ price: 130 }, 130, euro, NUDGES.appHint)).toBeUndefined();
+    expect(appHintLine(null, 130, euro, NUDGES.appHint)).toBeUndefined();
+    expect(appHintLine({ price: 100 }, undefined, euro, NUDGES.appHint)).toBeUndefined();
   });
 });

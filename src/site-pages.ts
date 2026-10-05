@@ -1,4 +1,4 @@
-import { LOCALE } from './app';
+import { DEFAULT_LANG, LANGS, X_DEFAULT, localeOf, type Lang } from './i18n/locales';
 
 // Single source of truth for every indexable route.
 // Three consumers read it: BaseLayout (canonical, via urlFor), sitemap.xml.ts (<lastmod>) and
@@ -7,6 +7,8 @@ import { LOCALE } from './app';
 //
 // `lastmod` is a claim made to search engines and readers, not a build artefact. Bump a date only
 // when that page's copy actually changed. Never wire it to the build clock.
+//
+// One lastmod per slug, shared by every language of a localized page.
 //
 // /, /support, /privacy and /terms are fixed: the iOS app (LegalLinks.swift) and the App Store
 // listing (fastlane/metadata/*/{marketing,support,privacy}_url.txt) point at them.
@@ -30,16 +32,42 @@ export const isSlug = (slug: string): slug is Slug => SITE_PAGES.some((page) => 
 
 export const DEFAULT_OG_IMAGE = '/og-image.jpg';
 
-export const pathFor = (slug: Slug) => (slug ? `/${slug}` : '/');
+// Only these have a page per language (/de, /de/search, /de/guides). Every other page is English-only at the root.
+export const LOCALIZED_SLUGS = ['', 'search', 'guides'] as const satisfies readonly Slug[];
 
-export const urlFor = (slug: Slug) => `${siteOrigin}${pathFor(slug)}`;
+export const isLocalized = (slug: Slug) => (LOCALIZED_SLUGS as readonly Slug[]).includes(slug);
 
-export const pageLink = (slug: Slug, label: string) => `<a href="${pathFor(slug)}">${label}</a>`;
+export function pathFor(slug: Slug, lang: Lang = DEFAULT_LANG): string {
+  const prefix = isLocalized(slug) ? localeOf(lang).prefix : '';
+  return `/${[prefix, slug].filter(Boolean).join('/')}`;
+}
 
-const longDate = new Intl.DateTimeFormat(LOCALE, { dateStyle: 'long', timeZone: 'UTC' });
+export const urlFor = (slug: Slug, lang: Lang = DEFAULT_LANG) => `${siteOrigin}${pathFor(slug, lang)}`;
 
-export const formatDate = (date: Date) => longDate.format(date);
+export interface Alternate {
+  hreflang: string;
+  href: string;
+}
 
-export const lastUpdated = (slug: Slug) => formatDate(new Date(SITE_PAGES.find((page) => page.slug === slug)!.lastmod));
+// The head and the sitemap both read this, so the hreflang cluster cannot drift between them.
+export const alternates = (slug: Slug): Alternate[] =>
+  isLocalized(slug)
+    ? [...LANGS.map((l) => ({ hreflang: l.hreflang, href: urlFor(slug, l.code) })), { hreflang: X_DEFAULT, href: urlFor(slug) }]
+    : [];
+
+// A localized page linking an English-only one says so, for the reader and for crawlers.
+export const hreflangOf = (slug: Slug, lang: Lang = DEFAULT_LANG) =>
+  lang !== DEFAULT_LANG && !isLocalized(slug) ? localeOf(DEFAULT_LANG).hreflang : undefined;
+
+export function pageLink(slug: Slug, label: string, lang: Lang = DEFAULT_LANG) {
+  const hreflang = hreflangOf(slug, lang);
+  return `<a href="${pathFor(slug, lang)}"${hreflang ? ` hreflang="${hreflang}"` : ''}>${label}</a>`;
+}
+
+export const formatDate = (date: Date, lang: Lang = DEFAULT_LANG) =>
+  new Intl.DateTimeFormat(localeOf(lang).tag, { dateStyle: 'long', timeZone: 'UTC' }).format(date);
+
+export const lastUpdated = (slug: Slug, lang: Lang = DEFAULT_LANG) =>
+  formatDate(new Date(SITE_PAGES.find((page) => page.slug === slug)!.lastmod), lang);
 
 export const isoDate = (date: Date) => date.toISOString().slice(0, 10);

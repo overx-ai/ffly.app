@@ -1,6 +1,13 @@
 ---
 import EUROPE from '../data/europe-map.json';
 import { EXAMPLE_TRIP } from '../app';
+import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
+
+interface Props { lang?: Lang; }
+
+const { lang = DEFAULT_LANG } = Astro.props;
+const { t, fmt } = useLang(lang);
+const nightsOf = (n: number) => fmt.plural(t.common.nights, n);
 
 type Point = readonly [number, number];
 
@@ -13,7 +20,7 @@ const LENGTH_SAMPLES = 32;
 const FLY = { speed: 110, startDwell: 0.9, dwellPerNight: 0.45, scale: 1.5 };
 // Label offsets are hand-placed so no label sits on a leg; a new example trip needs new ones.
 const LABELS: Record<string, { dx: number; dy: number; anchor: 'start' | 'end'; note?: string }> = {
-  Warsaw: { dx: 18, dy: 0, anchor: 'start', note: 'start and finish' },
+  Warsaw: { dx: 18, dy: 0, anchor: 'start', note: t.map.startFinish },
   Madrid: { dx: -18, dy: 2, anchor: 'end' },
   Amsterdam: { dx: 18, dy: -4, anchor: 'start' },
   Rome: { dx: 16, dy: 22, anchor: 'start' },
@@ -25,7 +32,7 @@ const pointOf = (city: string): Point => {
   if (!p) throw new Error(`europe-map.json has no point for ${city}: add it to scripts/europe-map.py`);
   return [p[0], p[1]];
 };
-const fmt = (n: number) => +n.toFixed(1);
+const round = (n: number) => +n.toFixed(1);
 
 const stops = EXAMPLE_TRIP.stops.map((s) => pointOf(s.city));
 const loop = stops.slice(0, -1);
@@ -57,7 +64,7 @@ const legs = loop.map((a, i) => {
   const pose = (t: number) => {
     const [x, y] = at(t);
     const [tx, ty] = tangent(t);
-    return `translate(${fmt(x)},${fmt(y)}) rotate(${fmt((Math.atan2(ty, tx) * 180) / Math.PI)})`;
+    return `translate(${round(x)},${round(y)}) rotate(${round((Math.atan2(ty, tx) * 180) / Math.PI)})`;
   };
   const [bx, by] = at(BADGE_T);
   let length = 0;
@@ -67,10 +74,10 @@ const legs = loop.map((a, i) => {
     prev = q;
   }
   return {
-    start: `M${fmt(a[0])},${fmt(a[1])}`,
-    curve: `Q${fmt(c[0])},${fmt(c[1])} ${fmt(b[0])},${fmt(b[1])}`,
+    start: `M${round(a[0])},${round(a[1])}`,
+    curve: `Q${round(c[0])},${round(c[1])} ${round(b[0])},${round(b[1])}`,
     arrow: pose(ARROW_T),
-    badge: [fmt(bx + nx * BADGE_OFFSET), fmt(by + ny * BADGE_OFFSET)] as const,
+    badge: [round(bx + nx * BADGE_OFFSET), round(by + ny * BADGE_OFFSET)] as const,
     mid: pose(0.5),
     length,
   };
@@ -101,13 +108,14 @@ const pins = EXAMPLE_TRIP.stops.slice(0, -1).map((s) => {
   const [x, y] = pointOf(s.city);
   const label = LABELS[s.city];
   if (!label) throw new Error(`RouteMap has no label placement for ${s.city}`);
-  return { x, y, city: s.city, note: 'nights' in s ? `${s.nights} nights` : label.note, ...label };
+  return { x, y, city: s.city, note: 'nights' in s ? nightsOf(s.nights) : label.note, ...label };
 });
 
 const { width, height, land, graticule } = EUROPE;
-const description = `Example search on a map of Europe: ${EXAMPLE_TRIP.stops
-  .map((s) => ('nights' in s ? `${s.city}, ${s.nights} nights` : s.city))
-  .join(', then ')}. Flights total ${EXAMPLE_TRIP.bestTotal}.`;
+const description = fmt.text(t.map.label, {
+  route: EXAMPLE_TRIP.stops.map((s) => ('nights' in s ? `${s.city}, ${nightsOf(s.nights)}` : s.city)).join(t.map.then),
+  total: fmt.money(EXAMPLE_TRIP.bestTotal, EXAMPLE_TRIP.currency),
+});
 ---
 <svg class="map" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={description}>
   <rect class="sea" width={width} height={height} />

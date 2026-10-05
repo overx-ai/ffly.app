@@ -1,29 +1,35 @@
 ---
 import AppStoreBadge from './AppStoreBadge.astro';
-import { APP, EXAMPLE_TRIP, NUDGES } from '../app';
+import { EXAMPLE_TRIP } from '../app';
+import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
 
+interface Props { lang?: Lang; }
+
+const { lang = DEFAULT_LANG } = Astro.props;
+const { t, fmt } = useLang(lang);
+const { nudges } = t.widget.script;
 const visits = EXAMPLE_TRIP.stops.filter((s) => 'nights' in s);
 ---
 <aside id="app-side" class="app-side" aria-labelledby="app-side-title">
-  <p class="lbl">{APP.name} for iPhone</p>
-  <p id="app-side-title" class="side-title">More in the app</p>
+  <p class="lbl">{t.common.appForIphone}</p>
+  <p id="app-side-title" class="side-title">{t.appSide.title}</p>
   <div class="phone" aria-hidden="true">
-    <p class="phone-title">Trips</p>
+    <p class="phone-title">{t.appSide.trips}</p>
     <div class="phone-card">
       <p class="phone-route">{EXAMPLE_TRIP.stops.map((s) => s.code).join(' → ')}</p>
       <ol class="chain">
         {visits.map((s) => (
-          <li><span class="city">{s.city}</span><span class="nights">{`${s.nights} nights`}</span></li>
+          <li><span class="city">{s.city}</span><span class="nights">{fmt.plural(t.common.nights, s.nights)}</span></li>
         ))}
       </ol>
     </div>
   </div>
-  <p id="nudge" class="nudge" aria-live="polite">{NUDGES.rotation[0]}</p>
+  <p id="nudge" class="nudge" aria-live="polite">{nudges.rotation[0]}</p>
   <ol id="nudge-dots" class="dots" aria-hidden="true">
-    {NUDGES.rotation.map((_, i) => <li class:list={{ on: i === 0 }} />)}
+    {nudges.rotation.map((_, i) => <li class:list={{ on: i === 0 }} />)}
   </ol>
-  <p class="price-line">{NUDGES.priceLine}</p>
-  <AppStoreBadge />
+  <p class="price-line">{nudges.priceLine}</p>
+  <AppStoreBadge lang={lang} />
 </aside>
 
 <style>

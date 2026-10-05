@@ -1,19 +1,23 @@
 ---
-import { APP, EXAMPLE_TRIP, LOCALE } from '../app';
+import { APP, EXAMPLE_TRIP } from '../app';
+import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
 
 interface Props {
   caption: string;
+  lang?: Lang;
 }
 
-const { caption } = Astro.props;
+const { caption, lang = DEFAULT_LANG } = Astro.props;
+const { t, tag, fmt } = useLang(lang);
+const pass = t.pass;
 
 // Illustrative flight details for the promo pass (the example search kept no legs): days follow the nights,
 // times stay sensible. Reused in turn on a longer trip.
 const FLIGHTS = [
-  { day: '14 OCT', time: '10:05', flight: 'FR 1062' },
-  { day: '16 OCT', time: '09:40', flight: 'KL 1705' },
-  { day: '18 OCT', time: '11:25', flight: 'HV 5401' },
-  { day: '22 OCT', time: '13:50', flight: 'W6 1452' },
+  { day: '2026-10-14', time: '10:05', flight: 'FR 1062' },
+  { day: '2026-10-16', time: '09:40', flight: 'KL 1705' },
+  { day: '2026-10-18', time: '11:25', flight: 'HV 5401' },
+  { day: '2026-10-22', time: '13:50', flight: 'W6 1452' },
 ];
 const BARCODE = { width: 196, height: 46 };
 const LCG = { multiplier: 1103515245, increment: 12345 };
@@ -23,9 +27,10 @@ const first = stops[0];
 const last = stops[stops.length - 1];
 const visits = stops.filter((s) => 'nights' in s);
 const nights = visits.reduce((sum, s) => sum + ('nights' in s ? s.nights : 0), 0);
-const searched = new Intl.DateTimeFormat(LOCALE, { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' })
-  .format(new Date(EXAMPLE_TRIP.searchedOn))
-  .toUpperCase();
+const passDate = (iso: string, year?: 'numeric') =>
+  fmt.date(new Date(iso), { day: '2-digit', month: 'short', year }).toLocaleUpperCase(tag);
+const searched = passDate(EXAMPLE_TRIP.searchedOn, 'numeric');
+const total = fmt.money(EXAMPLE_TRIP.bestTotal, EXAMPLE_TRIP.currency);
 const legs = stops.slice(0, -1).map((from, i) => ({ from, to: stops[i + 1], flight: FLIGHTS[i % FLIGHTS.length] }));
 const route = stops.map((s) => s.code).join('-');
 
@@ -43,35 +48,35 @@ for (let x = 0; x < BARCODE.width; ) {
   <div
     class="pass"
     role="group"
-    aria-label="Example boarding pass: the route, nights, flights and total"
+    aria-label={pass.label}
   >
     <div class="band">
       <b><img src="/icon-64.webp" width="22" height="22" alt="" />{APP.name}</b>
-      <span>Boarding pass · <span class="gold">Route 1 of {EXAMPLE_TRIP.routesFound}</span></span>
+      <span>{pass.band} · <span class="gold">{fmt.text(pass.routeOf, { n: EXAMPLE_TRIP.routesFound })}</span></span>
     </div>
     <div class="main">
       <div class="ends">
-        <div><span class="k">From</span><div class="iata">{first.code}</div><small>{first.city}</small></div>
-        <div class="via">VIA {visits.map((s) => s.code).join(' · ')}</div>
-        <div class="r"><span class="k">To</span><div class="iata">{last.code}</div><small>{last.city}</small></div>
+        <div><span class="k">{pass.from}</span><div class="iata">{first.code}</div><small>{first.city}</small></div>
+        <div class="via">{pass.via} {visits.map((s) => s.code).join(' · ')}</div>
+        <div class="r"><span class="k">{pass.to}</span><div class="iata">{last.code}</div><small>{last.city}</small></div>
       </div>
       <div class="meta">
-        <div><span class="k">Passenger</span><b>YOU</b></div>
-        <div><span class="k">Cities</span><b>{visits.length}</b></div>
-        <div><span class="k">Nights</span><b>{nights}</b></div>
-        <div><span class="k">Searched</span><b>{searched}</b></div>
+        <div><span class="k">{pass.passenger}</span><b>{pass.you}</b></div>
+        <div><span class="k">{pass.cities}</span><b>{visits.length}</b></div>
+        <div><span class="k">{pass.nights}</span><b>{nights}</b></div>
+        <div><span class="k">{pass.searched}</span><b>{searched}</b></div>
       </div>
       <div class="tbl">
         <table>
           <thead>
-            <tr><th>Leg</th><th>Nights</th><th>Date</th><th class="col-departs">Departs</th><th class="col-flight">Flight</th></tr>
+            <tr><th>{pass.leg}</th><th>{pass.nights}</th><th>{pass.date}</th><th class="col-departs">{pass.departs}</th><th class="col-flight">{pass.flight}</th></tr>
           </thead>
           <tbody>
             {legs.map((leg) => (
               <tr>
                 <td class="leg">{leg.from.code} → {leg.to.code} <span>{leg.to.city}</span></td>
-                <td>{'nights' in leg.to ? leg.to.nights : 'End'}</td>
-                <td class="mono">{leg.flight.day}</td>
+                <td>{'nights' in leg.to ? leg.to.nights : pass.end}</td>
+                <td class="mono">{passDate(leg.flight.day)}</td>
                 <td class="col-departs mono">{leg.flight.time}</td>
                 <td class="col-flight mono">{leg.flight.flight}</td>
               </tr>
@@ -81,14 +86,14 @@ for (let x = 0; x < BARCODE.width; ) {
       </div>
     </div>
     <div class="stub">
-      <div><span class="k">Flights total</span><div class="total">{EXAMPLE_TRIP.bestTotal}</div></div>
-      <span class="stamp">Best of<br />{EXAMPLE_TRIP.routesFound} routes</span>
+      <div><span class="k">{pass.total}</span><div class="total">{total}</div></div>
+      <span class="stamp">{pass.stampLead}<br />{fmt.plural(pass.stampRoutes, EXAMPLE_TRIP.routesFound)}</span>
       <svg class="barcode" viewBox={`0 0 ${BARCODE.width} ${BARCODE.height}`} preserveAspectRatio="none" aria-hidden="true">
         {bars.map((b) => <rect x={b.x} y="0" width={b.w} height={BARCODE.height} />)}
       </svg>
     </div>
   </div>
-  <figcaption>{caption} Flight dates, times and numbers are illustrative.</figcaption>
+  <figcaption>{caption} {pass.illustrative}</figcaption>
 </figure>
 
 <style>

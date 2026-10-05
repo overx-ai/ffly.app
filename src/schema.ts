@@ -1,5 +1,6 @@
 import { APP, APP_STORE_URL, DEVELOPER, PUBLISHER } from './app';
 import type { HowTo } from './guide-markdown';
+import { DEFAULT_LANG, localeOf, useLang, type Lang } from './i18n';
 import { DEFAULT_OG_IMAGE, isoDate, siteOrigin, urlFor, type Slug } from './site-pages';
 
 // No offers.price and no aggregateRating. Prices are territory-set and the app has no
@@ -7,7 +8,6 @@ import { DEFAULT_OG_IMAGE, isoDate, siteOrigin, urlFor, type Slug } from './site
 
 const overx = { '@type': 'Organization', name: PUBLISHER.name, url: PUBLISHER.url };
 const developer = { '@type': 'Person', name: DEVELOPER, url: PUBLISHER.url };
-const homeUrl = urlFor('');
 const appIcon = `${siteOrigin}/icon-512.png`;
 
 export interface Crumb {
@@ -15,26 +15,21 @@ export interface Crumb {
   slug: Slug;
 }
 
-export function appSchema() {
+export function appSchema(lang: Lang = DEFAULT_LANG) {
   return {
     '@context': 'https://schema.org',
     '@type': 'MobileApplication',
     name: APP.storeName,
     operatingSystem: `iOS ${APP.minimumOs} or later`,
     applicationCategory: 'TravelApplication',
-    url: homeUrl,
+    url: urlFor('', lang),
+    inLanguage: localeOf(lang).tag,
     image: appIcon,
     ...(APP_STORE_URL ? { installUrl: APP_STORE_URL, downloadUrl: APP_STORE_URL } : {}),
     author: developer,
     creator: overx,
     publisher: overx,
-    featureList: [
-      'The cheapest order and dates for a trip to several cities',
-      'Favours sensible flight times over pre-dawn wake-ups and midnight landings',
-      `Fares from ${APP.airlines.join(', ')} and more`,
-      'Routes ranked by what matters to you: schedule, price or a balance',
-      "Book each flight on the airline's site or a booking site",
-    ],
+    featureList: useLang(lang).t.schema.featureList,
   };
 }
 
@@ -43,24 +38,25 @@ export function organizationSchema() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: APP.name,
-    url: homeUrl,
+    url: urlFor(''),
     logo: appIcon,
     parentOrganization: overx,
   };
 }
 
-export function websiteSchema() {
+export function websiteSchema(lang: Lang = DEFAULT_LANG) {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: APP.name,
-    url: homeUrl,
+    url: urlFor('', lang),
+    inLanguage: localeOf(lang).tag,
     creator: overx,
   };
 }
 
-export function breadcrumb(name: string, slug: Slug, parent?: Crumb) {
-  const items: Crumb[] = [{ name: 'Home', slug: '' }, ...(parent ? [parent] : []), { name, slug }];
+export function breadcrumb(name: string, slug: Slug, parent?: Crumb, lang: Lang = DEFAULT_LANG) {
+  const items: Crumb[] = [{ name: useLang(lang).t.schema.home, slug: '' }, ...(parent ? [parent] : []), { name, slug }];
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -68,15 +64,16 @@ export function breadcrumb(name: string, slug: Slug, parent?: Crumb) {
       '@type': 'ListItem',
       position: i + 1,
       name: it.name,
-      item: urlFor(it.slug),
+      item: urlFor(it.slug, lang),
     })),
   };
 }
 
-export function faqSchema(items: readonly { question: string; answer: string }[]) {
+export function faqSchema(items: readonly { question: string; answer: string }[], lang: Lang = DEFAULT_LANG) {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
+    inLanguage: localeOf(lang).tag,
     mainEntity: items.map((it) => ({
       '@type': 'Question',
       name: it.question,

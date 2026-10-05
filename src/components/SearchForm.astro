@@ -3,60 +3,68 @@ import AppSide from './AppSide.astro';
 import AdSlot from './AdSlot.astro';
 import AppStoreBadge from './AppStoreBadge.astro';
 import PlaceCombo from './PlaceCombo.astro';
-import { APP, APP_ONLY_OPTIONS, APP_STORE_URL, NUDGES } from '../app';
+import { APP_STORE_URL } from '../app';
+import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
 import '../styles/search.css';
+
+interface Props { lang?: Lang; }
+
+const { lang = DEFAULT_LANG } = Astro.props;
+const { t, fmt } = useLang(lang);
+const w = t.widget;
+const col = w.columns;
 
 const openApp = APP_STORE_URL ?? '#app-side';
 const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" height="10" rx="2"/>';
 ---
-<div class="search-ui">
+<div class="search-ui" data-i18n={JSON.stringify(w.script)}>
   <noscript>
     <div class="card notice">
-      <p>The web search needs JavaScript. The {APP.name} app runs the same search on iPhone.</p>
-      <AppStoreBadge />
+      <p>{w.noscript}</p>
+      <AppStoreBadge lang={lang} />
     </div>
   </noscript>
 
   <div class="search-grid">
     <form id="search-form" class="card search-form" novalidate>
-      <p id="search-loading" class="note">Loading cities…</p>
+      <p id="search-loading" class="note">{w.loading}</p>
       <fieldset id="search-fields" class="fields" disabled>
-        <legend class="sr-only">Your trip</legend>
+        <legend class="sr-only">{w.legend}</legend>
 
         <div class="pair">
           <div class="field">
-            <label id="from-label" for="from">From <span class="remembered" data-remembered="from" hidden>Remembered</span></label>
-            <PlaceCombo id="from" placeholder="Type a city" />
+            <label id="from-label" for="from">{w.from} <span class="remembered" data-remembered="from" hidden>{w.remembered}</span></label>
+            <PlaceCombo id="from" placeholder={w.typeCity} />
           </div>
           <div class="field">
-            <label id="back-label" for="back">Back to <span class="remembered" data-remembered="back" hidden>Remembered</span></label>
-            <PlaceCombo id="back" placeholder="Same as From" describedBy="back-hint" />
-            <p id="back-hint" class="hint">Leave empty to come back where you start.</p>
+            <label id="back-label" for="back">{w.back} <span class="remembered" data-remembered="back" hidden>{w.remembered}</span></label>
+            <PlaceCombo id="back" placeholder={w.sameAsFrom} describedBy="back-hint" />
+            <p id="back-hint" class="hint">{w.backHint}</p>
           </div>
         </div>
 
         <div class="field">
           <label id="city-label" for="city">
-            Cities to visit <span id="city-count" class="count"></span>
-            <span class="remembered" data-remembered="cities" hidden>Remembered</span>
+            {w.cities} <span id="city-count" class="count"></span>
+            <span class="remembered" data-remembered="cities" hidden>{w.remembered}</span>
           </label>
-          <ul id="cities" class="chips" aria-label="Cities to visit"></ul>
-          <PlaceCombo id="city" placeholder="Add a city" describedBy="city-hint" />
-          <p id="city-hint" class="hint">Pick each city from the list. {APP.name} works out the order.</p>
+          <ul id="cities" class="chips" aria-label={w.cities}></ul>
+          <PlaceCombo id="city" placeholder={w.addCity} describedBy="city-hint" />
+          <p id="city-hint" class="hint">{w.cityHint}</p>
         </div>
 
         <div class="pair">
           <div class="field">
-            <span id="window-label" class="field-label">Travel window</span>
+            <span id="window-label" class="field-label">{w.window}</span>
             <div class="popover-anchor">
               <button id="window" type="button" class="picker" aria-haspopup="dialog" aria-expanded="false" aria-controls="calendar" aria-labelledby="window-label window-text">
                 <span id="window-text"></span>
               </button>
               <div id="calendar" class="calendar" role="dialog" aria-labelledby="window-label" hidden>
                 <div class="cal-nav">
-                  <button id="cal-prev" type="button" aria-label="Previous month">&lsaquo;</button>
-                  <p class="hint">Pick the first day, then the last.</p>
-                  <button id="cal-next" type="button" aria-label="Next month">&rsaquo;</button>
+                  <button id="cal-prev" type="button" aria-label={w.prevMonth}>&lsaquo;</button>
+                  <p class="hint">{w.calendarHint}</p>
+                  <button id="cal-next" type="button" aria-label={w.nextMonth}>&rsaquo;</button>
                 </div>
                 <div id="cal-months" class="cal-months"></div>
               </div>
@@ -64,17 +72,17 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
           </div>
 
           <fieldset class="field">
-            <legend class="field-label">Nights in each city</legend>
+            <legend class="field-label">{w.nights}</legend>
             <div class="steppers">
               {[
-                { key: 'min', label: 'At least' },
-                { key: 'max', label: 'At most' },
+                { key: 'min', label: w.atLeast },
+                { key: 'max', label: w.atMost },
               ].map((s) => (
                 <div class="stepper" data-nights={s.key}>
                   <span id={`${s.key}-nights-label`}>{s.label}</span>
-                  <button type="button" data-step="-1" aria-label={`${s.label}: fewer nights`}>&minus;</button>
+                  <button type="button" data-step="-1" aria-label={fmt.text(w.fewerNights, { label: s.label })}>&minus;</button>
                   <output id={`${s.key}-nights`} aria-labelledby={`${s.key}-nights-label`} aria-live="polite"></output>
-                  <button type="button" data-step="1" aria-label={`${s.label}: more nights`}>+</button>
+                  <button type="button" data-step="1" aria-label={fmt.text(w.moreNights, { label: s.label })}>+</button>
                 </div>
               ))}
             </div>
@@ -82,9 +90,9 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
         </div>
 
         <div class="field">
-          <span class="field-label">In the app</span>
+          <span class="field-label">{w.inApp}</span>
           <ul class="locked-chips">
-            {APP_ONLY_OPTIONS.map((o) => (
+            {Object.values(w.appOnly).map((o) => (
               <li>
                 <button type="button" class="locked-chip" data-nudge={o.nudge} aria-pressed="false" aria-controls="chip-nudge">
                   <svg viewBox="0 0 24 24" aria-hidden="true" set:html={LOCK} />
@@ -97,32 +105,32 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
         </div>
 
         <p id="form-error" class="form-error" role="alert"></p>
-        <button id="submit" class="btn" type="submit">Find routes</button>
+        <button id="submit" class="btn" type="submit">{w.submit}</button>
         <p id="quota-note" class="note"></p>
       </fieldset>
     </form>
 
-    <AppSide />
+    <AppSide lang={lang} />
   </div>
 
   <div id="problem" class="card problem" role="alert" hidden>
     <p id="problem-text"></p>
-    <button id="retry" class="btn btn-soon" type="button" hidden>Try again</button>
+    <button id="retry" class="btn btn-soon" type="button" hidden>{w.retry}</button>
   </div>
 
   <section id="progress" class="card progress" aria-labelledby="progress-title" hidden>
-    <p id="progress-title" class="lbl">Searching</p>
+    <p id="progress-title" class="lbl">{w.searching}</p>
     <p id="progress-status" class="status" aria-live="polite"></p>
     <div id="progress-bar" class="bar" role="progressbar" aria-labelledby="progress-title" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
       <span id="progress-fill"></span>
     </div>
     <p id="progress-detail" class="note"></p>
-    <p class="queue-nudge">{NUDGES.queue}</p>
+    <p class="queue-nudge">{w.script.nudges.queue}</p>
     <div id="notify-ask" class="notify-ask" hidden>
-      <p>Get a notification when your routes are ready?</p>
+      <p>{w.notifyAsk}</p>
       <div class="notify-buttons">
-        <button id="notify-yes" type="button" class="btn">Notify me</button>
-        <button id="notify-no" type="button" class="btn btn-soon">Not now</button>
+        <button id="notify-yes" type="button" class="btn">{w.notifyYes}</button>
+        <button id="notify-no" type="button" class="btn btn-soon">{w.notifyNo}</button>
       </div>
     </div>
   </section>
@@ -130,40 +138,37 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
   <section id="results" class="results" aria-labelledby="results-title" aria-live="polite" hidden>
     <h2 id="results-title"></h2>
     <p id="results-trip" class="note"></p>
-    <p id="results-empty" class="note" hidden>Try a wider travel window or a different number of nights.</p>
+    <p id="results-empty" class="note" hidden>{w.empty}</p>
     <p id="insights" class="insights" hidden></p>
     <p id="app-hint" class="app-hint" hidden></p>
     <div class="table-wrap">
       <table class="results-table">
         <thead>
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">Route</th>
-            <th scope="col">Dates</th>
-            <th scope="col">Nights</th>
-            <th scope="col">Flights</th>
-            <th scope="col">Watch out</th>
-            <th scope="col">Total</th>
-            <th scope="col"><span class="sr-only">Details</span></th>
+            <th scope="col">{col.rank}</th>
+            <th scope="col">{col.route}</th>
+            <th scope="col">{col.dates}</th>
+            <th scope="col">{col.nights}</th>
+            <th scope="col">{col.flights}</th>
+            <th scope="col">{col.warn}</th>
+            <th scope="col">{col.total}</th>
+            <th scope="col"><span class="sr-only">{col.details}</span></th>
           </tr>
         </thead>
         <tbody id="route-rows"></tbody>
       </table>
     </div>
     <p id="more-routes" hidden><a href="#app-side"></a></p>
-    <p class="quiet">
-      Book opens the airline's site or a booking site. A booking partner may pay {APP.name} a commission if you book
-      through its link, at no extra cost to you. Fares are indicative: confirm the price where you book.
-    </p>
+    <p class="quiet">{w.disclosure}</p>
     <p id="coverage" class="quiet" hidden></p>
     <AdSlot slot="searchResults" size="banner" />
   </section>
 
   <section id="upsell" class="card upsell" aria-labelledby="upsell-title" hidden>
-    <p class="lbl">{APP.name} for iPhone</p>
-    <h2 id="upsell-title">Every route in full, in the app</h2>
-    <p>{APP.proName} shows the dates, flight times, airlines and booking links for every route.</p>
-    <AppStoreBadge />
+    <p class="lbl">{t.common.appForIphone}</p>
+    <h2 id="upsell-title">{w.upsellTitle}</h2>
+    <p>{w.upsellBody}</p>
+    <AppStoreBadge lang={lang} />
   </section>
 </div>
 
@@ -181,14 +186,14 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
 
 <template id="route-row-template">
   <tr class="route-row">
-    <td class="rank" data-label="#"></td>
-    <td class="route" data-label="Route"></td>
-    <td class="dates" data-label="Dates"></td>
-    <td class="nights" data-label="Nights"></td>
-    <td class="flights" data-label="Flights"></td>
-    <td class="warn" data-label="Watch out"><ul class="warn-chips"></ul></td>
-    <td class="total" data-label="Total"></td>
-    <td class="details"><button type="button" class="details-toggle" aria-expanded="false">Details</button></td>
+    <td class="rank" data-label={col.rank}></td>
+    <td class="route" data-label={col.route}></td>
+    <td class="dates" data-label={col.dates}></td>
+    <td class="nights" data-label={col.nights}></td>
+    <td class="flights" data-label={col.flights}></td>
+    <td class="warn" data-label={col.warn}><ul class="warn-chips"></ul></td>
+    <td class="total" data-label={col.total}></td>
+    <td class="details"><button type="button" class="details-toggle" aria-expanded="false">{col.details}</button></td>
   </tr>
 </template>
 
@@ -206,7 +211,7 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
         <span class="leg-carrier"></span>
         <span class="leg-stops"></span>
         <span class="leg-price"></span>
-        <a class="btn book" target="_blank" rel="sponsored noopener">Book</a>
+        <a class="btn book" target="_blank" rel="sponsored noopener">{w.book}</a>
       </div>
     </td>
   </tr>
@@ -214,13 +219,13 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
 
 <template id="locked-row-template">
   <tr class="locked-row">
-    <td class="rank" data-label="#"></td>
+    <td class="rank" data-label={col.rank}></td>
     <td class="locked-cell" colspan="5">
-      <span class="blurred" aria-hidden="true">City → City → City · 00 Mon – 00 Mon</span>
+      <span class="blurred" aria-hidden="true">{w.lockedSample}</span>
       <span class="locked-text"></span>
     </td>
-    <td class="total" data-label="Total"></td>
-    <td class="details"><a class="open-app" href={openApp}>Open in app</a></td>
+    <td class="total" data-label={col.total}></td>
+    <td class="details"><a class="open-app" href={openApp}>{w.openApp}</a></td>
   </tr>
 </template>
 

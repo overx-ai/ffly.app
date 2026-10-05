@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import NoBreak from '../components/NoBreak.astro';
+import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
+import { formatDate, hreflangOf, isoDate, pathFor } from '../site-pages';
+import { parseGuide } from '../guide-markdown';
+import { GUIDES_INDEX, getGuides, guidePageSlug } from '../guides';
+
+interface Props { lang: Lang; }
+
+const { lang } = Astro.props;
+const { t, fmt } = useLang(lang);
+const { guides: copy } = t;
+// The articles are English-only, so a translated index marks each one as English.
+const english = lang !== DEFAULT_LANG;
+const guides = (await getGuides()).map((guide) => {
+  const slug = guidePageSlug(guide);
+  return { ...guide.data, href: pathFor(slug), hreflang: hreflangOf(slug, lang), minutes: parseGuide(guide.body).minutes };
+});
+---
+<BaseLayout title={copy.title} description={copy.description} slug={GUIDES_INDEX} lang={lang}>
+  <Header lang={lang} />
+  <main id="main" class="container page">
+    <h1>{copy.h1}</h1>
+    <p class="lead">{copy.lead}</p>
+
+    <ul class="list">
+      {guides.map((g) => (
+        <li>
+          <h2><a href={g.href} hreflang={g.hreflang} lang={g.hreflang}><NoBreak text={g.title} /></a></h2>
+          <p lang={g.hreflang}>{g.description}</p>
+          <p class="meta">
+            <time datetime={isoDate(g.published)}>{formatDate(g.published, lang)}</time> · {fmt.text(copy.minRead, { n: g.minutes })}
+            {english && <span class="lang">{t.common.inEnglish}</span>}
+          </p>
+        </li>
+      ))}
+    </ul>
+  </main>
+  <Footer lang={lang} slug={GUIDES_INDEX} />
+</BaseLayout>
+
+<style>
+  .list { list-style: none; margin: var(--space-2xl) 0 0; padding: 0; }
+  .list li { border-top: 1px solid var(--rule); padding-block: var(--space-lg); display: flex; flex-direction: column; gap: var(--space-sm); }
+  .list li:last-child { border-bottom: 1px solid var(--rule); }
+  .list h2 { font-size: clamp(1.4rem, 3.4vw, 1.75rem); line-height: 1.15; }
+  .list h2 a { color: var(--ink); text-decoration: none; }
+  .list h2 a:hover { text-decoration: underline; text-decoration-color: var(--gold); }
+  .list p { color: var(--ink-2); }
+  .list .meta { font: 400 13px var(--font-mono); }
+  .list .lang { font: 600 11px var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; margin-left: var(--space-xs); }
+</style>

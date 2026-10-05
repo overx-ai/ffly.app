@@ -1,8 +1,11 @@
 import { WEB_NOTIFY } from '../app';
+import type { Dict } from '../i18n';
 
 // ponytail: no service worker or web push, so the tab must stay open; add push if the share of open tabs is low.
 
 type NotificationApi = typeof Notification;
+
+export type NotifyText = Dict['widget']['script']['notify'];
 
 interface Doc {
   hidden: boolean;
@@ -15,11 +18,21 @@ export const canAsk = (api: NotificationApi | undefined) => api?.permission === 
 
 export const ask = async (api: NotificationApi) => (await api.requestPermission()) === 'granted';
 
-export function routesReady({ Notification: api, doc, focus }: { Notification?: NotificationApi; doc: Doc; focus: () => void }) {
+export function routesReady({
+  Notification: api,
+  doc,
+  focus,
+  text,
+}: {
+  Notification?: NotificationApi;
+  doc: Doc;
+  focus: () => void;
+  text: NotifyText;
+}) {
   if (!doc.hidden) return;
   if (api?.permission === 'granted') {
     try {
-      const note = new api(WEB_NOTIFY.title, { body: WEB_NOTIFY.body, icon: WEB_NOTIFY.icon });
+      const note = new api(text.title, { body: text.body, icon: WEB_NOTIFY.icon });
       note.onclick = () => {
         focus();
         note.close();
@@ -29,7 +42,7 @@ export function routesReady({ Notification: api, doc, focus }: { Notification?: 
     }
   }
   const title = doc.title;
-  doc.title = WEB_NOTIFY.tabTitle;
+  doc.title = text.tabTitle;
   const restore = () => {
     if (doc.hidden) return;
     doc.title = title;

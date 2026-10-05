@@ -1,7 +1,8 @@
 ---
 import '../styles/global.css';
 import { ADSENSE_CLIENT, ADSENSE_SCRIPT, APP, APP_STORE_ID, CONSENT_SCRIPT } from '../app';
-import { DEFAULT_OG_IMAGE, siteOrigin, urlFor, type Slug } from '../site-pages';
+import { DEFAULT_LANG, LANGS, localeOf, useLang, type Lang } from '../i18n';
+import { DEFAULT_OG_IMAGE, alternates, siteOrigin, urlFor, type Slug } from '../site-pages';
 import { breadcrumb, websiteSchema, type Crumb } from '../schema';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
   ogType?: 'website' | 'article';
   parent?: Crumb;
   structuredData?: object[];
+  lang?: Lang;
 }
 
 const {
@@ -22,7 +24,10 @@ const {
   ogType = 'website',
   parent,
   structuredData = [],
+  lang = DEFAULT_LANG,
 } = Astro.props;
+const { t, tag } = useLang(lang);
+const locale = localeOf(lang);
 
 // Match --bg in src/styles/global.css (light :root, dark media block).
 const THEME_COLOR = { light: '#F4F6FB', dark: '#040A1C' };
@@ -30,17 +35,18 @@ const PRELOAD_FONTS = ['/fonts/bricolage-grotesque-latin.woff2', '/fonts/figtree
 
 // A page outside SITE_PAGES (the 404) has no slug, so it gets no canonical URL and stays out of search.
 const noindex = slug === undefined;
-const canonical = noindex ? undefined : urlFor(slug);
+const canonical = noindex ? undefined : urlFor(slug, lang);
+const links = noindex ? [] : alternates(slug);
 // The home title already names the brand; suffixing it would render "ffly ... | ffly".
 const fullTitle = slug === '' ? title : `${title} | ${APP.name}`;
 // set:html is unescaped, so "<" becomes \u003c: no string in the data can close the script element.
 const jsonLd = (schema: object) => JSON.stringify(schema).replace(/</g, '\\u003c');
 let schemas = structuredData;
-if (slug === '') schemas = [websiteSchema(), ...structuredData];
-else if (slug !== undefined) schemas = [...structuredData, breadcrumb(title, slug, parent)];
+if (slug === '') schemas = [websiteSchema(lang), ...structuredData];
+else if (slug !== undefined) schemas = [...structuredData, breadcrumb(title, slug, parent, lang)];
 ---
 <!doctype html>
-<html lang="en">
+<html lang={tag}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -50,12 +56,16 @@ else if (slug !== undefined) schemas = [...structuredData, breadcrumb(title, slu
       ? <meta name="robots" content="noindex, nofollow" />
       : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />}
     {canonical && <link rel="canonical" href={canonical} />}
+    {links.map((l) => <link rel="alternate" hreflang={l.hreflang} href={l.href} />)}
 
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={APP.name} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}
+    {links.length > 0 && <meta property="og:locale" content={locale.og} />}
+    {links.length > 0 &&
+      LANGS.filter((l) => l.code !== lang).map((l) => <meta property="og:locale:alternate" content={l.og} />)}
     <meta property="og:image" content={`${siteOrigin}${ogImage}`} />
     {/* Hardcoded to match public/og-image.jpg. Change both together. */}
     <meta property="og:image:width" content="1200" />
@@ -83,7 +93,7 @@ else if (slug !== undefined) schemas = [...structuredData, breadcrumb(title, slu
     ))}
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main">{t.common.skipLink}</a>
     <slot />
   </body>
 </html>

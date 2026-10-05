@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SearchForm from '../components/SearchForm.astro';
+import { useLang, type Lang } from '../i18n';
+import { pageLink } from '../site-pages';
+
+interface Props { lang: Lang; }
+
+const { lang } = Astro.props;
+const { t, fmt } = useLang(lang);
+const { search } = t;
+const guideLink = pageLink('guides/cheapest-order-to-visit-cities', t.common.guideLinks.cheapestOrder, lang);
+---
+<BaseLayout title={search.title} description={search.description} slug="search" lang={lang}>
+  <Header lang={lang} />
+
+  <main id="main" class="container search-page">
+    <div class="search-head">
+      <p class="lbl">{search.label}</p>
+      <h1 set:html={search.h1} />
+      <p class="lead">{search.lead}</p>
+    </div>
+
+    <SearchForm lang={lang} />
+
+    <p class="guide-link" set:html={fmt.text(search.guideLink, { link: guideLink })} />
+  </main>
+
+  <Footer lang={lang} slug="search" />
+</BaseLayout>
+
+<style>
+  .search-page { padding-block: var(--space-2xl) var(--space-3xl); display: flex; flex-direction: column; gap: var(--space-lg); }
+  .search-head { display: flex; flex-direction: column; gap: var(--space-md); max-width: var(--max-width-prose); }
+  h1 { font-size: clamp(2.4rem, 6vw, 3.4rem); letter-spacing: -0.04em; }
+  .guide-link { color: var(--ink-2); font-size: 14px; }
+</style>

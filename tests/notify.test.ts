@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { WEB_NOTIFY } from '../src/app';
+import en from '../src/i18n/en';
 import { ask, canAsk, routesReady } from '../src/scripts/notify';
+
+const text = en.widget.script.notify;
 
 function fakeNotification(permission: NotificationPermission, answer: NotificationPermission = 'granted') {
   const made: { title: string; options?: NotificationOptions; onclick: (() => void) | null; close: () => void }[] = [];
@@ -54,7 +56,7 @@ describe('routesReady', () => {
   it('does nothing while the tab is visible', () => {
     const { Fake, made } = fakeNotification('granted');
     const doc = fakeDocument(false);
-    routesReady({ Notification: Fake, doc, focus: vi.fn() });
+    routesReady({ Notification: Fake, doc, focus: vi.fn(), text });
     expect(made).toHaveLength(0);
     expect(doc.title).toBe('Search | ffly');
   });
@@ -62,9 +64,9 @@ describe('routesReady', () => {
   it('fires one notification on a hidden tab; clicking it focuses the tab', () => {
     const { Fake, made } = fakeNotification('granted');
     const focus = vi.fn();
-    routesReady({ Notification: Fake, doc: fakeDocument(true), focus });
+    routesReady({ Notification: Fake, doc: fakeDocument(true), focus, text });
     expect(made).toHaveLength(1);
-    expect(made[0].title).toBe(WEB_NOTIFY.title);
+    expect(made[0].title).toBe(text.title);
     made[0].onclick?.();
     expect(focus).toHaveBeenCalledTimes(1);
     expect(made[0].close).toHaveBeenCalled();
@@ -73,10 +75,10 @@ describe('routesReady', () => {
   it('marks the tab title until the tab is visible again, with or without permission', () => {
     const { Fake, made } = fakeNotification('denied');
     const doc = fakeDocument(true);
-    routesReady({ Notification: Fake, doc, focus: vi.fn() });
+    routesReady({ Notification: Fake, doc, focus: vi.fn(), text });
     expect(made).toHaveLength(0);
-    expect(doc.title).toBe(WEB_NOTIFY.tabTitle);
-    expect(WEB_NOTIFY.tabTitle).toBe('(1) Routes ready · ffly');
+    expect(doc.title).toBe(text.tabTitle);
+    expect(text.tabTitle).toBe('(1) Routes ready · ffly');
     doc.show();
     expect(doc.title).toBe('Search | ffly');
     expect(doc.listeners.size).toBe(0);

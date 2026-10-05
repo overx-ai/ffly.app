@@ -1,4 +1,4 @@
-import { NUDGES } from '../app';
+import { fill } from '../i18n/text';
 
 // One rotation line per page view: show the stored index, store the next.
 export function rotation(stored: string | undefined, count: number) {
@@ -11,7 +11,8 @@ export function appHintLine(
   hint: { price: number } | null | undefined,
   best: number | undefined,
   money: (n: number) => string,
+  template: string,
 ): string | undefined {
   if (!hint || best === undefined || !(hint.price < best)) return undefined;
-  return NUDGES.appHint(money(hint.price), money(best - hint.price));
+  return fill(template, { from: money(hint.price), less: money(best - hint.price) });
 }

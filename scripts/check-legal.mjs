@@ -1,8 +1,19 @@
 // Asserts legal and site facts in the built output (run after `astro build`). Regressions: docs/bugs/001, 002, 003.
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const DIST = fileURLToPath(new URL('../dist/', import.meta.url));
+const source = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
+
+// The languages and localized slugs, read from the TypeScript that drives the build (src/i18n/locales.ts, src/site-pages.ts).
+const LANGS = [...source('src/i18n/locales.ts').matchAll(/\{ code: '(\w+)', prefix: '(\w*)', hreflang: '([\w-]+)', tag: '([\w-]+)'/g)]
+  .map(([, code, prefix, hreflang, tag]) => ({ code, prefix, hreflang, tag }));
+const LOCALIZED_SLUGS = JSON.parse(
+  source('src/site-pages.ts').match(/LOCALIZED_SLUGS = (\[[^\]]*\])/)?.[1].replace(/'/g, '"') ?? '[]',
+);
+const X_DEFAULT = 'x-default';
+// Carriers are named in the guides, the legal pages and live search results, never in the site's own pitch.
+const CARRIERS = ['Ryanair', 'Wizz Air', 'airBaltic', 'Volotea'];
 
 const LINKED = ['Search History', 'Purchase History', 'User ID', 'Email Address', 'Customer Support'];
 const NOT_LINKED = ['Product Interaction', 'Device ID'];
@@ -96,7 +107,8 @@ const GUIDE_FAQ_QUESTIONS = 5;
 const HOWTO_GUIDES = ['cheapest-order-to-visit-cities'];
 const guideNames = readdirSync(`${DIST}guides`, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
 const sitemap = readFileSync(`${DIST}sitemap.xml`, 'utf8');
-const resolves = (path) => existsSync(`${DIST}${path}`) || existsSync(`${DIST}${path}/index.html`);
+const isFile = (path) => existsSync(path) && statSync(path).isFile();
+const resolves = (path) => isFile(`${DIST}${path}`) || isFile(`${DIST}${path}/index.html`);
 check(guideNames.length > 0, 'Guides: no guide pages in the build');
 for (const name of HOWTO_GUIDES) check(guideNames.includes(name), `Guides: ${name} missing from the build`);
 for (const name of guideNames) {
@@ -127,6 +139,8 @@ check(/immutable/.test(headersFor('/_astro/(.*)')['Cache-Control'] ?? ''), 'verc
 const htmlPages = readdirSync(DIST, { recursive: true })
   .filter((f) => f.endsWith('.html'))
   .map((file) => [file, readFileSync(`${DIST}${file}`, 'utf8')]);
+// Inlined CSS is not copy, and words like "background" are CSS properties.
+const withoutCss = (html) => html.replace(/<style\b[\s\S]*?<\/style>/g, '').replace(/\sstyle="[^"]*"/g, '');
 for (const [file, html] of htmlPages) {
   for (const [tag] of html.matchAll(/<script\b[^>]*>/g)) {
     check(/\ssrc=|type="application\/ld\+json"/.test(tag), `${file}: inline ${tag} is blocked by the CSP`);
@@ -171,10 +185,59 @@ for (const [directive, hosts] of Object.entries(AD_CSP)) {
 }
 check(/shows no ads/.test(website) === adsOff, 'Privacy: #website must say "shows no ads" exactly while ADSENSE_CLIENT is unset');
 
-// The search lives on the home page under #search, and the header Search item points at it from every page.
-check(/<section[^>]*\bid="search"/.test(readHtml('')), 'Home: the #search section is missing');
+// Every localized page: self-canonical, html lang, and one reciprocal hreflang cluster shared with the sitemap.
+check(LANGS.length === 8 && LANGS[0].prefix === '', 'src/i18n/locales.ts: expected 8 languages, English first at the root');
+check(LOCALIZED_SLUGS.length > 0, 'src/site-pages.ts: LOCALIZED_SLUGS not found');
+const homePath = (lang) => (lang.prefix ? `/${lang.prefix}` : '/');
+const pagePath = (slug, lang) => `/${[lang.prefix, slug].filter(Boolean).join('/')}`;
+const pageDir = (path) => path.slice(1);
+const canonicalOf = (html) => html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
+const headAlternates = (html) =>
+  [...html.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)].map(([, hreflang, href]) => `${hreflang} ${href}`);
+const origin = canonicalOf(readHtml(''))?.replace(/\/$/, '') ?? '';
+check(origin.startsWith('https://'), 'Home: canonical missing');
+const sitemapAlternates = new Map(
+  [...sitemap.matchAll(/<url>\s*<loc>([^<]+)<\/loc>([\s\S]*?)<\/url>/g)].map(([, loc, body]) => [
+    loc,
+    [...body.matchAll(/<xhtml:link rel="alternate" hreflang="([^"]+)" href="([^"]+)"\/>/g)].map(([, hreflang, href]) => `${hreflang} ${href}`),
+  ]),
+);
+const localizedFiles = new Set();
+for (const slug of LOCALIZED_SLUGS) {
+  const urlOf = (lang) => `${origin}${pagePath(slug, lang)}`;
+  const cluster = [...LANGS.map((lang) => `${lang.hreflang} ${urlOf(lang)}`), `${X_DEFAULT} ${urlOf(LANGS[0])}`].sort();
+  for (const lang of LANGS) {
+    const where = pagePath(slug, lang);
+    const file = `${pageDir(where) ? `${pageDir(where)}/` : ''}index.html`;
+    localizedFiles.add(file);
+    if (!isFile(`${DIST}${file}`)) {
+      check(false, `${where}: localized page missing from the build`);
+      continue;
+    }
+    const html = readFileSync(`${DIST}${file}`, 'utf8');
+    check(html.includes(`<html lang="${lang.tag}">`), `${where}: <html lang> must be ${lang.tag}`);
+    check(canonicalOf(html) === urlOf(lang), `${where}: must be self-canonical`);
+    const head = headAlternates(html).sort();
+    check(JSON.stringify(head) === JSON.stringify(cluster), `${where}: hreflang must be the full reciprocal set (${LANGS.length} + ${X_DEFAULT})`);
+    check(JSON.stringify((sitemapAlternates.get(urlOf(lang)) ?? []).sort()) === JSON.stringify(head), `${where}: sitemap alternates must equal the head`);
+    check(/<meta property="og:locale" content="[a-z]{2}_[A-Z]{2}">/.test(html), `${where}: og:locale missing`);
+    if (slug === '') check(/<section[^>]*\bid="search"/.test(html), `${where}: the #search section is missing`);
+    if (slug === 'guides') {
+      for (const name of guideNames) check(html.includes(`href="/guides/${name}"`), `${where}: must list guides/${name}`);
+      if (lang.prefix) check(html.includes(`href="/guides/${guideNames[0]}" hreflang="en"`), `${where}: English guides must be linked with hreflang="en"`);
+    }
+  }
+}
 for (const [file, html] of htmlPages) {
-  if (html.includes('<header')) check(html.includes('href="/#search"'), `${file}: the header must link /#search`);
+  const lang = LANGS.find((l) => l.prefix && file.startsWith(`${l.prefix}/`)) ?? LANGS[0];
+  if (html.includes('<header')) check(html.includes(`href="${homePath(lang)}#search"`), `${file}: the header must link ${homePath(lang)}#search`);
+  check(!/\bundefined\b|\[object Object\]/.test(withoutCss(html)), `${file}: a literal "undefined" or "[object Object]" leaked into the page`);
+  if (!localizedFiles.has(file)) {
+    check(!/<link rel="alternate" hreflang=|og:locale/.test(html), `${file}: an English-only page must carry no hreflang alternates or og:locale`);
+  }
+}
+for (const [loc, links] of sitemapAlternates) {
+  check(links.length === 0 || links.length === LANGS.length + 1, `sitemap.xml: ${loc} must list ${LANGS.length} alternates + ${X_DEFAULT}`);
 }
 
 const connectHosts = (csp.match(/connect-src ([^;]*)/)?.[1] ?? '')
@@ -193,7 +256,7 @@ check(
 // No page names a vendor (Apple aside) or describes how ffly works inside; the legal pages name recipients by
 // category. Fare sources that are also carriers (Ryanair, Volotea...) are left out: a carrier is shown wherever a
 // flight is, so banning it would block legitimate UI.
-const BUNDLE_COPY = { 'coverage notice': "Some fares couldn't be checked right now.", 'poll retry line': 'Reconnecting…' };
+const WIDGET_COPY = { 'coverage notice': ['messages', 'coverage'], 'poll retry line': ['messages', 'reconnecting'] };
 const bannedTerm = (term) => new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i');
 const MECHANICS = [
   ...['AZair', 'Aviasales', 'Travelpayouts', 'RevenueCat', 'Telegram', 'Vercel'].map((name) => [name, `the vendor ${name}`]),
@@ -210,11 +273,28 @@ const COPY_BANS = [
   [bannedTerm('overx.ai/'), 'an API URL under overx.ai/'],
   [/\bHTTPS(?!:\/\/)/i, 'the technical term "HTTPS"'],
 ];
-for (const [what, copy] of Object.entries(BUNDLE_COPY)) {
-  check(bundle.includes(copy), `Search bundle: ${what} "${copy}" missing`);
+// The search widget's strings ship in SearchForm's data-i18n attribute: every language with the keys of English.
+const decode = (attr) => attr.replace(/&#34;|&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+const widgetText = (html) => {
+  const attr = html.match(/\sdata-i18n="([^"]*)"/)?.[1];
+  try {
+    return attr === undefined ? undefined : JSON.parse(decode(attr));
+  } catch {
+    return undefined;
+  }
+};
+const shape = (value) =>
+  value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).map(([k, v]) => [k, shape(v)])) : typeof value;
+const englishWidget = widgetText(readHtml('search'));
+check(englishWidget !== undefined, '/search: the widget data-i18n payload is missing or not JSON');
+for (const [what, keys] of Object.entries(WIDGET_COPY)) {
+  check(typeof keys.reduce((o, k) => o?.[k], englishWidget) === 'string', `/search: widget ${what} missing from data-i18n`);
 }
-// Inlined CSS is not copy, and words like "background" are CSS properties.
-const withoutCss = (html) => html.replace(/<style\b[\s\S]*?<\/style>/g, '').replace(/\sstyle="[^"]*"/g, '');
+for (const [file, html] of htmlPages.filter(([, html]) => html.includes('id="search-form"'))) {
+  const text = widgetText(html);
+  check(text !== undefined, `${file}: the widget data-i18n payload is missing or not JSON`);
+  check(JSON.stringify(shape(text)) === JSON.stringify(shape(englishWidget)), `${file}: the widget strings must have the keys of English`);
+}
 const llms = readFileSync(`${DIST}llms.txt`, 'utf8');
 // Copy rules for every published page, the legal ones included.
 for (const [where, text] of [['llms.txt', llms], ...htmlPages]) {
@@ -233,6 +313,10 @@ for (const [where, text] of copyPages) {
   check(!/airline's (?:own )?(?:web)?site(?! or a booking site)/i.test(text), `${where}: must not promise the airline's own site`);
 }
 check(!/live fares/i.test(copyText(readHtml('search'))), '/search: must not promise live fares');
+const carrierBans = CARRIERS.map((name) => [bannedTerm(name), `the carrier ${name}`]);
+for (const [where, text] of [['llms.txt', llms], ...htmlPages.filter(([file]) => localizedFiles.has(file))]) {
+  for (const [pattern, what] of carrierBans) check(!pattern.test(copyText(text)), `${where}: must not name ${what}`);
+}
 
 if (failures.length) {
   console.error(`check-legal: ${failures.length} failed\n- ${failures.join('\n- ')}`);

@@ -14,8 +14,8 @@ Those repos are the source of truth for copy, colours and claims.
   `nudges`, `results`, `notify`, `scroll`) that `tests/` covers. Plain TypeScript, no framework, custom controls
   only (no `<select>`, `<datalist>`, date or number input), rendering via `textContent`/`<template>` only (never
   `innerHTML` with API data). It calls `FFLY_API_BASE` (contract pinned in `docs/PINS.md`) anonymously:
-  `X-Platform: web`, never `X-Client-Id`, and never priority, filters or schedule. Its cookies, nudge copy and
-  scroll time live in `src/app.ts`.
+  `X-Platform: web`, never `X-Client-Id`, and never priority, filters or schedule. Its cookies and scroll time live
+  in `src/app.ts`, its copy in `src/i18n/en.ts` (`widget.script`, shipped in SearchForm's `data-i18n` attribute).
 - **Ads only after consent.** While `ADSENSE_CLIENT` in `src/app.ts` is undefined, no consent or ad script loads
   and `AdSlot` renders nothing (`npm test` asserts it). Set it, and `AD_SLOTS`, to load Google's consent message
   and then AdSense; `/privacy` switches its ad copy on the same constant.
@@ -38,7 +38,7 @@ Those repos are the source of truth for copy, colours and claims.
   `## FAQ` section's `### question`s and HowTo from `### 1.`...`### N.` headings; `npm test` asserts both.
   A new guide needs its `guides/{slug}` entry in `SITE_PAGES` (the build fails without it), with `lastmod`
   equal to its frontmatter `updated`.
-- **App facts live in `src/app.ts`**: limits, airlines, operator, publisher, API hosts,
+- **App facts live in `src/app.ts`**: limits, operator, publisher, API hosts,
   retention, external URLs. Do not hardcode any of them in a page.
 - **One contact address: `CONTACT_EMAIL` (`support@overx.ai`)** for support, contact and privacy
   requests, as on the sibling sites. Change it there and nowhere else.
@@ -90,12 +90,15 @@ Those repos are the source of truth for copy, colours and claims.
 - ffly is a search tool, not a travel agent; fares are indicative; Book opens "the airline's site or a booking
   site". Never name a data source or vendor (Aviasales, Travelpayouts, RevenueCat, Vercel...) on any page,
   the legal ones included: they say "a booking partner" and disclose its cookies, the partner identifier and
-  the commission. Airlines (carriers) may be named anywhere.
+  the commission. Carriers are not named on the home, search and guides-index pages (any language) or in
+  `llms.txt` (`CARRIERS` in `scripts/check-legal.mjs`); the guides and legal pages may name them, and search
+  results show the carriers the API returns.
 - **Value, not mechanics**, on every page: no cache, Keychain, server, memory, database, background,
   bundle id, endpoints or the API host, nor search limits such as "up to 8" cities. `MECHANICS` and
   `COPY_BANS` in `scripts/check-legal.mjs` ban them on every page (legal included), in `llms.txt`, and,
   except the API host, its URL and "HTTPS", in the JS bundle.
-- **No em dashes in published copy.** British spelling, and `LOCALE` (`en-GB`) for every date and number.
+- **No em dashes in published copy.** British spelling, and each language's `tag` in `src/i18n/locales.ts`
+  (`en-GB` for English) for every date and number.
   `npm test` fails on an em dash or "unlimited" on any page or in `llms.txt`.
 
 ## Design
@@ -112,7 +115,7 @@ Those repos are the source of truth for copy, colours and claims.
   computed at build time there from `src/data/europe-map.json` (regenerate: README); the fly is SVG
   `<animateMotion>`, so the map needs no JavaScript. Label offsets there are hand-placed for
   `EXAMPLE_TRIP`: a new example needs new ones, and a new city needs a point in `scripts/europe-map.py`.
-- Fonts are self-hosted latin woff2 in `public/fonts/`: Bricolage Grotesque (display), Figtree (body),
+- Fonts are self-hosted latin and latin-ext woff2 (split by `unicode-range`) in `public/fonts/`: Bricolage Grotesque (display), Figtree (body),
   IBM Plex Mono (data).
 - `og:image:width/height` in `BaseLayout` match `public/og-image.jpg` (1200x675). Change both together.
 - **No `favicon.svg`**: an SVG icon silently outranks every PNG.

@@ -1,0 +1,7 @@
+---
+import Search from '../../views/Search.astro';
+import { langPaths } from '../../i18n/paths';
+
+export const getStaticPaths = langPaths;
+---
+<Search lang={Astro.props.lang} />

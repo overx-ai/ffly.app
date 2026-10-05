@@ -1,10 +1,16 @@
 ---
 import AppStoreBadge from './AppStoreBadge.astro';
+import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
 import { pathFor } from '../site-pages';
+
+interface Props { lang?: Lang; }
+
+const { lang = DEFAULT_LANG } = Astro.props;
+const { t } = useLang(lang);
 ---
 <div class="ctas">
-  <AppStoreBadge />
-  <a class="btn" href={`${pathFor('')}#search`}>Search routes free</a>
+  <AppStoreBadge lang={lang} />
+  <a class="btn" href={`${pathFor('', lang)}#search`}>{t.common.searchFree}</a>
 </div>
 
 <style>
