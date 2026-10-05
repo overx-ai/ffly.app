@@ -22,8 +22,8 @@ export const TERMS: LegalDocument = {
   summaryTitle: 'The short version',
   summaryText: `ffly helps you plan cheap multi-city trips. It is a search tool, not a travel agent: fares come
     from third-party airline and fare-search websites, prices are indicative, and <strong>Book</strong> opens the
-    airline's site or a booking site such as Aviasales, where you book. Some booking links are partner links: ffly
-    may earn a commission, at no extra cost to you. ${APP.proName} is available as a weekly or yearly auto-renewing
+    airline's site or a booking site, where you book. Some booking links are partner links: ffly may earn a
+    commission, at no extra cost to you. ${APP.proName} is available as a weekly or yearly auto-renewing
     subscription, which you manage and cancel in your Apple ID account settings, or as a one-time ${APP.lifetimeName}
     purchase that does not renew.`,
   sections: [
@@ -54,20 +54,21 @@ export const TERMS: LegalDocument = {
       content: `
         <p>ffly is an information tool. We are not a travel agent, tour operator or airline, we do not sell tickets,
         and we are not a party to any booking you make. When you tap <strong>Book</strong>, the airline's site or a
-        booking site such as Aviasales opens, and any booking is made with that company under its own terms and
+        booking site opens, and any booking is made with that company under its own terms and
         conditions. That company alone is responsible for the flight, its price, fees, schedule changes,
         cancellations, refunds, baggage and other conditions of carriage. Entry, visa and health requirements are
         your responsibility.</p>
-        <p><strong>Partner links.</strong> Some booking links, such as those to Aviasales, are partner links. If you
-        book through one, ffly may earn a commission, at no extra cost to you.</p>`,
+        <p><strong>Partner links.</strong> Some booking links are partner links. If you book through one, ffly may
+        earn a commission, at no extra cost to you.</p>`,
     },
     {
       id: 'prices',
       title: 'Prices and Information Are Indicative',
       content: `
         <ul>
-          <li>Fares are collected from third-party websites at a point in time, and ${APP.proName} shows when a fare
-          was last checked, except for cached prices, which may be up to a week old and show no checked time. Prices and seat availability change often and may differ when you book.</li>
+          <li>Fares come from third-party sites at a point in time. ${APP.proName} shows when a fare was last checked,
+          but some fares found earlier may be up to a week old and show no checked time.</li>
+          <li>Prices and seat availability change often and may differ when you book.</li>
           <li>Prices may not include baggage, seat selection, payment or other fees, and converted prices are
           approximate.</li>
           <li>Flight times, daylight and sleep figures are estimates.</li>
@@ -85,11 +86,11 @@ export const TERMS: LegalDocument = {
           hidden, and the other routes show only their price and number of cities.</li>
           <li><strong>${APP.proName}:</strong> every route in full, including dates, flight times and booking links,
           and no ${APP.freeSearches}-search limit, as a weekly or yearly subscription (Section 6) or a one-time
-          ${APP.lifetimeName} purchase (Section 7). Pro is subject to fair use: a daily search limit protects the
-          service and the websites we check fares on.</li>
+          ${APP.lifetimeName} purchase (Section 7). Pro is subject to fair use: a daily search limit protects ffly
+          and the sites we check fares on.</li>
           <li><strong>Web search:</strong> searches at
           <a href="${pathFor('search')}">${SITE_HOST}${pathFor('search')}</a> are free, limited to
-          ${WEB_SEARCH.freeSearchesPerDay} per day per network, and show the cities, nights and total price of the
+          ${WEB_SEARCH.freeSearchesPerDay} per day, and show the cities, nights and total price of the
           top route, and only the price and number of cities of the other routes.</li>
         </ul>
         <p>We may change the features of Free and ${APP.proName} over time.</p>`,
@@ -118,12 +119,12 @@ export const TERMS: LegalDocument = {
       id: 'lifetime',
       title: `${APP.proName} ${APP.lifetimeName} Purchase`,
       content: `
-        <p><strong>${APP.proName} ${APP.lifetimeName}</strong> is a <strong>non-consumable</strong> in-app purchase
-        that unlocks ${APP.proName} with no time limit.</p>
+        <p><strong>${APP.proName} ${APP.lifetimeName}</strong> is an in-app purchase that unlocks ${APP.proName}
+        with no time limit.</p>
         <ul>
           <li>It is a <strong>one-time payment</strong>, charged to your Apple ID account at confirmation of
           purchase. It does not renew and there is no recurring charge.</li>
-          <li>The price is set per territory on the App Store and is shown to you in the app before you confirm.</li>
+          <li>The price is set by country on the App Store and is shown in the app before you confirm.</li>
           <li>It restores on other devices signed in to the same Apple ID through <strong>Restore
           purchases</strong>.</li>
           <li><strong>Buying ${APP.lifetimeName} does not cancel an existing ${APP.proName} subscription.</strong>
@@ -138,7 +139,8 @@ export const TERMS: LegalDocument = {
       content: `
         <p>You agree not to:</p>
         <ul>
-          <li>access the ffly API other than through the ffly app or ${SITE_HOST}, or scrape, crawl or resell ffly's results;</li>
+          <li>use ffly, or its results, other than through the ffly app or ${SITE_HOST}, or scrape, crawl or resell
+          ffly's results;</li>
           <li>work around search limits, the Free tier's hidden results, or any security measure;</li>
           <li>reverse engineer the app, except where the law allows it;</li>
           <li>use ffly for any unlawful purpose or in a way that could harm ffly, its users or the websites it
@@ -157,9 +159,9 @@ export const TERMS: LegalDocument = {
       id: 'availability',
       title: 'Availability',
       content: `
-        <p>We work to keep ffly running, but we do not guarantee it will be available at all times. Fare sources
-        may be slow or unavailable, searches may take time or fail, and search results kept on our server may be
-        lost before they expire. You can run a search again or reopen a saved trip from the Trips list.</p>`,
+        <p>We work to keep ffly running, but we can't promise it will always be available. Fare sources may be
+        slow or unavailable, searches may take time or fail, and a search may need to be run again. You can always
+        reopen a saved trip from the Trips list.</p>`,
     },
     {
       id: 'disclaimer',

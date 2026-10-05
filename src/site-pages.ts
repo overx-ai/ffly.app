@@ -13,8 +13,8 @@ import { LOCALE } from './app';
 export const SITE_PAGES = [
   { slug: '',        lastmod: '2026-10-05' },
   { slug: 'support', lastmod: '2026-10-05' },
-  { slug: 'privacy', lastmod: '2026-10-04' },
-  { slug: 'terms',   lastmod: '2026-10-04' },
+  { slug: 'privacy', lastmod: '2026-10-05' },
+  { slug: 'terms',   lastmod: '2026-10-05' },
   { slug: 'search',  lastmod: '2026-10-05' },
   { slug: 'guides',  lastmod: '2026-10-05' },
   { slug: 'guides/cheapest-order-to-visit-cities', lastmod: '2026-10-05' },

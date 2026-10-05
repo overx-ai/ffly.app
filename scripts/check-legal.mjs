@@ -60,7 +60,7 @@ for (const type of NOT_LINKED) {
   check(!linked.includes(type), `Privacy: ${type} must not be listed as linked`);
 }
 check(!/not linked to your identity/.test(privacy('searches')), 'Privacy: trip searches must not be called unlinked');
-check(/never your app user id/.test(privacy('searches')), 'Privacy: fare sources must be said to get no user id');
+check(/nothing that identifies you/.test(privacy('searches')), 'Privacy: fare sources must be said to get nothing that identifies you');
 check(/same for every ffly user/.test(privacy('booking-links')), 'Privacy: the partner identifier must be said to be ffly-wide');
 check(/at no extra cost/.test(privacy('booking-links')), 'Privacy: partner links must disclose the commission');
 
@@ -141,15 +141,23 @@ check(
   'vercel.json: CSP connect-src must allow the API host the search bundle calls (SERVICE.apiHost)',
 );
 
-// Only the legal pages name a fare source or describe how ffly works inside. Sources that are also carriers
-// (Ryanair, Volotea...) are left out: a carrier is shown wherever a flight is, so banning it would block legitimate UI.
+// No page names a vendor (Apple aside) or describes how ffly works inside; the legal pages name recipients by
+// category. Fare sources that are also carriers (Ryanair, Volotea...) are left out: a carrier is shown wherever a
+// flight is, so banning it would block legitimate UI.
 const BUNDLE_COPY = { 'coverage notice': "Some fares couldn't be checked right now.", 'poll retry line': 'Reconnecting…' };
-const LEGAL_ONLY = [
-  ...['AZair', 'Aviasales', 'Travelpayouts'].map((name) => [name, `the fare source ${name}`]),
-  ...['cache', 'Keychain', 'RevenueCat', 'server', 'background', 'bundle id', 'ai.overx.ffly'].map((term) => [term, `the technical term "${term}"`]),
+const bannedTerm = (term) => new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i');
+const MECHANICS = [
+  ...['AZair', 'Aviasales', 'Travelpayouts', 'RevenueCat', 'Telegram', 'Vercel'].map((name) => [name, `the vendor ${name}`]),
+  ...['cache', 'Keychain', 'server', 'memory', 'database', 'restart', 'endpoint', 'background', 'bundle id', 'install id', 'request id', 'ai.overx.ffly', 'overx.ai/']
+    .map((term) => [term, `the technical term "${term}"`]),
   ...['up to 8', 'up to 3 places', 'must or a maybe'].map((phrase) => [phrase, `the mechanics phrase "${phrase}"`]),
-].map(([term, what]) => [new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i'), what]);
-const LEGAL_FILES = ['privacy/index.html', 'terms/index.html'];
+].map(([term, what]) => [bannedTerm(term), what]);
+// The search bundle calls the API host and every page links https:// URLs, so these are banned in copy only.
+const COPY_BANS = [
+  ...MECHANICS,
+  ...connectHosts.map((host) => [bannedTerm(host), `the API host ${host}`]),
+  [/\bHTTPS(?!:\/\/)/i, 'the technical term "HTTPS"'],
+];
 for (const [what, copy] of Object.entries(BUNDLE_COPY)) {
   check(bundle.includes(copy), `Search bundle: ${what} "${copy}" missing`);
 }
@@ -161,12 +169,9 @@ for (const [where, text] of [['llms.txt', llms], ...htmlPages]) {
   check(!/\u2014|&mdash;|&#8212;|&#x2014;/i.test(text), `${where}: no em dashes in published copy`);
   check(!/unlimited/i.test(text), `${where}: Pro is never "unlimited"`);
 }
-const copyPages = [
-  ['llms.txt', copyText(llms)],
-  ...htmlPages.filter(([file]) => !LEGAL_FILES.includes(file)).map(([file, html]) => [file, copyText(withoutCss(html))]),
-];
-for (const [where, text] of [['Search bundle', bundle], ...copyPages]) {
-  for (const [pattern, what] of LEGAL_ONLY) {
+const copyPages = [['llms.txt', copyText(llms)], ...htmlPages.map(([file, html]) => [file, copyText(withoutCss(html))])];
+for (const [where, text, banned] of [['Search bundle', bundle, MECHANICS], ...copyPages.map((page) => [...page, COPY_BANS])]) {
+  for (const [pattern, what] of banned) {
     check(!pattern.test(text), `${where}: must not name ${what}`);
   }
 }

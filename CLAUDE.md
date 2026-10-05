@@ -48,9 +48,15 @@ Those repos are the source of truth for copy, colours and claims.
   History, Purchase History, User ID, Email Address (optional) and Customer Support (linked: every
   search carries the app user id and RevenueCat keeps purchases under it; the last two come from the
   feedback form, ios-ffly spec 012); none tracking. Change one, change all, plus the App Store
-  Connect privacy answers. Retention (24 h jobs, 10 min entitlement cache) is from the API config.
+  Connect privacy answers. Retention (24 h jobs) is from the API config.
   Feedback goes to 1B-bots `shared/form-aggregator` (database, logs, Telegram chat), which has no
   retention job: never state a number of days for it. Its facts are `FEEDBACK` in `src/app.ts`.
+- **Legal pages name recipients by category, never by vendor, and describe no mechanics.** Apple is the
+  only company named; everyone else is "our subscription provider", "a messaging service our team uses to
+  read feedback", "our hosting providers", "a booking partner". No hosts, endpoints, storage or restart
+  mechanics, cache durations, internal identifier names or field lists: retention is a promise ("deleted
+  within 24 hours"), identifiers are plain words ("a random identifier for your installation, not your
+  Apple ID"). Model the voice on `src/data/support.ts`.
 - `/terms` section 6 is the App Store 3.1.2(c) auto-renewable block (weekly and yearly), section 7
   the one-time Lifetime purchase (does not renew, does not cancel a running subscription), and
   section 1 links Apple's Standard EULA. No free trial is offered on any plan. Both are submission requirements. Cross-references say "Section 6": the layout
@@ -73,12 +79,13 @@ Those repos are the source of truth for copy, colours and claims.
 - "Favour sensible flight times over pre-dawn wake-ups and midnight landings", never a promise
   that no route has them.
 - ffly is a search tool, not a travel agent; fares are indicative; Book opens "the airline's site or a booking
-  site". Name a data source (Aviasales, Travelpayouts) only in `privacy.ts` and `terms.ts`, the legal
-  disclosures of the data source, cookies, partner identifier and commission; never in marketing or support copy
-  (`npm test` checks every other page and the JS bundle). Airlines (carriers) may be named anywhere.
-- **Value, not mechanics**, outside the legal pages: no cache, Keychain, RevenueCat, server, background,
-  bundle id, nor search limits such as "up to 8" cities. `LEGAL_ONLY` in `scripts/check-legal.mjs` bans them
-  on every other page, in `llms.txt` and in the JS bundle.
+  site". Never name a data source or vendor (Aviasales, Travelpayouts, RevenueCat, Vercel...) on any page,
+  the legal ones included: they say "a booking partner" and disclose its cookies, the partner identifier and
+  the commission. Airlines (carriers) may be named anywhere.
+- **Value, not mechanics**, on every page: no cache, Keychain, server, memory, database, background,
+  bundle id, endpoints or the API host, nor search limits such as "up to 8" cities. `MECHANICS` and
+  `COPY_BANS` in `scripts/check-legal.mjs` ban them on every page (legal included), in `llms.txt`, and,
+  except the API host and "HTTPS", in the JS bundle.
 - **No em dashes in published copy.** British spelling, and `LOCALE` (`en-GB`) for every date and number.
   `npm test` fails on an em dash or "unlimited" on any page or in `llms.txt`.
 
