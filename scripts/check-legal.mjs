@@ -84,6 +84,14 @@ const webSearch = privacy('web-search');
 check(/Notify me/.test(webSearch) && /notification/.test(webSearch), 'Privacy: #web-search must cover notifications');
 check(/booking partner/.test(webSearch) && /at no extra cost/.test(webSearch), 'Privacy: #web-search must cover partner booking links');
 check(/at no extra cost/.test(privacy('booking-links')), 'Privacy: partner links must disclose the commission');
+// Spec 005: a web search's result is kept, unlinked, so its shared link opens with it until the trip starts.
+const sharedSearch = /without anything that identifies you[^.]*link[^.]*until the trip's first day/;
+check(sharedSearch.test(copyText(webSearch)), "Privacy: #web-search must say shared web searches are stored without anything that identifies you, until the trip's first day");
+const retention = copyText(privacy('retention'));
+check(
+  /in the app are deleted within \d+ hours/.test(retention) && /until the trip's first day/.test(retention),
+  "Privacy: #retention must keep app searches to 24 hours and web search results until the trip's first day",
+);
 
 const feedbackNum = readHtml('privacy').match(/id="feedback"[^>]*>\s*<h2[^>]*><span class="num"[^>]*>0*(\d+)</)?.[1];
 check(

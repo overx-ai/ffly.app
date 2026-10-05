@@ -179,8 +179,9 @@ const faq: FaqItem[] = [
   .hero-map figcaption { font-size: 13px; color: var(--ink-2); margin-top: 4px; max-width: 70ch; }
 
   .sect { padding-block: clamp(48px, 7vw, 88px); border-top: 1px solid var(--rule); scroll-margin-top: var(--header-offset); }
-  #search { scroll-margin-top: var(--header-height); }
+  #search { scroll-margin-top: var(--header-height); padding-top: clamp(20px, 2.5vw, 32px); }
   #search:focus { outline: none; }
+  #search h2 { font-size: clamp(26px, 3vw, 36px); margin-bottom: var(--space-md); max-width: none; }
   .sect h2 {
     font-size: clamp(30px, 4.2vw, 52px);
     line-height: 1;

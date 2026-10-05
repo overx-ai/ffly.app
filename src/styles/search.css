@@ -1,7 +1,7 @@
 /* The search widget (SearchForm.astro) on / and /search. Global rather than scoped: the client script clones
    <template> rows that carry no Astro scope attribute. Every rule hangs off .search-ui. */
 
-.search-ui { display: flex; flex-direction: column; gap: var(--space-lg); }
+.search-ui { display: flex; flex-direction: column; gap: var(--space-md); }
 .search-ui [hidden] { display: none !important; }
 .search-ui .sr-only {
   position: absolute;
@@ -12,13 +12,6 @@
   white-space: nowrap;
 }
 
-.search-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
-  gap: var(--space-lg);
-  align-items: start;
-}
-
 .search-ui .note { color: var(--ink-2); font-size: 14px; }
 .search-ui .hint { color: var(--ink-2); font-size: 13px; line-height: 1.4; }
 .search-ui .quiet { color: var(--ink-2); font-size: 13px; }
@@ -26,7 +19,8 @@
 .search-ui .problem,
 .search-ui .upsell { display: flex; flex-direction: column; gap: var(--space-md); align-items: flex-start; }
 
-/* Form */
+/* Form: two rows on desktop (trip, then cities and the button), then one slim line of app-only options. */
+.search-ui .search-form { padding: var(--space-md) 20px; }
 .search-form .fields,
 .search-form .field {
   border: 0;
@@ -36,14 +30,22 @@
   display: flex;
   flex-direction: column;
 }
-.search-form .fields { gap: var(--space-lg); }
-.search-form .field { gap: var(--space-sm); }
+.search-form .fields { gap: 12px; }
+.search-form .field { gap: 4px; }
 .search-form .fields:disabled { opacity: 0.55; }
-.search-form #search-loading { padding-bottom: var(--space-md); }
-.search-form .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-lg) var(--space-md); }
+.search-form #search-loading { padding-bottom: var(--space-sm); }
+.search-form .trip-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.15fr) auto;
+  gap: 12px var(--space-md);
+  align-items: end;
+}
+.search-form .cities-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px var(--space-md); align-items: end; }
+.search-form .cities-row .btn { min-height: 40px; padding: 0 28px; white-space: nowrap; }
 .search-form .field > label,
 .search-form .field-label {
   font-family: var(--font-display);
+  font-size: 14px;
   font-weight: 700;
   padding: 0;
   display: flex;
@@ -51,6 +53,8 @@
   align-items: center;
   gap: 4px 8px;
 }
+/* A legend is no flex item, so the fieldset's gap misses it. */
+.search-form fieldset.field > legend { margin-bottom: 4px; }
 .search-form .count { color: var(--ink-2); font-family: var(--font-mono); font-weight: 500; font-size: 13px; }
 .search-form .remembered {
   font: 600 11px var(--font-mono);
@@ -65,8 +69,8 @@
 .search-form input[type="text"],
 .search-form .picker {
   width: 100%;
-  min-height: 48px;
-  padding: 10px 14px;
+  min-height: 40px;
+  padding: 7px 12px;
   font: 400 16px var(--font-body);
   color: var(--ink);
   background: var(--bg);
@@ -140,22 +144,26 @@
 
 .search-form svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; flex: none; }
 
+.search-form .city-box { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.search-form .city-box .combo { flex: 1 1 12em; min-width: 10em; }
 .search-form .chips,
-.search-form .locked-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+.search-form .locked-chips { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; }
+.search-form .chips { flex-wrap: wrap; }
 .search-form .chips:empty { display: none; }
 .search-form .chip {
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  padding-left: 14px;
+  padding-left: 12px;
+  min-height: 36px;
   border: 1px solid var(--rule);
   border-radius: var(--radius-pill);
   background: var(--fill);
   font-weight: 600;
 }
 .search-form .chip-remove {
-  min-width: 44px;
-  min-height: 40px;
+  min-width: 32px;
+  min-height: 34px;
   border: 0;
   background: none;
   color: var(--ink-2);
@@ -186,6 +194,7 @@
   cursor: pointer;
   flex: none;
 }
+.search-form .stepper button { width: 32px; height: 32px; font-size: 17px; }
 .search-form .cal-nav button:disabled,
 .search-form .stepper button:disabled { opacity: 0.35; cursor: default; }
 .search-form .cal-months { display: grid; grid-template-columns: repeat(2, auto); gap: var(--space-lg); padding-top: var(--space-sm); }
@@ -211,32 +220,46 @@
 .search-form .cal-month .start,
 .search-form .cal-month .end { background: var(--gold); color: var(--on-gold); font-weight: 700; border-radius: var(--radius-sm); }
 
-/* Nights */
-.search-form .steppers { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-lg); }
-.search-form .stepper { display: flex; align-items: center; gap: var(--space-sm); color: var(--ink-2); font-size: 14px; }
-.search-form .stepper span { min-width: 4.5em; }
+/* Nights: "- 2 + – - 4 +", the at-least and at-most labels read by screen readers only. */
+.search-form .steppers { display: flex; align-items: center; gap: 6px; min-height: 40px; }
+.search-form .stepper { display: flex; align-items: center; gap: 4px; }
+.search-form .range-dash { color: var(--ink-2); }
 .search-form .stepper output {
   min-width: 2ch;
   text-align: center;
   color: var(--ink);
-  font: 700 18px var(--font-display);
+  font: 700 17px var(--font-display);
   font-variant-numeric: tabular-nums;
 }
 
-/* App-only options */
+/* App-only options: one line that scrolls sideways when it runs out of room, the free-search note at its end. */
+.search-form .app-row {
+  display: flex;
+  align-items: center;
+  gap: 6px 12px;
+  border-top: 1px solid var(--rule);
+  padding-top: 10px;
+}
+.search-form .app-row .field-label { font-size: 13px; white-space: nowrap; color: var(--ink-2); }
+.search-form .locked-chips { flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: thin; padding-block: 2px; }
+.search-form .locked-chips li { flex: none; }
+.search-form #quota-note { flex: none; font-size: 13px; white-space: nowrap; }
+.search-form #quota-note:empty { display: none; }
 .search-form .locked-chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  min-height: 40px;
-  padding: 0 14px;
+  gap: 5px;
+  min-height: 30px;
+  padding: 0 10px;
   border: 1px dashed var(--rule);
   border-radius: var(--radius-pill);
   background: none;
   color: var(--ink-2);
-  font: 600 14px var(--font-body);
+  font: 600 13px var(--font-body);
+  white-space: nowrap;
   cursor: pointer;
 }
+.search-form .locked-chip svg { width: 14px; height: 14px; }
 .search-form .locked-chip[aria-pressed="true"] { border-style: solid; border-color: var(--accent); color: var(--ink); }
 .search-form .chip-nudge,
 .search-ui .queue-nudge { border-left: 3px solid var(--gold); padding-left: 12px; font-weight: 600; }
@@ -275,7 +298,9 @@
 }
 .search-ui .notify-buttons { display: flex; gap: var(--space-sm); }
 
-.search-ui .results { display: flex; flex-direction: column; gap: var(--space-md); }
+.search-ui .results { display: flex; flex-direction: column; gap: 12px; }
+.search-ui .shared-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm) var(--space-md); color: var(--ink-2); font-size: 14px; }
+.search-ui .shared-line .btn { padding: 6px 16px; min-height: 36px; font-size: 14px; }
 .search-ui .results h2 { font-size: clamp(1.6rem, 4vw, 2rem); }
 .search-ui .insights {
   padding: var(--space-md) var(--space-lg);
@@ -338,7 +363,7 @@
 .results-table .leg-row td { border-top: 0; padding-top: 0; background: var(--fill); }
 .results-table .leg {
   display: grid;
-  grid-template-columns: 7em 7.5em minmax(12em, 1fr) minmax(6em, auto) 5.5em 5em auto;
+  grid-template-columns: 7em 7.5em minmax(12em, 1fr) 6.5em minmax(6em, auto) 5.5em 5em auto;
   align-items: center;
   gap: 4px 14px;
   padding: 10px 14px;
@@ -349,22 +374,59 @@
 }
 .results-table .leg code { font: 600 12px var(--font-mono); color: var(--ink-2); }
 .results-table .leg-price { font-weight: 700; }
+.results-table .leg-nights { color: var(--ink-2); white-space: nowrap; }
 .results-table .book { padding: 6px 16px; min-height: 36px; font-size: 14px; }
 .results-table .locked-cell { position: relative; }
 .results-table .blurred { filter: blur(5px); user-select: none; color: var(--ink-2); white-space: nowrap; }
 .results-table .locked-text { position: absolute; inset: 0; display: flex; align-items: center; padding: 0 14px; font-weight: 600; }
 .results-table .open-app { font-weight: 700; white-space: nowrap; }
 
+/* Before any search: the empty state over placeholder rows, which pulse while a search runs. */
+.results-table .placeholder-note td { text-align: center; color: var(--ink-2); font-weight: 600; }
+.results-table .skeleton td { padding-block: 16px; }
+.results-table .bone { display: block; height: 10px; width: 70%; border-radius: var(--radius-pill); background: var(--fill); }
+.results-table .skeleton .route .bone { width: 90%; }
+.results-table .skeleton .rank .bone { width: 1.2em; }
+.search-ui .results.searching .placeholder-note { display: none; }
+.search-ui .results.searching .bone { animation: bone-pulse 0.9s ease-in-out infinite alternate; }
+@keyframes bone-pulse {
+  from { opacity: 0.45; }
+  to { opacity: 1; }
+}
+
 .search-ui .upsell { border-left: 3px solid var(--gold); }
 .search-ui .upsell h2 { font-size: 1.5rem; }
 .search-ui .upsell > p:not(.lbl) { color: var(--ink-2); }
 
 @media (max-width: 900px) {
-  .search-grid { grid-template-columns: minmax(0, 1fr); }
+  .search-form .trip-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 900px), (pointer: coarse) {
+  .search-form input[type="text"],
+  .search-form .picker,
+  .search-form .cities-row .btn,
+  .search-form .steppers { min-height: 44px; }
+  .search-form .chip { min-height: 44px; }
+  .search-form .chip-remove { min-width: 44px; min-height: 42px; }
+  .search-form .stepper button { width: 44px; height: 44px; }
+  .search-form .locked-chip { min-height: 44px; }
+}
+
+@media (max-width: 560px) {
+  .search-form .trip-row > :nth-child(n + 3) { grid-column: 1 / -1; }
+  .search-form .cities-row { grid-template-columns: minmax(0, 1fr); }
+  .search-form .cities-row .btn { width: 100%; }
+  .search-form .app-row { flex-wrap: wrap; }
+  .search-form .locked-chips { flex-basis: 100%; order: 1; }
+  .search-form #quota-note { margin-left: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-ui .results.searching .bone { animation: none; }
 }
 
 @media (max-width: 760px) {
-  .search-form .pair { grid-template-columns: minmax(0, 1fr); }
   .search-form .cal-months { grid-template-columns: auto; }
 
   /* On a phone the table becomes stacked rows, each cell labelled from data-label. */
@@ -400,4 +462,6 @@
   .results-table .leg { grid-template-columns: auto auto; width: 100%; }
   .results-table .leg-path { grid-column: 1 / -1; }
   .results-table .locked-cell { grid-column: 1 / -1; min-height: 2.5em; }
+  .results-table .placeholder-note td { justify-content: center; }
+  .results-table .skeleton :is(.rank, .dates, .nights, .flights, .warn, .details) { display: none; }
 }

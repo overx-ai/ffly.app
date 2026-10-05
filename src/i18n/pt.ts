@@ -164,7 +164,7 @@ const pt = {
 
   appSide: {
     title: 'Mais na app',
-    trips: 'Viagens',
+    dot: 'Dica {n} de {total}',
   },
 
   widget: {
@@ -204,6 +204,8 @@ const pt = {
     notifyYes: 'Avisar-me',
     notifyNo: 'Agora não',
     empty: 'Experimente um período de viagem mais alargado ou outro número de noites.',
+    emptyState: 'Os seus itinerários aparecem aqui',
+    searchAgain: 'Pesquisar novamente',
     columns: {
       rank: '#',
       route: 'Itinerário',
@@ -242,6 +244,7 @@ const pt = {
         network: `Sem ligação ao ${APP.name}. Verifique a rede e tente novamente.`,
         failed: 'Não foi possível concluir esta pesquisa. Tente novamente dentro de momentos.',
         expired: 'Esta pesquisa expirou. Faça-a novamente.',
+        searchedOn: 'Pesquisa de {date}',
         metaDown: 'Não foi possível carregar a lista de cidades. Verifique a rede e tente novamente.',
         fetching: 'A verificar tarifas',
         planning: 'A encontrar a melhor ordem',

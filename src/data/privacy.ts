@@ -40,12 +40,13 @@ const LEGAL_BASES = [
 
 export const PRIVACY: LegalDocument = {
   pageTitle: 'Privacy Policy',
-  description: `How the ffly iPhone app handles your data: no account, no location, no ads, no tracking. Your searches are deleted within ${SERVICE.searchRetentionHours} hours.`,
+  description: `How the ffly iPhone app handles your data: no account, no location, no ads, no tracking. Searches in the app are deleted within ${SERVICE.searchRetentionHours} hours.`,
   summaryTitle: 'The short version',
   summaryText: `ffly has no account and no sign-in. We don't collect your name, phone number or location, and we
     get your email address only if you add it to feedback. ${ADS ? 'The app shows no ads, this website shows ads only after you choose, and we' : 'We show no ads and'}
-    don't track you across other apps or websites.${ANALYTICS ? ' This website measures visits only if you agree.' : ''} To find routes, we receive the trip you search for, and we delete it within
-    ${SERVICE.searchRetentionHours} hours. We collect anonymous usage analytics to improve the app. Apple handles
+    don't track you across other apps or websites.${ANALYTICS ? ' This website measures visits only if you agree.' : ''} To find routes, we receive the trip you search for. We delete a search from the app
+    within ${SERVICE.searchRetentionHours} hours, and keep a web search's result, with nothing that identifies you,
+    until the trip starts, so its link keeps working. We collect anonymous usage analytics to improve the app. Apple handles
     payments. We never sell your data.`,
   sections: [
     {
@@ -229,7 +230,8 @@ export const PRIVACY: LegalDocument = {
       title: 'How Long We Keep Data',
       content: `
         <ul>
-          <li>Your searches are deleted within ${SERVICE.searchRetentionHours} hours.</li>
+          <li>Searches in the app are deleted within ${SERVICE.searchRetentionHours} hours. A web search's result is
+          kept, without anything that identifies you, until the trip's first day, then deleted.</li>
           <li>The free-search count for the web search resets daily, and so does the ${APP.proName} fair-use
           count. We keep your in-app free-search count only as long as the Free limit needs it.</li>
           <li>Feedback is kept to answer it and prevent abuse. You can ask us to delete it at any time.</li>
@@ -249,7 +251,11 @@ export const PRIVACY: LegalDocument = {
         <p>You can search on the home page and on the <a href="${pathFor('search')}">web search</a> page. A web
         search sends us your places, dates and nights. It sends no app identifier, and your search isn't stored
         with your IP address. We use your IP address only to count your free web searches for the day.</p>
-        <p>Your browser remembers your latest search until you close the tab, so reloading the page keeps it.</p>
+        <p>Your browser remembers your latest search until you close the tab, so reloading the page keeps it. The
+        page's address carries the places, dates and nights of your search, so you can share it.</p>
+        <p>When a web search finishes, we keep its result without anything that identifies you, so anyone who opens
+        the link to the same search sees that result until the trip's first day. Searches from the app are still
+        deleted within ${SERVICE.searchRetentionHours} hours.</p>
         <p>If you choose <strong>Notify me</strong>, your browser asks whether ${SITE_HOST} may send you
         notifications, and tells you when your routes are ready while the tab is open. Nothing is asked until you
         choose it, the notification comes from your browser itself, and you can turn it off in your browser's

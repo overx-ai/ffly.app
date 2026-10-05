@@ -164,7 +164,7 @@ const de = {
 
   appSide: {
     title: 'Mehr in der App',
-    trips: 'Reisen',
+    dot: 'Tipp {n} von {total}',
   },
 
   widget: {
@@ -204,6 +204,8 @@ const de = {
     notifyYes: 'Benachrichtige mich',
     notifyNo: 'Nicht jetzt',
     empty: 'Erweitere den Reisezeitraum oder ändere die Anzahl der Nächte.',
+    emptyState: 'Hier erscheinen deine Routen',
+    searchAgain: 'Erneut suchen',
     columns: {
       rank: '#',
       route: 'Route',
@@ -242,6 +244,7 @@ const de = {
         network: `${APP.name} ist nicht erreichbar. Prüfe deine Verbindung und versuch es erneut.`,
         failed: 'Diese Suche wurde nicht abgeschlossen. Versuch es gleich noch einmal.',
         expired: 'Diese Suche ist abgelaufen. Starte sie erneut.',
+        searchedOn: 'Gesucht am {date}',
         metaDown: 'Die Städteliste konnte nicht geladen werden. Prüfe deine Verbindung und versuch es erneut.',
         fetching: 'Preise werden geprüft',
         planning: 'Beste Reihenfolge wird ermittelt',

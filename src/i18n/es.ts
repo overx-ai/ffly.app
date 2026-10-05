@@ -170,7 +170,7 @@ const es = {
 
   appSide: {
     title: 'Más en la app',
-    trips: 'Viajes',
+    dot: 'Consejo {n} de {total}',
   },
 
   widget: {
@@ -210,6 +210,8 @@ const es = {
     notifyYes: 'Avísame',
     notifyNo: 'Ahora no',
     empty: 'Prueba con un periodo de viaje más amplio o con otro número de noches.',
+    emptyState: 'Tus rutas aparecerán aquí',
+    searchAgain: 'Buscar de nuevo',
     columns: {
       rank: '#',
       route: 'Ruta',
@@ -256,6 +258,7 @@ const es = {
         network: `No se puede conectar con ${APP.name}. Comprueba tu conexión y vuelve a intentarlo.`,
         failed: 'Esta búsqueda no ha terminado. Vuelve a intentarlo en un momento.',
         expired: 'Esta búsqueda ha caducado. Vuelve a lanzarla.',
+        searchedOn: 'Búsqueda del {date}',
         metaDown: 'No se ha podido cargar la lista de ciudades. Comprueba tu conexión y vuelve a intentarlo.',
         fetching: 'Consultando tarifas',
         planning: 'Calculando el mejor orden',

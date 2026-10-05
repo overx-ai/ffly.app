@@ -178,7 +178,7 @@ const pl = {
 
   appSide: {
     title: 'Więcej w aplikacji',
-    trips: 'Podróże',
+    dot: 'Wskazówka {n} z {total}',
   },
 
   widget: {
@@ -218,6 +218,8 @@ const pl = {
     notifyYes: 'Powiadom mnie',
     notifyNo: 'Nie teraz',
     empty: 'Poszerz okno dat lub zmień liczbę nocy.',
+    emptyState: 'Tutaj pojawią się Twoje trasy',
+    searchAgain: 'Szukaj ponownie',
     columns: {
       rank: '#',
       route: 'Trasa',
@@ -266,6 +268,7 @@ const pl = {
         network: `Brak połączenia z ${APP.name}. Sprawdź sieć i spróbuj ponownie.`,
         failed: 'To wyszukiwanie się nie zakończyło. Spróbuj ponownie za chwilę.',
         expired: 'To wyszukiwanie wygasło. Uruchom je ponownie.',
+        searchedOn: 'Wyszukano {date}',
         metaDown: 'Nie udało się wczytać listy miast. Sprawdź połączenie i spróbuj ponownie.',
         fetching: 'Sprawdzamy ceny',
         planning: 'Układamy najlepszą kolejność',

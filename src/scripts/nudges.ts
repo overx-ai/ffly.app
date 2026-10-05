@@ -1,6 +1,6 @@
 import { fill } from '../i18n/text';
 
-// One rotation line per page view: show the stored index, store the next.
+// The app strip's first tip per page view: show the stored index, store the next.
 export function rotation(stored: string | undefined, count: number) {
   const n = Number(stored);
   const index = Number.isInteger(n) && n >= 0 ? n % count : 0;

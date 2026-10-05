@@ -7,9 +7,11 @@ import {
   ACTIVE,
   NotFound,
   buildRequest,
+  canLookup,
   createSearch,
   getMeta,
   getSearch,
+  lookupShared,
   type Insights,
   type Meta,
   type Place,
@@ -20,9 +22,10 @@ import {
 } from './ffly-api';
 import { ask, canAsk, routesReady } from './notify';
 import { appHintLine, rotation } from './nudges';
-import { cookieString, fillPrefs, parseCookies, savedCookies } from './prefs';
+import { cookieString, fillPrefs, parseCookies, sameSearch, savedCookies, sharedRequest, shareUrl, type Prefs } from './prefs';
 import { routeRows, type RouteRow, type Warn } from './results';
 import { glideLinks } from './scroll';
+import { Ticker } from './ticker';
 
 interface Saved {
   id: string;
@@ -37,7 +40,9 @@ const MINUTE_S = 60;
 
 // One bundle serves every language: SearchForm renders that page's strings into data-i18n (the CSP allows no
 // inline script), and <html lang> is the locale of every date, number and list.
-const TEXT = JSON.parse(document.querySelector<HTMLElement>('[data-i18n]')!.dataset.i18n!) as Dict['widget']['script'];
+const TEXT = JSON.parse(document.querySelector<HTMLElement>('[data-i18n]')!.dataset.i18n!) as Dict['widget']['script'] & {
+  nights: Plural;
+};
 const MESSAGES = TEXT.messages;
 const LOCALE = document.documentElement.lang;
 const count = (forms: Plural, n: number, vars?: Vars) => plural(LOCALE, forms, n, vars);
@@ -69,6 +74,7 @@ const el = {
   formError: byId('form-error'),
   submit: byId<HTMLButtonElement>('submit'),
   quotaNote: byId('quota-note'),
+  strip: byId('app-side'),
   nudge: byId('nudge'),
   nudgeDots: byId('nudge-dots'),
   problem: byId('problem'),
@@ -85,6 +91,10 @@ const el = {
   results: byId('results'),
   resultsTitle: byId('results-title'),
   resultsTrip: byId('results-trip'),
+  resultsShared: byId('results-shared'),
+  resultsSearched: byId('results-searched'),
+  searchAgain: byId<HTMLButtonElement>('search-again'),
+  placeholder: byId('route-placeholder'),
   resultsEmpty: byId('results-empty'),
   insights: byId('insights'),
   appHint: byId('app-hint'),
@@ -114,6 +124,9 @@ const formatMoney = (amount: number) => money.format(amount);
 const listOf = new Intl.ListFormat(LOCALE, { type: 'conjunction' });
 const dayFormat = new Intl.DateTimeFormat(LOCALE, { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
 const countFormat = new Intl.NumberFormat(LOCALE);
+const searchedFormat = new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+// The home page keeps the address on its #search section; /search has no such anchor.
+const SHARE_HASH = document.getElementById('search') ? '#search' : '';
 const formatDay = (iso: string) => dayFormat.format(new Date(`${iso}T00:00:00Z`));
 
 const picker = new RangePicker({
@@ -163,6 +176,7 @@ function storage(): Storage | undefined {
 }
 
 const save = (saved: Saved) => storage()?.setItem(WEB_SEARCH.storageKey, JSON.stringify(saved));
+const forget = () => storage()?.removeItem(WEB_SEARCH.storageKey);
 
 function parseJson(raw: string): unknown {
   try {
@@ -197,7 +211,7 @@ function load(): Saved | undefined {
   if (!raw) return undefined;
   const saved = parseJson(raw);
   if (isSaved(saved)) return saved;
-  storage()?.removeItem(WEB_SEARCH.storageKey);
+  forget();
   return undefined;
 }
 
@@ -287,20 +301,26 @@ function defaultWindow() {
   return { from, to: addDays(from, WEB_SEARCH.windowDays) };
 }
 
-function setupForm(cookies: Map<string, string>) {
+function setupForm(cookies: Map<string, string>): Prefs {
   names = new Map(meta.places.map((p) => [p.code, p.name]));
   money = new Intl.NumberFormat(LOCALE, { style: 'currency', currency: meta.currency });
-  const prefs = fillPrefs(new URLSearchParams(location.search), cookies, (code) => names.has(code));
+  const limits = { maxNights: meta.limits.max_nights, maxWindowDays: meta.limits.max_window_days };
+  const prefs = fillPrefs(new URLSearchParams(location.search), cookies, (code) => names.has(code), limits);
   setPlace('from', prefs.from.value);
   setPlace('back', prefs.back.value);
   cities = prefs.cities.value.slice(0, maxCities());
   for (const field of ['from', 'back', 'cities'] as const) remembered(field, prefs[field].source === 'cookie');
+  const dates = prefs.dates.value;
+  if (dates && dates.from >= localToday()) picker.set(dates);
+  if (prefs.nights.value) nights = prefs.nights.value;
   renderCities();
   renderNights();
   renderQuota();
+  return prefs;
 }
 
 function fillForm(r: SearchRequest) {
+  for (const field of ['from', 'back', 'cities'] as const) remembered(field, false);
   setPlace('from', r.start);
   setPlace('back', finishOf(r));
   cities = r.cities.slice(0, maxCities());
@@ -338,17 +358,36 @@ function stopPolling() {
   pollTimer = undefined;
 }
 
-function clearOutcome() {
+const writeUrl = (request: SearchRequest) => history.replaceState(history.state, '', shareUrl(location.pathname, request, SHARE_HASH));
+
+// aria-busy keeps the live results region quiet while its placeholders swap, so only the outcome is announced.
+function setSearching(on: boolean) {
+  el.results.classList.toggle('searching', on);
+  el.results.setAttribute('aria-busy', String(on));
+}
+
+// The table stays on the page: before any search it shows the empty state, while one runs its placeholders pulse.
+function showPlaceholder(searching: boolean) {
+  for (const node of [el.resultsTitle, el.resultsTrip, el.resultsShared, el.resultsEmpty, el.insights, el.appHint, el.more, el.coverage]) {
+    node.hidden = true;
+  }
+  el.routeRows.replaceChildren();
+  el.placeholder.hidden = false;
+  setSearching(searching);
+}
+
+function clearOutcome(searching = false) {
   stopPolling();
   el.problem.hidden = true;
-  el.results.hidden = true;
   el.upsell.hidden = true;
   el.progress.hidden = true;
+  showPlaceholder(searching);
 }
 
 function showProblem(message: string, retry?: () => void, upsell = false) {
   stopPolling();
   el.progress.hidden = true;
+  setSearching(false);
   el.submit.disabled = false;
   el.problemText.textContent = message;
   retryAction = retry;
@@ -415,6 +454,7 @@ function legRows(row: RouteRow): HTMLElement[] {
       '.leg-from-code': leg.fromCode,
       '.leg-to': leg.to,
       '.leg-to-code': leg.toCode,
+      '.leg-nights': leg.nights ? count(TEXT.nights, leg.nights) : '',
       '.leg-carrier': leg.carrier,
       '.leg-stops': leg.stops ? count(MESSAGES.stops, leg.stops) : MESSAGES.direct,
       '.leg-price': leg.price,
@@ -484,8 +524,9 @@ function pushAds() {
 
 function renderResults(view: SearchView, request: SearchRequest) {
   const { rows, more } = routeRows(view, { name: nameOf, money: formatMoney, day: formatDay });
-  el.resultsTitle.textContent = rows.length ? count(MESSAGES.found, rows.length) : MESSAGES.none;
-  el.resultsTrip.textContent = tripLine(request);
+  showText(el.resultsTitle, rows.length ? count(MESSAGES.found, rows.length) : MESSAGES.none);
+  showText(el.resultsTrip, tripLine(request));
+  el.resultsShared.hidden = true;
   el.resultsEmpty.hidden = rows.length > 0;
   showText(el.insights, view.insights ? insightsLine(view.insights) : '');
   showText(el.appHint, appHintLine(view.app_hint, view.routes[0]?.price, formatMoney, TEXT.nudges.appHint) ?? '');
@@ -494,15 +535,48 @@ function renderResults(view: SearchView, request: SearchRequest) {
   el.more.hidden = more <= 0;
   showText(el.coverage, coverageLine(view.sources));
 
+  el.placeholder.hidden = true;
+  setSearching(false);
   el.progress.hidden = true;
-  el.results.hidden = false;
   el.upsell.hidden = !(more > 0 || rows.some((r) => r.kind !== 'full'));
   el.submit.disabled = false;
+  writeUrl(request);
   pushAds();
 }
 
+function searchedLine(at: string | null | undefined): string {
+  const date = at ? new Date(at) : undefined;
+  return date && !Number.isNaN(date.getTime()) ? fill(MESSAGES.searchedOn, { date: searchedFormat.format(date) }) : '';
+}
+
+// A stored result someone shared: shown as it was found, with its time and a way to run it afresh.
+function showShared(view: SearchView, request: SearchRequest) {
+  renderResults(view, request);
+  el.resultsSearched.textContent = searchedLine(view.searched_at);
+  el.resultsShared.hidden = false;
+}
+
+// A finished hit is rendered as it is and never polled: after an API restart its id is gone. An identical search
+// still running is polled like the visitor's own, but never re-run unasked if it is lost.
+async function showLookup(view: SearchView, request: SearchRequest): Promise<void> {
+  if (!ACTIVE.includes(view.status)) return showShared(view, request);
+  const saved = { id: view.id, request };
+  save(saved);
+  return resume(saved, true);
+}
+
+// Submitting is held while the lookup runs, so a late answer cannot replace a search the visitor just started.
+async function openShared(request: SearchRequest): Promise<void> {
+  showPlaceholder(true);
+  el.submit.disabled = true;
+  const outcome = await lookupShared(request);
+  if (outcome.kind === 'hit') return showLookup(outcome.view, request);
+  el.submit.disabled = false;
+  showPlaceholder(false);
+}
+
 function resume(saved: Saved, resubmitted = false): Promise<void> {
-  clearOutcome();
+  clearOutcome(true);
   el.submit.disabled = true;
   renderReconnecting();
   return poll(saved, resubmitted);
@@ -520,9 +594,18 @@ async function poll(saved: Saved, resubmitted: boolean, failures = 0): Promise<v
       pollTimer = setTimeout(() => poll(saved, resubmitted, failures + 1), WEB_SEARCH.pollRetryBaseMs * 2 ** failures);
       return;
     }
-    // Resubmit unasked only a search lost mid-run (an API restart): never spend a free search
-    // re-running one already shown, nor one whose dates have passed.
-    const current = saved.request.date_from >= localToday();
+    // A stored result first; then resubmit unasked only a search lost mid-run (an API restart): never spend a
+    // free search re-running one already shown, nor one whose dates have passed.
+    const current = canLookup(saved.request, localToday());
+    if (current) {
+      const shared = await lookupShared(saved.request);
+      const lostAgain = shared.kind === 'hit' && ACTIVE.includes(shared.view.status) && shared.view.id === saved.id;
+      if (shared.kind === 'hit' && !lostAgain) {
+        // Drop the lost id: a finished hit is not saved, so a reload looks the trip up again.
+        forget();
+        return showLookup(shared.view, saved.request);
+      }
+    }
     if (!resubmitted && !saved.finished && current) return submit(saved.request, true);
     return showProblem(MESSAGES.expired, current ? searchAgain : undefined);
   }
@@ -540,7 +623,8 @@ async function poll(saved: Saved, resubmitted: boolean, failures = 0): Promise<v
 
 async function submit(request: SearchRequest, resubmitted = false): Promise<void> {
   const retry = () => submit(request, resubmitted);
-  clearOutcome();
+  clearOutcome(true);
+  writeUrl(request);
   el.submit.disabled = true;
   renderProgress({ status: 'fetching', done: 0, total: 0, eta_s: null });
 
@@ -578,11 +662,62 @@ async function submit(request: SearchRequest, resubmitted = false): Promise<void
   }
 }
 
-function showRotation(cookies: Map<string, string>) {
-  const { index, next } = rotation(cookies.get(PREFS.nudge.cookie), TEXT.nudges.rotation.length);
-  el.nudge.textContent = TEXT.nudges.rotation[index];
-  [...el.nudgeDots.children].forEach((dot, i) => dot.classList.toggle('on', i === index));
+// The strip starts on the tip after the last page view's, then rotates while it is on screen and unattended.
+function setupStrip(cookies: Map<string, string>) {
+  const tips = TEXT.nudges.rotation;
+  const { index, next } = rotation(cookies.get(PREFS.nudge.cookie), tips.length);
   document.cookie = cookieString(PREFS.nudge, String(next));
+  const dots = [...el.nudgeDots.querySelectorAll<HTMLButtonElement>('button')];
+  el.nudgeDots.hidden = false;
+  const paint = (i: number) => {
+    el.nudge.textContent = tips[i];
+    dots.forEach((dot, j) => {
+      if (j === i) dot.setAttribute('aria-current', 'true');
+      else dot.removeAttribute('aria-current');
+    });
+  };
+  paint(index);
+
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ticker = new Ticker({
+    count: tips.length,
+    intervalMs: WEB_SEARCH.nudgeMs,
+    reducedMotion: reduced,
+    start: index,
+    onChange: (i, manual) => {
+      if (manual) el.nudge.setAttribute('aria-live', 'polite');
+      paint(i);
+      el.nudge.classList.remove('swap');
+      // Reading the layout between remove and add restarts the swap animation.
+      void el.nudge.offsetWidth;
+      el.nudge.classList.add('swap');
+    },
+  });
+  ticker.pause('offscreen');
+  el.nudgeDots.addEventListener('click', (event) => {
+    const dot = (event.target as Element).closest<HTMLButtonElement>('[data-tip]');
+    if (dot) ticker.show(Number(dot.dataset.tip));
+  });
+  el.strip.addEventListener('mouseenter', () => ticker.pause('hover'));
+  el.strip.addEventListener('mouseleave', () => ticker.resume('hover'));
+  el.strip.addEventListener('focusin', () => ticker.pause('focus'));
+  el.strip.addEventListener('focusout', (event) => {
+    if (!el.strip.contains(event.relatedTarget as Node | null)) ticker.resume('focus');
+  });
+  const onVisibility = () => (document.hidden ? ticker.pause('hidden') : ticker.resume('hidden'));
+  document.addEventListener('visibilitychange', onVisibility);
+  onVisibility();
+
+  if (!('IntersectionObserver' in window)) return ticker.resume('offscreen');
+  if (!reduced) el.strip.classList.add('pending');
+  new IntersectionObserver(
+    ([entry]) => {
+      if (!entry.isIntersecting) return ticker.pause('offscreen');
+      el.strip.classList.remove('pending');
+      ticker.resume('offscreen');
+    },
+    { threshold: 0.5 },
+  ).observe(el.strip);
 }
 
 const cityBox = placeBox(el.city, el.cityList, (p) => addCity(p.code), () =>
@@ -654,6 +789,8 @@ el.form.addEventListener('input', () => {
 
 el.retry.addEventListener('click', () => retryAction?.());
 
+el.searchAgain.addEventListener('click', () => el.form.requestSubmit());
+
 function closeNotifyAsk() {
   askedToNotify = true;
   el.notifyAsk.hidden = true;
@@ -673,19 +810,25 @@ async function init(): Promise<void> {
   } catch {
     return showProblem(MESSAGES.metaDown, () => void init());
   }
-  setupForm(parseCookies(document.cookie));
+  const prefs = setupForm(parseCookies(document.cookie));
   el.loading.hidden = true;
   el.fields.disabled = false;
 
+  // A shared link names the whole trip: the session's own search wins only when it is that same trip. A link
+  // whose trip has started only pre-fills the places and nights; setupForm skips its past dates.
+  const shared = sharedRequest(prefs, crypto.randomUUID());
   const saved = load();
-  if (saved) {
+  if (saved && (!shared || sameSearch(saved.request, shared))) {
     fillForm(saved.request);
-    void resume(saved);
+    return resume(saved);
   }
+  if (!shared || !canLookup(shared, localToday())) return;
+  fillForm(shared);
+  return openShared(shared);
 }
 
 glideLinks('search');
-showRotation(parseCookies(document.cookie));
+setupStrip(parseCookies(document.cookie));
 picker.set(defaultWindow());
 renderNights();
 void init();

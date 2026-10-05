@@ -11,6 +11,7 @@
 - [Spec 002 - Privacy: feedback form](specs/002-privacy-feedback.md): `/privacy` Section 8, linked Email Address and Customer Support
 - [Spec 003 - Search on home, results table, nudges](specs/003-search-home-table-nudges.md): `#search` on `/`, custom controls, cookies, notifications, consent-gated ads, light/dark map
 - [Spec 004 - Eight languages, analytics behind consent](specs/004-localization-and-analytics.md): `/de` … `/pt` for home, `/search` and `/guides`, canonicals and hreflang, GA4 after Accept
+- [Spec 005 - Compact search, shareable links](specs/005-compact-search-and-shared-links.md): nights per leg, two-row form, animated app strip, always-visible table, full trip in the URL, stored results for shared links
 - [PINS](PINS.md): the ffly API contract version the site codes against
 - [Plan - Spec 003](plans/spec-003.md): how spec 003 was built, and its binding deviations
 

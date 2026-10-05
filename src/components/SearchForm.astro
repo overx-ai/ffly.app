@@ -1,5 +1,5 @@
 ---
-import AppSide from './AppSide.astro';
+import AppStrip from './AppStrip.astro';
 import AdSlot from './AdSlot.astro';
 import AppStoreBadge from './AppStoreBadge.astro';
 import PlaceCombo from './PlaceCombo.astro';
@@ -13,11 +13,12 @@ const { lang = DEFAULT_LANG } = Astro.props;
 const { t, fmt } = useLang(lang);
 const w = t.widget;
 const col = w.columns;
+const COLUMNS = ['rank', 'route', 'dates', 'nights', 'flights', 'warn', 'total', 'details'] as const;
 
 const openApp = APP_STORE_URL ?? '#app-side';
 const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" height="10" rx="2"/>';
 ---
-<div class="search-ui" data-i18n={JSON.stringify(w.script)}>
+<div class="search-ui" data-i18n={JSON.stringify({ ...w.script, nights: t.common.nights })}>
   <noscript>
     <div class="card notice">
       <p>{w.noscript}</p>
@@ -25,93 +26,94 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
     </div>
   </noscript>
 
-  <div class="search-grid">
-    <form id="search-form" class="card search-form" novalidate>
-      <p id="search-loading" class="note">{w.loading}</p>
-      <fieldset id="search-fields" class="fields" disabled>
-        <legend class="sr-only">{w.legend}</legend>
+  <form id="search-form" class="card search-form" novalidate>
+    <p id="search-loading" class="note">{w.loading}</p>
+    <fieldset id="search-fields" class="fields" disabled>
+      <legend class="sr-only">{w.legend}</legend>
 
-        <div class="pair">
-          <div class="field">
-            <label id="from-label" for="from">{w.from} <span class="remembered" data-remembered="from" hidden>{w.remembered}</span></label>
-            <PlaceCombo id="from" placeholder={w.typeCity} />
-          </div>
-          <div class="field">
-            <label id="back-label" for="back">{w.back} <span class="remembered" data-remembered="back" hidden>{w.remembered}</span></label>
-            <PlaceCombo id="back" placeholder={w.sameAsFrom} describedBy="back-hint" />
-            <p id="back-hint" class="hint">{w.backHint}</p>
+      <div class="trip-row">
+        <div class="field">
+          <label id="from-label" for="from">{w.from} <span class="remembered" data-remembered="from" hidden>{w.remembered}</span></label>
+          <PlaceCombo id="from" placeholder={w.typeCity} />
+        </div>
+        <div class="field">
+          <label id="back-label" for="back">{w.back} <span class="remembered" data-remembered="back" hidden>{w.remembered}</span></label>
+          <PlaceCombo id="back" placeholder={w.sameAsFrom} describedBy="back-hint" />
+          <p id="back-hint" class="sr-only">{w.backHint}</p>
+        </div>
+        <div class="field">
+          <span id="window-label" class="field-label">{w.window}</span>
+          <div class="popover-anchor">
+            <button id="window" type="button" class="picker" aria-haspopup="dialog" aria-expanded="false" aria-controls="calendar" aria-labelledby="window-label window-text">
+              <span id="window-text"></span>
+            </button>
+            <div id="calendar" class="calendar" role="dialog" aria-labelledby="window-label" hidden>
+              <div class="cal-nav">
+                <button id="cal-prev" type="button" aria-label={w.prevMonth}>&lsaquo;</button>
+                <p class="hint">{w.calendarHint}</p>
+                <button id="cal-next" type="button" aria-label={w.nextMonth}>&rsaquo;</button>
+              </div>
+              <div id="cal-months" class="cal-months"></div>
+            </div>
           </div>
         </div>
+        <fieldset class="field">
+          <legend class="field-label">{w.nights}</legend>
+          <div class="steppers">
+            {[
+              { key: 'min', label: w.atLeast },
+              { key: 'max', label: w.atMost },
+            ].map((s, i) => (
+              <Fragment>
+                {i > 0 && <span class="range-dash" aria-hidden="true">–</span>}
+                <div class="stepper" data-nights={s.key}>
+                  <span id={`${s.key}-nights-label`} class="sr-only">{s.label}</span>
+                  <button type="button" data-step="-1" aria-label={fmt.text(w.fewerNights, { label: s.label })}>&minus;</button>
+                  <output id={`${s.key}-nights`} aria-labelledby={`${s.key}-nights-label`} aria-live="polite"></output>
+                  <button type="button" data-step="1" aria-label={fmt.text(w.moreNights, { label: s.label })}>+</button>
+                </div>
+              </Fragment>
+            ))}
+          </div>
+        </fieldset>
+      </div>
 
+      <div class="cities-row">
         <div class="field">
           <label id="city-label" for="city">
             {w.cities} <span id="city-count" class="count"></span>
             <span class="remembered" data-remembered="cities" hidden>{w.remembered}</span>
           </label>
-          <ul id="cities" class="chips" aria-label={w.cities}></ul>
-          <PlaceCombo id="city" placeholder={w.addCity} describedBy="city-hint" />
-          <p id="city-hint" class="hint">{w.cityHint}</p>
-        </div>
-
-        <div class="pair">
-          <div class="field">
-            <span id="window-label" class="field-label">{w.window}</span>
-            <div class="popover-anchor">
-              <button id="window" type="button" class="picker" aria-haspopup="dialog" aria-expanded="false" aria-controls="calendar" aria-labelledby="window-label window-text">
-                <span id="window-text"></span>
-              </button>
-              <div id="calendar" class="calendar" role="dialog" aria-labelledby="window-label" hidden>
-                <div class="cal-nav">
-                  <button id="cal-prev" type="button" aria-label={w.prevMonth}>&lsaquo;</button>
-                  <p class="hint">{w.calendarHint}</p>
-                  <button id="cal-next" type="button" aria-label={w.nextMonth}>&rsaquo;</button>
-                </div>
-                <div id="cal-months" class="cal-months"></div>
-              </div>
-            </div>
+          <div class="city-box">
+            <ul id="cities" class="chips" aria-label={w.cities}></ul>
+            <PlaceCombo id="city" placeholder={w.addCity} describedBy="city-hint" />
           </div>
-
-          <fieldset class="field">
-            <legend class="field-label">{w.nights}</legend>
-            <div class="steppers">
-              {[
-                { key: 'min', label: w.atLeast },
-                { key: 'max', label: w.atMost },
-              ].map((s) => (
-                <div class="stepper" data-nights={s.key}>
-                  <span id={`${s.key}-nights-label`}>{s.label}</span>
-                  <button type="button" data-step="-1" aria-label={fmt.text(w.fewerNights, { label: s.label })}>&minus;</button>
-                  <output id={`${s.key}-nights`} aria-labelledby={`${s.key}-nights-label`} aria-live="polite"></output>
-                  <button type="button" data-step="1" aria-label={fmt.text(w.moreNights, { label: s.label })}>+</button>
-                </div>
-              ))}
-            </div>
-          </fieldset>
+          <p id="city-hint" class="sr-only">{w.cityHint}</p>
         </div>
-
-        <div class="field">
-          <span class="field-label">{w.inApp}</span>
-          <ul class="locked-chips">
-            {Object.values(w.appOnly).map((o) => (
-              <li>
-                <button type="button" class="locked-chip" data-nudge={o.nudge} aria-pressed="false" aria-controls="chip-nudge">
-                  <svg viewBox="0 0 24 24" aria-hidden="true" set:html={LOCK} />
-                  {o.label}
-                </button>
-              </li>
-            ))}
-          </ul>
-          <p id="chip-nudge" class="chip-nudge" aria-live="polite" hidden></p>
-        </div>
-
-        <p id="form-error" class="form-error" role="alert"></p>
         <button id="submit" class="btn" type="submit">{w.submit}</button>
-        <p id="quota-note" class="note"></p>
-      </fieldset>
-    </form>
+      </div>
 
-    <AppSide lang={lang} />
-  </div>
+      <p id="form-error" class="form-error" role="alert"></p>
+
+      <div class="app-row">
+        <span id="in-app-label" class="field-label">{w.inApp}</span>
+        <ul class="locked-chips" aria-labelledby="in-app-label">
+          {Object.values(w.appOnly).map((o) => (
+            <li>
+              <button type="button" class="locked-chip" data-nudge={o.nudge} aria-pressed="false" aria-controls="chip-nudge">
+                <svg viewBox="0 0 24 24" aria-hidden="true" set:html={LOCK} />
+                {o.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+        <p id="quota-note" class="note"></p>
+      </div>
+      <p id="chip-nudge" class="chip-nudge" aria-live="polite" hidden></p>
+    </fieldset>
+  </form>
+
+  <AppStrip lang={lang} />
 
   <div id="problem" class="card problem" role="alert" hidden>
     <p id="problem-text"></p>
@@ -135,9 +137,13 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
     </div>
   </section>
 
-  <section id="results" class="results" aria-labelledby="results-title" aria-live="polite" hidden>
-    <h2 id="results-title"></h2>
-    <p id="results-trip" class="note"></p>
+  <section id="results" class="results" aria-labelledby="results-title" aria-live="polite">
+    <h2 id="results-title" hidden>{w.emptyState}</h2>
+    <p id="results-trip" class="note" hidden></p>
+    <p id="results-shared" class="shared-line" hidden>
+      <span id="results-searched"></span>
+      <button id="search-again" type="button" class="btn btn-soon">{w.searchAgain}</button>
+    </p>
     <p id="results-empty" class="note" hidden>{w.empty}</p>
     <p id="insights" class="insights" hidden></p>
     <p id="app-hint" class="app-hint" hidden></p>
@@ -145,16 +151,17 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
       <table class="results-table">
         <thead>
           <tr>
-            <th scope="col">{col.rank}</th>
-            <th scope="col">{col.route}</th>
-            <th scope="col">{col.dates}</th>
-            <th scope="col">{col.nights}</th>
-            <th scope="col">{col.flights}</th>
-            <th scope="col">{col.warn}</th>
-            <th scope="col">{col.total}</th>
-            <th scope="col"><span class="sr-only">{col.details}</span></th>
+            {COLUMNS.map((c) => <th scope="col">{c === 'details' ? <span class="sr-only">{col[c]}</span> : col[c]}</th>)}
           </tr>
         </thead>
+        <tbody id="route-placeholder" class="placeholder">
+          <tr class="placeholder-note"><td colspan={COLUMNS.length}>{w.emptyState}</td></tr>
+          {[1, 2].map(() => (
+            <tr class="skeleton" aria-hidden="true">
+              {COLUMNS.map((c) => <td class={c}><i class="bone"></i></td>)}
+            </tr>
+          ))}
+        </tbody>
         <tbody id="route-rows"></tbody>
       </table>
     </div>
@@ -203,11 +210,12 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
 
 <template id="leg-row-template">
   <tr class="leg-row" hidden>
-    <td colspan="8">
+    <td colspan={COLUMNS.length}>
       <div class="leg">
         <span class="leg-day"></span>
         <span class="leg-time"></span>
         <span class="leg-path"><span class="leg-from"></span> <code class="leg-from-code"></code> &rarr; <span class="leg-to"></span> <code class="leg-to-code"></code></span>
+        <span class="leg-nights"></span>
         <span class="leg-carrier"></span>
         <span class="leg-stops"></span>
         <span class="leg-price"></span>

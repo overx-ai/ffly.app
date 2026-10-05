@@ -170,7 +170,7 @@ const en = {
 
   appSide: {
     title: 'More in the app',
-    trips: 'Trips',
+    dot: 'Tip {n} of {total}',
   },
 
   widget: {
@@ -210,6 +210,8 @@ const en = {
     notifyYes: 'Notify me',
     notifyNo: 'Not now',
     empty: 'Try a wider travel window or a different number of nights.',
+    emptyState: 'Your routes will appear here',
+    searchAgain: 'Search again',
     columns: {
       rank: '#',
       route: 'Route',
@@ -249,6 +251,7 @@ const en = {
         network: `Could not reach ${APP.name}. Check your connection and try again.`,
         failed: 'This search did not finish. Try again in a moment.',
         expired: 'This search has expired. Run it again.',
+        searchedOn: 'Searched {date}',
         metaDown: 'Could not load the list of cities. Check your connection and try again.',
         fetching: 'Checking fares',
         planning: 'Working out the best order',

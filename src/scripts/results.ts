@@ -20,6 +20,7 @@ export interface LegRow {
   stops: number;
   price: string;
   link: string | undefined;
+  nights?: number;
 }
 
 export interface RouteRow {
@@ -58,7 +59,8 @@ export function safeLink(url: string | null | undefined): string | undefined {
   }
 }
 
-const legRow = (leg: Leg, f: Format): LegRow => ({
+// nights[i] is the stay at leg i's destination, so the flight back has none.
+const legRow = (leg: Leg, f: Format, nights: number | undefined): LegRow => ({
   day: leg.day ? f.day(leg.day) : '',
   time: [leg.dep, leg.arr].filter(Boolean).join('–'),
   from: f.name(leg.from_place),
@@ -69,6 +71,7 @@ const legRow = (leg: Leg, f: Format): LegRow => ({
   stops: leg.stops,
   price: leg.price != null ? f.money(leg.price) : '',
   link: safeLink(leg.link),
+  nights,
 });
 
 function kindOf(route: Route): RouteRow['kind'] {
@@ -90,7 +93,7 @@ function routeRow(route: Route, rank: number, f: Format): RouteRow {
     warnings: warningsOf(legs),
     total: f.money(route.price),
     nCities: route.n_cities,
-    legs: legs.map((l) => legRow(l, f)),
+    legs: legs.map((l, i) => legRow(l, f, route.nights?.[i])),
   };
 }
 

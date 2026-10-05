@@ -72,6 +72,7 @@ export const WEB_SEARCH = {
   minNights: 2,
   maxNights: 4,
   placeMatches: 8,
+  nudgeMs: 5000,
   earlyBefore: '07:00',
   lateFrom: '23:00',
 } as const;

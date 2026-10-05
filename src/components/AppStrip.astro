@@ -1,0 +1,90 @@
+---
+import AppStoreBadge from './AppStoreBadge.astro';
+import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
+
+interface Props { lang?: Lang; }
+
+const { lang = DEFAULT_LANG } = Astro.props;
+const { t, fmt } = useLang(lang);
+const { nudges } = t.widget.script;
+const total = nudges.rotation.length;
+---
+<aside id="app-side" class="app-strip" aria-label={t.appSide.title}>
+  <img class="strip-icon" src="/icon-64.webp" width="40" height="40" alt="" />
+  <div class="strip-text">
+    <p class="nudge-line"><span id="nudge" class="nudge" aria-live="off">{nudges.rotation[0]}</span></p>
+    <p class="price-line">{nudges.priceLine}</p>
+  </div>
+  <ol id="nudge-dots" class="dots" hidden>
+    {nudges.rotation.map((_, i) => (
+      <li>
+        <button type="button" data-tip={i} aria-current={i === 0 ? 'true' : undefined} aria-label={fmt.text(t.appSide.dot, { n: i + 1, total })}></button>
+      </li>
+    ))}
+  </ol>
+  <AppStoreBadge lang={lang} />
+</aside>
+
+<style>
+  .app-strip {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm) var(--space-md);
+    padding: 10px var(--space-md);
+    background: var(--night);
+    color: var(--on-night);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    --store-bg: var(--on-night);
+    --store-ink: var(--night);
+    scroll-margin-top: var(--header-height);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .app-strip.pending { opacity: 0; transform: translateY(16px); }
+  .strip-icon { flex: none; border-radius: 10px; }
+  .strip-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .nudge-line { overflow: hidden; font: 700 16px/1.3 var(--font-display); }
+  .nudge { display: inline-block; }
+  .nudge.swap { animation: nudge-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  @keyframes nudge-in {
+    from { opacity: 0; transform: translateY(0.8em); }
+    to { opacity: 1; transform: none; }
+  }
+  .price-line { font-size: 13px; font-weight: 600; color: var(--navy-haze); }
+  .dots { list-style: none; margin: 0; padding: 0; display: flex; flex: none; }
+  .dots button {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+  .dots button::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-pill);
+    background: var(--navy-edge);
+    transition: width 0.3s ease, background-color 0.3s ease;
+  }
+  .dots button[aria-current="true"]::before { width: 16px; background: var(--gold); }
+  .dots button:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; border-radius: var(--radius-sm); }
+  .app-strip :global(.store) { flex: none; padding: 8px 14px; font-size: 13px; min-height: 36px; }
+
+  @media (pointer: coarse) {
+    .app-strip :global(.store) { min-height: 44px; }
+  }
+  @media (max-width: 760px) {
+    .app-strip { flex-wrap: wrap; column-gap: var(--space-sm); padding-inline: 12px; }
+    .strip-text { flex-basis: calc(100% - 56px); }
+    .dots { order: 1; }
+    .app-strip :global(.store) { margin-left: auto; order: 2; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .app-strip, .dots button::before { transition: none; }
+    .nudge.swap { animation: none; }
+  }
+</style>

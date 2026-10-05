@@ -72,7 +72,15 @@ describe('routeRows', () => {
       stops: 1,
       price: '€40',
       link: 'https://example.com/book?marker=1',
+      nights: 3,
     });
+  });
+
+  it('gives each leg the nights at its destination, and none to the flight back', () => {
+    const [row] = routeRows(view([full]), format).rows;
+    expect(row.legs.map((l) => l.nights)).toEqual([2, 3, undefined]);
+    const noNights: Route = { ...full, nights: null };
+    expect(routeRows(view([noNights]), format).rows[0].legs.map((l) => l.nights)).toEqual([undefined, undefined, undefined]);
   });
 
   it('locks the tail, and counts more routes only beyond the locked rows shown', () => {

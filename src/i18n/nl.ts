@@ -164,7 +164,7 @@ const nl = {
 
   appSide: {
     title: 'Meer in de app',
-    trips: 'Reizen',
+    dot: 'Tip {n} van {total}',
   },
 
   widget: {
@@ -204,6 +204,8 @@ const nl = {
     notifyYes: 'Laat het me weten',
     notifyNo: 'Niet nu',
     empty: 'Probeer een ruimere reisperiode of een ander aantal nachten.',
+    emptyState: 'Je routes verschijnen hier',
+    searchAgain: 'Zoek opnieuw',
     columns: {
       rank: '#',
       route: 'Route',
@@ -242,6 +244,7 @@ const nl = {
         network: `Kan ${APP.name} niet bereiken. Controleer je verbinding en probeer het opnieuw.`,
         failed: 'Deze zoekopdracht is niet voltooid. Probeer het zo opnieuw.',
         expired: 'Deze zoekopdracht is verlopen. Start hem opnieuw.',
+        searchedOn: 'Gezocht op {date}',
         metaDown: 'Kan de lijst met steden niet laden. Controleer je verbinding en probeer het opnieuw.',
         fetching: 'Prijzen checken',
         planning: 'Beste volgorde bepalen',

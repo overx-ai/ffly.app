@@ -57,7 +57,7 @@ export const SUPPORT_FAQ: readonly FaqItem[] = [
     question: 'How do I delete my data?',
     answer: `<p>ffly has no account. Swipe a trip in the Trips list to delete it, and uninstall the app to clear
       the rest of the data on your device, except the free-search counter, which stays on your iPhone after you
-      uninstall. Your searches are deleted within ${SERVICE.searchRetentionHours} hours. Apple, and the service that
+      uninstall. Your searches in the app are deleted within ${SERVICE.searchRetentionHours} hours. Apple, and the service that
       manages ${APP.proName} purchases for us, keep purchase records as needed for refunds and accounting.</p>
       <p>To delete feedback you sent, and the email address if you added one, write to ${mailto(CONTACT_EMAIL)} from
       that address or tell us roughly when you sent it, as

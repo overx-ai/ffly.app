@@ -1,7 +1,8 @@
 import { FFLY_API_BASE, WEB_SEARCH } from '../app';
 
-// Wire shapes of ffly API contract 1.3.0 (1B-bots apps/ffly-api/contract/openapi.json, spec 533), only the
-// fields this page reads. The web channel gets routes 1-3 in full and a locked tail, so most fields are optional.
+// Wire shapes of ffly API contract 1.3.0 (1B-bots apps/ffly-api/contract/openapi.json, spec 533), plus the
+// shared-search lookup of 1.5.0 (spec 535), only the fields this page reads. The web channel gets routes 1-3 in
+// full and a locked tail, so most fields are optional.
 
 export interface Place {
   code: string;
@@ -86,6 +87,7 @@ export interface SearchView {
   sources?: { source: string; status: 'ok' | 'partial' | 'unavailable' }[] | null;
   more_routes?: number;
   app_hint?: { price: number } | null;
+  searched_at?: string | null;
 }
 
 // The web sends the trip only: priority, filters (stops, excluded, pinned) and schedule are app-only (422 app_only).
@@ -146,5 +148,34 @@ export async function createSearch(request: SearchRequest): Promise<SubmitOutcom
       return { kind: body.reason === 'web_unavailable' ? 'web_unavailable' : 'busy' };
     default:
       return { kind: 'error' };
+  }
+}
+
+export type SharedOutcome = { kind: 'hit'; view: SearchView } | { kind: 'miss' };
+
+export const canLookup = (request: SearchRequest, today: string) => request.date_from >= today;
+
+// Lists go comma-separated and readable (cities=MAD,AMS), as in the app's share link and the shared lookup.
+export const commaQuery = (pairs: [string, string][]) =>
+  pairs.map(([key, value]) => `${key}=${encodeURIComponent(value).replace(/%2C/g, ',')}`).join('&');
+
+// A stored web search, free of quota: a finished result, or an identical search still running (poll it by id).
+// Anything else (an older API's 404 or 405, a 422, a CORS or network failure) is a miss: the caller only pre-fills.
+export async function lookupShared(request: SearchRequest): Promise<SharedOutcome> {
+  const query = commaQuery([
+    ['start', request.start],
+    ['ends', request.ends.join(',')],
+    ['cities', request.cities.join(',')],
+    ['date_from', request.date_from],
+    ['date_to', request.date_to],
+    ['min_nights', String(request.min_nights)],
+    ['max_nights', String(request.max_nights)],
+  ]);
+  try {
+    const view = await getJson<SearchView>(`/searches/shared?${query}`);
+    const usable = typeof view.id === 'string' && Array.isArray(view.routes) && (view.status === 'done' || ACTIVE.includes(view.status));
+    return usable ? { kind: 'hit', view } : { kind: 'miss' };
+  } catch {
+    return { kind: 'miss' };
   }
 }
