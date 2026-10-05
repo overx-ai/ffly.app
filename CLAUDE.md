@@ -50,7 +50,8 @@ Those repos are the source of truth for copy, colours and claims.
   feedback form, ios-ffly spec 012); none tracking. Change one, change all, plus the App Store
   Connect privacy answers. Retention (24 h jobs) is from the API config.
   Feedback goes to 1B-bots `shared/form-aggregator` (database, logs, Telegram chat), which has no
-  retention job: never state a number of days for it. Its facts are `FEEDBACK` in `src/app.ts`.
+  retention job: never state a number of days for it. The one feedback figure on the site, the app's
+  offline queue expiry (ios-ffly `FeedbackQueueRules`), is `FEEDBACK` in `src/app.ts`.
 - **Legal pages name recipients by category, never by vendor, and describe no mechanics.** Apple is the
   only company named; everyone else is "our subscription provider", "a messaging service our team uses to
   read feedback", "our hosting providers", "a booking partner". No hosts, endpoints, storage or restart
@@ -85,7 +86,7 @@ Those repos are the source of truth for copy, colours and claims.
 - **Value, not mechanics**, on every page: no cache, Keychain, server, memory, database, background,
   bundle id, endpoints or the API host, nor search limits such as "up to 8" cities. `MECHANICS` and
   `COPY_BANS` in `scripts/check-legal.mjs` ban them on every page (legal included), in `llms.txt`, and,
-  except the API host and "HTTPS", in the JS bundle.
+  except the API host, its URL and "HTTPS", in the JS bundle.
 - **No em dashes in published copy.** British spelling, and `LOCALE` (`en-GB`) for every date and number.
   `npm test` fails on an em dash or "unlimited" on any page or in `llms.txt`.
 

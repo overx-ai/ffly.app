@@ -55,18 +55,13 @@ export const CONTACT_EMAIL = 'support@overx.ai';
 
 export const SERVICE = {
   apiHost: 'api.overx.ai',
-  analyticsHost: 'analytics.overx.ai',
   searchRetentionHours: 24,
-  entitlementCacheMinutes: 10,
 } as const;
 
 export const FFLY_API_BASE = `https://${SERVICE.apiHost}/ffly`;
 
-// The in-app feedback form (ios-ffly spec 012): OverX's form-aggregator, and the app's offline queue
-// (FeedbackQueueRules). form-aggregator has no retention job, so there is no retention figure here.
+// The app's offline feedback queue (ios-ffly FeedbackQueueRules.expiry): an unsent message is dropped after this.
 export const FEEDBACK = {
-  serviceHost: `${SERVICE.apiHost}/forms`,
-  queuedMessages: 20,
   queuedDays: 7,
 } as const;
 
@@ -95,9 +90,6 @@ export const EXTERNAL = {
   appleEula: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
   applePrivacy: 'https://www.apple.com/legal/privacy/',
   appleRefund: 'https://reportaproblem.apple.com',
-  revenueCatPrivacy: 'https://www.revenuecat.com/privacy',
-  telegramPrivacy: 'https://telegram.org/privacy',
-  vercelPrivacy: 'https://vercel.com/legal/privacy-policy',
 } as const;
 
 export const mailto = (email: string) => `<a href="mailto:${email}">${email}</a>`;

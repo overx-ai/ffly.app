@@ -47,6 +47,10 @@ check(/up to a week old and show no checked time/.test(terms('prices')), 'Terms:
 check(/at no extra cost/.test(terms('not-a-travel-agent')), 'Terms: partner links must disclose the commission');
 
 const privacy = readPage('privacy');
+// GDPR Art. 13: plain-language rewrites must keep every required disclosure.
+for (const id of ['who-we-are', 'legal-bases', 'sharing', 'security', 'retention', 'rights', 'children', 'changes', 'contact']) privacy(id);
+check(/Standard Contractual Clauses/.test(privacy('security')), 'Privacy: international transfers must name their safeguard');
+check(/data protection authority/.test(privacy('rights')), 'Privacy: rights must include complaining to a data protection authority');
 const labels = privacy('app-store-labels');
 const linked = labels.match(/Data linked to you:(.*?)Data not linked to you:/)?.[1] ?? '';
 const notLinked = labels.match(/Data not linked to you:(.*)$/)?.[1] ?? '';
@@ -148,14 +152,15 @@ const BUNDLE_COPY = { 'coverage notice': "Some fares couldn't be checked right n
 const bannedTerm = (term) => new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i');
 const MECHANICS = [
   ...['AZair', 'Aviasales', 'Travelpayouts', 'RevenueCat', 'Telegram', 'Vercel'].map((name) => [name, `the vendor ${name}`]),
-  ...['cache', 'Keychain', 'server', 'memory', 'database', 'restart', 'endpoint', 'background', 'bundle id', 'install id', 'request id', 'ai.overx.ffly', 'overx.ai/']
+  ...['cache', 'Keychain', 'server', 'memory', 'database', 'restart', 'endpoint', 'background', 'bundle id', 'install id', 'request id', 'ai.overx.ffly']
     .map((term) => [term, `the technical term "${term}"`]),
   ...['up to 8', 'up to 3 places', 'must or a maybe'].map((phrase) => [phrase, `the mechanics phrase "${phrase}"`]),
 ].map(([term, what]) => [bannedTerm(term), what]);
-// The search bundle calls the API host and every page links https:// URLs, so these are banned in copy only.
+// The search bundle builds the API URL and every page links https:// URLs, so these are banned in copy only.
 const COPY_BANS = [
   ...MECHANICS,
   ...connectHosts.map((host) => [bannedTerm(host), `the API host ${host}`]),
+  [bannedTerm('overx.ai/'), 'an API URL under overx.ai/'],
   [/\bHTTPS(?!:\/\/)/i, 'the technical term "HTTPS"'],
 ];
 for (const [what, copy] of Object.entries(BUNDLE_COPY)) {
@@ -170,7 +175,8 @@ for (const [where, text] of [['llms.txt', llms], ...htmlPages]) {
   check(!/unlimited/i.test(text), `${where}: Pro is never "unlimited"`);
 }
 const copyPages = [['llms.txt', copyText(llms)], ...htmlPages.map(([file, html]) => [file, copyText(withoutCss(html))])];
-for (const [where, text, banned] of [['Search bundle', bundle, MECHANICS], ...copyPages.map((page) => [...page, COPY_BANS])]) {
+const banScans = [['Search bundle', bundle, MECHANICS], ...copyPages.map(([where, text]) => [where, text, COPY_BANS])];
+for (const [where, text, banned] of banScans) {
   for (const [pattern, what] of banned) {
     check(!pattern.test(text), `${where}: must not name ${what}`);
   }

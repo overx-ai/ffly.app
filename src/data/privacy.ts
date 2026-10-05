@@ -1,4 +1,4 @@
-import { APP, CONTACT_EMAIL, EXTERNAL, OPERATOR, SERVICE, SITE_HOST, externalLink, mailto } from '../app';
+import { APP, CONTACT_EMAIL, EXTERNAL, FEEDBACK, OPERATOR, SERVICE, SITE_HOST, externalLink, mailto } from '../app';
 import { pathFor } from '../site-pages';
 import type { LegalDocument } from './types';
 
@@ -91,8 +91,8 @@ export const PRIVACY: LegalDocument = {
       title: 'Anonymous Usage Analytics',
       content: `
         <p>ffly sends us usage events such as searches, purchases and onboarding steps. Each event comes with the
-        app and iOS version, the device model, your language and region settings, whether you're on Free or
-        ${APP.proName}, device identifiers that are not the advertising identifier, and a random session
+        app and iOS version, the device model, your language, region and time zone settings, whether you're on
+        Free or ${APP.proName}, device identifiers that are not the advertising identifier, and a random session
         identifier.</p>
         <p>Analytics never include the places you search, your travel dates, the text of your feedback or any
         contact detail. They are not linked to you and are never used for tracking or advertising.</p>`,
@@ -112,7 +112,8 @@ export const PRIVACY: LegalDocument = {
         </ul>
         <p>We use it only to read and answer your message and to fix what you report. We store it with the IP
         address it came from, and a copy goes to a messaging service our team uses to read feedback. If you're
-        offline, the message waits on your iPhone and is sent once ffly can connect.</p>
+        offline, the message waits on your iPhone for up to ${FEEDBACK.queuedDays} days and is sent once ffly can
+        connect.</p>
         <p>Feedback is linked to you. If you'd rather not be contacted, leave the email field empty. To delete
         feedback and the email address you gave, write to ${mailto(CONTACT_EMAIL)}. Write from that address, or
         tell us roughly when you sent it, so we can find it.</p>`,

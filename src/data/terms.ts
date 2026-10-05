@@ -36,7 +36,7 @@ export const TERMS: LegalDocument = {
         using ffly you agree to these Terms. If you do not agree, do not use ffly.</p>
         <p>ffly is licensed to you under Apple's
         ${externalLink(EXTERNAL.appleEula, 'Licensed Application End User License Agreement (Standard EULA)')},
-        which these Terms supplement. Where these Terms and the Standard EULA conflict about the license to the app,
+        which these Terms supplement. Where these Terms and the Standard EULA conflict about the licence to the app,
         the Standard EULA prevails.</p>`,
     },
     {
@@ -139,8 +139,8 @@ export const TERMS: LegalDocument = {
       content: `
         <p>You agree not to:</p>
         <ul>
-          <li>use ffly, or its results, other than through the ffly app or ${SITE_HOST}, or scrape, crawl or resell
-          ffly's results;</li>
+          <li>use ffly other than through the ffly app or ${SITE_HOST}, or scrape, crawl or resell ffly's
+          results;</li>
           <li>work around search limits, the Free tier's hidden results, or any security measure;</li>
           <li>reverse engineer the app, except where the law allows it;</li>
           <li>use ffly for any unlawful purpose or in a way that could harm ffly, its users or the websites it
@@ -160,7 +160,7 @@ export const TERMS: LegalDocument = {
       title: 'Availability',
       content: `
         <p>We work to keep ffly running, but we can't promise it will always be available. Fare sources may be
-        slow or unavailable, searches may take time or fail, and a search may need to be run again. You can always
+        slow or unavailable, searches may take time or fail, and a search may need to be run again. You can still
         reopen a saved trip from the Trips list.</p>`,
     },
     {
