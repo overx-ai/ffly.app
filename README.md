@@ -41,6 +41,21 @@ at those exact paths.
 curl -sL https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_land.geojson | uv run scripts/europe-map.py /dev/stdin > src/data/europe-map.json
 ```
 
+## Fonts
+`public/fonts/` holds Google Fonts' latin and latin-ext woff2 subsets. Bricolage Grotesque is cut to weights 700-800
+(optical size kept) by `scripts/fonts.py`, which reads `bricolage-grotesque-{latin,latin-ext}.woff2`, writes
+`bricolage-grotesque-700-800-*.woff2` and deletes its sources. Fonts are cached immutably by name, so a changed font
+file needs a new name (and the new name in `src/styles/global.css` and `PRELOAD_FONTS` in `BaseLayout`).
+
+To regenerate, save the `/* latin */` and `/* latin-ext */` woff2 that Google Fonts lists for the full variable font
+as those two sources in `public/fonts/`, then run the script:
+
+```bash
+UA='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36'
+curl -sA "$UA" 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800'
+uv run --with fonttools --with brotli python scripts/fonts.py
+```
+
 ## Places snapshot
 `npm run places` writes what the search form opens on before `/meta` answers: `src/data/web-meta.json` (the web tier's
 limits and currency, bundled) and `public/places.json` (the places with the site's languages' names and their country,

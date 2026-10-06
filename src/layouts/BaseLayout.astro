@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import ConsentBanner from '../components/ConsentBanner.astro';
-import { ADSENSE_CLIENT, ADSENSE_SCRIPT, APP, APP_STORE_ID, CONSENT_SCRIPT } from '../app';
+import { ADSENSE_CLIENT, ADSENSE_SCRIPT, APP, APP_STORE_ID, CONSENT_SCRIPT, FFLY_API_BASE } from '../app';
 import { DEFAULT_LANG, LANGS, localeOf, useLang, type Lang } from '../i18n';
 import { DEFAULT_OG_IMAGE, alternates, siteOrigin, urlFor, type Slug } from '../site-pages';
 import { breadcrumb, websiteSchema, type Crumb } from '../schema';
@@ -15,6 +15,7 @@ interface Props {
   parent?: Crumb;
   structuredData?: object[];
   lang?: Lang;
+  preconnectApi?: boolean;
 }
 
 const {
@@ -26,13 +27,14 @@ const {
   parent,
   structuredData = [],
   lang = DEFAULT_LANG,
+  preconnectApi = false,
 } = Astro.props;
 const { t } = useLang(lang);
 const locale = localeOf(lang);
 
 // Match --bg in src/styles/global.css (light :root, dark media block).
 const THEME_COLOR = { light: '#F4F6FB', dark: '#040A1C' };
-const PRELOAD_FONTS = ['/fonts/bricolage-grotesque-latin.woff2', '/fonts/figtree-latin.woff2'];
+const PRELOAD_FONTS = ['/fonts/bricolage-grotesque-700-800-latin.woff2', '/fonts/figtree-latin.woff2'];
 
 // A page outside SITE_PAGES (the 404) has no slug, so it gets no canonical URL and stays out of search.
 const noindex = slug === undefined;
@@ -83,6 +85,7 @@ else if (slug !== undefined) schemas = [...structuredData, breadcrumb(title, slu
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content={THEME_COLOR.light} media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content={THEME_COLOR.dark} media="(prefers-color-scheme: dark)" />
+    {preconnectApi && <link rel="preconnect" href={new URL(FFLY_API_BASE).origin} crossorigin />}
     {PRELOAD_FONTS.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
 
     {/* Google's certified consent message first, then AdSense, which waits for its consent signal. */}

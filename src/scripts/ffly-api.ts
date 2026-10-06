@@ -115,14 +115,12 @@ export type SubmitOutcome =
 
 export class NotFound extends Error {}
 
-const headers = { 'X-Platform': WEB_SEARCH.platform };
-
 // A timeout rejects like a network error, so callers show their existing network message.
 // Safari before 16 has no AbortSignal.timeout; there the request simply runs without one.
 export const timeout = () => AbortSignal.timeout?.(WEB_SEARCH.requestTimeoutMs);
 
 async function getJson<T>(path: string): Promise<T> {
-  const res = await fetch(`${FFLY_API_BASE}${path}`, { headers, signal: timeout() });
+  const res = await fetch(`${FFLY_API_BASE}${path}`, { signal: timeout() });
   if (res.status === 404) throw new NotFound(path);
   if (!res.ok) throw new Error(`GET ${path}: ${res.status}`);
   return res.json() as Promise<T>;
@@ -137,7 +135,7 @@ export const versionOf = (etag: string | null) => etag?.replace(/^W\//, '').repl
 // A conditional request: the browser then neither answers from nor fills its own store, so a 304 reaches us.
 export async function getPlaces(version?: string): Promise<PlacesAnswer> {
   const res = await fetch(`${FFLY_API_BASE}/places`, {
-    headers: version ? { ...headers, 'If-None-Match': `"${version}"` } : headers,
+    headers: version ? { 'If-None-Match': `"${version}"` } : {},
     signal: timeout(),
   });
   if (res.status === 304) return { kind: 'same' };
@@ -152,7 +150,7 @@ export const getSearch = (id: string) => getJson<SearchView>(`/searches/${encode
 export async function createSearch(request: SearchRequest): Promise<SubmitOutcome> {
   const res = await fetch(`${FFLY_API_BASE}/searches`, {
     method: 'POST',
-    headers: { ...headers, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(request),
     signal: timeout(),
   });

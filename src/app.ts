@@ -60,7 +60,6 @@ export const FEEDBACK = {
 
 // The web search on / (#search) and /search (src/scripts/search.ts), an anonymous Free caller of FFLY_API_BASE.
 export const WEB_SEARCH = {
-  platform: 'web',
   freeSearchesPerDay: 5,
   pollMs: 2000,
   requestTimeoutMs: 15000,

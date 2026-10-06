@@ -7,7 +7,6 @@ const app = readFileSync(new URL('../src/app.ts', import.meta.url), 'utf8');
 const read = (pattern, what) => app.match(pattern)?.[1] ?? fail(`src/app.ts: no ${what}`);
 const host = read(/apiHost: '([^']+)'/, 'SERVICE.apiHost');
 const base = `https://${host}${read(/FFLY_API_BASE = `https:\/\/\$\{SERVICE\.apiHost\}([^`]*)`/, 'FFLY_API_BASE')}`;
-const headers = { 'X-Platform': read(/platform: '([^']+)'/, 'WEB_SEARCH.platform') };
 const HEAD_OUT = new URL('../src/data/web-meta.json', import.meta.url);
 const PLACES_OUT = new URL(`../public${read(/placesUrl: '([^']+)'/, 'WEB_SEARCH.placesUrl')}`, import.meta.url);
 // The site ships only its own languages; /places carries all 49 of the app's.
@@ -21,7 +20,7 @@ function fail(message) {
 }
 
 async function get(path) {
-  const res = await fetch(`${base}${path}`, { headers });
+  const res = await fetch(`${base}${path}`);
   return res.ok ? { body: await res.json(), etag: res.headers.get('ETag') } : undefined;
 }
 

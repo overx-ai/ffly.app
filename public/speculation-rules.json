@@ -1,0 +1,19 @@
+{
+  "prefetch": [
+    {
+      "source": "document",
+      "where": {
+        "and": [
+          { "href_matches": "/*" },
+          { "not": { "href_matches": "/_astro/*" } },
+          { "not": { "href_matches": "/*.webmanifest" } },
+          { "not": { "href_matches": "/*.json" } },
+          { "not": { "href_matches": "/*.xml" } },
+          { "not": { "href_matches": "/*.txt" } },
+          { "not": { "href_matches": "/*\\?(.+)" } }
+        ]
+      },
+      "eagerness": "moderate"
+    }
+  ]
+}

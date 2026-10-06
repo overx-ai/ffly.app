@@ -65,6 +65,7 @@ const faq: FaqItem[] = [
   slug=""
   lang={lang}
   structuredData={[appSchema(lang), organizationSchema(), faqSchema(faq, lang)]}
+  preconnectApi
 >
   <Header lang={lang} />
 

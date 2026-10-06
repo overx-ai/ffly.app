@@ -36,7 +36,7 @@ Gold is never darkened: a dark gold reads as brown, and the owner rejected it. I
 | Boarding pass | `src/components/BoardingPass.astro` | `EXAMPLE_TRIP` in full: the route, nights and total, plus illustrative dates, departure times and flight numbers (`FLIGHTS`), said so in the caption. |
 | Store CTAs | `src/components/StoreCtas.astro` | App Store badge plus "Try a search free on the web". |
 | Guides | `src/content/guides/*.md`, `src/layouts/GuideLayout.astro`, `src/guide-markdown.ts` | Each guide gets Article, FAQPage (from `## FAQ`) and HowTo (from `### 1.`…`### N.`) JSON-LD. |
-| Fonts | `public/fonts/` | Self-hosted Bricolage Grotesque, Figtree and IBM Plex Mono, latin and latin-ext subsets split by `unicode-range`, so Polish ą ę ł ń ś ź ż stay in the brand fonts. |
+| Fonts | `public/fonts/` | Self-hosted Bricolage Grotesque, Figtree and IBM Plex Mono, latin and latin-ext subsets split by `unicode-range`, so Polish ą ę ł ń ś ź ż stay in the brand fonts. Bricolage is cut to weights 700-800 (`scripts/fonts.py`); fonts are cached immutably, so a changed file gets a new name. |
 | Consent banner | `src/components/ConsentBanner.astro`, `src/scripts/consent{,-state}.ts` | Fixed to the bottom of every page, `hidden` until no choice is stored. Accept and Reject have equal weight. The footer "Cookie settings" reopens it. |
 | Icon and share image | `public/icon-*`, `public/og-image.jpg` | The Night "from-to" icon (ios-ffly `design/icon/icon-e-night.png`). |
 

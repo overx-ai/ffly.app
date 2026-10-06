@@ -15,9 +15,11 @@ Those repos are the source of truth for copy, colours and claims.
   script: `src/scripts/search.ts` over small DOM-free modules (`ffly-api`, `combobox`, `calendar`, `prefs`,
   `nudges`, `results`, `notify`, `scroll`, `ticker`, `places`, `places-store`) that `tests/` covers. Plain TypeScript, no framework, custom controls
   only (no `<select>`, `<datalist>`, date or number input), rendering via `textContent`/`<template>` only (never
-  `innerHTML` with API data). It calls `FFLY_API_BASE` (contract pinned in `docs/PINS.md`) anonymously:
-  `X-Platform: web`, never `X-Client-Id`, and never priority, filters or schedule. Its cookies and scroll time live
-  in `src/app.ts`, its copy in `src/i18n/en.ts` (`widget.script`, shipped in SearchForm's `data-i18n` attribute).
+  `innerHTML` with API data). It calls `FFLY_API_BASE` (contract pinned in `docs/PINS.md`) anonymously and with no
+  custom header (no `X-Platform`, never `X-Client-Id`): the API's default channel is web, so its GETs are simple CORS
+  requests with no preflight. Never priority, filters or schedule. The pages carrying it preconnect to the API origin
+  (`BaseLayout` `preconnectApi`). Its cookies and scroll time live in `src/app.ts`, its copy in `src/i18n/en.ts`
+  (`widget.script`, shipped in SearchForm's `data-i18n` attribute).
 - **Shareable searches (spec 005).** The URL carries the whole trip: `from`, `back` (omitted when it is just `from`),
   `cities` (comma-separated, as in the app's share link), `dates=YYYY-MM-DD..YYYY-MM-DD`, `nights=min-max`
   (`shareQuery` in `prefs.ts`, written with `replaceState` on submit and on results). A complete link with a future
@@ -39,9 +41,11 @@ Those repos are the source of truth for copy, colours and claims.
   and `AdSlot` renders nothing (`npm test` asserts it). Set it, and `AD_SLOTS`, to load Google's consent message
   and then AdSense; `/privacy` switches its ad copy on the same constant.
 - Deploy: `git push origin main`, then Vercel builds. `vercel.json` holds clean URLs, the
-  security headers (CSP, nosniff, Referrer-Policy) and immutable caching of `/_astro/`; `npm test` checks
-  them. The CSP allows no inline script and no third-party host but `api.overx.ai` and the analytics hosts
-  (`GA_CSP`, only while `GA_MEASUREMENT_ID` is set): add any new one there.
+  security headers (CSP, nosniff, Referrer-Policy), immutable caching of `/_astro/` and `/fonts/`, a week's caching
+  of the icons and images, and the `Speculation-Rules` header naming `public/speculation-rules.json` (prefetch on
+  hover or touch, never prerender; served as `application/speculationrules+json`); `npm test` checks them. The CSP
+  allows no inline script and no third-party host but `api.overx.ai` and the analytics hosts (`GA_CSP`, only while
+  `GA_MEASUREMENT_ID` is set): add any new one there.
   The ad and consent hosts (`AD_CSP` in `scripts/check-legal.mjs`) go in only with `ADSENSE_CLIENT`; `npm test`
   fails if the CSP and the constant disagree.
   Hosting and DNS: [docs/001-deployment.md](docs/001-deployment.md).
@@ -163,7 +167,8 @@ Those repos are the source of truth for copy, colours and claims.
   Never use SMIL `<animateMotion>` there: it re-laid out the page every frame, off screen too (`check-legal` bans it). Label offsets there are hand-placed for
   `EXAMPLE_TRIP`: a new example needs new ones, and a new city needs a point in `scripts/europe-map.py`.
 - Fonts are self-hosted latin and latin-ext woff2 (split by `unicode-range`) in `public/fonts/`: Bricolage Grotesque (display), Figtree (body),
-  IBM Plex Mono (data).
+  IBM Plex Mono (data). They are cached immutably by name, so **a changed font file gets a new name**. Bricolage is
+  cut to weights 700-800 (`scripts/fonts.py`): never ask the display font for a lighter weight.
 - `og:image:width/height` in `BaseLayout` match `public/og-image.jpg` (1200x675). Change both together.
 - **No `favicon.svg`**: an SVG icon silently outranks every PNG.
 - Hyphenated words in large headings go in `<span class="nw">` so they do not break at the hyphen.

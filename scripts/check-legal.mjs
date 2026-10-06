@@ -148,7 +148,42 @@ const csp = siteHeaders['Content-Security-Policy'] ?? '';
 check(/default-src 'self'/.test(csp) && /frame-ancestors 'none'/.test(csp), 'vercel.json: CSP missing or incomplete');
 check(siteHeaders['X-Content-Type-Options'] === 'nosniff', 'vercel.json: X-Content-Type-Options nosniff missing');
 check(siteHeaders['Referrer-Policy'] === 'strict-origin-when-cross-origin', 'vercel.json: Referrer-Policy missing');
-check(/immutable/.test(headersFor('/_astro/(.*)')['Cache-Control'] ?? ''), 'vercel.json: /_astro/ must be cached immutable');
+// Every vercel.json source here is a regex of groups and literals (no :params), so it can be matched as one.
+check(vercel.headers.every((h) => !h.source.includes(':')), 'vercel.json: a :param source breaks servedHeader');
+function servedHeader(path, key) {
+  const rules = vercel.headers.filter((h) => new RegExp(`^${h.source}$`).test(path));
+  return rules.flatMap((h) => h.headers).findLast((h) => h.key === key)?.value;
+}
+const IMMUTABLE = 'public, max-age=31536000, immutable';
+const WEEK = 'public, max-age=604800';
+check(servedHeader('/_astro/page.js', 'Cache-Control') === IMMUTABLE, 'vercel.json: /_astro/ must be cached immutable');
+const fonts = readdirSync(`${DIST}fonts`);
+check(fonts.length > 0, 'Build: no fonts in dist/fonts');
+for (const font of fonts) check(servedHeader(`/fonts/${font}`, 'Cache-Control') === IMMUTABLE, `vercel.json: /fonts/${font} must be cached immutable`);
+for (const image of readdirSync(DIST).filter((f) => /\.(png|jpg|webp|ico)$/.test(f))) {
+  check(servedHeader(`/${image}`, 'Cache-Control') === WEEK, `vercel.json: /${image} must be cached for a week`);
+}
+check(servedHeader('/', 'Cache-Control') === undefined, 'vercel.json: pages must keep the default revalidating cache');
+
+// Speculation rules (header-delivered, so the CSP needs no inline script): prefetch only, never prerender.
+const SPECULATION_URL = '/speculation-rules.json';
+check(siteHeaders['Speculation-Rules'] === `"${SPECULATION_URL}"`, 'vercel.json: Speculation-Rules header missing');
+check(servedHeader(SPECULATION_URL, 'Content-Type') === 'application/speculationrules+json', `vercel.json: ${SPECULATION_URL} needs its MIME type`);
+let speculation = {};
+try {
+  speculation = JSON.parse(readFileSync(`${DIST}${SPECULATION_URL.slice(1)}`, 'utf8'));
+} catch (error) {
+  check(false, `${SPECULATION_URL}: ${error.message}`);
+}
+check(!('prerender' in speculation), `${SPECULATION_URL}: prefetch only, never prerender`);
+const prefetch = speculation.prefetch ?? [];
+check(prefetch.length > 0 && prefetch.every((rule) => rule.eagerness === 'moderate'), `${SPECULATION_URL}: prefetch rules must be moderate`);
+// `/*\?*` would match every URL, a query-less one too (its search part `*` matches ""), and so exclude every link.
+const SPECULATION_EXCLUDES = ['/_astro/*', '/*.webmanifest', '/*.json', '/*.xml', '/*.txt', '/*\\?(.+)'];
+for (const rule of prefetch) {
+  const excluded = new Set((rule.where?.and ?? []).map((condition) => condition.not?.href_matches));
+  for (const pattern of SPECULATION_EXCLUDES) check(excluded.has(pattern), `${SPECULATION_URL}: must exclude ${pattern}`);
+}
 
 // The CSP has no 'unsafe-inline' for scripts: every executable script must load from a file.
 const htmlPages = readdirSync(DIST, { recursive: true })
@@ -165,6 +200,16 @@ for (const [file, html] of htmlPages) {
     check(href === '/' || (!href.endsWith('/') && resolves(href.slice(1))), `${file}: link ${href} does not resolve`);
   }
   check(!/"(?:offers|aggregateRating)"/.test(JSON.stringify(jsonLd(html))), `${file}: JSON-LD must carry no offers or aggregateRating`);
+}
+
+// The pages with the search widget open the API connection with the HTML; no other page does.
+const apiHost = source('src/app.ts').match(/apiHost: '([^']+)'/)?.[1];
+check(apiHost !== undefined, 'src/app.ts: no SERVICE.apiHost');
+const preconnect = `<link rel="preconnect" href="https://${apiHost}" crossorigin>`;
+const searchPages = new Set(LANGS.flatMap(({ prefix }) => ['', 'search/'].map((page) => `${prefix && `${prefix}/`}${page}index.html`)));
+for (const [file, html] of htmlPages) {
+  const want = searchPages.has(file);
+  check(html.includes(preconnect) === want, `${file}: ${want ? 'must' : 'must not'} preconnect to the API`);
 }
 
 // A constant's initialiser in src/app.ts, or undefined when its declaration is missing.
@@ -374,7 +419,9 @@ for (const [where, text] of [['llms.txt', llms], ...htmlPages]) {
   check(!/\u2014|&mdash;|&#8212;|&#x2014;/i.test(text), `${where}: no em dashes in published copy`);
   for (const [pattern, term] of UNLIMITED) check(!pattern.test(text), `${where}: Pro is never "unlimited" (${term})`);
 }
-const copyPages = [['llms.txt', copyText(llms)], ...htmlPages.map(([file, html]) => [file, copyText(withoutCss(html))])];
+// <link> tags are never shown, and the API preconnect names the host by design.
+const copyOf = (html) => copyText(withoutCss(html).replace(/<link\b[^>]*>/g, ''));
+const copyPages = [['llms.txt', copyText(llms)], ...htmlPages.map(([file, html]) => [file, copyOf(html)])];
 const banScans = [['Search bundle', bundle, MECHANICS], ...copyPages.map(([where, text]) => [where, text, COPY_BANS])];
 for (const [where, text, banned] of banScans) {
   for (const [pattern, what] of banned) {

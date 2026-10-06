@@ -10,6 +10,9 @@ Contracts this site codes against. Bump a row in the same change that adopts a n
 | ffly API worldwide places | 1.8.0 | 1B-bots `docs/specs/539` (3,493 places, nullable `Place.country`, ISO 3166-1 alpha-2) | `public/places.json`, `countryNamer` (spec 008) |
 | ffly API web end cap | 1.5.0 | 1B-bots `docs/specs/535` T8 (`/meta` `tier_limits.max_ends` = 2 for web) | `endLimit` in `src/scripts/ffly-api.ts` (spec 006) |
 
+The site sends no `X-Platform` header: a request without one is the web channel (1B-bots `apps/ffly-api/routes/deps.py`
+`channel_of`: the app channel needs `X-Platform: ios` plus a known subscriber id), so the GETs need no CORS preflight.
+
 `lookupShared` needs ffly API ≥ 1.5.0. On an older API the lookup answers 404 or 405, which the site treats as a miss:
 a shared link then only pre-fills the form, so the site can ship before the API.
 

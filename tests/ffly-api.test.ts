@@ -1,6 +1,18 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FFLY_API_BASE } from '../src/app';
-import { buildRequest, canLookup, createSearch, endLimit, getPlaces, lookupShared, searchedAt, versionOf, type Meta } from '../src/scripts/ffly-api';
+import {
+  buildRequest,
+  canLookup,
+  createSearch,
+  endLimit,
+  getMeta,
+  getPlaces,
+  getSearch,
+  lookupShared,
+  searchedAt,
+  versionOf,
+  type Meta,
+} from '../src/scripts/ffly-api';
 
 const trip = {
   start: 'WAW',
@@ -107,7 +119,7 @@ describe('lookupShared', () => {
     );
     await lookupShared(buildRequest({ ...trip, ends: ['VNO', 'FCO'] }, 'id-1'));
     expect((fetch.mock.calls[1] as unknown as [string])[0]).toContain('&ends=VNO,FCO&');
-    expect(init.headers).toEqual({ 'X-Platform': 'web' });
+    expect(init.headers ?? {}).toEqual({});
   });
 
   it('returns an identical search still running as a hit, to poll by its id', async () => {
@@ -170,7 +182,7 @@ describe('getPlaces', () => {
     expect(await getPlaces('abc')).toEqual({ kind: 'same' });
     expect(fetch.mock.calls[0][0]).toBe(`${FFLY_API_BASE}/places`);
     expect(sentHeaders(fetch)['If-None-Match']).toBe('"abc"');
-    expect(sentHeaders(fetch)['X-Platform']).toBe('web');
+    expect(Object.keys(sentHeaders(fetch))).toEqual(['If-None-Match']);
   });
 
   it('asks unconditionally with no version', async () => {
@@ -198,5 +210,38 @@ describe('versionOf', () => {
     expect(versionOf('W/"abc"')).toBe('abc');
     expect(versionOf(null)).toBeUndefined();
     expect(versionOf('""')).toBeUndefined();
+  });
+});
+
+// The API's default channel is web, so the page sends no custom header: a GET with none is a simple CORS request,
+// answered without a preflight round trip.
+describe('request headers', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  const view = { id: 'job-1', status: 'done', done: 3, total: 3, eta_s: null, routes: [] };
+  const sent = async (call: () => Promise<unknown>, body: object = view, status = 200) => {
+    const fetch = vi.fn(async (_url: string, _init?: RequestInit) => new Response(status === 304 ? null : JSON.stringify(body), { status }));
+    vi.stubGlobal('fetch', fetch);
+    await call();
+    return new Headers(fetch.mock.calls[0][1]?.headers);
+  };
+  const names = (headers: Headers) => [...headers.keys()];
+
+  it('sends no header on GET /meta, /searches/{id} and /searches/shared', async () => {
+    expect(names(await sent(getMeta))).toEqual([]);
+    expect(names(await sent(() => getSearch('job-1')))).toEqual([]);
+    expect(names(await sent(() => lookupShared(buildRequest(trip, 'a'))))).toEqual([]);
+  });
+
+  it('sends only If-None-Match on GET /places, and nothing without a version', async () => {
+    const places = { places: [] };
+    expect(names(await sent(() => getPlaces('v1'), places, 304))).toEqual(['if-none-match']);
+    expect(names(await sent(() => getPlaces(), places))).toEqual([]);
+  });
+
+  it('sends only the JSON content type on POST /searches, never X-Platform or X-Client-Id', async () => {
+    const headers = await sent(() => createSearch(buildRequest(trip, 'a')), { id: 'job-1' }, 202);
+    expect(names(headers)).toEqual(['content-type']);
+    expect(headers.get('content-type')).toBe('application/json');
   });
 });
