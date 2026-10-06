@@ -163,6 +163,13 @@ for (const font of fonts) check(servedHeader(`/fonts/${font}`, 'Cache-Control') 
 for (const image of readdirSync(DIST).filter((f) => /\.(png|jpg|webp|ico)$/.test(f))) {
   check(servedHeader(`/${image}`, 'Cache-Control') === WEEK, `vercel.json: /${image} must be cached for a week`);
 }
+check(servedHeader('/places.json', 'Cache-Control') === IMMUTABLE, 'vercel.json: /places.json must be cached immutable');
+// The page asks for /places.json?v={web-meta places_version}: a file under another version would be cached for good.
+const staticPlacesVersion = JSON.parse(readFileSync(`${DIST}places.json`, 'utf8')).version;
+check(
+  Boolean(staticPlacesVersion) && staticPlacesVersion === JSON.parse(source('src/data/web-meta.json')).places_version,
+  'places.json: its version must be web-meta.json places_version (run npm run places)',
+);
 check(servedHeader('/', 'Cache-Control') === undefined, 'vercel.json: pages must keep the default revalidating cache');
 
 // Speculation rules (header-delivered, so the CSP needs no inline script): prefetch only, never prerender.
@@ -351,6 +358,11 @@ const bundle = readdirSync(`${DIST}_astro`)
 check(
   connectHosts.some((host) => bundle.includes(`"${host}"`)),
   'vercel.json: CSP connect-src must allow the API host the search bundle calls (SERVICE.apiHost)',
+);
+// Cached immutably, so the file is only ever fetched under its version: a new list is a new URL.
+check(
+  /(placesUrl\}|\/places\.json)\?v=/.test(bundle),
+  'Bundle: places.json must be fetched as /places.json?v={places_version}',
 );
 check(bundle.includes('googletagmanager.com/gtag/js') === gaOn, 'Bundle: the consent module must carry gtag.js exactly while GA_MEASUREMENT_ID is set');
 

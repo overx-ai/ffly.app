@@ -14,13 +14,19 @@ function box(initial?: PlaceSet) {
   if (initial) items.set(WEB_SEARCH.placesKey, JSON.stringify(initial));
   return {
     items,
-    getItem: (key: string) => items.get(key) ?? null,
+    getItem: vi.fn((key: string) => items.get(key) ?? null),
     setItem: vi.fn((key: string, value: string) => void items.set(key, value)),
   };
 }
 
 const stored = (b: ReturnType<typeof box>) => JSON.parse(b.items.get(WEB_SEARCH.placesKey) ?? 'null') as PlaceSet | null;
-const meta = (places_version?: string | null) => ({ places: [place('WAR', 'Warsaw (meta)')], places_version });
+const META_PLACES = [place('WAR', 'Warsaw (meta)')];
+const meta = (places_version?: string | null, places: Place[] | undefined = META_PLACES) => ({ places, places_version });
+const offline = async (): Promise<never> => {
+  throw new Error('offline');
+};
+const calls = (f: unknown) => (vi.isMockFunction(f) ? f.mock.calls.length : 0);
+const fetches = (s: ReturnType<typeof sources>) => calls(s.loadStatic) + calls(s.fetchPlaces);
 const sources = (over: Partial<NonNullable<ConstructorParameters<typeof PlacesStore>[1]>> = {}) => ({
   staticVersion: STATIC.version,
   loadStatic: vi.fn(async () => STATIC),
@@ -29,26 +35,42 @@ const sources = (over: Partial<NonNullable<ConstructorParameters<typeof PlacesSt
 });
 
 describe('PlacesStore at first paint', () => {
-  it('opens on the stored places, else on nothing until they load', () => {
-    expect(new PlacesStore(box(STORED), sources()).current).toEqual(STORED);
-    expect(new PlacesStore(box(), sources()).current).toBeUndefined();
-    expect(new PlacesStore(undefined, sources()).current).toBeUndefined();
-  });
-
-  it('ignores a stored value it cannot read', () => {
-    const b = box();
-    b.items.set(WEB_SEARCH.placesKey, '{"version":"v9","places":[]}');
-    expect(new PlacesStore(b, sources()).current).toBeUndefined();
-    b.items.set(WEB_SEARCH.placesKey, 'not json');
-    expect(new PlacesStore(b, sources()).current).toBeUndefined();
+  it('reads no storage until the places are asked for', () => {
+    const b = box(STORED);
+    new PlacesStore(b, sources());
+    expect(b.getItem).not.toHaveBeenCalled();
   });
 });
 
 describe('PlacesStore.load', () => {
-  it('answers the stored places without fetching the static file', async () => {
+  it('loads the stored places without fetching, reading the storage once', async () => {
+    const b = box(STORED);
     const s = sources();
-    expect(await new PlacesStore(box(STORED), s).load()).toEqual(STORED);
-    expect(s.loadStatic).not.toHaveBeenCalled();
+    const store = new PlacesStore(b, s);
+    expect(await store.load()).toEqual(STORED);
+    expect(await store.load()).toEqual(STORED);
+    expect(fetches(s)).toBe(0);
+    expect(b.getItem).toHaveBeenCalledTimes(1);
+  });
+
+  it('treats a stored value it cannot read as absent: one fetch of the static file', async () => {
+    for (const broken of ['{"version":"v9","places":[]}', '{"version":"v9","places":[{"code":"WAR"}]}', '{"places":[]}', 'not json']) {
+      const b = box();
+      b.items.set(WEB_SEARCH.placesKey, broken);
+      const s = sources();
+      expect(await new PlacesStore(b, s).load()).toEqual(STATIC);
+      expect(fetches(s)).toBe(1);
+      expect(stored(b)).toEqual(STATIC);
+    }
+  });
+
+  it('loads without any storage at all, or with one that refuses to be read', async () => {
+    expect(await new PlacesStore(undefined, sources()).load()).toEqual(STATIC);
+    const blocked = box(STORED);
+    blocked.getItem.mockImplementation(() => {
+      throw new Error('SecurityError');
+    });
+    expect(await new PlacesStore(blocked, sources()).load()).toEqual(STATIC);
   });
 
   it('fetches the static file once, however often it is asked, and stores it', async () => {
@@ -60,7 +82,6 @@ describe('PlacesStore.load', () => {
     expect(second).toEqual(STATIC);
     expect(s.loadStatic).toHaveBeenCalledTimes(1);
     expect(stored(b)).toEqual(STATIC);
-    expect(store.current).toEqual(STATIC);
   });
 
   it('answers nothing when the static file fails, and tries again next time', async () => {
@@ -84,7 +105,7 @@ describe('PlacesStore.refresh', () => {
   it('asks nothing while the version is the one it holds', async () => {
     const s = sources();
     const store = new PlacesStore(box(STORED), s);
-    expect(await store.refresh(meta('v2'))).toBe(store.current);
+    expect(await store.refresh(meta('v2'))).toEqual(STORED);
     expect(s.fetchPlaces).not.toHaveBeenCalled();
     expect(s.loadStatic).not.toHaveBeenCalled();
   });
@@ -112,7 +133,6 @@ describe('PlacesStore.refresh', () => {
     expect(s.fetchPlaces).toHaveBeenCalledWith('v2');
     expect(set).toEqual({ version: 'v3', places: LIVE });
     expect(stored(b)).toEqual(set);
-    expect(store.current).toEqual(set);
   });
 
   it("keeps only the site's languages of the API's names", async () => {
@@ -134,16 +154,31 @@ describe('PlacesStore.refresh', () => {
     expect(b.setItem).not.toHaveBeenCalled();
   });
 
-  it('uses /meta places, unstored, when the API has no version or /places fails', async () => {
+  it('keeps the list it holds when the API has no version or /places fails', async () => {
     const b = box(STORED);
-    const old = new PlacesStore(b, sources());
-    expect(await old.refresh(meta(undefined))).toEqual({ version: null, places: meta().places });
-    const offline = async (): Promise<PlacesAnswer> => {
-      throw new Error('offline');
-    };
-    const failing = new PlacesStore(b, sources({ fetchPlaces: offline }));
-    expect(await failing.refresh(meta('v3'))).toEqual({ version: null, places: meta().places });
+    expect(await new PlacesStore(b, sources()).refresh(meta(undefined))).toEqual(STORED);
+    expect(await new PlacesStore(b, sources({ fetchPlaces: offline })).refresh(meta('v3'))).toEqual(STORED);
     expect(stored(b)).toEqual(STORED);
+  });
+
+  it('falls back to the static list, then to /meta places, never storing an unversioned list', async () => {
+    const b = box();
+    expect(await new PlacesStore(b, sources()).refresh(meta(undefined))).toEqual(STATIC);
+    expect(await new PlacesStore(box(), sources({ fetchPlaces: offline })).refresh(meta('v3'))).toEqual(STATIC);
+    const none = box();
+    const store = new PlacesStore(none, sources({ loadStatic: offline, fetchPlaces: offline }));
+    expect(await store.refresh(meta('v3'))).toEqual({ version: null, places: META_PLACES });
+    expect(await new PlacesStore(none, sources({ loadStatic: offline })).refresh(meta(undefined))).toEqual({ version: null, places: META_PLACES });
+    expect(none.setItem).not.toHaveBeenCalled();
+  });
+
+  it('answers an empty list when nothing at all has places, and an empty /meta never replaces a list', async () => {
+    const lost = sources({ loadStatic: offline, fetchPlaces: offline });
+    expect(await new PlacesStore(box(), lost).refresh({ places_version: 'v3' })).toEqual({ version: null, places: [] });
+    const store = new PlacesStore(box(), sources({ fetchPlaces: offline }));
+    await store.load();
+    expect(await store.refresh(meta(undefined, []))).toEqual(STATIC);
+    expect(await store.load()).toEqual(STATIC);
   });
 
   it('survives a storage that refuses to write', async () => {
@@ -152,6 +187,49 @@ describe('PlacesStore.refresh', () => {
       throw new Error('full');
     });
     expect((await new PlacesStore(b, sources()).refresh(meta('v3'))).places).toEqual(LIVE);
+  });
+});
+
+// The API's places_version is a hash of the list's content, so a stored list at that version is valid as it is.
+describe('PlacesStore validity', () => {
+  it('fetches nothing, ever, while the stored version is the live one', async () => {
+    const s = sources();
+    const store = new PlacesStore(box(STORED), s);
+    await store.load();
+    await store.refresh(meta('v2'));
+    await store.load();
+    expect(s.loadStatic).not.toHaveBeenCalled();
+    expect(s.fetchPlaces).not.toHaveBeenCalled();
+  });
+
+  it('fetches a new version once, then never again on the next visit', async () => {
+    for (const [version, which] of [['v1', 'loadStatic'], ['v3', 'fetchPlaces']] as const) {
+      const b = box(STORED);
+      const s = sources();
+      const store = new PlacesStore(b, s);
+      await store.load();
+      await store.refresh(meta(version));
+      expect(fetches(s)).toBe(1);
+      expect(s[which]).toHaveBeenCalledTimes(1);
+      expect(stored(b)?.version).toBe(version);
+
+      const next = sources();
+      const visit = new PlacesStore(b, next);
+      await visit.load();
+      await visit.refresh(meta(version));
+      await visit.load();
+      expect(fetches(next)).toBe(0);
+    }
+  });
+
+  it('fetches once over a corrupt stored entry', async () => {
+    const b = box();
+    b.items.set(WEB_SEARCH.placesKey, '{"version":"v1","places":');
+    const s = sources();
+    const store = new PlacesStore(b, s);
+    await store.load();
+    await store.refresh(meta('v1'));
+    expect(fetches(s)).toBe(1);
   });
 });
 
@@ -164,10 +242,11 @@ describe('fetchStaticPlaces', () => {
     return fetch;
   };
 
-  it('reads the same-origin static file', async () => {
+  it('reads the same-origin static file under its version, so each version has its own URL', async () => {
     const fetch = stub(() => new Response(JSON.stringify(STATIC)));
     expect(await fetchStaticPlaces()).toEqual(STATIC);
-    expect(fetch.mock.calls[0][0]).toBe(WEB_SEARCH.placesUrl);
+    expect(fetch.mock.calls[0][0]).toBe(`${WEB_SEARCH.placesUrl}?v=${encodeURIComponent(WEB_META.places_version)}`);
+    expect(WEB_META.places_version).toBeTruthy();
   });
 
   it('rejects an error status or a body that is not a place list', async () => {
@@ -182,7 +261,7 @@ describe('the bundled head', () => {
   it('holds the limits the form opens on, and no places', () => {
     const start = provisionalMeta();
     expect(start.free_searches_left).toBeNull();
-    expect(start.places).toEqual([]);
+    expect(start.places).toBeUndefined();
     expect(start.tier_limits.max_cities).toBeGreaterThan(0);
     expect(start.limits.max_window_days).toBeGreaterThan(0);
     expect(WEB_META).not.toHaveProperty('places');

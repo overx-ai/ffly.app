@@ -41,7 +41,7 @@ Those repos are the source of truth for copy, colours and claims.
   and `AdSlot` renders nothing (`npm test` asserts it). Set it, and `AD_SLOTS`, to load Google's consent message
   and then AdSense; `/privacy` switches its ad copy on the same constant.
 - Deploy: `git push origin main`, then Vercel builds. `vercel.json` holds clean URLs, the
-  security headers (CSP, nosniff, Referrer-Policy), immutable caching of `/_astro/` and `/fonts/`, a week's caching
+  security headers (CSP, nosniff, Referrer-Policy), immutable caching of `/_astro/`, `/fonts/` and `/places.json`, a week's caching
   of the icons and images, and the `Speculation-Rules` header naming `public/speculation-rules.json` (prefetch on
   hover or touch, never prerender; served as `application/speculationrules+json`); `npm test` checks them. The CSP
   allows no inline script and no third-party host but `api.overx.ai` and the analytics hosts (`GA_CSP`, only while
@@ -91,7 +91,11 @@ Those repos are the source of truth for copy, colours and claims.
   1.8.0, names trimmed to the eight languages), **never in the JS bundle**: the page fetches it same-origin on the first
   focus in the form or once idle. Until then a place field says "Loading cities…", never an empty list; only a link or
   cookie naming places waits for it. A visitor's own copy lives in `localStorage` under `WEB_SEARCH.placesKey`, keyed
-  by `/meta` `places_version`; a version past the static file's fetches `/places` (If-None-Match). The place fields
+  by `/meta` `places_version`; a version past the static file's fetches `/places` (If-None-Match). **Spec 009:** `/meta` is
+  asked with `?places=false`; the stored list is read only once the page is idle or a place field needs it; a stored
+  list whose version equals `/meta`'s `places_version` is never fetched again; `places.json` is fetched as
+  `?v={version}` and cached immutably (`check-legal` asserts the header, the versioned URL and that the file's
+  version is `web-meta.json`'s). The place fields
   never wait for `/meta`; Find route does. `matchPlaces` folds each list once per language (keep it under the
   keystroke budget in `tests/combobox.test.ts`). Suggestions show the country (`Intl.DisplayNames`), nothing else does.
   The example trip's labels (map, pass) are named from `public/places.json` at build time (`src/example-city.ts`); the

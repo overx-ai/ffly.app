@@ -233,6 +233,14 @@ describe('request headers', () => {
     expect(names(await sent(() => lookupShared(buildRequest(trip, 'a'))))).toEqual([]);
   });
 
+  it('asks /meta without the place list, and with no header', async () => {
+    const fetch = vi.fn(async (_url: string, _init?: RequestInit) => new Response('{}'));
+    vi.stubGlobal('fetch', fetch);
+    await getMeta();
+    expect(fetch.mock.calls[0][0]).toBe(`${FFLY_API_BASE}/meta?places=false`);
+    expect(names(new Headers(fetch.mock.calls[0][1]?.headers))).toEqual([]);
+  });
+
   it('sends only If-None-Match on GET /places, and nothing without a version', async () => {
     const places = { places: [] };
     expect(names(await sent(() => getPlaces('v1'), places, 304))).toEqual(['if-none-match']);

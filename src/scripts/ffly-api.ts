@@ -14,7 +14,7 @@ export interface Place {
 }
 
 export interface Meta {
-  places: Place[];
+  places?: Place[];
   places_version?: string | null;
   currency: string;
   limits: { max_cities: number; max_ends: number; max_nights: number; max_window_days: number };
@@ -126,7 +126,9 @@ async function getJson<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export const getMeta = () => getJson<Meta>('/meta');
+// The site has its own place list (places-store.ts): 1.9.0 then answers /meta without one, an older API ignores the
+// parameter and sends it anyway.
+export const getMeta = () => getJson<Meta>('/meta?places=false');
 
 export type PlacesAnswer = { kind: 'same' } | { kind: 'fresh'; version?: string; places: Place[] };
 

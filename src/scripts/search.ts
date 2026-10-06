@@ -401,7 +401,13 @@ function usePlaces(set: PlaceSet | undefined) {
   for (const box of boxes.values()) box.update();
 }
 
-const loadPlaces = () => placesStore.load().then(usePlaces);
+let placesAsked!: () => void;
+const askedForPlaces = new Promise<void>((resolve) => (placesAsked = resolve));
+
+const loadPlaces = () => {
+  placesAsked();
+  return placesStore.load().then(usePlaces);
+};
 
 function useMeta(next: Meta) {
   meta = next;
@@ -962,8 +968,7 @@ el.notifyNo.addEventListener('click', closeNotifyAsk);
 async function openForm(): Promise<Prefs> {
   useMeta(provisionalMeta());
   const cookies = parseCookies(document.cookie);
-  usePlaces(placesStore.current);
-  if (!places.length && namesPlaces(new URLSearchParams(location.search), cookies)) await loadPlaces();
+  if (namesPlaces(new URLSearchParams(location.search), cookies)) await loadPlaces();
   const prefs = setupForm(cookies);
   el.loading.hidden = true;
   el.fields.disabled = false;
@@ -987,7 +992,8 @@ async function init(prefs: Prefs, metaAnswer = getMeta()): Promise<void> {
     return;
   }
   el.submit.disabled = false;
-  void placesStore.refresh(meta).then(usePlaces);
+  // Not before the places are asked for: checking the version reads the stored list, a parse kept off page start.
+  void askedForPlaces.then(() => placesStore.refresh(meta)).then(usePlaces);
 
   // A shared link names the whole trip: the session's own search wins only when it is that same trip. A link
   // whose trip has started only pre-fills the places and nights; setupForm skips its past dates.

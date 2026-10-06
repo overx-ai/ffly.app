@@ -8,6 +8,7 @@ Contracts this site codes against. Bump a row in the same change that adopts a n
 | ffly API shared-search lookup | 1.5.0 | 1B-bots `docs/specs/535` (`GET /searches/shared`; its time is `updated`, epoch seconds) | `lookupShared` in `src/scripts/ffly-api.ts` (spec 005) |
 | ffly API localized places | 1.7.0 | ffly-api 1.7.0 (`Place.names`, `/meta` `places_version`, `GET /places` with ETag) | `getPlaces`, `places-store.ts`, `placeName` (spec 007) |
 | ffly API worldwide places | 1.8.0 | 1B-bots `docs/specs/539` (3,493 places, nullable `Place.country`, ISO 3166-1 alpha-2) | `public/places.json`, `countryNamer` (spec 008) |
+| ffly API meta without places | 1.9.0 | 1B-bots `docs/specs/540` (`GET /meta?places=false`: `places: []`, the rest unchanged) | `getMeta` in `src/scripts/ffly-api.ts` (spec 009) |
 | ffly API web end cap | 1.5.0 | 1B-bots `docs/specs/535` T8 (`/meta` `tier_limits.max_ends` = 2 for web) | `endLimit` in `src/scripts/ffly-api.ts` (spec 006) |
 
 The site sends no `X-Platform` header: a request without one is the web channel (1B-bots `apps/ffly-api/routes/deps.py`
@@ -23,6 +24,9 @@ name is the English one from `/meta`, nothing is stored, and the snapshot (`node
 the bundled `src/data/web-meta.json`. Regenerate both (`npm run places`) whenever `/meta.places_version` moves, so first
 visits load the site's file instead of the API's 49-language `/places`. Against a pre-1.8.0 list `country` is absent and
 suggestions show no country.
+
+`getMeta` asks `/meta?places=false`. An API older than 1.9.0 ignores the parameter and sends the full place list, which
+the site tolerates (`Meta.places` is optional and stands in only when nothing else has a list).
 
 `endLimit` reads `tier_limits.max_ends` (1 when absent). While the API says 1, Back to stays a single field; at 2 it
 becomes a chip list, with no site change needed.

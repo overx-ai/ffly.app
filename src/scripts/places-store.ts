@@ -10,10 +10,10 @@ export interface PlaceSet {
 }
 
 // Built by scripts/places.mjs with public/places.json: the limits the form opens on before /meta answers, and the
-// version of that static place list.
-export const WEB_META = HEAD as Omit<Meta, 'free_searches_left' | 'places'>;
+// version of that static place list (never null: public/places.json is cached for good under it).
+export const WEB_META = HEAD as Omit<Meta, 'free_searches_left' | 'places' | 'places_version'> & { places_version: string };
 
-export const provisionalMeta = (): Meta => ({ ...WEB_META, places: [], free_searches_left: null });
+export const provisionalMeta = (): Meta => ({ ...WEB_META, free_searches_left: null });
 
 const SITE_LANGS = LANGS.map((l) => l.code);
 
@@ -27,11 +27,14 @@ const isPlaceSet = (value: unknown): value is PlaceSet => {
   );
 };
 
+// The version names the file, so the HTTP cache may keep it for good (vercel.json) and a new list is a new URL.
+const STATIC_URL = `${WEB_SEARCH.placesUrl}?v=${encodeURIComponent(WEB_META.places_version)}`;
+
 export async function fetchStaticPlaces(): Promise<PlaceSet> {
-  const res = await fetch(WEB_SEARCH.placesUrl, { signal: timeout() });
-  if (!res.ok) throw new Error(`GET ${WEB_SEARCH.placesUrl}: ${res.status}`);
+  const res = await fetch(STATIC_URL, { signal: timeout() });
+  if (!res.ok) throw new Error(`GET ${STATIC_URL}: ${res.status}`);
   const body: unknown = await res.json();
-  if (!isPlaceSet(body)) throw new Error(`GET ${WEB_SEARCH.placesUrl}: no places`);
+  if (!isPlaceSet(body)) throw new Error(`GET ${STATIC_URL}: no places`);
   return body;
 }
 
@@ -43,13 +46,15 @@ interface Sources {
   fetchPlaces: (version?: string) => Promise<PlacesAnswer>;
 }
 
-const DEFAULT_SOURCES: Sources = { staticVersion: WEB_META.places_version ?? null, loadStatic: fetchStaticPlaces, fetchPlaces: getPlaces };
+const DEFAULT_SOURCES: Sources = { staticVersion: WEB_META.places_version, loadStatic: fetchStaticPlaces, fetchPlaces: getPlaces };
 
-// The visitor's own copy of the places, kept under the API's places_version: a page opens on it at once, and only a
-// new version is fetched again. Without one the list comes from the site's static file, fetched only when a place
-// field needs it; the API's /places (conditional, so an unchanged list costs a 304) only when that file is behind.
+// The visitor's own copy of the places, kept under the API's places_version, a hash of the list: a copy at /meta's
+// version is never fetched again. It is read (a large parse) only when the places are first asked for. Without one
+// the list comes from the site's static file; the API's /places (conditional, so an unchanged list costs a 304) only
+// when that file is behind.
 export class PlacesStore {
   private held: PlaceSet | undefined;
+  private wasRead = false;
   private staticLoad: Promise<PlaceSet> | undefined;
   private readonly sources: Sources;
 
@@ -58,15 +63,11 @@ export class PlacesStore {
     sources: Partial<Sources> = {},
   ) {
     this.sources = { ...DEFAULT_SOURCES, ...sources };
-    this.held = this.read();
-  }
-
-  get current(): PlaceSet | undefined {
-    return this.held;
   }
 
   async load(): Promise<PlaceSet | undefined> {
-    if (this.held) return this.held;
+    const stored = this.readStored();
+    if (stored) return stored;
     try {
       const set = await this.staticSet();
       return this.held ?? this.keep(set);
@@ -76,21 +77,40 @@ export class PlacesStore {
   }
 
   async refresh(meta: Pick<Meta, 'places' | 'places_version'>): Promise<PlaceSet> {
+    const held = this.readStored();
     const version = meta.places_version;
-    const fromMeta = () => this.keep({ version: null, places: meta.places });
-    if (!version) return fromMeta();
-    if (version === this.held?.version) return this.held;
-    try {
-      if (version === this.sources.staticVersion) {
-        const set = await this.staticSet();
-        if (set.version === version) return this.keep(set);
-      }
-      const answer = await this.sources.fetchPlaces(this.held?.version ?? undefined);
-      if (answer.kind === 'same') return this.held ?? fromMeta();
-      return this.keep({ version: answer.version ?? version, places: withLanguages(answer.places, SITE_LANGS) });
-    } catch {
-      return fromMeta();
+    if (!version) return this.fallback(meta);
+    if (version === held?.version) return held;
+    return (await this.fetchVersion(version).catch(() => undefined)) ?? this.fallback(meta);
+  }
+
+  private async fetchVersion(version: string): Promise<PlaceSet | undefined> {
+    if (version === this.sources.staticVersion) {
+      const set = await this.staticSet();
+      if (set.version === version) return this.keep(set);
     }
+    const answer = await this.sources.fetchPlaces(this.held?.version ?? undefined);
+    if (answer.kind === 'same') return undefined;
+    return this.keep({ version: answer.version ?? version, places: withLanguages(answer.places, SITE_LANGS) });
+  }
+
+  // An older API still sends /meta's places: they stand in for one page, never stored, and only when nothing else
+  // has a list.
+  private async fallback(meta: Pick<Meta, 'places'>): Promise<PlaceSet> {
+    if (this.held) return this.held;
+    const loaded = await this.load();
+    if (loaded) return loaded;
+    const set = { version: null, places: meta.places ?? [] };
+    if (set.places.length) this.held = set;
+    return set;
+  }
+
+  private readStored(): PlaceSet | undefined {
+    if (!this.wasRead) {
+      this.wasRead = true;
+      this.held ??= this.read();
+    }
+    return this.held;
   }
 
   private staticSet(): Promise<PlaceSet> {
@@ -101,7 +121,6 @@ export class PlacesStore {
     return this.staticLoad;
   }
 
-  // Only a versioned list is stored: /meta's own places stand in for one page and are never kept.
   private keep(set: PlaceSet): PlaceSet {
     this.held = set;
     if (set.version) this.write(set);

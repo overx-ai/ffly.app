@@ -59,7 +59,8 @@ uv run --with fonttools --with brotli python scripts/fonts.py
 ## Places snapshot
 `npm run places` writes what the search form opens on before `/meta` answers: `src/data/web-meta.json` (the web tier's
 limits and currency, bundled) and `public/places.json` (the places with the site's languages' names and their country,
-fetched by the page on the first focus or once idle, spec 008). Regenerate both after the API's places change:
+fetched by the page on the first focus or once idle, spec 008, as `/places.json?v={places_version}`, cached immutably,
+spec 009). Regenerate both after the API's places change, so the version and the file move together:
 
 ```bash
 npm run places

@@ -29,7 +29,7 @@ const saved = PLACES_FILE && JSON.parse(readFileSync(PLACES_FILE, 'utf8'));
 const fresh = saved ? { body: saved, etag: saved.version } : await get('/places');
 const trim = (names) => (names ? Object.fromEntries(Object.entries(names).filter(([k]) => keepLang(k))) : names);
 const places = (fresh?.body.places ?? meta.places).map((p) => (p.names ? { ...p, names: trim(p.names) } : p));
-const version = fresh?.etag?.replace(/^W\//, '').replace(/^"|"$/g, '') || meta.places_version || null;
+const version = fresh?.etag?.replace(/^W\//, '').replace(/^"|"$/g, '') || meta.places_version || fail('no places version: public/places.json is cached immutably under it');
 if (!Array.isArray(places) || !places.length) fail('no places');
 
 const { max_cities, max_ends, searches_per_day } = meta.tier_limits;
@@ -42,4 +42,4 @@ const head = {
 writeFileSync(HEAD_OUT, `${JSON.stringify(head, null, 2)}\n`);
 // One place per line keeps the diff of a refresh readable.
 writeFileSync(PLACES_OUT, `{"version":${JSON.stringify(version)},"places":[\n${places.map((p) => JSON.stringify(p)).join(',\n')}\n]}\n`);
-console.log(`${places.length} places, version ${version ?? 'none'}, from ${fresh ? '/places' : '/meta'}`);
+console.log(`${places.length} places, version ${version}, from ${fresh ? '/places' : '/meta'}`);
