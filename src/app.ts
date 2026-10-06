@@ -67,6 +67,7 @@ export const WEB_SEARCH = {
   pollRetries: 3,
   pollRetryBaseMs: 2000,
   storageKey: 'ffly.search',
+  placesKey: 'ffly.places',
   startInDays: 21,
   windowDays: 7,
   minNights: 2,

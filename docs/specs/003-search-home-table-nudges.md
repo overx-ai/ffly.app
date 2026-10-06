@@ -46,7 +46,8 @@ Only Night-palette tokens are used (`global.css`).
 2. **Custom controls only.** No `<datalist>`, `type=date`, `<select>` or native number spinner.
    - **`combobox.ts`:** an ARIA 1.2 combobox with a listbox.
      - Keys: ↑/↓/Enter/Esc/Home/End.
-     - Matches the prefix of a name or code, with top places first.
+     - Matches the prefix of a name or code, with top places first. Since spec 007: localized names, folded case and
+       diacritics, ranked exact code > name prefix > word start > contains.
      - Multi-airport cities are grouped (row: city, country and airports, plus a mono code tag).
      - A pick becomes a chip.
      - The cap comes from `/meta` (4 on the web). A 5th pick shows the "Up to 8 cities in the app" nudge row.

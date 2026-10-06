@@ -3,7 +3,7 @@ import type { Plural } from './text';
 
 // The source dictionary. Every other language `satisfies Dict` (typeof this), so a missing key fails the build.
 // Placeholders: {name} is filled at runtime; a Plural object picks its form by Intl.PluralRules, with {n} the count.
-// Brand, plan and city names stay as they are. Copy rules (CLAUDE.md) bind every language.
+// Brand and plan names stay as they are; city names come from the API per language (spec 007), so never inflect one. Copy rules (CLAUDE.md) bind every language.
 
 const p = (forms: Plural) => forms;
 

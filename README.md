@@ -41,6 +41,14 @@ at those exact paths.
 curl -sL https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_land.geojson | uv run scripts/europe-map.py /dev/stdin > src/data/europe-map.json
 ```
 
+## Places snapshot
+`src/data/places.json` is what the search form opens on before `/meta` answers: the places (with every language's
+names from API 1.7.0) and the web tier's limits. Regenerate after the API's places change:
+
+```bash
+npm run places
+```
+
 ## Verification
 
 ```bash

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FFLY_API_BASE } from '../src/app';
-import { buildRequest, canLookup, createSearch, endLimit, lookupShared, searchedAt, type Meta } from '../src/scripts/ffly-api';
+import { buildRequest, canLookup, createSearch, endLimit, getPlaces, lookupShared, searchedAt, versionOf, type Meta } from '../src/scripts/ffly-api';
 
 const trip = {
   start: 'WAW',
@@ -151,5 +151,52 @@ describe('searchedAt', () => {
     expect(searchedAt({ updated: null })).toBeUndefined();
     expect(searchedAt({})).toBeUndefined();
     expect(searchedAt({ updated: Number.NaN })).toBeUndefined();
+  });
+});
+
+describe('getPlaces', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  const places = [{ code: 'WAR', name: 'Warsaw', top: true, names: { de: 'Warschau' } }];
+  const stub = (response: () => Response) => {
+    const fetch = vi.fn(async (_url: string, _init?: RequestInit) => response());
+    vi.stubGlobal('fetch', fetch);
+    return fetch;
+  };
+  const sentHeaders = (fetch: ReturnType<typeof stub>) => fetch.mock.calls[0][1]?.headers as Record<string, string>;
+
+  it('asks conditionally on the version it holds, quoted as an ETag', async () => {
+    const fetch = stub(() => new Response(null, { status: 304 }));
+    expect(await getPlaces('abc')).toEqual({ kind: 'same' });
+    expect(fetch.mock.calls[0][0]).toBe(`${FFLY_API_BASE}/places`);
+    expect(sentHeaders(fetch)['If-None-Match']).toBe('"abc"');
+    expect(sentHeaders(fetch)['X-Platform']).toBe('web');
+  });
+
+  it('asks unconditionally with no version', async () => {
+    const fetch = stub(() => new Response(JSON.stringify({ places }), { status: 200 }));
+    await getPlaces();
+    expect(sentHeaders(fetch)).not.toHaveProperty('If-None-Match');
+  });
+
+  it('returns the places and the version from the ETag', async () => {
+    stub(() => new Response(JSON.stringify({ places }), { status: 200, headers: { ETag: '"v7"' } }));
+    expect(await getPlaces('v6')).toEqual({ kind: 'fresh', version: 'v7', places });
+  });
+
+  it('rejects an error status or a body without places', async () => {
+    stub(() => new Response('{}', { status: 404 }));
+    await expect(getPlaces()).rejects.toThrow();
+    stub(() => new Response('{}', { status: 200 }));
+    await expect(getPlaces()).rejects.toThrow();
+  });
+});
+
+describe('versionOf', () => {
+  it('strips the quotes and a weak prefix, and has nothing for no ETag', () => {
+    expect(versionOf('"abc"')).toBe('abc');
+    expect(versionOf('W/"abc"')).toBe('abc');
+    expect(versionOf(null)).toBeUndefined();
+    expect(versionOf('""')).toBeUndefined();
   });
 });

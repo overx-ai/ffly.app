@@ -7,7 +7,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "test": "vitest run && npm run build && node scripts/check-legal.mjs",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "places": "node scripts/places.mjs"
   },
   "dependencies": {
     "astro": "^4.16.0"

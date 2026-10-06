@@ -13,7 +13,7 @@ Those repos are the source of truth for copy, colours and claims.
   is the DOM-free, tested `consent-state.ts`.
   `SearchForm.astro` (specs 001 and 003) sits on `/` under `#search` and on `/search`, and ships one bundled
   script: `src/scripts/search.ts` over small DOM-free modules (`ffly-api`, `combobox`, `calendar`, `prefs`,
-  `nudges`, `results`, `notify`, `scroll`, `ticker`, `places`) that `tests/` covers. Plain TypeScript, no framework, custom controls
+  `nudges`, `results`, `notify`, `scroll`, `ticker`, `places`, `places-store`) that `tests/` covers. Plain TypeScript, no framework, custom controls
   only (no `<select>`, `<datalist>`, date or number input), rendering via `textContent`/`<template>` only (never
   `innerHTML` with API data). It calls `FFLY_API_BASE` (contract pinned in `docs/PINS.md`) anonymously:
   `X-Platform: web`, never `X-Client-Id`, and never priority, filters or schedule. Its cookies and scroll time live
@@ -79,7 +79,14 @@ Those repos are the source of truth for copy, colours and claims.
 - Never redirect by browser language or IP.
 - Copy lives in `src/i18n/{lang}.ts`, each `satisfies Dict`; never hardcode copy in a view.
 - Shared terms (plan names, Book, priorities) come from ios-ffly `Scripts/l10n/{lang}.json`; German says "du".
-- City names stay English. Polish plurals need `few` and `many`.
+- City names come from the API's `names` in the page's language (`placeName`: exact tag, then base language, then the
+  English `name`), nominative and never inflected: copy never puts a city into a grammatical case. Polish plurals need
+  `few` and `many`.
+- **Places open at once (spec 007).** `src/data/places.json` (`node scripts/places.mjs`, committed) is the form's start:
+  the places and the web tier's limits. A visitor's own copy lives in `localStorage` under `WEB_SEARCH.placesKey`,
+  keyed by `/meta` `places_version`; only a new version fetches `/places` (If-None-Match). The place fields never wait
+  for `/meta`; Find route does. The example trip's labels (map, pass) are named from the snapshot at build time; the
+  map's `europe-map.json` and `LABELS` stay keyed by the English name.
 - Every copy rule holds in every language; `check-legal` bans "unlimited" in all eight (`UNLIMITED`).
 
 ## Legal pages are one decision across repos

@@ -24,7 +24,8 @@ import {
 } from './ffly-api';
 import { ask, canAsk, routesReady } from './notify';
 import { appHintLine, rotation } from './nudges';
-import { addPlace, removePlace } from './places';
+import { addPlace, fold, placeName, removePlace } from './places';
+import { PlacesStore, provisionalMeta } from './places-store';
 import { cookieString, fillPrefs, finishOf, parseCookies, sameSearch, savedCookies, sharedRequest, shareUrl, type Prefs } from './prefs';
 import { routeRows, type RouteRow, type Warn } from './results';
 import { glideLinks } from './scroll';
@@ -116,7 +117,8 @@ const clone = (id: string) => byId<HTMLTemplateElement>(id).content.firstElement
 
 let meta: Meta;
 let money: Intl.NumberFormat;
-let names = new Map<string, string>();
+let places: Place[] = [];
+let byCode = new Map<string, Place>();
 let pickedFrom: string | undefined;
 const lists: Record<ListName, string[]> = { cities: [], ends: [] };
 let nights: Nights = { min: WEB_SEARCH.minNights, max: WEB_SEARCH.maxNights };
@@ -125,7 +127,11 @@ let pollTimer: ReturnType<typeof setTimeout> | undefined;
 let askedToNotify = false;
 let adsPushed = false;
 
-const nameOf = (code: string) => names.get(code) ?? code;
+const localName = (place: Place) => placeName(place, LOCALE);
+const nameOf = (code: string) => {
+  const place = byCode.get(code);
+  return place ? localName(place) : code;
+};
 const maxCities = () => Math.min(meta.tier_limits.max_cities, meta.limits.max_cities);
 const maxEnds = () => endLimit(meta);
 const severalEnds = () => maxEnds() > 1;
@@ -164,18 +170,18 @@ function showText(node: HTMLElement, text: string) {
 function resolvePlace(raw: string): string | undefined {
   const text = raw.trim();
   if (!text) return undefined;
-  if (names.has(text.toUpperCase())) return text.toUpperCase();
-  const lower = text.toLowerCase();
-  return meta.places.find((p) => p.name.toLowerCase() === lower)?.code;
+  if (byCode.has(text.toUpperCase())) return text.toUpperCase();
+  const typed = fold(text);
+  return places.find((p) => fold(localName(p)) === typed || fold(p.name) === typed)?.code;
 }
 
 function remembered(field: Field, on: boolean) {
   for (const tag of document.querySelectorAll<HTMLElement>(`[data-remembered="${field}"]`)) tag.hidden = !on;
 }
 
-function storage(): Storage | undefined {
+function storage(kind: 'sessionStorage' | 'localStorage' = 'sessionStorage'): Storage | undefined {
   try {
-    return window.sessionStorage;
+    return window[kind];
   } catch {
     return undefined;
   }
@@ -183,6 +189,7 @@ function storage(): Storage | undefined {
 
 const save = (saved: Saved) => storage()?.setItem(WEB_SEARCH.storageKey, JSON.stringify(saved));
 const forget = () => storage()?.removeItem(WEB_SEARCH.storageKey);
+const placesStore = new PlacesStore(storage('localStorage'));
 
 function parseJson(raw: string): unknown {
   try {
@@ -223,7 +230,9 @@ function load(): Saved | undefined {
 
 function placeOption(place: Place): HTMLElement {
   const row = clone('place-option-template');
-  part(row, '.place-name').textContent = place.name;
+  const name = localName(place);
+  part(row, '.place-local').textContent = name;
+  showText(part(row, '.place-alt'), name === place.name ? '' : place.name);
   const airports = place.airports && place.airports.length > 1 ? place.airports.join(' · ') : '';
   showText(part(row, '.place-airports'), airports);
   part(row, '.place-code').textContent = place.code;
@@ -246,7 +255,7 @@ function placeBox(input: HTMLInputElement, list: HTMLElement, exclude: Codes, on
     input,
     list,
     options: (query) =>
-      matchPlaces(meta.places, query, { exclude: new Set(exclude().filter(isText)), limit: WEB_SEARCH.placeMatches }),
+      matchPlaces(places, query, { exclude: new Set(exclude().filter(isText)), limit: WEB_SEARCH.placeMatches, lang: LOCALE }),
     renderOption: placeOption,
     renderNotice: placeNotice,
     notice,
@@ -378,11 +387,40 @@ function defaultWindow() {
   return { from, to: addDays(from, WEB_SEARCH.windowDays) };
 }
 
-function setupForm(cookies: Map<string, string>): Prefs {
-  names = new Map(meta.places.map((p) => [p.code, p.name]));
+function usePlaces(list: Place[]) {
+  places = list;
+  byCode = new Map(list.map((p) => [p.code, p]));
+}
+
+function useMeta(next: Meta) {
+  meta = next;
   money = new Intl.NumberFormat(LOCALE, { style: 'currency', currency: meta.currency });
+}
+
+const caps = () => `${maxCities()}/${maxEnds()}`;
+
+// The form opened on the snapshot's limits; the live ones rarely differ, and only then are the lists redrawn.
+function applyMeta(next: Meta) {
+  const before = caps();
+  const wasSeveral = severalEnds();
+  useMeta(next);
+  if (caps() !== before) {
+    setLists(lists.ends, lists.cities);
+    if (!wasSeveral && severalEnds() && lists.ends.length) el.back.value = '';
+  }
+  renderNights();
+  renderQuota();
+}
+
+// Fields being typed in keep their text: only picks are renamed.
+function renderNames() {
+  if (pickedFrom) setFrom(pickedFrom);
+  for (const name of ['ends', 'cities'] as const) if (lists[name].length) renderList(name);
+}
+
+function setupForm(cookies: Map<string, string>): Prefs {
   const limits = { maxNights: meta.limits.max_nights, maxWindowDays: meta.limits.max_window_days };
-  const prefs = fillPrefs(new URLSearchParams(location.search), cookies, (code) => names.has(code), limits);
+  const prefs = fillPrefs(new URLSearchParams(location.search), cookies, (code) => byCode.has(code), limits);
   setFrom(prefs.from.value);
   setLists(prefs.back.value, prefs.cities.value);
   for (const field of ['from', 'back', 'cities'] as const) remembered(field, prefs[field].source === 'cookie');
@@ -908,16 +946,32 @@ el.notifyYes.addEventListener('click', () => {
 
 el.notifyNo.addEventListener('click', closeNotifyAsk);
 
-async function init(): Promise<void> {
-  clearOutcome();
-  try {
-    meta = await getMeta();
-  } catch {
-    return showProblem(MESSAGES.metaDown, () => void init());
-  }
+// The places are there at once (stored or the snapshot), so the fields open before /meta answers; searching waits for it.
+function openForm(): Prefs {
+  usePlaces(placesStore.current.places);
+  useMeta(provisionalMeta());
   const prefs = setupForm(parseCookies(document.cookie));
   el.loading.hidden = true;
   el.fields.disabled = false;
+  el.submit.disabled = true;
+  return prefs;
+}
+
+async function init(prefs: Prefs): Promise<void> {
+  clearOutcome();
+  try {
+    applyMeta(await getMeta());
+  } catch {
+    showProblem(MESSAGES.metaDown, () => void init(prefs));
+    el.submit.disabled = true;
+    return;
+  }
+  el.submit.disabled = false;
+  void placesStore.refresh(meta).then((set) => {
+    if (set.places === places) return;
+    usePlaces(set.places);
+    renderNames();
+  });
 
   // A shared link names the whole trip: the session's own search wins only when it is that same trip. A link
   // whose trip has started only pre-fills the places and nights; setupForm skips its past dates.
@@ -935,5 +989,4 @@ async function init(): Promise<void> {
 glideLinks('search');
 setupStrip(parseCookies(document.cookie));
 picker.set(defaultWindow());
-renderNights();
-void init();
+void init(openForm());

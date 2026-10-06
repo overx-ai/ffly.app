@@ -2,11 +2,12 @@
 import EUROPE from '../data/europe-map.json';
 import { EXAMPLE_TRIP } from '../app';
 import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
+import { exampleCity } from '../scripts/places-store';
 
 interface Props { lang?: Lang; }
 
 const { lang = DEFAULT_LANG } = Astro.props;
-const { t, fmt } = useLang(lang);
+const { t, tag, fmt } = useLang(lang);
 const nightsOf = (n: number) => fmt.plural(t.common.nights, n);
 
 type Point = readonly [number, number];
@@ -18,7 +19,8 @@ const BADGE_OFFSET = 16;
 const LENGTH_SAMPLES = 32;
 // The fly moves at one speed (map units per second) and waits at each city in proportion to its nights.
 const FLY = { speed: 110, startDwell: 0.9, dwellPerNight: 0.45, scale: 1.5 };
-// Label offsets are hand-placed so no label sits on a leg; a new example trip needs new ones.
+// Label offsets are hand-placed so no label sits on a leg; a new example trip needs new ones. Keyed by the English
+// name, as europe-map.json is; the label shows the page's language.
 const LABELS: Record<string, { dx: number; dy: number; anchor: 'start' | 'end'; note?: string }> = {
   Warsaw: { dx: 18, dy: 0, anchor: 'start', note: t.map.startFinish },
   Madrid: { dx: -18, dy: 2, anchor: 'end' },
@@ -108,12 +110,14 @@ const pins = EXAMPLE_TRIP.stops.slice(0, -1).map((s) => {
   const [x, y] = pointOf(s.city);
   const label = LABELS[s.city];
   if (!label) throw new Error(`RouteMap has no label placement for ${s.city}`);
-  return { x, y, city: s.city, note: 'nights' in s ? nightsOf(s.nights) : label.note, ...label };
+  return { x, y, city: exampleCity(s, tag), note: 'nights' in s ? nightsOf(s.nights) : label.note, ...label };
 });
 
 const { width, height, land, graticule } = EUROPE;
 const description = fmt.text(t.map.label, {
-  route: EXAMPLE_TRIP.stops.map((s) => ('nights' in s ? `${s.city}, ${nightsOf(s.nights)}` : s.city)).join(t.map.then),
+  route: EXAMPLE_TRIP.stops
+    .map((s) => ('nights' in s ? `${exampleCity(s, tag)}, ${nightsOf(s.nights)}` : exampleCity(s, tag)))
+    .join(t.map.then),
   total: fmt.money(EXAMPLE_TRIP.bestTotal, EXAMPLE_TRIP.currency),
 });
 ---

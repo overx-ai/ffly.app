@@ -1,4 +1,5 @@
 import type { Place } from './ffly-api';
+import { fold, placeName } from './places';
 
 export interface ComboState {
   open: boolean;
@@ -34,15 +35,35 @@ export function comboKey(state: ComboState, key: string, count: number): ComboSt
 const groupMembers = (places: Place[]) =>
   new Set(places.flatMap((p) => (p.airports && p.airports.length > 1 ? p.airports.filter((a) => a !== p.code) : [])));
 
-export function matchPlaces(places: Place[], query: string, opts: { exclude: Set<string>; limit: number }): Place[] {
-  const q = query.trim().toLowerCase();
+// Below this length "contains" would match nearly every place.
+const CONTAINS_FROM = 3;
+const WORD_BREAK = /[\s\-'’().,/]+/u;
+const RANK = { code: 0, prefix: 1, wordStart: 2, contains: 3 } as const;
+
+function rankOf(place: Place, q: string, lang: string): number | undefined {
+  const codes = [place.code, ...(place.airports ?? [])].map(fold);
+  if (codes.includes(q)) return RANK.code;
+  const names = [placeName(place, lang), place.name].map(fold);
+  if (names.some((n) => n.startsWith(q)) || codes.some((c) => c.startsWith(q))) return RANK.prefix;
+  if (names.some((n) => n.split(WORD_BREAK).some((word) => word.startsWith(q)))) return RANK.wordStart;
+  if (q.length >= CONTAINS_FROM && names.some((n) => n.includes(q))) return RANK.contains;
+  return undefined;
+}
+
+// Exact code (a city's airport codes included) > name prefix > word start > contains, top places first within each.
+export function matchPlaces(places: Place[], query: string, opts: { exclude: Set<string>; limit: number; lang: string }): Place[] {
+  const q = fold(query.trim());
   const members = groupMembers(places);
-  const starts = (text: string) => text.toLowerCase().startsWith(q);
-  return places
-    .filter((p) => !opts.exclude.has(p.code) && !members.has(p.code))
-    .filter((p) => (q ? starts(p.name) || starts(p.code) || Boolean(p.airports?.some(starts)) : p.top))
-    .sort((a, b) => Number(b.top) - Number(a.top))
-    .slice(0, opts.limit);
+  const shown = places.filter((p) => !opts.exclude.has(p.code) && !members.has(p.code));
+  if (!q) return shown.filter((p) => p.top).slice(0, opts.limit);
+  return shown
+    .flatMap((place) => {
+      const rank = rankOf(place, q, opts.lang);
+      return rank === undefined ? [] : [{ place, rank }];
+    })
+    .sort((a, b) => a.rank - b.rank || Number(b.place.top) - Number(a.place.top))
+    .slice(0, opts.limit)
+    .map((m) => m.place);
 }
 
 export interface ComboOptions {

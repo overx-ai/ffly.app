@@ -1,7 +1,7 @@
 import { FFLY_API_BASE, WEB_SEARCH } from '../app';
 
 // Wire shapes of ffly API contract 1.3.0 (1B-bots apps/ffly-api/contract/openapi.json, spec 533), plus the
-// shared-search lookup of 1.5.0 (spec 535), only the fields this page reads. The web channel gets routes 1-3 in
+// shared-search lookup of 1.5.0 (spec 535) and the localized places of 1.7.0, only the fields this page reads. The web channel gets routes 1-3 in
 // full and a locked tail, so most fields are optional.
 
 export interface Place {
@@ -9,10 +9,12 @@ export interface Place {
   name: string;
   top: boolean;
   airports?: string[] | null;
+  names?: Record<string, string> | null;
 }
 
 export interface Meta {
   places: Place[];
+  places_version?: string | null;
   currency: string;
   limits: { max_cities: number; max_ends: number; max_nights: number; max_window_days: number };
   tier_limits: { max_cities: number; max_ends?: number; searches_per_day: number | null };
@@ -126,6 +128,23 @@ async function getJson<T>(path: string): Promise<T> {
 }
 
 export const getMeta = () => getJson<Meta>('/meta');
+
+export type PlacesAnswer = { kind: 'same' } | { kind: 'fresh'; version?: string; places: Place[] };
+
+export const versionOf = (etag: string | null) => etag?.replace(/^W\//, '').replace(/^"|"$/g, '') || undefined;
+
+// A conditional request: the browser then neither answers from nor fills its own store, so a 304 reaches us.
+export async function getPlaces(version?: string): Promise<PlacesAnswer> {
+  const res = await fetch(`${FFLY_API_BASE}/places`, {
+    headers: version ? { ...headers, 'If-None-Match': `"${version}"` } : headers,
+    signal: timeout(),
+  });
+  if (res.status === 304) return { kind: 'same' };
+  if (!res.ok) throw new Error(`GET /places: ${res.status}`);
+  const body = (await res.json()) as { places?: unknown };
+  if (!Array.isArray(body.places)) throw new Error('GET /places: no places');
+  return { kind: 'fresh', version: versionOf(res.headers.get('ETag')), places: body.places as Place[] };
+}
 
 export const getSearch = (id: string) => getJson<SearchView>(`/searches/${encodeURIComponent(id)}`);
 

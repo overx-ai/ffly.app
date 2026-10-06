@@ -1,6 +1,7 @@
 ---
 import { APP, EXAMPLE_TRIP } from '../app';
 import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
+import { exampleCity } from '../scripts/places-store';
 
 interface Props {
   caption: string;
@@ -56,9 +57,9 @@ for (let x = 0; x < BARCODE.width; ) {
     </div>
     <div class="main">
       <div class="ends">
-        <div><span class="k">{pass.from}</span><div class="iata">{first.code}</div><small>{first.city}</small></div>
+        <div><span class="k">{pass.from}</span><div class="iata">{first.code}</div><small>{exampleCity(first, tag)}</small></div>
         <div class="via">{pass.via} {visits.map((s) => s.code).join(' · ')}</div>
-        <div class="r"><span class="k">{pass.to}</span><div class="iata">{last.code}</div><small>{last.city}</small></div>
+        <div class="r"><span class="k">{pass.to}</span><div class="iata">{last.code}</div><small>{exampleCity(last, tag)}</small></div>
       </div>
       <div class="meta">
         <div><span class="k">{pass.passenger}</span><b>{pass.you}</b></div>
@@ -74,7 +75,7 @@ for (let x = 0; x < BARCODE.width; ) {
           <tbody>
             {legs.map((leg) => (
               <tr>
-                <td class="leg">{leg.from.code} → {leg.to.code} <span>{leg.to.city}</span></td>
+                <td class="leg">{leg.from.code} → {leg.to.code} <span>{exampleCity(leg.to, tag)}</span></td>
                 <td>{'nights' in leg.to ? leg.to.nights : pass.end}</td>
                 <td class="mono">{passDate(leg.flight.day)}</td>
                 <td class="col-departs mono">{leg.flight.time}</td>
