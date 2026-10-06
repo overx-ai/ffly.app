@@ -278,6 +278,7 @@ const nl = {
         lateLandings: { one: '{n} landing om middernacht minder', other: '{n} landingen om middernacht minder' },
         daylightGained: '{h} u meer daglicht',
       },
+      allAirports: 'Alle luchthavens',
       nudges: {
         priceLine: 'Prijzen in de app zijn vaak lager.',
         queue: 'In de app slaat je zoekopdracht de wachtrij over.',

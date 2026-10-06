@@ -3,8 +3,9 @@
 Website for **ffly**, at `ffly.app`. Astro 4, static, one dependency (plus `vitest`, dev only). Zero client
 JavaScript, except the free web search widget on `/` (`#search`) and `/search`, and the consent banner.
 
-Eight languages (spec 004): English at the root, and German, French, Spanish, Italian, Dutch, Polish and
-Portuguese under `/de` `/fr` `/es` `/it` `/nl` `/pl` `/pt`. Only the home page, `/search` and `/guides` are
+Thirteen languages (specs 004, 010): English at the root, and German, French, Spanish, Italian, Dutch, Polish,
+Portuguese, Russian, Swedish, Danish, Norwegian and Finnish under `/de` `/fr` `/es` `/it` `/nl` `/pl` `/pt` `/ru` `/sv`
+`/da` `/no` `/fi`. Only the home page, `/search` and `/guides` are
 localized; support, privacy, terms, the guide articles and the 404 are English only.
 
 ```bash
@@ -47,6 +48,12 @@ curl -sL https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/g
 `bricolage-grotesque-700-800-*.woff2` and deletes its sources. Fonts are cached immutably by name, so a changed font
 file needs a new name (and the new name in `src/styles/global.css` and `PRELOAD_FONTS` in `BaseLayout`).
 
+Cyrillic (spec 010): Bricolage and Figtree have none, so Onest (variable, declared 400-800) follows them in
+`--font-display` and `--font-body`, and IBM Plex Mono has its cyrillic faces under its own family name. Each is a
+`cyrillic` and `cyrillic-ext` subset with Google's `unicode-range`, so only a page with Cyrillic text fetches them; the
+footer names another language in another script (Русский) in the system font for the same reason. `scripts/fonts.py`
+downloads any of them missing from `public/fonts/` (`DOWNLOADS`), never preloaded.
+
 To regenerate, save the `/* latin */` and `/* latin-ext */` woff2 that Google Fonts lists for the full variable font
 as those two sources in `public/fonts/`, then run the script:
 
@@ -58,9 +65,11 @@ uv run --with fonttools --with brotli python scripts/fonts.py
 
 ## Places snapshot
 `npm run places` writes what the search form opens on before `/meta` answers: `src/data/web-meta.json` (the web tier's
-limits and currency, bundled) and `public/places.json` (the places with the site's languages' names and their country,
-fetched by the page on the first focus or once idle, spec 008, as `/places.json?v={places_version}`, cached immutably,
-spec 009). Regenerate both after the API's places change, so the version and the file move together:
+limits and currency, bundled) and `public/places.json` (the places with the site's languages' names, their country and,
+as `local`, a city's name in its country's language when no kept name holds it, spec 010; fetched by the page on the
+first focus or once idle, spec 008, as `/places.json?v={places_version}&l={site languages}`, cached immutably,
+spec 009). The trimming rule and the country languages (`COUNTRY_LANG`) live in `src/scripts/local-names.mjs`, shared
+by the script and the page. Regenerate both after the API's places change, so the version and the file move together:
 
 ```bash
 npm run places
@@ -76,13 +85,13 @@ for u in / /support /privacy /terms /search /guides; do
   curl -s localhost:4329$u | grep -c '<h1\|rel="canonical"'; done   # 2 each
 
 # npm test already fails on trailing-slash or dead internal links, em dashes, "unlimited" in any of the
-# eight languages, offers/aggregateRating in JSON-LD, non-reciprocal hreflang and a head that differs from
+# thirteen languages, offers/aggregateRating in JSON-LD, non-reciprocal hreflang and a head that differs from
 # the sitemap. Fare figures are left to a human read:
 grep -rohE --include='*.html' '€ ?[0-9][0-9.,]*' dist   # only the labelled EXAMPLE_TRIP totals
 
-# Canonicals and hreflang: a localized page is self-canonical with 8 alternates plus x-default -> the root;
+# Canonicals and hreflang: a localized page is self-canonical with 13 alternates plus x-default -> the root;
 # an English-only page has its canonical and no alternates.
-curl -s localhost:4329/de/search | grep -oE '<link rel="(canonical|alternate)"[^>]*>'   # 1 + 9
+curl -s localhost:4329/de/search | grep -oE '<link rel="(canonical|alternate)"[^>]*>'   # 1 + 14
 curl -s localhost:4329/support   | grep -oE '<link rel="(canonical|alternate)"[^>]*>'   # 1
 curl -s localhost:4329/sitemap.xml | grep -c 'xhtml:link'                              # 9 per localized URL
 curl -sI localhost:4329/ -H 'Accept-Language: de' | head -1                            # 200, never a redirect

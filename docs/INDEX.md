@@ -16,6 +16,7 @@
 - [Spec 007 - Localized places, better matching, instant list](specs/007-localized-places.md): names per language, folded and ranked matching, the places snapshot and the stored copy
 - [Spec 008 - Worldwide places](specs/008-worldwide-places.md): API 1.8.0's 3,493 places in `public/places.json` (out of the bundle, loaded lazily), a folded index, the country in suggestions
 - [Spec 009 - /meta without places](specs/009-meta-without-places.md): `/meta?places=false`, the stored list read when idle, a stored list at the live version never fetched again, `places.json?v=` cached immutably
+- [Spec 010 - Russian and Nordic languages, local city names](specs/010-russian-and-nordic.md): ru, sv, da, nb, fi; search by local name and every code, "All airports", Cyrillic fonts only where needed, places cache marked with the site's languages
 - [PINS](PINS.md): the ffly API contract version the site codes against
 - [Plan - Spec 003](plans/spec-003.md): how spec 003 was built, and its binding deviations
 

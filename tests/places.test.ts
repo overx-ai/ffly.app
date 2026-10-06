@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { addPlace, cityOf, countryNamer, fold, placeName, removePlace, withLanguages } from '../src/scripts/places';
+import STATIC from '../public/places.json';
+import { LANGS } from '../src/i18n/locales';
+import type { Place } from '../src/scripts/ffly-api';
+import { addPlace, cityOf, countryNamer, fold, localOf, optionParts, placeName, removePlace, withLanguages } from '../src/scripts/places';
 
 describe('addPlace', () => {
   it('appends in the order picked, up to the cap', () => {
@@ -101,5 +104,70 @@ describe('withLanguages', () => {
       { code: 'RIX', name: 'Riga', top: true },
     ];
     expect(withLanguages(places, ['de', 'pt']).map((p) => p.names)).toEqual([{ de: 'Warschau', 'pt-BR': 'Varsóvia' }, null, undefined]);
+  });
+});
+
+describe('withLanguages and the local name', () => {
+  const warsaw = { code: 'WAR', name: 'Warsaw', top: true, country: 'PL', names: { de: 'Warschau', pl: 'Warszawa', ru: 'Варшава' } };
+  const prague = { code: 'PRG', name: 'Prague', top: true, country: 'CZ', names: { cs: 'Praha', de: 'Prag' } };
+
+  it("keeps the city's own name when its language is not one of the site's", () => {
+    expect(withLanguages([warsaw], ['en', 'de'])[0]).toEqual({ ...warsaw, names: { de: 'Warschau' }, local: 'Warszawa' });
+    expect(withLanguages([prague], ['en', 'de'])[0]).toEqual({ ...prague, names: { de: 'Prag' }, local: 'Praha' });
+  });
+
+  it('keeps no separate local name when the names already hold it, or it is the English name', () => {
+    expect(withLanguages([warsaw], ['en', 'pl'])[0]).toEqual({ ...warsaw, names: { pl: 'Warszawa' } });
+    const oslo = { code: 'OSL', name: 'Oslo', top: true, country: 'NO', names: { de: 'Oslo' } };
+    expect(withLanguages([oslo], ['en'])[0]).toEqual({ ...oslo, names: {} });
+  });
+
+  it('keeps none for a country whose language has no names, or a place with no country', () => {
+    const reykjavik = { code: 'REK', name: 'Reykjavik', top: true, country: 'IS', names: { de: 'Reykjavík' } };
+    expect(withLanguages([reykjavik], ['en'])[0]).not.toHaveProperty('local');
+    const nowhere = { code: 'XXX', name: 'Nowhere', top: false, country: null, names: { pl: 'Nigdzie' } };
+    expect(withLanguages([nowhere], ['en'])[0]).not.toHaveProperty('local');
+  });
+
+  it("takes a country's regional names first, as placeName does", () => {
+    const rio = { code: 'RIO', name: 'Rio de Janeiro', top: true, country: 'BR', names: { pt: 'Rio de Janeiro (PT)', 'pt-BR': 'Rio' } };
+    expect(withLanguages([rio], ['en'])[0].local).toBe('Rio');
+  });
+});
+
+describe('localOf', () => {
+  it('reads a kept local name, else the name in the country language the site keeps', () => {
+    expect(localOf({ name: 'Prague', country: 'CZ', local: 'Praha' })).toEqual({ name: 'Praha', lang: 'cs' });
+    expect(localOf({ name: 'Warsaw', country: 'PL', names: { pl: 'Warszawa' } })).toEqual({ name: 'Warszawa', lang: 'pl' });
+    expect(localOf({ name: 'Oslo', country: 'NO', names: {} })).toBeUndefined();
+    expect(localOf({ name: 'London', country: 'GB' })).toBeUndefined();
+  });
+});
+
+describe('optionParts over the full place list', () => {
+  const PLACES = STATIC.places as Place[];
+  const at = (code: string) => PLACES.find((p) => p.code === code)!;
+
+  it('labels a city with more than one airport, never a single airport or an airport row', () => {
+    expect(optionParts(at('WAR'), 'en-GB')).toMatchObject({ airports: ['WAW', 'WMI'], allAirports: true });
+    expect(optionParts(at('LON'), 'de').allAirports).toBe(true);
+    expect(optionParts(at('MAD'), 'en-GB')).toMatchObject({ airports: [], allAirports: false });
+    expect(optionParts(at('WAW'), 'en-GB')).toMatchObject({ airports: [], allAirports: false });
+  });
+
+  it('shows the name the chosen field shows, then the English and the local name only where they differ', () => {
+    expect(optionParts(at('WAR'), 'en-GB')).toMatchObject({ name: 'Warsaw', english: '', local: { name: 'Warszawa', lang: 'pl' } });
+    expect(optionParts(at('WAR'), 'de')).toMatchObject({ name: 'Warschau', english: 'Warsaw', local: { name: 'Warszawa', lang: 'pl' } });
+    expect(optionParts(at('WAR'), 'pl')).toMatchObject({ name: 'Warszawa', english: 'Warsaw', local: undefined });
+    expect(optionParts(at('MOW'), 'en-GB').local).toEqual({ name: 'Москва', lang: 'ru' });
+    for (const code of ['WAR', 'LON', 'MOW']) expect(optionParts(at(code), 'de').name).toBe(placeName(at(code), 'de'));
+  });
+});
+
+describe('public/places.json', () => {
+  // The stored copy is marked with the site's languages, so a file built before a language was added would pass as complete.
+  it("carries the names of exactly the site's languages", () => {
+    const kept = new Set((STATIC.places as Place[]).flatMap((p) => Object.keys(p.names ?? {}).map((key) => key.split('-')[0])));
+    expect([...kept].sort()).toEqual(LANGS.map((l) => l.code).filter((code) => code !== 'en').sort());
   });
 });

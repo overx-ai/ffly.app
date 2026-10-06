@@ -75,32 +75,38 @@ Those repos are the source of truth for copy, colours and claims.
 - Footer of every page carries "Created by overx.ai" linking to `https://overx.ai` (followed).
 
 ## Languages (spec 004)
-- en at the root; de, fr, es, it, nl, pl, pt (pt-PT) under `/de` … `/pt`. Rows in `src/i18n/locales.ts`.
+- en at the root; de, fr, es, it, nl, pl, pt (pt-PT), ru, sv, da, nb (prefix `/no`), fi under their prefix (spec 010).
+  Rows in `src/i18n/locales.ts`, fields in the order `code, prefix, hreflang, tag, og` (two regexes read it). Norwegian
+  is `nb` in code, tag and hreflang (the API's names and the app's strings), `/no` in the URL.
 - Localized: `/`, `/search`, `/guides` only (views in `src/views`, routes in `src/pages/[lang]`).
   Support, privacy, terms, guide articles and the 404 stay English at the root.
-- Every page self-canonical. Localized pages: reciprocal hreflang for all 8 plus `x-default` → root, same
+- Every page self-canonical. Localized pages: reciprocal hreflang for all 13 plus `x-default` → root, same
   set in the sitemap (`alternates()` in `src/site-pages.ts`). English-only pages: no alternates.
 - Never redirect by browser language or IP.
 - Copy lives in `src/i18n/{lang}.ts`, each `satisfies Dict`; never hardcode copy in a view.
 - Shared terms (plan names, Book, priorities) come from ios-ffly `Scripts/l10n/{lang}.json`; German says "du".
 - City names come from the API's `names` in the page's language (`placeName`: exact tag, then base language, then the
-  English `name`), nominative and never inflected: copy never puts a city into a grammatical case. Polish plurals need
+  English `name`), nominative and never inflected: copy never puts a city into a grammatical case. Polish and Russian plurals need
   `few` and `many`.
 - **Places open at once (specs 007, 008).** `npm run places` (committed output) writes `src/data/web-meta.json`, the web
   tier's limits, currency and places version, bundled for first paint, and `public/places.json`, the 3,493 places (API
-  1.8.0, names trimmed to the eight languages), **never in the JS bundle**: the page fetches it same-origin on the first
+  1.8.0, names trimmed to the site's languages), **never in the JS bundle**: the page fetches it same-origin on the first
   focus in the form or once idle. Until then a place field says "Loading cities…", never an empty list; only a link or
   cookie naming places waits for it. A visitor's own copy lives in `localStorage` under `WEB_SEARCH.placesKey`, keyed
   by `/meta` `places_version`; a version past the static file's fetches `/places` (If-None-Match). **Spec 009:** `/meta` is
   asked with `?places=false`; the stored list is read only once the page is idle or a place field needs it; a stored
   list whose version equals `/meta`'s `places_version` is never fetched again; `places.json` is fetched as
-  `?v={version}` and cached immutably (`check-legal` asserts the header, the versioned URL and that the file's
+  `?v={version}&l={PLACES_LANGS}` and cached immutably (`check-legal` asserts the header, the versioned URL and that the file's
   version is `web-meta.json`'s). The place fields
   never wait for `/meta`; Find route does. `matchPlaces` folds each list once per language (keep it under the
-  keystroke budget in `tests/combobox.test.ts`). Suggestions show the country (`Intl.DisplayNames`), nothing else does.
+  keystroke budget in `tests/combobox.test.ts`). A query matches the page language's name, the English name, the city's local name (`local`, or its name in
+  `COUNTRY_LANG[country]`, `src/scripts/local-names.mjs`), the city code and every airport code, as the app does plus the
+  local name. Suggestions show the country (`Intl.DisplayNames`), nothing else does; a city with more than one airport
+  shows `allAirports` beside its codes in the list, never in the chosen field. The stored list carries `PLACES_LANGS`, so
+  adding a language replaces every visitor's copy once.
   The example trip's labels (map, pass) are named from `public/places.json` at build time (`src/example-city.ts`); the
   map's `europe-map.json` and `LABELS` stay keyed by the English name.
-- Every copy rule holds in every language; `check-legal` bans "unlimited" in all eight (`UNLIMITED`).
+- Every copy rule holds in every language; `check-legal` bans "unlimited" in all thirteen (`UNLIMITED`).
 
 ## Legal pages are one decision across repos
 - `/privacy` lists exactly the seven types in `ios-ffly/Template/PrivacyInfo.xcprivacy` and
@@ -170,7 +176,9 @@ Those repos are the source of truth for copy, colours and claims.
   animation sampled from the legs at build time (`fly-route`), so it runs on the compositor and needs no JavaScript.
   Never use SMIL `<animateMotion>` there: it re-laid out the page every frame, off screen too (`check-legal` bans it). Label offsets there are hand-placed for
   `EXAMPLE_TRIP`: a new example needs new ones, and a new city needs a point in `scripts/europe-map.py`.
-- Fonts are self-hosted latin and latin-ext woff2 (split by `unicode-range`) in `public/fonts/`: Bricolage Grotesque (display), Figtree (body),
+- Fonts are self-hosted latin and latin-ext woff2 (split by `unicode-range`) in `public/fonts/`, plus cyrillic subsets
+  (spec 010): Onest after Bricolage and Figtree in the stacks, and IBM Plex Mono's own; only a page with Cyrillic text
+  fetches them, and footer links in another script use the system font. Bricolage Grotesque (display), Figtree (body),
   IBM Plex Mono (data). They are cached immutably by name, so **a changed font file gets a new name**. Bricolage is
   cut to weights 700-800 (`scripts/fonts.py`): never ask the display font for a lighter weight.
 - `og:image:width/height` in `BaseLayout` match `public/og-image.jpg` (1200x675). Change both together.

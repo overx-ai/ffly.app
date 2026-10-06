@@ -9,6 +9,11 @@ export const LANGS = [
   { code: 'nl', prefix: 'nl', hreflang: 'nl', tag: 'nl', og: 'nl_NL', name: 'Nederlands' },
   { code: 'pl', prefix: 'pl', hreflang: 'pl', tag: 'pl', og: 'pl_PL', name: 'Polski' },
   { code: 'pt', prefix: 'pt', hreflang: 'pt-PT', tag: 'pt-PT', og: 'pt_PT', name: 'Português' },
+  { code: 'ru', prefix: 'ru', hreflang: 'ru', tag: 'ru', og: 'ru_RU', name: 'Русский' },
+  { code: 'sv', prefix: 'sv', hreflang: 'sv', tag: 'sv', og: 'sv_SE', name: 'Svenska' },
+  { code: 'da', prefix: 'da', hreflang: 'da', tag: 'da', og: 'da_DK', name: 'Dansk' },
+  { code: 'nb', prefix: 'no', hreflang: 'nb', tag: 'nb', og: 'nb_NO', name: 'Norsk' },
+  { code: 'fi', prefix: 'fi', hreflang: 'fi', tag: 'fi', og: 'fi_FI', name: 'Suomi' },
 ] as const;
 
 export type Locale = (typeof LANGS)[number];

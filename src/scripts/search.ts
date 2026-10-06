@@ -24,7 +24,7 @@ import {
 } from './ffly-api';
 import { ask, canAsk, routesReady } from './notify';
 import { appHintLine, rotation } from './nudges';
-import { addPlace, countryNamer, fold, placeName, removePlace } from './places';
+import { addPlace, countryNamer, fold, optionParts, placeName, placeNames, removePlace } from './places';
 import { PlacesStore, provisionalMeta, type PlaceSet } from './places-store';
 import { cookieString, fillPrefs, finishOf, namesPlaces, parseCookies, sameSearch, savedCookies, sharedRequest, shareUrl, type Prefs } from './prefs';
 import { routeRows, type RouteRow, type Warn } from './results';
@@ -174,7 +174,7 @@ function resolvePlace(raw: string): string | undefined {
   if (!text) return undefined;
   if (byCode.has(text.toUpperCase())) return text.toUpperCase();
   const typed = fold(text);
-  return places.find((p) => fold(localName(p)) === typed || fold(p.name) === typed)?.code;
+  return places.find((p) => placeNames(p, LOCALE).some((name) => fold(name) === typed))?.code;
 }
 
 function remembered(field: Field, on: boolean) {
@@ -232,12 +232,16 @@ function load(): Saved | undefined {
 
 function placeOption(place: Place): HTMLElement {
   const row = clone('place-option-template');
-  const name = localName(place);
-  part(row, '.place-local').textContent = name;
-  showText(part(row, '.place-alt'), name === place.name ? '' : place.name);
+  const parts = optionParts(place, LOCALE);
+  part(row, '.place-local').textContent = parts.name;
+  showText(part(row, '.place-alt'), parts.english);
+  const native = part(row, '.place-native');
+  showText(native, parts.local?.name ?? '');
+  if (parts.local) native.lang = parts.local.lang;
   showText(part(row, '.place-country'), countryName(place.country));
-  const airports = place.airports && place.airports.length > 1 ? place.airports.join(' · ') : '';
-  showText(part(row, '.place-airports'), airports);
+  part(row, '.place-airports').hidden = !parts.allAirports;
+  showText(part(row, '.place-all'), parts.allAirports ? TEXT.allAirports : '');
+  showText(part(row, '.place-codes'), parts.airports.join(' · '));
   part(row, '.place-code').textContent = place.code;
   return row;
 }

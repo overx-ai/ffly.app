@@ -1,7 +1,9 @@
 // Writes what the web search form starts from before /meta answers: src/data/web-meta.json, the web tier's limits
 // and currency (bundled, read at first paint), and public/places.json, the places from /places (API >= 1.7.0, with
-// the site's languages' names; else /meta's own places), fetched by the page only when a place field needs them.
+// the site's languages' names and each city's local name; else /meta's own places), fetched by the page only when a
+// place field needs them.
 import { readFileSync, writeFileSync } from 'node:fs';
+import { withLanguages } from '../src/scripts/local-names.mjs';
 
 const app = readFileSync(new URL('../src/app.ts', import.meta.url), 'utf8');
 const read = (pattern, what) => app.match(pattern)?.[1] ?? fail(`src/app.ts: no ${what}`);
@@ -11,7 +13,6 @@ const HEAD_OUT = new URL('../src/data/web-meta.json', import.meta.url);
 const PLACES_OUT = new URL(`../public${read(/placesUrl: '([^']+)'/, 'WEB_SEARCH.placesUrl')}`, import.meta.url);
 // The site ships only its own languages; /places carries all 49 of the app's.
 const LANG_CODES = [...readFileSync(new URL('../src/i18n/locales.ts', import.meta.url), 'utf8').matchAll(/code: '([a-z]+)'/g)].map((m) => m[1]);
-const keepLang = (key) => LANG_CODES.includes(key.split('-')[0]);
 // PLACES_FILE: a saved /places body, for a snapshot before that route is deployed.
 const PLACES_FILE = process.env.PLACES_FILE;
 
@@ -27,8 +28,7 @@ async function get(path) {
 const meta = (await get('/meta'))?.body ?? fail(`${base}/meta did not answer`);
 const saved = PLACES_FILE && JSON.parse(readFileSync(PLACES_FILE, 'utf8'));
 const fresh = saved ? { body: saved, etag: saved.version } : await get('/places');
-const trim = (names) => (names ? Object.fromEntries(Object.entries(names).filter(([k]) => keepLang(k))) : names);
-const places = (fresh?.body.places ?? meta.places).map((p) => (p.names ? { ...p, names: trim(p.names) } : p));
+const places = withLanguages(fresh?.body.places ?? meta.places, LANG_CODES);
 const version = fresh?.etag?.replace(/^W\//, '').replace(/^"|"$/g, '') || meta.places_version || fail('no places version: public/places.json is cached immutably under it');
 if (!Array.isArray(places) || !places.length) fail('no places');
 

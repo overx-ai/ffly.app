@@ -124,10 +124,16 @@
 .search-form .place[aria-selected="true"],
 .search-form .place:hover { background: var(--fill); }
 .search-form .place-name { grid-area: name; font-weight: 600; }
-.search-form .place-alt { margin-inline-start: 0.4em; font-weight: 400; color: var(--ink-2); }
+.search-form .place-alt,
+.search-form .place-native { font-weight: 400; color: var(--ink-2); }
+/* The template has no whitespace between the names, so this space is where a long row may wrap. */
+.search-form .place-alt::before,
+.search-form .place-native::before { content: " "; }
 .search-form .place-country { font-weight: 400; color: var(--ink-2); }
-.search-form .place-country::before { content: "\00a0· "; content: "\00a0· " / ""; }
+.search-form .place-country::before { content: "\00a0· "; content: "\00a0· " / ", "; }
 .search-form .place-airports { grid-area: airports; color: var(--ink-2); font: 500 12px var(--font-mono); }
+.search-form .place-all { font-family: var(--font-body); }
+.search-form .place-all::after { content: "\00a0· "; content: "\00a0· " / ", "; }
 .search-form .place-code {
   grid-area: code;
   font: 600 12px var(--font-mono);
@@ -428,6 +434,9 @@
 @media (max-width: 900px) {
   .search-form .trip-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .search-form .trip-row > .field:nth-child(n + 3) { order: 1; }
+  /* Two fields share a row here, so each list spans both: From's to the right, Back to's to the left. */
+  .search-form #from-list { right: auto; width: calc(200% + var(--space-md)); }
+  .search-form #back-list { left: auto; width: calc(200% + var(--space-md)); }
 }
 
 @media (max-width: 900px), (pointer: coarse) {
@@ -446,6 +455,7 @@
 @media (max-width: 560px) {
   .search-form .trip-row > :nth-child(n + 3),
   .search-form .trip-row:has(#ends:not([hidden], :empty)) > :nth-child(-n + 2) { grid-column: 1 / -1; }
+  .search-form .trip-row:has(#ends:not([hidden], :empty)) :is(#from-list, #back-list) { left: 0; right: 0; width: auto; }
   .search-form .cities-row { grid-template-columns: minmax(0, 1fr); }
   .search-form .cities-row .btn { width: 100%; }
   .search-form .app-row { flex-wrap: wrap; }

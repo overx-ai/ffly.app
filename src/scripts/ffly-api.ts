@@ -11,6 +11,7 @@ export interface Place {
   airports?: string[] | null;
   names?: Record<string, string> | null;
   country?: string | null;
+  local?: string | null;
 }
 
 export interface Meta {

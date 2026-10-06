@@ -1,17 +1,19 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { EXAMPLE_TRIP, WEB_SEARCH } from '../src/app';
 import { exampleCity } from '../src/example-city';
+import { LANGS } from '../src/i18n/locales';
 import type { Place, PlacesAnswer } from '../src/scripts/ffly-api';
-import { PlacesStore, WEB_META, fetchStaticPlaces, provisionalMeta, type PlaceSet } from '../src/scripts/places-store';
+import { PLACES_LANGS, PlacesStore, WEB_META, fetchStaticPlaces, provisionalMeta, type PlaceSet } from '../src/scripts/places-store';
 
 const place = (code: string, name: string, names?: Record<string, string>): Place => ({ code, name, top: true, names });
 const STATIC: PlaceSet = { version: 'v1', places: [place('WAR', 'Warsaw')] };
 const STORED: PlaceSet = { version: 'v2', places: [place('WAR', 'Warsaw', { de: 'Warschau' })] };
 const LIVE = [place('WAR', 'Warsaw', { de: 'Warschau', pl: 'Warszawa' })];
 
-function box(initial?: PlaceSet) {
+// langs null: a list stored before the site's languages were marked.
+function box(initial?: PlaceSet, langs: string | null = PLACES_LANGS) {
   const items = new Map<string, string>();
-  if (initial) items.set(WEB_SEARCH.placesKey, JSON.stringify(initial));
+  if (initial) items.set(WEB_SEARCH.placesKey, JSON.stringify(langs === null ? initial : { ...initial, langs }));
   return {
     items,
     getItem: vi.fn((key: string) => items.get(key) ?? null),
@@ -19,7 +21,13 @@ function box(initial?: PlaceSet) {
   };
 }
 
-const stored = (b: ReturnType<typeof box>) => JSON.parse(b.items.get(WEB_SEARCH.placesKey) ?? 'null') as PlaceSet | null;
+function stored(b: ReturnType<typeof box>): PlaceSet | null {
+  const value = JSON.parse(b.items.get(WEB_SEARCH.placesKey) ?? 'null') as (PlaceSet & { langs?: string }) | null;
+  if (!value) return null;
+  const { langs, ...set } = value;
+  expect(langs).toBe(PLACES_LANGS);
+  return set;
+}
 const META_PLACES = [place('WAR', 'Warsaw (meta)')];
 const meta = (places_version?: string | null, places: Place[] | undefined = META_PLACES) => ({ places, places_version });
 const offline = async (): Promise<never> => {
@@ -222,6 +230,22 @@ describe('PlacesStore validity', () => {
     }
   });
 
+  it("ignores a list stored for other languages, or before the site's languages were marked, and replaces it", async () => {
+    for (const langs of [null, 'en,de', `${PLACES_LANGS},xx`]) {
+      const b = box(STORED, langs);
+      const s = sources();
+      const store = new PlacesStore(b, s);
+      expect(await store.load()).toEqual(STATIC);
+      await store.refresh(meta('v1'));
+      expect(fetches(s)).toBe(1);
+      expect(stored(b)).toEqual(STATIC);
+    }
+  });
+
+  it('marks the stored list with every language of the site, so a new language is a new list', () => {
+    expect(PLACES_LANGS).toBe(LANGS.map((l) => l.code).join(','));
+  });
+
   it('fetches once over a corrupt stored entry', async () => {
     const b = box();
     b.items.set(WEB_SEARCH.placesKey, '{"version":"v1","places":');
@@ -242,10 +266,12 @@ describe('fetchStaticPlaces', () => {
     return fetch;
   };
 
-  it('reads the same-origin static file under its version, so each version has its own URL', async () => {
+  it('reads the same-origin static file under its version and languages, so each list has its own URL', async () => {
     const fetch = stub(() => new Response(JSON.stringify(STATIC)));
     expect(await fetchStaticPlaces()).toEqual(STATIC);
-    expect(fetch.mock.calls[0][0]).toBe(`${WEB_SEARCH.placesUrl}?v=${encodeURIComponent(WEB_META.places_version)}`);
+    expect(fetch.mock.calls[0][0]).toBe(
+      `${WEB_SEARCH.placesUrl}?v=${encodeURIComponent(WEB_META.places_version)}&l=${encodeURIComponent(PLACES_LANGS)}`,
+    );
     expect(WEB_META.places_version).toBeTruthy();
   });
 

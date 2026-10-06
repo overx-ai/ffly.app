@@ -278,6 +278,7 @@ const pt = {
         lateLandings: { one: '{n} aterragem à meia-noite a menos', other: '{n} aterragens à meia-noite a menos' },
         daylightGained: '{h} h a mais de luz do dia',
       },
+      allAirports: 'Todos os aeroportos',
       nudges: {
         priceLine: 'Na app, os preços são muitas vezes mais baixos.',
         queue: 'Na app, a sua pesquisa passa à frente da fila.',

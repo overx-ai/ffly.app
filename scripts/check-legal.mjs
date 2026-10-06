@@ -6,8 +6,8 @@ const DIST = fileURLToPath(new URL('../dist/', import.meta.url));
 const source = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 
 // The languages and localized slugs, read from the TypeScript that drives the build (src/i18n/locales.ts, src/site-pages.ts).
-const LANGS = [...source('src/i18n/locales.ts').matchAll(/\{ code: '(\w+)', prefix: '(\w*)', hreflang: '([\w-]+)', tag: '([\w-]+)'/g)]
-  .map(([, code, prefix, hreflang, tag]) => ({ code, prefix, hreflang, tag }));
+const LANGS = [...source('src/i18n/locales.ts').matchAll(/\{ code: '(\w+)', prefix: '(\w*)', hreflang: '([\w-]+)', tag: '([\w-]+)', og: '(\w+)'/g)]
+  .map(([, code, prefix, hreflang, tag, og]) => ({ code, prefix, hreflang, tag, og }));
 const LOCALIZED_SLUGS = JSON.parse(
   source('src/site-pages.ts').match(/LOCALIZED_SLUGS = (\[[^\]]*\])/)?.[1].replace(/'/g, '"') ?? '[]',
 );
@@ -219,6 +219,10 @@ for (const [file, html] of htmlPages) {
   check(html.includes(preconnect) === want, `${file}: ${want ? 'must' : 'must not'} preconnect to the API`);
 }
 
+for (const [file, html] of htmlPages) {
+  for (const [, font] of html.matchAll(/url\("?\/fonts\/([^")]+)/g)) check(fonts.includes(font), `${file}: @font-face names /fonts/${font}, which is not in the build`);
+}
+
 // A constant's initialiser in src/app.ts, or undefined when its declaration is missing.
 const appConstant = (name) => source('src/app.ts').match(new RegExp(`export const ${name}\\b[^=]*=\\s*([^;]+);`))?.[1].trim();
 function cspAgrees(hosts, on, constant) {
@@ -294,8 +298,13 @@ check(/runs no analytics/.test(website) !== gaOn, 'Privacy: #website must say "r
 // Every localized page: self-canonical, html lang, and one reciprocal hreflang cluster shared with the sitemap.
 const langRows = source('src/i18n/locales.ts').match(/\{ code: '/g)?.length ?? 0;
 check(LANGS.length > 1 && LANGS.length === langRows && LANGS[0].prefix === '', 'src/i18n/locales.ts: every LANGS row must parse, English first at the root');
+for (const field of ['code', 'prefix', 'hreflang', 'tag', 'og']) {
+  const values = LANGS.map((lang) => lang[field].toLowerCase());
+  check(new Set(values).size === values.length, `src/i18n/locales.ts: two LANGS rows share a ${field}`);
+}
 check(LOCALIZED_SLUGS.length > 0, 'src/site-pages.ts: LOCALIZED_SLUGS not found');
 const pagePath = (slug, lang) => `/${[lang.prefix, slug].filter(Boolean).join('/')}`;
+const fileOf = (path) => (path === '/' ? 'index.html' : `${path.slice(1)}/index.html`);
 const canonicalOf = (html) => html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
 const headAlternates = (html) =>
   [...html.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)].map(([, hreflang, href]) => `${hreflang} ${href}`);
@@ -307,15 +316,14 @@ const sitemapAlternates = new Map(
     [...body.matchAll(/<xhtml:link rel="alternate" hreflang="([^"]+)" href="([^"]+)"\/>/g)].map(([, hreflang, href]) => `${hreflang} ${href}`),
   ]),
 );
-const localizedFiles = new Set();
+const localizedFiles = new Map();
 for (const slug of LOCALIZED_SLUGS) {
   const urlOf = (lang) => `${origin}${pagePath(slug, lang)}`;
   const cluster = [...LANGS.map((lang) => `${lang.hreflang} ${urlOf(lang)}`), `${X_DEFAULT} ${urlOf(LANGS[0])}`].sort();
   for (const lang of LANGS) {
     const where = pagePath(slug, lang);
-    const dir = where.slice(1);
-    const file = dir ? `${dir}/index.html` : 'index.html';
-    localizedFiles.add(file);
+    const file = fileOf(where);
+    localizedFiles.set(file, slug);
     if (!isFile(`${DIST}${file}`)) {
       check(false, `${where}: localized page missing from the build`);
       continue;
@@ -326,7 +334,10 @@ for (const slug of LOCALIZED_SLUGS) {
     const head = headAlternates(html).sort();
     check(JSON.stringify(head) === JSON.stringify(cluster), `${where}: hreflang must be the full reciprocal set (${LANGS.length} + ${X_DEFAULT})`);
     check(JSON.stringify((sitemapAlternates.get(urlOf(lang)) ?? []).sort()) === JSON.stringify(head), `${where}: sitemap alternates must equal the head`);
-    check(/<meta property="og:locale" content="[a-z]{2}_[A-Z]{2}">/.test(html), `${where}: og:locale missing`);
+    check(html.includes(`<meta property="og:locale" content="${lang.og}">`), `${where}: og:locale must be ${lang.og}`);
+    const ogAlternates = [...html.matchAll(/<meta property="og:locale:alternate" content="([^"]+)">/g)].map(([, og]) => og).sort();
+    const otherOgs = LANGS.filter((l) => l !== lang).map((l) => l.og).sort();
+    check(JSON.stringify(ogAlternates) === JSON.stringify(otherOgs), `${where}: og:locale:alternate must name every other language once`);
     if (slug === '') check(/<section[^>]*\bid="search"/.test(html), `${where}: the #search section is missing`);
     if (slug === 'guides') {
       for (const name of guideNames) check(html.includes(`href="/guides/${name}"`), `${where}: must list guides/${name}`);
@@ -341,6 +352,24 @@ for (const [file, html] of htmlPages) {
   check(!/\bundefined\b|\[object Object\]/.test(withoutCss(html)), `${file}: a literal "undefined" or "[object Object]" leaked into the page`);
   if (!localizedFiles.has(file)) {
     check(!/<link rel="alternate" hreflang=|og:locale/.test(html), `${file}: an English-only page must carry no hreflang alternates or og:locale`);
+  }
+}
+// The footer switcher links the same page in each language where it has one, else each language's home: each link is
+// that page's canonical URL, in the order of LANGS.
+for (const [file, html] of htmlPages) {
+  const nav = html.match(/<nav class="links langs"[^>]*>([\s\S]*?)<\/nav>/)?.[1];
+  if (nav === undefined) {
+    check(!html.includes('<footer'), `${file}: the footer language switcher is missing`);
+    continue;
+  }
+  const slug = localizedFiles.get(file) ?? '';
+  const links = [...nav.matchAll(/<a href="([^"]+)"[^>]*\shreflang="([^"]+)"/g)].map(([, href, hreflang]) => `${hreflang} ${href}`);
+  const want = LANGS.map((lang) => `${lang.hreflang} ${pagePath(slug, lang)}`);
+  check(JSON.stringify(links) === JSON.stringify(want), `${file}: the language switcher must link ${want.join(', ')}`);
+  for (const lang of LANGS) {
+    const href = pagePath(slug, lang);
+    const target = fileOf(href);
+    check(isFile(`${DIST}${target}`) && canonicalOf(readFileSync(`${DIST}${target}`, 'utf8')) === `${origin}${href}`, `${file}: switcher link ${href} must be its page's canonical`);
   }
 }
 for (const [loc, links] of sitemapAlternates) {
@@ -361,8 +390,8 @@ check(
 );
 // Cached immutably, so the file is only ever fetched under its version: a new list is a new URL.
 check(
-  /(placesUrl\}|\/places\.json)\?v=/.test(bundle),
-  'Bundle: places.json must be fetched as /places.json?v={places_version}',
+  /(placesUrl\}|\/places\.json)\?v=[^;]{0,120}&l=/.test(bundle),
+  'Bundle: places.json must be fetched as /places.json?v={places_version}&l={site languages}',
 );
 check(bundle.includes('googletagmanager.com/gtag/js') === gaOn, 'Bundle: the consent module must carry gtag.js exactly while GA_MEASUREMENT_ID is set');
 
@@ -404,6 +433,10 @@ const shape = (value) =>
   !value || typeof value !== 'object' ? typeof value
     : isPlural(value) ? 'plural'
     : Object.fromEntries(Object.entries(value).map(([k, v]) => [k, shape(v)]));
+const emptyLeaves = (value, path = []) =>
+  typeof value === 'string' ? (value.trim() ? [] : [path.join('.')])
+    : value && typeof value === 'object' ? Object.entries(value).flatMap(([k, v]) => emptyLeaves(v, [...path, k]))
+    : [];
 const englishWidget = widgetText(readHtml('search'));
 check(englishWidget !== undefined, '/search: the widget data-i18n payload is missing or not JSON');
 for (const [what, keys] of Object.entries(WIDGET_COPY)) {
@@ -413,6 +446,8 @@ for (const [file, html] of htmlPages.filter(([, html]) => html.includes('id="sea
   const text = widgetText(html);
   check(text !== undefined, `${file}: the widget data-i18n payload is missing or not JSON`);
   check(JSON.stringify(shape(text)) === JSON.stringify(shape(englishWidget)), `${file}: the widget strings must have the keys of English`);
+  const empty = emptyLeaves(text);
+  check(empty.length === 0, `${file}: empty widget strings: ${empty.join(', ')}`);
 }
 const llms = readFileSync(`${DIST}llms.txt`, 'utf8');
 // Pro has a daily fair-use cap, so no language may call it unlimited. Exact phrases, so "sem o limite de 3" passes.
@@ -425,6 +460,11 @@ const UNLIMITED = [
   'onbeperkt', 'ongelimiteerd', 'onbegrensd',
   'nieograniczon', 'bez limitu', 'bez ogranicze',
   'sem limite',
+  'безлимит', 'неограничен', 'без ограничени', 'без лимит',
+  'obegränsa', 'utan gräns',
+  'ubegrænse', 'uden grænse',
+  'ubegrense', 'uten grense',
+  'rajaton', 'rajattom', 'rajoittamaton', 'ilman raj',
 ].map((term) => [bannedTerm(term), term]);
 // Copy rules for every published page, the legal ones included.
 for (const [where, text] of [['llms.txt', llms], ...htmlPages]) {

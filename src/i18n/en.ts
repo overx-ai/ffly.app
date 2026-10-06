@@ -285,6 +285,7 @@ const en = {
         lateLandings: p({ one: '{n} fewer midnight landing', other: '{n} fewer midnight landings' }),
         daylightGained: '{h} h more daylight',
       },
+      allAirports: 'All airports',
       // Owner rule: name no source, airline or mechanics; never a city count ("up to 8" is a banned mechanics phrase).
       nudges: {
         priceLine: 'Prices in the app are often cheaper.',

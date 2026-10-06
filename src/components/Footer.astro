@@ -20,6 +20,10 @@ const pageLinks = [
   { slug: 'privacy', label: footer.privacy },
   { slug: 'terms', label: footer.terms },
 ] as const satisfies readonly { slug: Slug; label: string }[];
+// Another language's name in another script (Русский on a Latin page) takes the system font, so the page never
+// downloads a font for that one word.
+const LATIN = /^[\p{Script=Latin}\s]+$/u;
+const otherScript = (l: (typeof LANGS)[number]) => l.code !== lang && !LATIN.test(l.name);
 ---
 <footer>
   <div class="container">
@@ -39,6 +43,7 @@ const pageLinks = [
           lang={l.tag}
           hreflang={l.hreflang}
           aria-current={l.code === lang && slug === switchTo ? 'page' : undefined}
+          class={otherScript(l) ? 'other-script' : undefined}
         >{l.name}</a>
       ))}
     </nav>
@@ -72,6 +77,7 @@ const pageLinks = [
   .links span a { text-decoration: underline; }
   .langs { font-size: 13px; }
   .langs [aria-current] { color: var(--ink); font-weight: 600; }
+  .langs .other-script { font-family: var(--font-system); }
   .fine {
     font-size: 13px;
     line-height: 1.55;

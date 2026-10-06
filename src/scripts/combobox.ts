@@ -1,5 +1,5 @@
 import type { Place } from './ffly-api';
-import { fold, placeName } from './places';
+import { fold, placeNames } from './places';
 
 export interface ComboState {
   open: boolean;
@@ -58,7 +58,7 @@ function foldedOf(places: readonly Place[], lang: string): Folded[] {
   if (!folded) {
     const members = groupMembers(places);
     folded = places.map((place) => {
-      const names = [...new Set([placeName(place, lang), place.name].map(fold))];
+      const names = [...new Set(placeNames(place, lang).map(fold))];
       return {
         place,
         member: members.has(place.code),

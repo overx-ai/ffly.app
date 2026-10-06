@@ -35,8 +35,9 @@ describe('pathFor and urlFor', () => {
 describe('alternates', () => {
   it('lists every language plus x-default, pointing at the English root URL', () => {
     const links = site.alternates('search');
-    expect(links.map((l) => l.hreflang)).toEqual(['en', 'de', 'fr', 'es', 'it', 'nl', 'pl', 'pt-PT', 'x-default']);
+    expect(links.map((l) => l.hreflang)).toEqual(['en', 'de', 'fr', 'es', 'it', 'nl', 'pl', 'pt-PT', 'ru', 'sv', 'da', 'nb', 'fi', 'x-default']);
     expect(links.find((l) => l.hreflang === 'pt-PT')?.href).toBe(`${ORIGIN}/pt/search`);
+    expect(links.find((l) => l.hreflang === 'nb')?.href).toBe(`${ORIGIN}/no/search`);
     expect(links.at(-1)?.href).toBe(`${ORIGIN}/search`);
     expect(site.alternates('').at(-1)?.href).toBe(`${ORIGIN}/`);
   });
@@ -81,6 +82,10 @@ describe('dictionaries', () => {
 
   it('give every language the keys of English', () => {
     for (const { code } of LANGS) expect(shape(useLang(code).t), code).toEqual(shape(en));
+  });
+
+  it('label a city with several airports in every language', () => {
+    for (const { code } of LANGS) expect(useLang(code).t.widget.script.allAirports, code).toMatch(/\S/);
   });
 
   it('format per locale', () => {

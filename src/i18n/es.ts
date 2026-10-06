@@ -304,6 +304,7 @@ const es = {
         },
         daylightGained: '{h} h más de día',
       },
+      allAirports: 'Todos los aeropuertos',
       nudges: {
         priceLine: 'En la app los precios suelen ser más bajos.',
         queue: 'En la app tu búsqueda se salta la cola.',

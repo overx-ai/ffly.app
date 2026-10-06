@@ -165,6 +165,38 @@ describe('matchPlaces over the full place list', () => {
     expect(find('SVO')).not.toContain('SVO');
     expect(find('minsk')[0]).toBe('MSQ');
   });
+
+  it("finds a city by the page's name, its own local name, its English name and every code", () => {
+    const find = (q: string, lang = 'en-GB') =>
+      matchPlaces(PLACES, q, { exclude: new Set(), limit: WEB_SEARCH.placeMatches, lang }).map((p) => p.code);
+    expect(find('Warszawa')[0]).toBe('WAR');
+    expect(find('Warszawa', 'de')[0]).toBe('WAR');
+    expect(find('WMI')[0]).toBe('WAR');
+    expect(find('WAR')[0]).toBe('WAR');
+    expect(find('Praha')[0]).toBe('PRG');
+    expect(find('Göteborg')[0]).toBe('GOT');
+    expect(find('København')[0]).toBe('CPH');
+    expect(find('Copenhagen')[0]).toBe('CPH');
+    expect(find('москва', 'ru')[0]).toBe('MOW');
+    expect(find('Moscow', 'ru')[0]).toBe('MOW');
+    expect(find('москва')[0]).toBe('MOW');
+  });
+});
+
+describe('matchPlaces matches the local name', () => {
+  const list = [
+    { code: 'PRG', name: 'Prague', top: true, country: 'CZ', local: 'Praha', names: { de: 'Prag' } },
+    { code: 'WAR', name: 'Warsaw', top: true, country: 'PL', names: { pl: 'Warszawa' } },
+    { code: 'BRQ', name: 'Brno', top: false, country: 'CZ' },
+  ];
+  const find = (q: string, lang: string) => matchPlaces(list, q, { exclude: new Set(), limit: 8, lang }).map((p) => p.code);
+
+  it('by prefix, word start and contains, as the other names', () => {
+    expect(find('prah', 'de')).toEqual(['PRG']);
+    expect(find('warsz', 'en-GB')).toEqual(['WAR']);
+    expect(find('aha', 'en-GB')).toEqual(['PRG']);
+    expect(find('br', 'en-GB')).toEqual(['BRQ']);
+  });
 });
 
 describe('matchPlaces folds each list once per language', () => {

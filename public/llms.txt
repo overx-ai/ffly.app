@@ -19,8 +19,9 @@
 ## Languages
 - The home page, web search and guides list are also in German (https://ffly.app/de), French
   (https://ffly.app/fr), Spanish (https://ffly.app/es), Italian (https://ffly.app/it), Dutch
-  (https://ffly.app/nl), Polish (https://ffly.app/pl) and Portuguese (https://ffly.app/pt), each
-  with /search and /guides under it. Support, privacy, terms and the guide articles are in English.
+  (https://ffly.app/nl), Polish (https://ffly.app/pl), Portuguese (https://ffly.app/pt), Russian
+  (https://ffly.app/ru), Swedish (https://ffly.app/sv), Danish (https://ffly.app/da), Norwegian
+  (https://ffly.app/no) and Finnish (https://ffly.app/fi), each with /search and /guides under it. Support, privacy, terms and the guide articles are in English.
 
 ## Guides
 - [Guides](https://ffly.app/guides): articles on planning a cheap trip to several cities.

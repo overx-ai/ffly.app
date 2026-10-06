@@ -327,6 +327,7 @@ const pl = {
         },
         daylightGained: '{h} godz. więcej dnia',
       },
+      allAirports: 'Wszystkie lotniska',
       nudges: {
         priceLine: 'Ceny w aplikacji są często niższe.',
         queue: 'W aplikacji twoje wyszukiwanie omija kolejkę.',

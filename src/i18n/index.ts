@@ -6,12 +6,17 @@ import it from './it';
 import nl from './nl';
 import pl from './pl';
 import pt from './pt';
+import ru from './ru';
+import sv from './sv';
+import da from './da';
+import nb from './nb';
+import fi from './fi';
 import { localeOf, type Lang } from './locales';
 import { fill, plural, type Plural, type Vars } from './text';
 
 export type Dict = typeof en;
 
-const DICTS: Record<Lang, Dict> = { en, de, fr, es, it, nl, pl, pt };
+const DICTS: Record<Lang, Dict> = { en, de, fr, es, it, nl, pl, pt, ru, sv, da, nb, fi };
 
 export function useLang(lang: Lang) {
   const { tag } = localeOf(lang);

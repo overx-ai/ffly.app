@@ -17,6 +17,10 @@ export const provisionalMeta = (): Meta => ({ ...WEB_META, free_searches_left: n
 
 const SITE_LANGS = LANGS.map((l) => l.code);
 
+// The places version is a hash of the API's list, which a new site language leaves as it is, yet the site's copy of
+// the list then carries more names: the stored copy and the static URL are marked with the site's languages too.
+export const PLACES_LANGS = SITE_LANGS.join(',');
+
 const isPlaceSet = (value: unknown): value is PlaceSet => {
   const set = value as Partial<PlaceSet> | null;
   return (
@@ -27,8 +31,8 @@ const isPlaceSet = (value: unknown): value is PlaceSet => {
   );
 };
 
-// The version names the file, so the HTTP cache may keep it for good (vercel.json) and a new list is a new URL.
-const STATIC_URL = `${WEB_SEARCH.placesUrl}?v=${encodeURIComponent(WEB_META.places_version)}`;
+// The version and languages name the file, so the HTTP cache may keep it for good (vercel.json) and a new list is a new URL.
+const STATIC_URL = `${WEB_SEARCH.placesUrl}?v=${encodeURIComponent(WEB_META.places_version)}&l=${encodeURIComponent(PLACES_LANGS)}`;
 
 export async function fetchStaticPlaces(): Promise<PlaceSet> {
   const res = await fetch(STATIC_URL, { signal: timeout() });
@@ -40,6 +44,8 @@ export async function fetchStaticPlaces(): Promise<PlaceSet> {
 
 type Box = Pick<Storage, 'getItem' | 'setItem'>;
 
+type Stored = PlaceSet & { langs: string };
+
 interface Sources {
   staticVersion: string | null;
   loadStatic: () => Promise<PlaceSet>;
@@ -48,10 +54,10 @@ interface Sources {
 
 const DEFAULT_SOURCES: Sources = { staticVersion: WEB_META.places_version, loadStatic: fetchStaticPlaces, fetchPlaces: getPlaces };
 
-// The visitor's own copy of the places, kept under the API's places_version, a hash of the list: a copy at /meta's
-// version is never fetched again. It is read (a large parse) only when the places are first asked for. Without one
-// the list comes from the site's static file; the API's /places (conditional, so an unchanged list costs a 304) only
-// when that file is behind.
+// The visitor's own copy of the places, kept under the API's places_version, a hash of the list, and the site's
+// languages: a copy at /meta's version and these languages is never fetched again. It is read (a large parse) only
+// when the places are first asked for. Without one the list comes from the site's static file; the API's /places
+// (conditional, so an unchanged list costs a 304) only when that file is behind.
 export class PlacesStore {
   private held: PlaceSet | undefined;
   private wasRead = false;
@@ -130,7 +136,8 @@ export class PlacesStore {
   private read(): PlaceSet | undefined {
     try {
       const value: unknown = JSON.parse(this.box?.getItem(WEB_SEARCH.placesKey) ?? 'null');
-      return isPlaceSet(value) && value.version ? value : undefined;
+      if (!isPlaceSet(value) || !value.version || (value as Stored).langs !== PLACES_LANGS) return undefined;
+      return { version: value.version, places: value.places };
     } catch {
       return undefined;
     }
@@ -138,7 +145,8 @@ export class PlacesStore {
 
   private write(set: PlaceSet) {
     try {
-      this.box?.setItem(WEB_SEARCH.placesKey, JSON.stringify(set));
+      const stored: Stored = { ...set, langs: PLACES_LANGS };
+      this.box?.setItem(WEB_SEARCH.placesKey, JSON.stringify(stored));
     } catch {
       // A full or blocked storage only means the next page loads the list again.
     }
