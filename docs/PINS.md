@@ -12,7 +12,7 @@ Contracts this site codes against. Bump a row in the same change that adopts a n
 `lookupShared` needs ffly API ≥ 1.5.0. On an older API the lookup answers 404 or 405, which the site treats as a miss:
 a shared link then only pre-fills the form, so the site can ship before the API.
 
-Localized names arrive with the 1.7.0 deploy. Until then `names`, `places_version` and `/places` are absent: every
+1.7.0 deployed 2026-10-06 (1B-bots c0e5c4f41; `/places` is gzipped, weak `ETag` `W/"<version>"`). Against an older server `names`, `places_version` and `/places` are absent: every
 name is the English one from `/meta`, nothing is stored, and the snapshot (`node scripts/places.mjs`) has no version.
 Regenerate the snapshot after that deploy so first visits get the names too.
 
