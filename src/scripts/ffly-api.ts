@@ -89,7 +89,7 @@ export interface SearchView {
   sources?: { source: string; status: 'ok' | 'partial' | 'unavailable' }[] | null;
   more_routes?: number;
   app_hint?: { price: number } | null;
-  searched_at?: number | null;
+  updated?: number | null;
 }
 
 // The web sends the trip only: priority, filters (stops, excluded, pinned) and schedule are app-only (422 app_only).
@@ -182,6 +182,6 @@ export async function lookupShared(request: SearchRequest): Promise<SharedOutcom
   }
 }
 
-export function searchedAt(seconds: number | null | undefined): Date | undefined {
-  return typeof seconds === 'number' && Number.isFinite(seconds) ? new Date(seconds * 1000) : undefined;
+export function searchedAt({ updated }: Pick<SearchView, 'updated'>): Date | undefined {
+  return typeof updated === 'number' && Number.isFinite(updated) ? new Date(updated * 1000) : undefined;
 }

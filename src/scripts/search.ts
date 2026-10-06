@@ -626,15 +626,15 @@ function renderResults(view: SearchView, request: SearchRequest) {
   pushAds();
 }
 
-function searchedLine(at: number | null | undefined): string {
-  const date = searchedAt(at);
+function searchedLine(view: SearchView): string {
+  const date = searchedAt(view);
   return date ? fill(MESSAGES.searchedOn, { date: searchedFormat.format(date) }) : '';
 }
 
 // A stored result someone shared: shown as it was found, with its time and a way to run it afresh.
 function showShared(view: SearchView, request: SearchRequest) {
   renderResults(view, request);
-  el.resultsSearched.textContent = searchedLine(view.searched_at);
+  el.resultsSearched.textContent = searchedLine(view);
   el.resultsShared.hidden = false;
 }
 

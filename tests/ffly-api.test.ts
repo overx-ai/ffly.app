@@ -91,7 +91,7 @@ describe('lookupShared', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   const request = buildRequest(trip, 'id-1');
-  const view = { id: 'job-1', status: 'done', done: 3, total: 3, eta_s: null, routes: [], searched_at: 1791194400 };
+  const view = { id: 'job-1', status: 'done', done: 3, total: 3, eta_s: null, routes: [], updated: 1791194400 };
   const stub = (impl: () => Promise<Response>) => {
     const fetch = vi.fn(impl);
     vi.stubGlobal('fetch', fetch);
@@ -111,7 +111,7 @@ describe('lookupShared', () => {
   });
 
   it('returns an identical search still running as a hit, to poll by its id', async () => {
-    const running = { ...view, status: 'fetching', searched_at: null };
+    const running = { ...view, status: 'fetching', updated: null };
     stub(async () => new Response(JSON.stringify(running), { status: 200 }));
     expect(await lookupShared(request)).toEqual({ kind: 'hit', view: running });
   });
@@ -144,12 +144,12 @@ describe('canLookup', () => {
 });
 
 describe('searchedAt', () => {
-  it('reads the contract’s epoch seconds', () => {
-    expect(searchedAt(1791236677.38)?.toISOString()).toBe('2026-10-05T21:44:37.380Z');
+  it('reads the view’s updated time as the contract’s epoch seconds', () => {
+    expect(searchedAt({ updated: 1791236677.38 })?.toISOString()).toBe('2026-10-05T21:44:37.380Z');
   });
-  it('is undefined when absent or not a time', () => {
-    expect(searchedAt(null)).toBeUndefined();
-    expect(searchedAt(undefined)).toBeUndefined();
-    expect(searchedAt(Number.NaN)).toBeUndefined();
+  it('is undefined when updated is absent or not a time', () => {
+    expect(searchedAt({ updated: null })).toBeUndefined();
+    expect(searchedAt({})).toBeUndefined();
+    expect(searchedAt({ updated: Number.NaN })).toBeUndefined();
   });
 });

@@ -5,7 +5,7 @@ Contracts this site codes against. Bump a row in the same change that adopts a n
 | Dependency | Version | Source | Used by |
 |---|---|---|---|
 | ffly API contract | 1.3.0 | 1B-bots `docs/specs/533-ffly-channels-web-app.md` (`apps/ffly-api/contract/openapi.json`) | `src/scripts/ffly-api.ts` (spec 003) |
-| ffly API shared-search lookup | 1.5.0 | 1B-bots `docs/specs/535` (`GET /searches/shared`, `searched_at`) | `lookupShared` in `src/scripts/ffly-api.ts` (spec 005) |
+| ffly API shared-search lookup | 1.5.0 | 1B-bots `docs/specs/535` (`GET /searches/shared`; its time is `updated`, epoch seconds) | `lookupShared` in `src/scripts/ffly-api.ts` (spec 005) |
 | ffly API web end cap | 1.5.0 | 1B-bots `docs/specs/535` T8 (`/meta` `tier_limits.max_ends` = 2 for web) | `endLimit` in `src/scripts/ffly-api.ts` (spec 006) |
 
 `lookupShared` needs ffly API ≥ 1.5.0. On an older API the lookup answers 404 or 405, which the site treats as a miss:

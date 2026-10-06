@@ -73,7 +73,7 @@ source: owner, 2026-10-05 screenshots: "why no nights in table", "form is big an
   (`Filled`, query or default). `shareQuery(request)` builds the query string (commas kept readable),
   `shareUrl(path, request, hash)` the URL, `sharedRequest(prefs)` the complete request or `undefined`, and
   `sameSearch(a, b)` compares two requests by their share query.
-- **`src/scripts/ffly-api.ts`:** `SearchView.searched_at?: string | null`; `lookupShared(request)` →
+- **`src/scripts/ffly-api.ts`:** `SearchView.updated?: number | null` (epoch seconds; `searched_at` was dropped, T-883); `lookupShared(request)` →
   `{ kind: 'hit', view } | { kind: 'miss' }`; `canLookup(request, today)` guards past dates. A hit is a finished
   result (rendered as it is, never polled or saved: after an API restart its id is gone) or an identical search still
   running (polled by id like the visitor's own, never re-run unasked). A 422 is a miss. Lists go as
@@ -109,7 +109,7 @@ source: owner, 2026-10-05 screenshots: "why no nights in table", "form is big an
 
 ## Cross-Repo Interfaces
 - **Consumes 1B-bots spec 535** (ffly API 1.5.0): `GET {FFLY_API_BASE}/searches/shared?start=&ends=&cities=&date_from=&date_to=&min_nights=&max_nights=`
-  → 200 `SearchView` (as `GET /searches/{id}`) plus `searched_at` (ISO datetime), 404 on a miss; no quota.
+  → 200 `SearchView` (as `GET /searches/{id}`) whose `updated` (epoch seconds) is the time shown, 404 on a miss; no quota.
   List parameters are comma-separated. Fallback for anything else: pre-fill.
 - Ships independently: before 535 is live every lookup is a miss.
 
@@ -118,7 +118,7 @@ source: owner, 2026-10-05 screenshots: "why no nights in table", "form is big an
 |----|-------------|-------|------------|--------|-------|
 | T1 | Nights per leg: `LegRow.nights`, `.leg-nights`, `common.nights` in the widget payload | dev | - | done | src/scripts/results.ts, src/components/SearchForm.astro, src/styles/search.css, src/scripts/search.ts, tests/results.test.ts |
 | T2 | URL parameters: `fillPrefs` dates and nights, `shareQuery`/`shareUrl`/`sharedRequest`/`sameSearch`, `replaceState` on submit | dev | - | done | src/scripts/prefs.ts, src/scripts/search.ts, tests/prefs.test.ts |
-| T3 | `lookupShared`, `canLookup`, `searched_at`; PINS note | dev | - | done | src/scripts/ffly-api.ts, tests/ffly-api.test.ts, docs/PINS.md |
+| T3 | `lookupShared`, `canLookup`, `updated`; PINS note | dev | - | done | src/scripts/ffly-api.ts, tests/ffly-api.test.ts, docs/PINS.md |
 | T4 | Rotation timer `ticker.ts` | dev | - | done | src/scripts/ticker.ts, tests/ticker.test.ts |
 | T5 | Compact full-width form and tighter `#search` heading | dev | - | done | src/components/SearchForm.astro, src/styles/search.css, src/views/Home.astro |
 | T6 | App strip replacing AppSide, slide-in and rotation | dev | T4 | done | src/components/AppStrip.astro, src/components/AppSide.astro (deleted), src/scripts/search.ts, src/i18n/*.ts |
