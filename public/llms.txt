@@ -7,7 +7,7 @@
 
 ## Pages
 - [Home](https://ffly.app/): what the app does, an example search, Free and ffly Pro.
-- [Web search](https://ffly.app/search): try a search in the browser, free, once a day; shows the
+- [Web search](https://ffly.app/search): try a search in the browser, free, 5 searches a day; shows the
   top route's cities, nights and total price. The app shows every route in full.
 - [Support](https://ffly.app/support): restoring a purchase, cancelling ffly Pro, why fares
   are indicative, blurred routes on Free, deleting data.
@@ -36,7 +36,7 @@
 - You choose where you start and finish, the cities to see, your dates, how long to stay in each
   and what matters most (best schedule, lowest price, or a balance).
 - Free: 3 searches in the app, showing the cities, the days in each and the total price.
-- Web search at ffly.app/search: free, once a day, showing the cities, nights and total price of
+- Web search at ffly.app/search: free, 5 searches a day, showing the cities, nights and total price of
   the top route, and only the price and number of cities of the other routes.
 - ffly Pro: every route in full (dates, flight times, airlines, booking links) and no 3-search
   limit. Weekly and yearly auto-renewable subscriptions, or a one-time Lifetime purchase that does

@@ -3,7 +3,7 @@ title: Multi-city vs one-way tickets on Europe's budget airlines
 slug: multi-city-vs-one-way-tickets
 keyword: multi-city vs one-way tickets
 published: 2026-10-05
-updated: 2026-10-05
+updated: 2026-10-06
 cluster: B. Booking mechanics on low-cost carriers
 intent: comparison
 serp_format: 1,500-2,500 word comparison with a quick answer, a comparison table, pros and cons and an FAQ. Ranking pages are written for long-haul flights on full-service airlines.
@@ -110,7 +110,7 @@ ffly, a [multi-city trip planner](/), is built for the separate one-ways case. G
 
 Each flight is then yours to book with the airline or a booking site, under their terms, since ffly is a search tool and doesn't sell tickets. Fares may not include bags, so add those when you book.
 
-The iPhone app gives you 3 free searches, and the [web search](/search) runs one free search a day.
+The iPhone app gives you 3 free searches, and the [web search](/search) runs 5 free searches a day.
 
 ## FAQ
 

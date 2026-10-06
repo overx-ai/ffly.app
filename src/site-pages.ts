@@ -13,14 +13,14 @@ import { DEFAULT_LANG, LANGS, X_DEFAULT, localeOf, type Lang } from './i18n/loca
 // /, /support, /privacy and /terms are fixed: the iOS app (LegalLinks.swift) and the App Store
 // listing (fastlane/metadata/*/{marketing,support,privacy}_url.txt) point at them.
 export const SITE_PAGES = [
-  { slug: '',        lastmod: '2026-10-05' },
+  { slug: '',        lastmod: '2026-10-06' },
   { slug: 'support', lastmod: '2026-10-05' },
   { slug: 'privacy', lastmod: '2026-10-05' },
-  { slug: 'terms',   lastmod: '2026-10-05' },
+  { slug: 'terms',   lastmod: '2026-10-06' },
   { slug: 'search',  lastmod: '2026-10-05' },
   { slug: 'guides',  lastmod: '2026-10-05' },
   { slug: 'guides/cheapest-order-to-visit-cities', lastmod: '2026-10-05' },
-  { slug: 'guides/multi-city-vs-one-way-tickets',  lastmod: '2026-10-05' },
+  { slug: 'guides/multi-city-vs-one-way-tickets',  lastmod: '2026-10-06' },
 ] as const;
 
 export type Slug = (typeof SITE_PAGES)[number]['slug'];
