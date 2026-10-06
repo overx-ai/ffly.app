@@ -88,3 +88,10 @@ describe('dictionaries', () => {
     expect(useLang('de').fmt.money(129.62, 'EUR')).toMatch(/^129,62\s€$/);
   });
 });
+
+describe('fill and abbreviations', () => {
+  it('does not double a full stop after a value that already ends in one', () => {
+    expect(fill('{from} bis {to}.', { from: 'So., 15. Nov.', to: 'So., 22. Nov.' })).toBe('So., 15. Nov. bis So., 22. Nov.');
+    expect(fill('{to}.', { to: '22 Nov' })).toBe('22 Nov.');
+  });
+});
