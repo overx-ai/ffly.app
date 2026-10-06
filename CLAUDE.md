@@ -153,8 +153,9 @@ Those repos are the source of truth for copy, colours and claims.
   gold as text and accent. Red is for the boarding-pass stamp, errors and the results' "Watch out" chips only.
 - The home hero map follows the colour scheme: mist sea, white land, `--navy-blue` legs and a navy fly in
   light, the night set in dark, all as custom properties in `src/components/RouteMap.astro`. Its geometry is
-  computed at build time there from `src/data/europe-map.json` (regenerate: README); the fly is SVG
-  `<animateMotion>`, so the map needs no JavaScript. Label offsets there are hand-placed for
+  computed at build time there from `src/data/europe-map.json` (regenerate: README); the fly is a CSS `transform`
+  animation sampled from the legs at build time (`fly-route`), so it runs on the compositor and needs no JavaScript.
+  Never use SMIL `<animateMotion>` there: it re-laid out the page every frame, off screen too (`check-legal` bans it). Label offsets there are hand-placed for
   `EXAMPLE_TRIP`: a new example needs new ones, and a new city needs a point in `scripts/europe-map.py`.
 - Fonts are self-hosted latin and latin-ext woff2 (split by `unicode-range`) in `public/fonts/`: Bricolage Grotesque (display), Figtree (body),
   IBM Plex Mono (data).

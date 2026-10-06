@@ -49,6 +49,13 @@ function readPage(page) {
   };
 }
 
+// SMIL <animateMotion> re-laid out the home page every frame, off screen too; the fly is a compositor transform animation.
+for (const { prefix: lang } of LANGS) {
+  const home = readHtml(lang);
+  check(!home.includes('<animateMotion'), `${lang || 'en'} home: the map fly must not use SMIL <animateMotion>`);
+  check(/@keyframes fly-route\{/.test(home), `${lang || 'en'} home: the map fly needs its transform keyframes`);
+}
+
 const terms = readPage('terms');
 check(/through the ffly app or ffly\.app/.test(terms('acceptable-use')), 'Terms Acceptable Use must allow ffly.app');
 check(/web search/i.test(terms('free-and-pro')), 'Terms section 5 must describe the web search');

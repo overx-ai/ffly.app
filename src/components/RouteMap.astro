@@ -82,29 +82,48 @@ const legs = loop.map((a, i) => {
     badge: [round(bx + nx * BADGE_OFFSET), round(by + ny * BADGE_OFFSET)] as const,
     mid: pose(0.5),
     length,
+    at,
+    tangent,
   };
 });
-const flightPath = `${legs[0].start} ${legs.map((l) => l.curve).join(' ')}`;
-
-const totalLength = legs.reduce((sum, l) => sum + l.length, 0);
-const times = [0, FLY.startDwell];
-const points = [0, 0];
-let clock = FLY.startDwell;
-let flown = 0;
+// The fly is a CSS transform animation sampled from the legs at build time, so it runs on the compositor: SMIL
+// <animateMotion> re-laid out the whole page on every frame, off screen too.
+const FLY_SAMPLES = 16;
+const frames: { at: number; x: number; y: number; angle: number }[] = [];
+let clock = 0;
+let heading = 0;
+const poseAt = (leg: { at: (t: number) => Point; tangent: (t: number) => Point }, t: number) => {
+  const [x, y] = leg.at(t);
+  const [tx, ty] = leg.tangent(t);
+  let angle = (Math.atan2(ty, tx) * 180) / Math.PI;
+  // Unwrapped so a keyframe pair never interpolates the long way round.
+  while (angle - heading > 180) angle -= 360;
+  while (angle - heading < -180) angle += 360;
+  heading = angle;
+  return { x, y, angle };
+};
+const start = poseAt(legs[0], 0);
+frames.push({ at: 0, ...start });
+clock = FLY.startDwell;
+frames.push({ at: clock, ...start });
 legs.forEach((l, i) => {
-  clock += l.length / FLY.speed;
-  flown += l.length;
-  times.push(clock);
-  points.push(flown / totalLength);
+  const begin = clock;
+  const duration = l.length / FLY.speed;
+  for (let step = 1; step <= FLY_SAMPLES; step++) {
+    frames.push({ at: begin + (duration * step) / FLY_SAMPLES, ...poseAt(l, step / FLY_SAMPLES) });
+  }
+  clock = begin + duration;
   const stop = EXAMPLE_TRIP.stops[i + 1];
   if ('nights' in stop) {
     clock += stop.nights * FLY.dwellPerNight;
-    times.push(clock);
-    points.push(flown / totalLength);
+    frames.push({ ...frames[frames.length - 1], at: clock });
   }
 });
-const keyTimes = times.map((x) => (x / clock).toFixed(4)).join(';');
-const keyPoints = points.map((x) => Math.min(1, x).toFixed(4)).join(';');
+const keyframe = (f: (typeof frames)[number]) =>
+  ((f.at / clock) * 100).toFixed(2) + '%{transform:translate(' + round(f.x) + 'px,' + round(f.y) + 'px) rotate(' + round(f.angle) + 'deg)}';
+const flyCss =
+  '@keyframes fly-route{' + frames.map(keyframe).join('') + '}' +
+  '.fly-anim{animation:fly-route ' + clock.toFixed(2) + 's linear infinite}';
 
 const pins = EXAMPLE_TRIP.stops.slice(0, -1).map((s) => {
   const [x, y] = pointOf(s.city);
@@ -121,6 +140,7 @@ const description = fmt.text(t.map.label, {
   total: fmt.money(EXAMPLE_TRIP.bestTotal, EXAMPLE_TRIP.currency),
 });
 ---
+<style is:inline set:html={flyCss}></style>
 <svg class="map" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={description}>
   <rect class="sea" width={width} height={height} />
   <path class="land" d={land} />
@@ -167,18 +187,7 @@ const description = fmt.text(t.map.label, {
       <circle class="eye" cx="10.2" cy="3.1" r="2.7" />
     </g>
   </defs>
-  <g class="fly-anim" aria-hidden="true">
-    <use href="#fly" />
-    <animateMotion
-      dur={`${clock.toFixed(2)}s`}
-      repeatCount="indefinite"
-      rotate="auto"
-      calcMode="linear"
-      keyTimes={keyTimes}
-      keyPoints={keyPoints}
-      path={flightPath}
-    />
-  </g>
+  <g class="fly-anim" aria-hidden="true"><use href="#fly" /></g>
   <g class="fly-static" aria-hidden="true" transform={legs[0].mid}><use href="#fly" /></g>
 </svg>
 
