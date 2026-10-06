@@ -125,6 +125,8 @@
 .search-form .place:hover { background: var(--fill); }
 .search-form .place-name { grid-area: name; font-weight: 600; }
 .search-form .place-alt { margin-inline-start: 0.4em; font-weight: 400; color: var(--ink-2); }
+.search-form .place-country { font-weight: 400; color: var(--ink-2); }
+.search-form .place-country::before { content: "\00a0· "; content: "\00a0· " / ""; }
 .search-form .place-airports { grid-area: airports; color: var(--ink-2); font: 500 12px var(--font-mono); }
 .search-form .place-code {
   grid-area: code;

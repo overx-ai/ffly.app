@@ -96,6 +96,9 @@ function readNights(raw: string | null, limits: Limits): Nights | undefined {
   return min && max && nights.min >= 1 && nights.min <= nights.max && nights.max <= limits.maxNights ? nights : undefined;
 }
 
+export const namesPlaces = (query: URLSearchParams, cookies: Map<string, string>) =>
+  (['from', 'back', 'cities'] as const).some((key) => query.get(QUERY[key]) || cookies.get(PREFS[key].cookie));
+
 export function fillPrefs(
   query: URLSearchParams,
   cookies: Map<string, string>,

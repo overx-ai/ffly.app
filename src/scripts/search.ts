@@ -24,9 +24,9 @@ import {
 } from './ffly-api';
 import { ask, canAsk, routesReady } from './notify';
 import { appHintLine, rotation } from './nudges';
-import { addPlace, fold, placeName, removePlace } from './places';
-import { PlacesStore, provisionalMeta } from './places-store';
-import { cookieString, fillPrefs, finishOf, parseCookies, sameSearch, savedCookies, sharedRequest, shareUrl, type Prefs } from './prefs';
+import { addPlace, countryNamer, fold, placeName, removePlace } from './places';
+import { PlacesStore, provisionalMeta, type PlaceSet } from './places-store';
+import { cookieString, fillPrefs, finishOf, namesPlaces, parseCookies, sameSearch, savedCookies, sharedRequest, shareUrl, type Prefs } from './prefs';
 import { routeRows, type RouteRow, type Warn } from './results';
 import { glideLinks } from './scroll';
 import { Ticker } from './ticker';
@@ -46,6 +46,7 @@ const MINUTE_S = 60;
 // inline script), and <html lang> is the locale of every date, number and list.
 const TEXT = JSON.parse(document.querySelector<HTMLElement>('[data-i18n]')!.dataset.i18n!) as Dict['widget']['script'] & {
   nights: Plural;
+  loading: string;
 };
 const MESSAGES = TEXT.messages;
 const LOCALE = document.documentElement.lang;
@@ -128,6 +129,7 @@ let askedToNotify = false;
 let adsPushed = false;
 
 const localName = (place: Place) => placeName(place, LOCALE);
+const countryName = countryNamer(LOCALE);
 const nameOf = (code: string) => {
   const place = byCode.get(code);
   return place ? localName(place) : code;
@@ -233,6 +235,7 @@ function placeOption(place: Place): HTMLElement {
   const name = localName(place);
   part(row, '.place-local').textContent = name;
   showText(part(row, '.place-alt'), name === place.name ? '' : place.name);
+  showText(part(row, '.place-country'), countryName(place.country));
   const airports = place.airports && place.airports.length > 1 ? place.airports.join(' · ') : '';
   showText(part(row, '.place-airports'), airports);
   part(row, '.place-code').textContent = place.code;
@@ -242,6 +245,7 @@ function placeOption(place: Place): HTMLElement {
 function placeNotice(text: string): HTMLElement {
   const row = clone('place-notice-template');
   part(row, '.notice-text').textContent = text;
+  if (text === TEXT.loading) part(row, 'svg').remove();
   return row;
 }
 
@@ -250,6 +254,7 @@ const boxes = new Map<HTMLInputElement, Combobox>();
 
 type Codes = () => (string | undefined)[];
 
+// Until the place list is there a field says it is loading, never that nothing matches.
 function placeBox(input: HTMLInputElement, list: HTMLElement, exclude: Codes, onPick: (place: Place) => void, notice?: () => string | undefined) {
   const box = new Combobox({
     input,
@@ -258,7 +263,7 @@ function placeBox(input: HTMLInputElement, list: HTMLElement, exclude: Codes, on
       matchPlaces(places, query, { exclude: new Set(exclude().filter(isText)), limit: WEB_SEARCH.placeMatches, lang: LOCALE }),
     renderOption: placeOption,
     renderNotice: placeNotice,
-    notice,
+    notice: () => (places.length ? notice?.() : TEXT.loading),
     onPick,
   });
   boxes.set(input, box);
@@ -387,10 +392,16 @@ function defaultWindow() {
   return { from, to: addDays(from, WEB_SEARCH.windowDays) };
 }
 
-function usePlaces(list: Place[]) {
-  places = list;
-  byCode = new Map(list.map((p) => [p.code, p]));
+// Fields being typed in keep their text: only picks are renamed, and an open list redraws.
+function usePlaces(set: PlaceSet | undefined) {
+  if (!set || set.places === places) return;
+  places = set.places;
+  byCode = new Map(places.map((p) => [p.code, p]));
+  renderNames();
+  for (const box of boxes.values()) box.update();
 }
+
+const loadPlaces = () => placesStore.load().then(usePlaces);
 
 function useMeta(next: Meta) {
   meta = next;
@@ -412,7 +423,6 @@ function applyMeta(next: Meta) {
   renderQuota();
 }
 
-// Fields being typed in keep their text: only picks are renamed.
 function renderNames() {
   if (pickedFrom) setFrom(pickedFrom);
   for (const name of ['ends', 'cities'] as const) if (lists[name].length) renderList(name);
@@ -876,7 +886,7 @@ el.back.addEventListener('change', () => {
 el.city.addEventListener('keydown', (event) => {
   if (event.key !== 'Enter' || event.defaultPrevented) return;
   event.preventDefault();
-  if (!el.city.value.trim()) return;
+  if (!el.city.value.trim() || !places.length) return;
   const code = resolvePlace(el.city.value);
   if (code) {
     addTo('cities', code);
@@ -946,32 +956,38 @@ el.notifyYes.addEventListener('click', () => {
 
 el.notifyNo.addEventListener('click', closeNotifyAsk);
 
-// The places are there at once (stored or the snapshot), so the fields open before /meta answers; searching waits for it.
-function openForm(): Prefs {
-  usePlaces(placesStore.current.places);
+// The fields open before /meta answers, on the bundled limits; searching waits for it. The places are the stored
+// ones, else the static list, loaded on the first focus in the form or once the page is idle. Only a link or a cookie
+// that names places waits for that list, to read them.
+async function openForm(): Promise<Prefs> {
   useMeta(provisionalMeta());
-  const prefs = setupForm(parseCookies(document.cookie));
+  const cookies = parseCookies(document.cookie);
+  usePlaces(placesStore.current);
+  if (!places.length && namesPlaces(new URLSearchParams(location.search), cookies)) await loadPlaces();
+  const prefs = setupForm(cookies);
   el.loading.hidden = true;
   el.fields.disabled = false;
   el.submit.disabled = true;
   return prefs;
 }
 
-async function init(prefs: Prefs): Promise<void> {
+function loadPlacesWhenIdle() {
+  const idle = () => (window.requestIdleCallback ?? setTimeout)(() => void loadPlaces());
+  if (document.readyState === 'complete') idle();
+  else window.addEventListener('load', idle, { once: true });
+}
+
+async function init(prefs: Prefs, metaAnswer = getMeta()): Promise<void> {
   clearOutcome();
   try {
-    applyMeta(await getMeta());
+    applyMeta(await metaAnswer);
   } catch {
     showProblem(MESSAGES.metaDown, () => void init(prefs));
     el.submit.disabled = true;
     return;
   }
   el.submit.disabled = false;
-  void placesStore.refresh(meta).then((set) => {
-    if (set.places === places) return;
-    usePlaces(set.places);
-    renderNames();
-  });
+  void placesStore.refresh(meta).then(usePlaces);
 
   // A shared link names the whole trip: the session's own search wins only when it is that same trip. A link
   // whose trip has started only pre-fills the places and nights; setupForm skips its past dates.
@@ -989,4 +1005,8 @@ async function init(prefs: Prefs): Promise<void> {
 glideLinks('search');
 setupStrip(parseCookies(document.cookie));
 picker.set(defaultWindow());
-void init(openForm());
+el.fields.addEventListener('focusin', () => void loadPlaces());
+loadPlacesWhenIdle();
+const firstMeta = getMeta();
+firstMeta.catch(() => undefined);
+void openForm().then((prefs) => init(prefs, firstMeta));

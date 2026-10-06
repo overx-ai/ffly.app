@@ -14,6 +14,9 @@ source: owner, 2026-10-06 (localized places on ffly-api 1.7.0)
 
 # 007 - Localized place names, better place search, and a place list that is there at once
 
+> Spec 008 moved the snapshot of T4 out of the bundle (`public/places.json`, loaded lazily) when API 1.8.0 grew the
+> list to 3,493 places; the rest stands.
+
 > **TL;DR** - Places show in the page's language (the API's `names`, English when missing). The place search folds
 > case and diacritics, matches the localized and the English name, the code and a city's airport codes, and ranks
 > exact code > name prefix > word start > contains. The place fields work the moment the page loads, from the

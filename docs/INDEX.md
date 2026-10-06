@@ -14,6 +14,7 @@
 - [Spec 005 - Compact search, shareable links](specs/005-compact-search-and-shared-links.md): nights per leg, two-row form, animated app strip, always-visible table, full trip in the URL, stored results for shared links
 - [Spec 006 - Clear buttons, several Back to cities](specs/006-clear-buttons-and-several-back-cities.md): × on place fields, Back to as a chip list, dark-mode range
 - [Spec 007 - Localized places, better matching, instant list](specs/007-localized-places.md): names per language, folded and ranked matching, the places snapshot and the stored copy
+- [Spec 008 - Worldwide places](specs/008-worldwide-places.md): API 1.8.0's 3,493 places in `public/places.json` (out of the bundle, loaded lazily), a folded index, the country in suggestions
 - [PINS](PINS.md): the ffly API contract version the site codes against
 - [Plan - Spec 003](plans/spec-003.md): how spec 003 was built, and its binding deviations
 

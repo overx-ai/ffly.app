@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import STATIC from '../public/places.json';
+import { WEB_SEARCH } from '../src/app';
+import type { Place } from '../src/scripts/ffly-api';
 import { comboKey, matchPlaces } from '../src/scripts/combobox';
 
 const places = [
@@ -129,5 +132,49 @@ describe('comboKey', () => {
   it('does nothing with no rows or another key', () => {
     expect(comboKey(closed, 'ArrowDown', 0)).toBeUndefined();
     expect(comboKey(open(0), 'a', 3)).toBeUndefined();
+  });
+});
+
+describe('matchPlaces over the full place list', () => {
+  const PLACES = STATIC.places as Place[];
+  // About 5 ms here when every keystroke folded every name; a phone runs several times slower.
+  const KEYSTROKE_MS = 3;
+  const QUERIES = ['m', 'mo', 'mos', 'mosc', 'lon', 'saint', 'svo', 'warsz', 'zz', 'new y', 'san ', 'b'];
+
+  it('answers a keystroke within budget once the list is folded', () => {
+    const ROUNDS = 5;
+    for (const lang of ['en-GB', 'pl']) {
+      const opts = { exclude: new Set(['LON']), limit: WEB_SEARCH.placeMatches, lang };
+      matchPlaces(PLACES, 'a', opts);
+      // The best of a few rounds, so other test files running alongside do not count.
+      const rounds = Array.from({ length: ROUNDS }, () => {
+        const started = performance.now();
+        for (const q of QUERIES) matchPlaces(PLACES, q, opts);
+        return (performance.now() - started) / QUERIES.length;
+      });
+      expect(Math.min(...rounds)).toBeLessThan(KEYSTROKE_MS);
+    }
+  });
+
+  it('finds the places the 1.8.0 list added, member airports by their exact code only', () => {
+    const find = (q: string, lang = 'en-GB') =>
+      matchPlaces(PLACES, q, { exclude: new Set(), limit: WEB_SEARCH.placeMatches, lang }).map((p) => p.code);
+    expect(find('moscow')[0]).toBe('MOW');
+    expect(find('moskwa', 'pl')[0]).toBe('MOW');
+    expect(find('SVO')[0]).toBe('MOW');
+    expect(find('SVO')).not.toContain('SVO');
+    expect(find('minsk')[0]).toBe('MSQ');
+  });
+});
+
+describe('matchPlaces folds each list once per language', () => {
+  it('follows a new list and a new language', () => {
+    const before = [{ code: 'WAR', name: 'Warsaw', top: true, names: { de: 'Warschau' } }];
+    const after = [{ code: 'WAR', name: 'Warsaw', top: true, names: { de: 'Warschau', pl: 'Warszawa' } }];
+    const find = (list: Place[], q: string, lang: string) => matchPlaces(list, q, { exclude: new Set(), limit: 8, lang }).map((p) => p.code);
+    expect(find(before, 'warsch', 'de')).toEqual(['WAR']);
+    expect(find(before, 'warsz', 'pl')).toEqual([]);
+    expect(find(after, 'warsz', 'pl')).toEqual(['WAR']);
+    expect(find(after, 'warsch', 'pl')).toEqual([]);
   });
 });

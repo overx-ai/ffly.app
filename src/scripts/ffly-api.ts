@@ -1,7 +1,7 @@
 import { FFLY_API_BASE, WEB_SEARCH } from '../app';
 
 // Wire shapes of ffly API contract 1.3.0 (1B-bots apps/ffly-api/contract/openapi.json, spec 533), plus the
-// shared-search lookup of 1.5.0 (spec 535) and the localized places of 1.7.0, only the fields this page reads. The web channel gets routes 1-3 in
+// shared-search lookup of 1.5.0 (spec 535), the localized places of 1.7.0 and their country of 1.8.0, only the fields this page reads. The web channel gets routes 1-3 in
 // full and a locked tail, so most fields are optional.
 
 export interface Place {
@@ -10,6 +10,7 @@ export interface Place {
   top: boolean;
   airports?: string[] | null;
   names?: Record<string, string> | null;
+  country?: string | null;
 }
 
 export interface Meta {
@@ -118,7 +119,7 @@ const headers = { 'X-Platform': WEB_SEARCH.platform };
 
 // A timeout rejects like a network error, so callers show their existing network message.
 // Safari before 16 has no AbortSignal.timeout; there the request simply runs without one.
-const timeout = () => AbortSignal.timeout?.(WEB_SEARCH.requestTimeoutMs);
+export const timeout = () => AbortSignal.timeout?.(WEB_SEARCH.requestTimeoutMs);
 
 async function getJson<T>(path: string): Promise<T> {
   const res = await fetch(`${FFLY_API_BASE}${path}`, { headers, signal: timeout() });

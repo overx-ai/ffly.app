@@ -6,6 +6,7 @@ import {
   cookieString,
   fillPrefs,
   finishOf,
+  namesPlaces,
   parseCookies,
   sameSearch,
   savedCookies,
@@ -159,5 +160,18 @@ describe('share links', () => {
     expect(sameSearch(request, roundTrip)).toBe(false);
     expect(sameSearch(twoEnds, { ...twoEnds, ends: ['FCO', 'VNO'] })).toBe(false);
     expect(sameSearch(twoEnds, request)).toBe(false);
+  });
+});
+
+describe('namesPlaces', () => {
+  it('is true when the link or a cookie names a place, so the form waits for the place list', () => {
+    expect(namesPlaces(new URLSearchParams('cities=MAD'), new Map())).toBe(true);
+    expect(namesPlaces(new URLSearchParams('back=WAW'), new Map())).toBe(true);
+    expect(namesPlaces(new URLSearchParams(), parseCookies('ffly_from=VNO'))).toBe(true);
+  });
+
+  it('is false with nothing to name, dates and nights included', () => {
+    expect(namesPlaces(new URLSearchParams('dates=2026-11-01..2026-11-08&nights=2-4'), parseCookies('ffly_nudge=2'))).toBe(false);
+    expect(namesPlaces(new URLSearchParams('from='), new Map())).toBe(false);
   });
 });

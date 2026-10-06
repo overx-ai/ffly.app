@@ -42,8 +42,9 @@ curl -sL https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/g
 ```
 
 ## Places snapshot
-`src/data/places.json` is what the search form opens on before `/meta` answers: the places (with every language's
-names from API 1.7.0) and the web tier's limits. Regenerate after the API's places change:
+`npm run places` writes what the search form opens on before `/meta` answers: `src/data/web-meta.json` (the web tier's
+limits and currency, bundled) and `public/places.json` (the places with the site's languages' names and their country,
+fetched by the page on the first focus or once idle, spec 008). Regenerate both after the API's places change:
 
 ```bash
 npm run places

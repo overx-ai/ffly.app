@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addPlace, cityOf, fold, placeName, removePlace } from '../src/scripts/places';
+import { addPlace, cityOf, countryNamer, fold, placeName, removePlace, withLanguages } from '../src/scripts/places';
 
 describe('addPlace', () => {
   it('appends in the order picked, up to the cap', () => {
@@ -74,5 +74,32 @@ describe('cityOf', () => {
     expect(cityOf(places, 'WAW')?.code).toBe('WAR');
     expect(cityOf(places, 'VNO')?.code).toBe('VNO');
     expect(cityOf(places, 'XXX')).toBeUndefined();
+  });
+});
+
+describe('countryNamer', () => {
+  it("names a country in the page's language", () => {
+    expect(countryNamer('en-GB')('CA')).toBe('Canada');
+    expect(countryNamer('de')('GB')).toBe('Vereinigtes Königreich');
+    expect(countryNamer('pl')('RU')).toBe('Rosja');
+  });
+
+  it('says nothing for no country or a code it cannot name', () => {
+    const name = countryNamer('en-GB');
+    expect(name(null)).toBe('');
+    expect(name(undefined)).toBe('');
+    expect(name('XX')).toBe('');
+    expect(name('not a code')).toBe('');
+  });
+});
+
+describe('withLanguages', () => {
+  it('keeps the names in the given languages and their regional variants only', () => {
+    const places = [
+      { code: 'WAR', name: 'Warsaw', top: true, names: { de: 'Warschau', 'pt-BR': 'Varsóvia', ja: 'ワルシャワ' } },
+      { code: 'VNO', name: 'Vilnius', top: true, names: null },
+      { code: 'RIX', name: 'Riga', top: true },
+    ];
+    expect(withLanguages(places, ['de', 'pt']).map((p) => p.names)).toEqual([{ de: 'Warschau', 'pt-BR': 'Varsóvia' }, null, undefined]);
   });
 });

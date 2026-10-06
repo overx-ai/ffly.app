@@ -32,7 +32,7 @@ export function comboKey(state: ComboState, key: string, count: number): ComboSt
   }
 }
 
-const groupMembers = (places: Place[]) =>
+const groupMembers = (places: readonly Place[]) =>
   new Set(places.flatMap((p) => (p.airports && p.airports.length > 1 ? p.airports.filter((a) => a !== p.code) : [])));
 
 // Below this length "contains" would match nearly every place.
@@ -40,26 +40,55 @@ const CONTAINS_FROM = 3;
 const WORD_BREAK = /[\s\-'’().,/]+/u;
 const RANK = { code: 0, prefix: 1, wordStart: 2, contains: 3 } as const;
 
-function rankOf(place: Place, q: string, lang: string): number | undefined {
-  const codes = [place.code, ...(place.airports ?? [])].map(fold);
+interface Folded {
+  place: Place;
+  member: boolean;
+  codes: string[];
+  names: string[];
+  words: string[];
+}
+
+// Folding every name on each keystroke costs too much on a phone with thousands of places: once per list and language.
+const foldedLists = new WeakMap<readonly Place[], Map<string, Folded[]>>();
+
+function foldedOf(places: readonly Place[], lang: string): Folded[] {
+  let byLang = foldedLists.get(places);
+  if (!byLang) foldedLists.set(places, (byLang = new Map()));
+  let folded = byLang.get(lang);
+  if (!folded) {
+    const members = groupMembers(places);
+    folded = places.map((place) => {
+      const names = [...new Set([placeName(place, lang), place.name].map(fold))];
+      return {
+        place,
+        member: members.has(place.code),
+        codes: [place.code, ...(place.airports ?? [])].map(fold),
+        names,
+        words: names.flatMap((n) => n.split(WORD_BREAK)),
+      };
+    });
+    byLang.set(lang, folded);
+  }
+  return folded;
+}
+
+function rankOf({ codes, names, words }: Folded, q: string): number | undefined {
   if (codes.includes(q)) return RANK.code;
-  const names = [placeName(place, lang), place.name].map(fold);
   if (names.some((n) => n.startsWith(q)) || codes.some((c) => c.startsWith(q))) return RANK.prefix;
-  if (names.some((n) => n.split(WORD_BREAK).some((word) => word.startsWith(q)))) return RANK.wordStart;
+  if (words.some((word) => word.startsWith(q))) return RANK.wordStart;
   if (q.length >= CONTAINS_FROM && names.some((n) => n.includes(q))) return RANK.contains;
   return undefined;
 }
 
 // Exact code (a city's airport codes included) > name prefix > word start > contains, top places first within each.
-export function matchPlaces(places: Place[], query: string, opts: { exclude: Set<string>; limit: number; lang: string }): Place[] {
+export function matchPlaces(places: readonly Place[], query: string, opts: { exclude: Set<string>; limit: number; lang: string }): Place[] {
   const q = fold(query.trim());
-  const members = groupMembers(places);
-  const shown = places.filter((p) => !opts.exclude.has(p.code) && !members.has(p.code));
-  if (!q) return shown.filter((p) => p.top).slice(0, opts.limit);
+  const shown = foldedOf(places, opts.lang).filter((f) => !f.member && !opts.exclude.has(f.place.code));
+  if (!q) return shown.filter((f) => f.place.top).slice(0, opts.limit).map((f) => f.place);
   return shown
-    .flatMap((place) => {
-      const rank = rankOf(place, q, opts.lang);
-      return rank === undefined ? [] : [{ place, rank }];
+    .flatMap((folded) => {
+      const rank = rankOf(folded, q);
+      return rank === undefined ? [] : [{ place: folded.place, rank }];
     })
     .sort((a, b) => a.rank - b.rank || Number(b.place.top) - Number(a.place.top))
     .slice(0, opts.limit)
@@ -97,6 +126,11 @@ export class Combobox {
   close() {
     this.state = CLOSED;
     this.render();
+  }
+
+  // The options changed under an open list (the places arrived): redraw it, else nothing.
+  update() {
+    if (this.state.open) this.open();
   }
 
   private refresh() {

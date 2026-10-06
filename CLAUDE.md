@@ -82,10 +82,15 @@ Those repos are the source of truth for copy, colours and claims.
 - City names come from the API's `names` in the page's language (`placeName`: exact tag, then base language, then the
   English `name`), nominative and never inflected: copy never puts a city into a grammatical case. Polish plurals need
   `few` and `many`.
-- **Places open at once (spec 007).** `src/data/places.json` (`node scripts/places.mjs`, committed) is the form's start:
-  the places and the web tier's limits. A visitor's own copy lives in `localStorage` under `WEB_SEARCH.placesKey`,
-  keyed by `/meta` `places_version`; only a new version fetches `/places` (If-None-Match). The place fields never wait
-  for `/meta`; Find route does. The example trip's labels (map, pass) are named from the snapshot at build time; the
+- **Places open at once (specs 007, 008).** `npm run places` (committed output) writes `src/data/web-meta.json`, the web
+  tier's limits, currency and places version, bundled for first paint, and `public/places.json`, the 3,493 places (API
+  1.8.0, names trimmed to the eight languages), **never in the JS bundle**: the page fetches it same-origin on the first
+  focus in the form or once idle. Until then a place field says "Loading cities…", never an empty list; only a link or
+  cookie naming places waits for it. A visitor's own copy lives in `localStorage` under `WEB_SEARCH.placesKey`, keyed
+  by `/meta` `places_version`; a version past the static file's fetches `/places` (If-None-Match). The place fields
+  never wait for `/meta`; Find route does. `matchPlaces` folds each list once per language (keep it under the
+  keystroke budget in `tests/combobox.test.ts`). Suggestions show the country (`Intl.DisplayNames`), nothing else does.
+  The example trip's labels (map, pass) are named from `public/places.json` at build time (`src/example-city.ts`); the
   map's `europe-map.json` and `LABELS` stay keyed by the English name.
 - Every copy rule holds in every language; `check-legal` bans "unlimited" in all eight (`UNLIMITED`).
 
