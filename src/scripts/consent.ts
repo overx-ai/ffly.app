@@ -1,9 +1,12 @@
 import { GA_MEASUREMENT_ID, GTAG_SCRIPT } from '../app';
-import { CHOICES, analyticsCookies, choiceCookie, expiryCookies, mustReload, readChoice, shouldShowBanner, type Choice } from './consent-state';
+import { CHOICES, analyticsCookies, choiceCookie, expiryCookies, initialChoice, mustReload, readChoice, shouldShowBanner, type Choice } from './consent-state';
 
 declare global {
   interface Window {
     dataLayer: unknown[];
+  }
+  interface Navigator {
+    globalPrivacyControl?: boolean;
   }
 }
 
@@ -32,7 +35,7 @@ function loadAnalytics(id: string) {
 function start(id: string) {
   const banner = document.getElementById('consent');
   if (!banner) return;
-  let choice = readChoice(document.cookie);
+  let choice = initialChoice(readChoice(document.cookie), navigator.globalPrivacyControl === true);
   let opener: HTMLElement | undefined;
 
   // Hiding the banner drops the focus of a keyboard user: hand it to what opened the banner, or on first load

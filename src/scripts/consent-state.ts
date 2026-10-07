@@ -11,6 +11,10 @@ export function readChoice(cookieHeader: string): Choice | undefined {
   return isChoice(value) ? value : undefined;
 }
 
+// Global Privacy Control counts as Reject until the visitor chooses otherwise in Cookie settings (/privacy #ccpa).
+export const initialChoice = (stored: Choice | undefined, globalPrivacyControl: boolean): Choice | undefined =>
+  stored ?? (globalPrivacyControl ? 'denied' : undefined);
+
 export const choiceCookie = (choice: Choice) => cookieString(CONSENT, choice);
 
 export const shouldShowBanner = (measurementId: string | undefined, choice: Choice | undefined) =>

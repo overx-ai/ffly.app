@@ -1,7 +1,7 @@
 ---
 status: current
 created: 2026-10-04
-updated: 2026-10-05
+updated: 2026-10-07
 ---
 
 # 000 - Tasks
@@ -34,7 +34,7 @@ updated: 2026-10-05
 | T-020 | **Partner reporting unstated.** Privacy `#booking-links`: Travelpayouts reports bookings made through ffly's identifier to ffly. Confirm in the partner dashboard what it shows (expected: route, date, price, no person), then state it | ffly-site | low | - | audit 2026-10-04; needs Travelpayouts sign-up |
 | T-021 | **A guide marked draft would publish.** The guides collection drops `status:` and never checks it, so a draft registered in `SITE_PAGES` goes live. Fix: keep `status` in `src/content/config.ts` and filter or throw on `draft` | ffly-site | low | - | /code review 2026-10-05 |
 | T-022 | **Boarding-pass table at ≤520px scrolls but isn't focusable.** `.tbl` gets `overflow-x: auto` with no `tabindex`. Departs and Flight hide at narrow widths, so the impact is low | ffly-site | low | - | /code review 2026-10-05 |
-| T-023 | **Free-tier copy predates spec 003.** Home now says "3 full searches free in the app", but Terms Section 5 and `/support` still describe app Free as partly hidden (the home `BoardingPass` shows full data since 2026-10-05). Align them with ios-ffly's current Free tier (legal pages are one decision across repos) | ffly-site | medium | - | sweep 2026-10-05 (spec 003) |
+| T-023 | **Free-tier copy predates spec 003.** Home now says "3 full searches free in the app", but Terms Section 5 and `/support` still describe app Free as partly hidden (the home `BoardingPass` shows full data since 2026-10-05). Align them with ios-ffly's current Free tier (legal pages are one decision across repos) | ffly-site | medium | - | sweep 2026-10-05 (spec 003); done 2026-10-07 (spec 011: Terms Section 5 and /support say Free is 3 searches in full) |
 | T-025 | **Quota note can be one low after a retry.** `search.ts` takes one off `free_searches_left` on every `created`, including a replayed `client_request_id` the API did not count | ffly-site | low | - | /code review 2026-10-05 |
 | T-026 | **Calendar: arrowing up from the second month can show the previous, all-disabled month** in the first column. Cosmetic, pre-existing in spec 003's first cut | ffly-site | low | - | /code review 2026-10-05 |
 | T-027 | **Polish Lifetime name is inconsistent in the app.** The App Store product says "ffly Pro Dożywotni", the in-app label "Dożywotnio"; the site uses "Dożywotnio". Pick one in ios-ffly and mirror it in `src/i18n/pl.ts` | ffly-site | low | - | spec 004 |

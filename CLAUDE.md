@@ -35,7 +35,8 @@ Those repos are the source of truth for copy, colours and claims.
   and `CONSENT` in `src/app.ts`, `GA_CSP` in `scripts/check-legal.mjs`. gtag is defined in `consent.ts` and `gtag/js`
   injected only after Accept (Consent Mode v2 basic, ad storage and signals off); no page HTML may reference it, and
   the footer "Cookie settings" reopens the banner. Unset `GA_MEASUREMENT_ID` and the banner, the control, the CSP
-  hosts and the `/privacy` analytics copy all go. When ads go on, AdSense in the EEA needs a Google-certified CMP, so
+  hosts and the `/privacy` analytics copy all go. A browser sending Global Privacy Control counts as Reject until the
+  visitor accepts in Cookie settings (`initialChoice`), as `/privacy` `#ccpa` promises. When ads go on, AdSense in the EEA needs a Google-certified CMP, so
   that step replaces this banner with Google's consent message, covering analytics too.
 - **Ads only after consent.** While `ADSENSE_CLIENT` in `src/app.ts` is undefined, no consent or ad script loads
   and `AdSlot` renders nothing (`npm test` asserts it). Set it, and `AD_SLOTS`, to load Google's consent message
@@ -71,7 +72,9 @@ Those repos are the source of truth for copy, colours and claims.
 - **Legal and support copy lives in `src/data/{privacy,terms,support}.ts`**, typed by
   `src/data/types.ts`. TypeScript rather than the siblings' JSON so the email, operator and limits
   come from `src/app.ts`. English only.
-- Operator string is `Yauheni Malashchytski, trading as OverX AI`, copied from vocele-web.
+- The operator is a person: `OPERATOR` = `Yauheni Malashchytski` (owner, 2026-10-07: "don't mention overx, just my name"),
+  with `OPERATOR_ADDRESS`, `OPERATOR_PHONE` and `OPERATOR_COUNTRY` (Belarus) in `src/app.ts`. OverX appears only in the
+  footer credit and the contact address: `check-legal` fails on "OverX" in the main content of /privacy, /terms, /support.
 - Footer of every page carries "Created by overx.ai" linking to `https://overx.ai` (followed).
 
 ## Languages (spec 004)
@@ -109,27 +112,37 @@ Those repos are the source of truth for copy, colours and claims.
 - Every copy rule holds in every language; `check-legal` bans "unlimited" in all thirteen (`UNLIMITED`).
 
 ## Legal pages are one decision across repos
-- `/privacy` lists exactly the seven types in `ios-ffly/Template/PrivacyInfo.xcprivacy` and
-  `docs/compliance/data-inventory.yaml`: Product Interaction, Device ID (not linked), and Search
-  History, Purchase History, User ID, Email Address (optional) and Customer Support (linked: every
-  search carries the app user id and RevenueCat keeps purchases under it; the last two come from the
-  feedback form, ios-ffly spec 012); none tracking. Change one, change all, plus the App Store
-  Connect privacy answers. Retention (24 h jobs) is from the API config. A finished web search is kept, with nothing
+- `/privacy` `#app-store-labels` lists exactly the nine types in `ios-ffly/Template/PrivacyInfo.xcprivacy` and
+  `docs/compliance/data-inventory.yaml`, in Apple's names, each in a `<span class="label">`: **tracking** Device ID (the
+  IDFA, only after ATT "Allow", with AppsFlyer, ios-ffly specs 016 and 024); **linked** Search History, Purchase History,
+  User ID, Email Address, Customer Support and Device ID; **not linked** Product Interaction, Crash Data and Performance
+  Data. `check-legal` reads the inventory when the sibling is checked out (else its pinned copy, `PINNED_LABELS`) and
+  fails on any difference, and on any "no tracking" claim. `#attribution` describes AppsFlyer, SKAdNetwork and the Apple
+  Search Ads token, the EEA/UK/CH rule (nothing until Settings › Privacy › Ad measurement) and how to withdraw;
+  `#live-activity` the push token, gone with the search. Change one, change all, plus the App Store Connect privacy
+  answers. Retention (24 h jobs) is from the API config. A finished web search is kept, with nothing
   that identifies the searcher, until its `date_from` (1B-bots spec 535), so shared links work: `/privacy`
   `#web-search` and `#retention` say so and `check-legal` asserts it.
   Feedback goes to 1B-bots `shared/form-aggregator` (database, logs, Telegram chat), which has no
   retention job: never state a number of days for it. The one feedback figure on the site, the app's
   offline queue expiry (ios-ffly `FeedbackQueueRules`), is `FEEDBACK` in `src/app.ts`.
-- **Legal pages name recipients by category, never by vendor, and describe no mechanics.** Apple is the
-  only company named; everyone else is "our subscription provider", "a messaging service our team uses to
-  read feedback", "our hosting providers", "a booking partner". No hosts, endpoints, storage or restart
+- **Only /privacy and /terms name vendors, and only the processors** (`NAMED_PROCESSORS` in `check-legal`, owner
+  2026-10-07): Apple, RevenueCat, AppsFlyer and Google (website analytics after consent; AdSense only with
+  `ADSENSE_CLIENT`), each with its role, the data and a link to its policy (`EXTERNAL` in `src/app.ts`). Every other page
+  names none of them, and every other recipient stays a category everywhere: "our hosting providers", "a messaging
+  service our team uses to read feedback", "a booking partner". Legal pages describe no mechanics: no hosts, endpoints, storage or restart
   mechanics, cache durations, internal identifier names or field lists: retention is a promise ("deleted
   within 24 hours"), identifiers are plain words ("a random identifier for your installation, not your
   Apple ID"). Model the voice on `src/data/support.ts`.
 - `/terms` section 6 is the App Store 3.1.2(c) auto-renewable block (weekly and yearly), section 7
   the one-time Lifetime purchase (does not renew, does not cancel a running subscription), and
-  section 1 links Apple's Standard EULA. No free trial is offered on any plan. Both are submission requirements. Cross-references say "Section 6": the layout
-  numbers sections by order, so reordering breaks them.
+  section 1 links Apple's Standard EULA, and `#apple` carries Apple's minimum EULA terms. No free trial is offered on
+  any plan. Both are submission requirements, and `check-legal` asserts 6 and 7 keep their numbers and titles. The
+  layout numbers sections by order; cross-references come from the same order (`legalSections` in
+  `src/data/sections.ts`, `privacySection` for /support), never a typed number.
+- **Operator placeholders gate publishing (spec 011).** `EU_REPRESENTATIVE`, `UK_REPRESENTATIVE` and `GOVERNING_LAW` in
+  `src/app.ts` are `REPLACE_ME` until the owner supplies them, and `check-legal` fails `npm test` naming each one still
+  unfilled. Both legal pages show "Effective: … · Last updated: …", both the `SITE_PAGES` lastmod.
 - Copy was ported from the overx.ai worktree (`sites/main/src/content/ffly/*.ts`) on 2026-10-03.
   **This repo is now the source of truth**; do not re-extract.
 
@@ -148,9 +161,9 @@ Those repos are the source of truth for copy, colours and claims.
 - "Favour sensible flight times over pre-dawn wake-ups and midnight landings", never a promise
   that no route has them.
 - ffly is a search tool, not a travel agent; fares are indicative; Book opens "the airline's site or a booking
-  site". Never name a data source or vendor (Aviasales, Travelpayouts, RevenueCat, Vercel...) on any page,
-  the legal ones included: they say "a booking partner" and disclose its cookies, the partner identifier and
-  the commission. Carriers are not named on the home, search and guides-index pages (any language) or in
+  site". Never name a data source or vendor (Aviasales, Travelpayouts, Telegram, Vercel...) on any page, the legal
+  ones included (only the processors above, on /privacy and /terms): they say "a booking partner" and disclose its
+  cookies, the partner identifier and the commission. Carriers are not named on the home, search and guides-index pages (any language) or in
   `llms.txt` (`CARRIERS` in `scripts/check-legal.mjs`); the guides and legal pages may name them, and search
   results show the carriers the API returns.
 - **Value, not mechanics**, on every page: no cache, Keychain, server, memory, database, background,

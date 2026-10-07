@@ -4,6 +4,7 @@ import {
   analyticsCookies,
   choiceCookie,
   expiryCookies,
+  initialChoice,
   mustReload,
   readChoice,
   shouldShowBanner,
@@ -92,5 +93,17 @@ describe('withdrawal', () => {
     for (const line of expiryCookies(analyticsCookies(jar.header), 'www.ffly.app')) jar.set(line);
     expect(analyticsCookies(jar.header)).toEqual([]);
     expect(jar.header).toBe('ffly_from=WAW; ffly_consent=denied');
+  });
+});
+
+describe('Global Privacy Control', () => {
+  it('counts as Reject until the visitor chooses', () => {
+    expect(initialChoice(undefined, true)).toBe('denied');
+    expect(shouldShowBanner('G-TEST', initialChoice(undefined, true))).toBe(false);
+  });
+
+  it('never overrides a stored choice, and is nothing without the signal', () => {
+    expect(initialChoice('granted', true)).toBe('granted');
+    expect(initialChoice(undefined, false)).toBeUndefined();
   });
 });

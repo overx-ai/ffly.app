@@ -39,7 +39,17 @@ export const APP_STORE_URL = APP_STORE_ID ? `https://apps.apple.com/app/id${APP_
 // The domain as named in copy. Not the build's `site` (astro.config.mjs), which PUBLIC_SITE_URL overrides.
 export const SITE_HOST = 'ffly.app';
 
-export const OPERATOR = 'Yauheni Malashchytski, trading as OverX AI';
+// The controller of personal data on /privacy and the trader on /terms: a person, never a company name (owner, 2026-10-07).
+export const OPERATOR = 'Yauheni Malashchytski';
+export const OPERATOR_COUNTRY = 'Belarus';
+export const OPERATOR_ADDRESS = '76 Galo Street, flat 91, Minsk, Belarus';
+export const OPERATOR_PHONE = '+375 29 778 21 78';
+// TODO(owner): spec 011. GDPR and UK GDPR Art. 27 representatives (name and postal address of each) and the governing
+// law of /terms (a jurisdiction, e.g. "the Republic of Belarus"). scripts/check-legal.mjs fails `npm test` while any is
+// REPLACE_ME, because the legal pages are not fit to publish without them.
+export const EU_REPRESENTATIVE = 'REPLACE_ME';
+export const UK_REPRESENTATIVE = 'REPLACE_ME';
+export const GOVERNING_LAW = 'REPLACE_ME';
 export const DEVELOPER = 'Yauheni Malashchytski';
 export const PUBLISHER = { name: 'OverX AI', label: 'overx.ai', url: 'https://overx.ai' } as const;
 
@@ -126,6 +136,11 @@ export const EXTERNAL = {
   appleEula: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
   applePrivacy: 'https://www.apple.com/legal/privacy/',
   appleRefund: 'https://reportaproblem.apple.com',
+  revenuecatPrivacy: 'https://www.revenuecat.com/privacy/',
+  appsflyerPrivacy: 'https://www.appsflyer.com/legal/privacy-policy/',
+  appsflyerOptout: 'https://www.appsflyer.com/optout',
+  googlePrivacy: 'https://policies.google.com/privacy',
+  googlePartnerSites: 'https://policies.google.com/technologies/partner-sites',
 } as const;
 
 export const mailto = (email: string) => `<a href="mailto:${email}">${email}</a>`;

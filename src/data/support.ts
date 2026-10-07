@@ -1,11 +1,12 @@
 import { APP, CONTACT_EMAIL, EXTERNAL, SERVICE, externalLink, mailto } from '../app';
 import { pathFor } from '../site-pages';
+import { privacySection } from './privacy';
 import type { FaqItem } from './types';
 
 export const SUPPORT = {
   pageTitle: 'Support',
   description:
-    'Help with ffly: restoring purchases, cancelling ffly Pro, why fares are indicative, blurred routes on the Free plan, and deleting your data.',
+    'Help with ffly: restoring purchases, cancelling ffly Pro, what Free includes, why fares are indicative, and deleting your data.',
 } as const;
 
 export const SUPPORT_FAQ: readonly FaqItem[] = [
@@ -30,8 +31,8 @@ export const SUPPORT_FAQ: readonly FaqItem[] = [
   },
   {
     question: `What do Free and ${APP.proName} include?`,
-    answer: `<p><strong>Free:</strong> ${APP.freeSearches} searches. You see the cities, the days in each and the
-      total price.</p>
+    answer: `<p><strong>Free:</strong> ${APP.freeSearches} searches in the app, each showing every route in full,
+      with dates, flight times and booking links.</p>
       <p><strong>${APP.proName}:</strong> every route in full, with dates, flight times and booking links, and no
       ${APP.freeSearches}-search limit. It comes as a weekly or yearly subscription, or a one-time
       ${APP.lifetimeName} purchase that does not renew. Prices are shown in the app, in your currency, before you
@@ -44,9 +45,10 @@ export const SUPPORT_FAQ: readonly FaqItem[] = [
       confirm the final price where you book: Book opens the airline's site or a booking site.</p>`,
   },
   {
-    question: 'Why are some routes blurred?',
-    answer: `<p>On the Free plan, ffly shows the cities, the days in each and the total price, and blurs the
-      dates, flight times and booking links. ${APP.proName} shows every route in full.</p>`,
+    question: `What happens after my ${APP.freeSearches} free searches?`,
+    answer: `<p>Your first ${APP.freeSearches} searches show every route in full. After that, <strong>Find
+      route</strong> offers ${APP.proName} before it searches. The trips you already searched stay in your Trips
+      list, and deleting and reinstalling ffly does not reset the count.</p>`,
   },
   {
     question: 'Is ffly a travel agent?',
@@ -61,6 +63,6 @@ export const SUPPORT_FAQ: readonly FaqItem[] = [
       manages ${APP.proName} purchases for us, keep purchase records as needed for refunds and accounting.</p>
       <p>To delete feedback you sent, and the email address if you added one, write to ${mailto(CONTACT_EMAIL)} from
       that address or tell us roughly when you sent it, as
-      <a href="${pathFor('privacy')}#feedback">Section 8 of the Privacy Policy</a> describes.</p>`,
+      <a href="${pathFor('privacy')}#feedback">Section ${privacySection('feedback')} of the Privacy Policy</a> describes.</p>`,
   },
 ];
