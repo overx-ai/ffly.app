@@ -35,12 +35,20 @@ const GA_COOKIES = GA_MEASUREMENT_ID ? ['_ga', `_ga_${GA_MEASUREMENT_ID.replace(
 const ATT_SETTINGS = 'iOS Settings &rarr; Privacy &amp; Security &rarr; Tracking';
 const AD_MEASUREMENT = "<strong>Ad measurement</strong> in ffly's Settings &rarr; Privacy";
 
-const IDS = [
+const REPRESENTATIVES = [
+  ['EU representative', EU_REPRESENTATIVE],
+  ['UK representative', UK_REPRESENTATIVE],
+].filter(([, who]) => who);
+const REPRESENTATIVE_ROWS = REPRESENTATIVES.map(([role, who]) => `
+          <li><strong>${role}:</strong> ${who}</li>`).join('');
+
+const ALL_IDS = [
   'who-we-are', 'representatives', 'app-store-labels', 'not-collected', 'searches', 'app-user-id', 'ip-address',
   'purchases', 'analytics', 'crash-performance', 'attribution', 'live-activity', 'feedback', 'on-device',
   'booking-links', 'web-search', 'website', 'legal-bases', 'sharing', 'transfers', 'security', 'retention', 'rights',
   'ccpa', 'children', 'changes', 'contact',
 ] as const;
+const IDS = ALL_IDS.filter((id) => id !== 'representatives' || REPRESENTATIVES.length > 0);
 const { number, ref, build } = legalSections(IDS);
 export const privacySection = number;
 
@@ -95,9 +103,7 @@ export const PRIVACY: LegalDocument = {
         <p>We are established in ${OPERATOR_COUNTRY}, outside the European Economic Area and the United Kingdom. Under
         Article 27 of the GDPR and of the UK GDPR, we have appointed representatives. You can contact them, instead of
         us or as well as us, about anything in this policy:</p>
-        <ul>
-          <li><strong>EU representative:</strong> ${EU_REPRESENTATIVE}</li>
-          <li><strong>UK representative:</strong> ${UK_REPRESENTATIVE}</li>
+        <ul>${REPRESENTATIVE_ROWS}
         </ul>`,
     },
     'app-store-labels': {
@@ -510,9 +516,7 @@ export const PRIVACY: LegalDocument = {
     contact: {
       title: 'Contact Us',
       content: `
-        <ul>${CONTACT_ROWS}
-          <li><strong>EU representative:</strong> ${EU_REPRESENTATIVE}</li>
-          <li><strong>UK representative:</strong> ${UK_REPRESENTATIVE}</li>
+        <ul>${CONTACT_ROWS}${REPRESENTATIVE_ROWS}
           <li><strong>Support:</strong> <a href="${pathFor('support')}">ffly Support</a></li>
         </ul>`,
     },

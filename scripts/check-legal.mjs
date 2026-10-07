@@ -89,8 +89,11 @@ for (const { prefix: lang } of LANGS) {
 }
 
 // Both legal pages: required sections in GDPR Art. 13, CCPA and App Store 3.1.2/5.1.1 order of business (spec 011).
+const placeholderValue = (name) => appConstant(name)?.match(/^'([^']*)'$/)?.[1];
+// An empty representative means none appointed yet: /privacy then leaves #representatives out (owner, 2026-10-07).
+const REPRESENTED = Boolean(placeholderValue('EU_REPRESENTATIVE') || placeholderValue('UK_REPRESENTATIVE'));
 const PRIVACY_IDS = [
-  'who-we-are', 'representatives', 'app-store-labels', 'not-collected', 'searches', 'app-user-id', 'ip-address',
+  'who-we-are', ...(REPRESENTED ? ['representatives'] : []), 'app-store-labels', 'not-collected', 'searches', 'app-user-id', 'ip-address',
   'purchases', 'analytics', 'crash-performance', 'attribution', 'live-activity', 'feedback', 'on-device',
   'booking-links', 'web-search', 'website', 'legal-bases', 'sharing', 'transfers', 'security', 'retention', 'rights',
   'ccpa', 'children', 'changes', 'contact',
@@ -171,7 +174,7 @@ for (const [term, what] of [
 check(privacyHtml.includes('href="https://www.appsflyer.com/optout"'), 'Privacy: #attribution must link AppsFlyer\'s opt-out page');
 check(/push token/.test(privacy('live-activity')) && /deleted with the search/.test(privacy('live-activity')), 'Privacy: #live-activity must say the push token goes with the search');
 check(/Standard Contractual Clauses/.test(privacy('transfers')) && /UK/.test(privacy('transfers')) && /Belarus/.test(privacy('transfers')), 'Privacy: transfers must name the controller\'s country and the SCCs with the UK Addendum');
-check(/Article 27/.test(privacy('representatives')), 'Privacy: #representatives must name the Art. 27 representatives');
+if (REPRESENTED) check(/Article 27/.test(privacy('representatives')), 'Privacy: #representatives must name the Art. 27 representatives');
 const rights = privacy('rights');
 for (const right of ['access', 'correct', 'delete', 'portable', 'object', 'restrict', 'withdraw', 'one month', 'identity', 'data protection authority', 'automated']) {
   check(rights.includes(right), `Privacy: #rights must cover "${right}"`);
@@ -221,8 +224,11 @@ for (const page of ['privacy', 'terms']) {
 
 // Operator details the owner must supply (spec 011). Until each is filled, the pages are not fit to publish.
 const OPERATOR_PLACEHOLDERS = ['OPERATOR_ADDRESS', 'EU_REPRESENTATIVE', 'UK_REPRESENTATIVE', 'GOVERNING_LAW'];
-const placeholderValue = (name) => appConstant(name)?.match(/^'([^']*)'$/)?.[1];
-const unfilled = OPERATOR_PLACEHOLDERS.filter((name) => { const v = placeholderValue(name); return v === undefined || v === 'REPLACE_ME' || v === ''; });
+const OPTIONAL = new Set(['EU_REPRESENTATIVE', 'UK_REPRESENTATIVE']);
+const unfilled = OPERATOR_PLACEHOLDERS.filter((name) => {
+  const v = placeholderValue(name);
+  return v === undefined || v === 'REPLACE_ME' || (v === '' && !OPTIONAL.has(name));
+});
 check(unfilled.length === 0, `src/app.ts: fill ${unfilled.join(', ')} (still REPLACE_ME): the legal pages cannot be published without them`);
 for (const [name, page, id] of [
   ['OPERATOR_ADDRESS', 'privacy', 'who-we-are'], ['OPERATOR_PHONE', 'privacy', 'who-we-are'], ['EU_REPRESENTATIVE', 'privacy', 'representatives'],
@@ -230,6 +236,7 @@ for (const [name, page, id] of [
   ['GOVERNING_LAW', 'terms', 'governing-law'],
 ]) {
   const value = placeholderValue(name);
+  if (value === '' && OPTIONAL.has(name)) continue;
   check(value !== undefined && (page === 'privacy' ? privacy : terms)(id).includes(value), `${page}: #${id} must show ${name} from src/app.ts`);
 }
 

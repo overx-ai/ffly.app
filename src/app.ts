@@ -44,12 +44,11 @@ export const OPERATOR = 'Yauheni Malashchytski';
 export const OPERATOR_COUNTRY = 'Belarus';
 export const OPERATOR_ADDRESS = '76 Galo Street, flat 91, Minsk, Belarus';
 export const OPERATOR_PHONE = '+375 29 778 21 78';
-// TODO(owner): spec 011. GDPR and UK GDPR Art. 27 representatives (name and postal address of each) and the governing
-// law of /terms (a jurisdiction, e.g. "the Republic of Belarus"). scripts/check-legal.mjs fails `npm test` while any is
-// REPLACE_ME, because the legal pages are not fit to publish without them.
-export const EU_REPRESENTATIVE = 'REPLACE_ME';
-export const UK_REPRESENTATIVE = 'REPLACE_ME';
-export const GOVERNING_LAW = 'REPLACE_ME';
+// TODO(owner): spec 011. GDPR and UK GDPR Art. 27 representatives (name and postal address of each). Empty = none appointed
+// yet (owner, 2026-10-07): /privacy then leaves the section out rather than claim one. REPLACE_ME fails `npm test`.
+export const EU_REPRESENTATIVE = '';
+export const UK_REPRESENTATIVE = '';
+export const GOVERNING_LAW = 'the Republic of Belarus';
 export const DEVELOPER = 'Yauheni Malashchytski';
 export const PUBLISHER = { name: 'OverX AI', label: 'overx.ai', url: 'https://overx.ai' } as const;
 

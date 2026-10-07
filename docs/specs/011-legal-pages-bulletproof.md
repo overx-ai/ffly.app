@@ -1,7 +1,7 @@
 ---
 id: 011
 title: "Privacy and terms, bulletproof and in lock-step with the app"
-status: in-progress
+status: done
 created: 2026-10-07
 updated: 2026-10-07
 repo: ffly-site
@@ -15,8 +15,8 @@ tasks: []
 
 > **TL;DR** — `/privacy` contradicts the app (says "no tracking"; the app uses the IDFA after ATT and declares 9 data
 > types), and both pages lack GDPR/CCPA/Apple basics. They are rewritten to match ios-ffly's manifest and its new
-> AppsFlyer attribution, name the vendors, and gate release on the operator's address, EU/UK representatives and
-> governing law. Owner: fill the four `REPLACE_ME` values, get a lawyer's read, say "push".
+> AppsFlyer attribution, name the vendors, show the owner's name and Minsk address, and use Belarus law. Owner: appoint
+> EU/UK Art. 27 representatives (the section stays hidden until then) and get a lawyer's read.
 
 ## Requirements
 - Owner, 2026-10-07: "make our privacy and terms bulletproof … check the bible". Answers: name the vendors; operator
@@ -69,6 +69,6 @@ tasks: []
 | consumes | ios-ffly `docs/compliance/data-inventory.yaml` + AppsFlyer (spec 024) | 2026-10-07 | ios-ffly spec 024 | pinned copy of the labels in check-legal |
 
 ## Acceptance Criteria
-- [ ] Every label, tracking and processor statement matches the app's inventory.
-- [ ] All S3–S5 sections present; check-legal asserts them.
-- [ ] `npm test` green except the REPLACE_ME gate, which names the four values to fill.
+- [x] Every label, tracking and processor statement matches the app's inventory.
+- [x] All S3–S5 sections present; check-legal asserts them.
+- [x] `npm test` green; the REPLACE_ME gate stays for any future placeholder.

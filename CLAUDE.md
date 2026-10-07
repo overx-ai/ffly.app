@@ -140,9 +140,10 @@ Those repos are the source of truth for copy, colours and claims.
   any plan. Both are submission requirements, and `check-legal` asserts 6 and 7 keep their numbers and titles. The
   layout numbers sections by order; cross-references come from the same order (`legalSections` in
   `src/data/sections.ts`, `privacySection` for /support), never a typed number.
-- **Operator placeholders gate publishing (spec 011).** `EU_REPRESENTATIVE`, `UK_REPRESENTATIVE` and `GOVERNING_LAW` in
-  `src/app.ts` are `REPLACE_ME` until the owner supplies them, and `check-legal` fails `npm test` naming each one still
-  unfilled. Both legal pages show "Effective: … · Last updated: …", both the `SITE_PAGES` lastmod.
+- **Operator placeholders gate publishing (spec 011).** `check-legal` fails `npm test` on any `REPLACE_ME` in
+  `src/app.ts`'s operator constants. `GOVERNING_LAW` is the Republic of Belarus; `EU_REPRESENTATIVE` / `UK_REPRESENTATIVE`
+  are empty until the owner appoints them (2026-10-07), and /privacy then leaves `#representatives` out rather than
+  claim one. Both legal pages show "Effective: … · Last updated: …", both the `SITE_PAGES` lastmod.
 - Copy was ported from the overx.ai worktree (`sites/main/src/content/ffly/*.ts`) on 2026-10-03.
   **This repo is now the source of truth**; do not re-extract.
 
