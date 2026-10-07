@@ -1,0 +1,10 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["26SAAF256Q.ai.overx.ffly"],
+        "components": [{ "/": "/search*", "comment": "Shared ffly routes open the app (ios-ffly spec 025)" }]
+      }
+    ]
+  }
+}
