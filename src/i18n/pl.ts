@@ -25,6 +25,11 @@ const pl = {
       languages: 'Język',
       disclaimer: `${APP.name} to wyszukiwarka, a nie biuro podróży, i nie jest powiązany z żadną linią lotniczą. Ceny są orientacyjne: ostateczną cenę sprawdź na stronie, na której rezerwujesz.`,
     },
+    langHint: {
+      text: 'Ta strona jest dostępna po polsku',
+      open: 'Otwórz',
+      close: 'Zamknij',
+    },
     store: {
       download: 'Pobierz z App Store',
       soon: 'Wkrótce w App Store',

@@ -25,6 +25,11 @@ const fr = {
       languages: 'Langue',
       disclaimer: `${APP.name} est un outil de recherche, pas une agence de voyages, et n’est affilié à aucune compagnie aérienne. Les tarifs sont indicatifs : vérifiez le prix final sur le site où vous réservez.`,
     },
+    langHint: {
+      text: 'Cette page existe en français',
+      open: 'Ouvrir',
+      close: 'Fermer',
+    },
     store: {
       download: 'Télécharger dans l’App Store',
       soon: 'Bientôt sur l’App Store',

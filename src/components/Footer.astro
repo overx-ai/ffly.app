@@ -1,7 +1,8 @@
 ---
 import { CONTACT_EMAIL, DEVELOPER, GA_MEASUREMENT_ID, PUBLISHER } from '../app';
-import { DEFAULT_LANG, LANGS, useLang, type Lang } from '../i18n';
-import { hreflangOf, isLocalized, pathFor, type Slug } from '../site-pages';
+import LanguageLinks from './LanguageLinks.astro';
+import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
+import { hreflangOf, pathFor, type Slug } from '../site-pages';
 
 interface Props {
   lang?: Lang;
@@ -12,18 +13,12 @@ const { lang = DEFAULT_LANG, slug } = Astro.props;
 const { t } = useLang(lang);
 const { footer } = t.common;
 const year = new Date().getFullYear();
-// The same page in each language where it has one; otherwise each language's home.
-const switchTo: Slug = slug !== undefined && isLocalized(slug) ? slug : '';
 const pageLinks = [
   { slug: 'guides', label: footer.guides },
   { slug: 'support', label: footer.support },
   { slug: 'privacy', label: footer.privacy },
   { slug: 'terms', label: footer.terms },
 ] as const satisfies readonly { slug: Slug; label: string }[];
-// Another language's name in another script (Русский on a Latin page) takes the system font, so the page never
-// downloads a font for that one word.
-const LATIN = /^[\p{Script=Latin}\s]+$/u;
-const otherScript = (l: (typeof LANGS)[number]) => l.code !== lang && !LATIN.test(l.name);
 ---
 <footer>
   <div class="container">
@@ -37,15 +32,7 @@ const otherScript = (l: (typeof LANGS)[number]) => l.code !== lang && !LATIN.tes
       <span>{footer.createdBy} <a href={PUBLISHER.url} rel="noopener">{PUBLISHER.label}</a></span>
     </nav>
     <nav class="links langs" aria-label={footer.languages}>
-      {LANGS.map((l) => (
-        <a
-          href={pathFor(switchTo, l.code)}
-          lang={l.tag}
-          hreflang={l.hreflang}
-          aria-current={l.code === lang && slug === switchTo ? 'page' : undefined}
-          class={otherScript(l) ? 'other-script' : undefined}
-        >{l.name}</a>
-      ))}
+      <LanguageLinks lang={lang} slug={slug} />
     </nav>
     <p class="fine">{footer.disclaimer}</p>
   </div>
@@ -63,8 +50,8 @@ const otherScript = (l: (typeof LANGS)[number]) => l.code !== lang && !LATIN.tes
     align-items: center;
     gap: 0 var(--space-lg);
   }
-  .links > * { min-height: 44px; display: inline-flex; align-items: center; gap: 0.3em; }
-  .links a { color: var(--ink-2); text-decoration: none; }
+  .links > :global(*) { min-height: 44px; display: inline-flex; align-items: center; gap: 0.3em; }
+  .links :global(a) { color: var(--ink-2); text-decoration: none; }
   .links button {
     padding: 0;
     border: 0;
@@ -73,11 +60,10 @@ const otherScript = (l: (typeof LANGS)[number]) => l.code !== lang && !LATIN.tes
     font: inherit;
     cursor: pointer;
   }
-  .links a:hover, .links button:hover { color: var(--ink); }
+  .links :global(a:hover), .links button:hover { color: var(--ink); }
   .links span a { text-decoration: underline; }
   .langs { font-size: 13px; }
-  .langs [aria-current] { color: var(--ink); font-weight: 600; }
-  .langs .other-script { font-family: var(--font-system); }
+  .langs :global([aria-current]) { color: var(--ink); font-weight: 600; }
   .fine {
     font-size: 13px;
     line-height: 1.55;

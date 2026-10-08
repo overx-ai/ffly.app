@@ -31,6 +31,11 @@ const en = {
       languages: 'Language',
       disclaimer: `${APP.name} is a search tool, not a travel agent, and is not affiliated with any airline. Fares are indicative: confirm the final price on the site you book on.`,
     },
+    langHint: {
+      text: 'This page is in English',
+      open: 'Open',
+      close: 'Close',
+    },
     store: {
       download: 'Download on the App Store',
       soon: 'Coming soon to the App Store',

@@ -25,6 +25,11 @@ const fi = {
       languages: 'Kieli',
       disclaimer: `${APP.name} on hakutyökalu, ei matkatoimisto, eikä se ole sidoksissa mihinkään lentoyhtiöön. Hinnat ovat suuntaa antavia: tarkista lopullinen hinta sivustolta, jolta varaat.`,
     },
+    langHint: {
+      text: 'Tämä sivu on saatavilla suomeksi',
+      open: 'Avaa',
+      close: 'Sulje',
+    },
     store: {
       download: 'Lataa App Storesta',
       soon: 'Tulossa pian App Storeen',

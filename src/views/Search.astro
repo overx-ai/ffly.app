@@ -14,7 +14,7 @@ const { search } = t;
 const guideLink = pageLink('guides/cheapest-order-to-visit-cities', t.common.guideLinks.cheapestOrder, lang);
 ---
 <BaseLayout title={search.title} description={search.description} slug="search" lang={lang} preconnectApi>
-  <Header lang={lang} />
+  <Header lang={lang} slug="search" />
 
   <main id="main" class="container search-page">
     <div class="search-head">

@@ -25,6 +25,11 @@ const da = {
       languages: 'Sprog',
       disclaimer: `${APP.name} er et søgeværktøj, ikke et rejsebureau, og har ingen tilknytning til noget flyselskab. Priserne er vejledende: tjek den endelige pris på den side, du booker på.`,
     },
+    langHint: {
+      text: 'Denne side findes på dansk',
+      open: 'Åbn',
+      close: 'Luk',
+    },
     store: {
       download: 'Download i App Store',
       soon: 'Snart i App Store',

@@ -10,7 +10,7 @@ interface Props extends LegalDocument { slug: Slug; }
 const { slug, pageTitle, description, summaryTitle, summaryText, sections } = Astro.props;
 ---
 <BaseLayout title={pageTitle} description={description} slug={slug}>
-  <Header />
+  <Header slug={slug} />
   <main id="main" class="container page legal">
     <h1>{pageTitle}</h1>
     <p class="updated">Effective: {lastUpdated(slug)} · Last updated: {lastUpdated(slug)}</p>

@@ -25,6 +25,11 @@ const nb = {
       languages: 'Språk',
       disclaimer: `${APP.name} er et søkeverktøy, ikke et reisebyrå, og er ikke tilknyttet noe flyselskap. Prisene er veiledende: sjekk den endelige prisen på nettstedet der du bestiller.`,
     },
+    langHint: {
+      text: 'Denne siden finnes på norsk',
+      open: 'Åpne',
+      close: 'Lukk',
+    },
     store: {
       download: 'Last ned fra App Store',
       soon: 'Kommer snart til App Store',

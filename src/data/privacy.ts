@@ -322,8 +322,9 @@ export const PRIVACY: LegalDocument = {
           ])}
         </ul>
         <p>It never remembers your travel dates. It also keeps the list of cities in your browser's storage, so the
-        search opens quickly; that list is the same for everyone. You can delete these cookies and this storage in
-        your browser at any time.</p>
+        search opens quickly; that list is the same for everyone. Once you pick a language or close the note offering
+        this page in your language, it remembers that there too, so the note does not come back. You can delete these
+        cookies and this storage in your browser at any time.</p>
         ${ADS
           ? `<p>This website shows ads from Google AdSense. Before any ad loads, Google's consent message asks whether
         you agree to personalised ads, and remembers your choice. If you don't agree, you may still see ads that are

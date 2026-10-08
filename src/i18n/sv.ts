@@ -25,6 +25,11 @@ const sv = {
       languages: 'Språk',
       disclaimer: `${APP.name} är ett sökverktyg, inte en resebyrå, och har ingen koppling till något flygbolag. Priserna är vägledande: kontrollera slutpriset på sajten där du bokar.`,
     },
+    langHint: {
+      text: 'Den här sidan finns på svenska',
+      open: 'Öppna',
+      close: 'Stäng',
+    },
     store: {
       download: 'Hämta i App Store',
       soon: 'Snart i App Store',

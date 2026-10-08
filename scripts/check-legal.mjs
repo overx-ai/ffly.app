@@ -196,6 +196,7 @@ check(/same for every ffly user/.test(privacy('booking-links')), 'Privacy: the p
 // Spec 003: the web search remembers places in functional cookies, never dates; notifications only on request.
 const website = privacy('website');
 check(/cookies/.test(website) && /never remembers your travel dates/.test(website), 'Privacy: #website must cover the search cookies and say dates are never kept');
+check(/pick a language/.test(website), 'Privacy: #website must say the language choice is remembered (spec 012)');
 // The consent cookie exists only while the banner does (GA_MEASUREMENT_ID set).
 const consentCookie = appConstant('CONSENT')?.match(/cookie: '([^']+)'/)?.[1];
 const siteCookies = [...source('src/app.ts').matchAll(/cookie: '([^']+)'/g)].map(([, name]) => name)
@@ -500,6 +501,7 @@ for (const [file, html] of htmlPages) {
     check(!/<link rel="alternate" hreflang=|og:locale/.test(html), `${file}: an English-only page must carry no hreflang alternates or og:locale`);
   }
 }
+const switcherLinks = (html) => [...html.matchAll(/<a href="([^"]+)"[^>]*\shreflang="([^"]+)"/g)].map(([, href, hreflang]) => `${hreflang} ${href}`);
 // The footer switcher links the same page in each language where it has one, else each language's home: each link is
 // that page's canonical URL, in the order of LANGS.
 for (const [file, html] of htmlPages) {
@@ -509,7 +511,7 @@ for (const [file, html] of htmlPages) {
     continue;
   }
   const slug = localizedFiles.get(file) ?? '';
-  const links = [...nav.matchAll(/<a href="([^"]+)"[^>]*\shreflang="([^"]+)"/g)].map(([, href, hreflang]) => `${hreflang} ${href}`);
+  const links = switcherLinks(nav);
   const want = LANGS.map((lang) => `${lang.hreflang} ${pagePath(slug, lang)}`);
   check(JSON.stringify(links) === JSON.stringify(want), `${file}: the language switcher must link ${want.join(', ')}`);
   for (const lang of LANGS) {
@@ -517,6 +519,12 @@ for (const [file, html] of htmlPages) {
     const target = fileOf(href);
     check(isFile(`${DIST}${target}`) && canonicalOf(readFileSync(`${DIST}${target}`, 'utf8')) === `${origin}${href}`, `${file}: switcher link ${href} must be its page's canonical`);
   }
+  // Spec 012: the header menu offers exactly the footer's links.
+  const header = html.match(/<header\b[\s\S]*?<\/header>/)?.[0];
+  check(header !== undefined, `${file}: a page with the footer switcher must have the header`);
+  const menu = header?.match(/<details class="lang-menu\b[\s\S]*?<\/details>/)?.[0];
+  check(menu !== undefined, `${file}: the header language switcher is missing`);
+  check(JSON.stringify(switcherLinks(menu ?? '')) === JSON.stringify(links), `${file}: the header language switcher must link what the footer's does`);
 }
 for (const [loc, links] of sitemapAlternates) {
   check(links.length === 0 || links.length === LANGS.length + 1, `sitemap.xml: ${loc} must list ${LANGS.length} alternates + ${X_DEFAULT}`);
@@ -596,6 +604,32 @@ for (const [file, html] of htmlPages.filter(([, html]) => html.includes('id="sea
   const empty = emptyLeaves(text);
   check(empty.length === 0, `${file}: empty widget strings: ${empty.join(', ')}`);
 }
+// Spec 012: the language hint exists, hidden, on exactly the localized pages, with every language's strings and the
+// same page in that language. It is never a redirect.
+for (const [file, html] of htmlPages) {
+  const card = html.match(/<[a-z]+ id="lang-hint"[^>]*>/)?.[0];
+  const slug = localizedFiles.get(file);
+  if (slug === undefined) {
+    check(card === undefined, `${file}: the language hint belongs on localized pages only`);
+    continue;
+  }
+  check(card !== undefined && /\shidden\b/.test(card), `${file}: the language hint must be on the page, hidden until the script shows it`);
+  let hints;
+  try {
+    hints = JSON.parse(decode(card?.match(/\sdata-hints="([^"]*)"/)?.[1] ?? ''));
+  } catch {
+    hints = undefined;
+  }
+  check(Array.isArray(hints) && hints.length === LANGS.length, `${file}: the language hint must carry all ${LANGS.length} languages in data-hints`);
+  for (const [i, lang] of LANGS.entries()) {
+    const hint = Array.isArray(hints) ? hints[i] : undefined;
+    check(hint?.code === lang.code && hint?.href === pagePath(slug, lang), `${file}: hint ${i} must offer ${pagePath(slug, lang)}`);
+    for (const key of ['text', 'open', 'close']) {
+      check(typeof hint?.[key] === 'string' && hint[key].trim() !== '', `${file}: empty language hint string ${lang.code}.${key}`);
+    }
+  }
+}
+check(!/location\.(?:replace|assign)|location\.href\s*=/.test(bundle), 'Bundle: no script may redirect by language');
 const llms = readFileSync(`${DIST}llms.txt`, 'utf8');
 // Pro has a daily fair-use cap, so no language may call it unlimited. Exact phrases, so "sem o limite de 3" passes.
 const UNLIMITED = [

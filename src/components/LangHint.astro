@@ -1,0 +1,86 @@
+---
+import { DEFAULT_LANG, LANGS, otherScript, useLang, type Lang } from '../i18n';
+import { isLocalized, pathFor, type Slug } from '../site-pages';
+import type { LangHintEntry } from '../scripts/lang-hint-state';
+
+interface Props {
+  lang?: Lang;
+  slug?: Slug;
+}
+
+const { lang = DEFAULT_LANG, slug } = Astro.props;
+const page = slug !== undefined && isLocalized(slug) ? slug : undefined;
+const hints: LangHintEntry[] =
+  page === undefined
+    ? []
+    : LANGS.map((l) => ({
+        code: l.code,
+        tag: l.tag,
+        hreflang: l.hreflang,
+        href: pathFor(page, l.code),
+        system: otherScript(l, lang),
+        ...useLang(l.code).t.common.langHint,
+      }));
+---
+{page !== undefined && (
+  <aside id="lang-hint" class="lang-hint" aria-labelledby="lang-hint-text" data-lang={lang} data-hints={JSON.stringify(hints)} hidden>
+    <p id="lang-hint-text" data-hint-text></p>
+    <a class="btn" data-hint-open></a>
+    <button type="button" class="close" data-hint-close>
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M3 3l10 10M13 3L3 13" />
+      </svg>
+    </button>
+  </aside>
+)}
+
+<script>
+  import '../scripts/lang-hint';
+</script>
+
+<style>
+  .lang-hint {
+    position: fixed;
+    z-index: 4;
+    top: calc(var(--header-height) + var(--space-sm));
+    right: var(--gutter);
+    max-width: min(420px, calc(100vw - 2 * var(--gutter)));
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 6px 6px 6px var(--space-md);
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    font-size: 15px;
+    line-height: 1.35;
+  }
+  .lang-hint[hidden] { display: none; }
+  .lang-hint.other-script { font-family: var(--font-system); }
+  .lang-hint p { flex: 1 1 auto; margin: 0; }
+  .lang-hint .btn {
+    flex: none;
+    padding: 10px 18px;
+    font-family: inherit;
+    font-size: 15px;
+  }
+  .close {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: none;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+  .close:hover { color: var(--ink); background: var(--fill); }
+  @media (max-width: 560px) {
+    .lang-hint { left: var(--gutter); max-width: none; }
+  }
+</style>

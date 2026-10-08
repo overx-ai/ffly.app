@@ -87,6 +87,12 @@ export const WEB_SEARCH = {
   lateFrom: '23:00',
 } as const;
 
+// The "this page is in your language" hint (spec 012) stops once the visitor dismisses it or picks a language.
+export const LANG_HINT = {
+  storageKey: 'ffly.lang',
+  dismissed: 'dismissed',
+} as const;
+
 // The hero button and the header "Search" glide to #search over this long (instant under reduced motion).
 export const SCROLL_MS = 1200;
 

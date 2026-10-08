@@ -1,16 +1,19 @@
 # ffly-site (ffly.app)
 
 Marketing, support and legal site for **ffly** (`ai.overx.ffly`), the iPhone app for cheap
-multi-city trips. Astro 4, static output, deployed on Vercel. Client JavaScript only in the search widget (`/` and `/search`) and the consent banner (every page).
+multi-city trips. Astro 4, static output, deployed on Vercel. Client JavaScript only in the search widget (`/` and `/search`), the consent banner and the language module (every page).
 
 The app source lives at `../../0E-extensions/ios-ffly`, the API at `1B-bots` `apps/ffly-api`.
 Those repos are the source of truth for copy, colours and claims.
 
 ## Tech Stack
 - Astro 4, `output: 'static'`, `trailingSlash: 'never'`. **One dependency: `astro`**, plus `vitest` (dev only) for `tests/`.
-- **Zero client JavaScript, except the search widget and the consent module.** Theme switching is pure CSS, the
-  FAQ is `<details>`. `ConsentBanner.astro` (in `BaseLayout`, every page) loads `src/scripts/consent.ts`, whose logic
-  is the DOM-free, tested `consent-state.ts`.
+- **Zero client JavaScript, except the search widget, the consent module and the language module.** Theme switching
+  is pure CSS, the FAQ and the header language menu are `<details>`. `ConsentBanner.astro` (in `BaseLayout`, every page)
+  loads `src/scripts/consent.ts`, whose logic is the DOM-free, tested `consent-state.ts`. `LangHint.astro` (in
+  `BaseLayout`, every page) loads `src/scripts/lang-hint.ts` (spec 012), whose logic is the DOM-free, tested
+  `lang-hint-state.ts`: it shows the language hint, remembers a picked language, and closes the header menu on Escape
+  or a click outside.
   `SearchForm.astro` (specs 001 and 003) sits on `/` under `#search` and on `/search`, and ships one bundled
   script: `src/scripts/search.ts` over small DOM-free modules (`ffly-api`, `combobox`, `calendar`, `prefs`,
   `nudges`, `results`, `notify`, `scroll`, `ticker`, `places`, `places-store`) that `tests/` covers. Plain TypeScript, no framework, custom controls
@@ -85,7 +88,14 @@ Those repos are the source of truth for copy, colours and claims.
   Support, privacy, terms, guide articles and the 404 stay English at the root.
 - Every page self-canonical. Localized pages: reciprocal hreflang for all 13 plus `x-default` → root, same
   set in the sitemap (`alternates()` in `src/site-pages.ts`). English-only pages: no alternates.
-- Never redirect by browser language or IP.
+- Never redirect by browser language or IP. Instead (spec 012): the header carries the footer's switcher
+  (`LanguageLinks.astro`, one list for both, the same page in each language where it has one, else that language's
+  home) as a globe `<details>` menu, and on localized pages only a hidden card (`LangHint.astro`, every language's
+  `common.langHint` and target in `data-hints`) offers the first of `navigator.languages` the site has when it is not
+  the page's, in that language. It never shows again once dismissed or once any language link is clicked
+  (`LANG_HINT.storageKey` in `localStorage`, `/privacy` `#website` says so). A hint in another script than the page's
+  uses the system font, so a Latin page never fetches Onest. `check-legal` asserts the header menu equals the footer
+  list and the card is on exactly the localized pages with every string filled.
 - Copy lives in `src/i18n/{lang}.ts`, each `satisfies Dict`; never hardcode copy in a view.
 - Shared terms (plan names, Book, priorities) come from ios-ffly `Scripts/l10n/{lang}.json`; German says "du".
 - City names come from the API's `names` in the page's language (`placeName`: exact tag, then base language, then the

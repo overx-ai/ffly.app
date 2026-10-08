@@ -33,4 +33,4 @@ export function useLang(lang: Lang) {
   };
 }
 
-export { DEFAULT_LANG, LANGS, TRANSLATED_LANGS, localeOf, type Lang } from './locales';
+export { DEFAULT_LANG, LANGS, TRANSLATED_LANGS, localeOf, otherScript, shortCode, type Lang } from './locales';

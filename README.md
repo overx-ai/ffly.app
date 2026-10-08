@@ -1,12 +1,15 @@
 # ffly-site
 
 Website for **ffly**, at `ffly.app`. Astro 4, static, one dependency (plus `vitest`, dev only). Zero client
-JavaScript, except the free web search widget on `/` (`#search`) and `/search`, and the consent banner.
+JavaScript, except the free web search widget on `/` (`#search`) and `/search`, the consent banner, and the language
+hint and header language menu (spec 012).
 
 Thirteen languages (specs 004, 010): English at the root, and German, French, Spanish, Italian, Dutch, Polish,
 Portuguese, Russian, Swedish, Danish, Norwegian and Finnish under `/de` `/fr` `/es` `/it` `/nl` `/pl` `/pt` `/ru` `/sv`
 `/da` `/no` `/fi`. Only the home page, `/search` and `/guides` are
-localized; support, privacy, terms, the guide articles and the 404 are English only.
+localized; support, privacy, terms, the guide articles and the 404 are English only. The header and the footer both
+switch language; a visitor whose browser asks for another of the thirteen gets a dismissable hint offering it, never a
+redirect.
 
 ```bash
 npm install
@@ -103,6 +106,9 @@ Consent, in a private window with DevTools open on the Network tab:
 3. Footer "Cookie settings", then Accept: `gtag/js` loads, `collect` requests carry `gcs=G101` (ad storage
    denied, analytics granted), and the choice holds on `/de` and `/support` (one cookie, `Path=/`).
 4. "Cookie settings", then Reject: the `_ga*` cookies are deleted.
+
+Language hint, in a browser set to Russian: `/` shows "Эта страница есть на русском" linking `/ru`, in the system
+font on `/de`; ✕ hides it for good; `/ru` shows none. The header globe on `/search` links `/ru/search`, on `/support` `/ru`.
 
 Then read every page at 390px and 1280px in both colour schemes, and `/de` and `/pl` (the longest strings)
 with `/de/search` and `/pl/search`.

@@ -25,6 +25,11 @@ const nl = {
       languages: 'Taal',
       disclaimer: `${APP.name} is een zoektool, geen reisbureau, en is niet verbonden aan een airline. Prijzen zijn indicatief: controleer de definitieve prijs op de site waar je boekt.`,
     },
+    langHint: {
+      text: 'Deze pagina is er in het Nederlands',
+      open: 'Openen',
+      close: 'Sluiten',
+    },
     store: {
       download: 'Download in de App Store',
       soon: 'Binnenkort in de App Store',

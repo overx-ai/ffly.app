@@ -1,0 +1,27 @@
+---
+import { DEFAULT_LANG, LANGS, otherScript, type Lang } from '../i18n';
+import { isLocalized, pathFor, type Slug } from '../site-pages';
+
+interface Props {
+  lang?: Lang;
+  slug?: Slug;
+}
+
+const { lang = DEFAULT_LANG, slug } = Astro.props;
+// The same page in each language where it has one; otherwise each language's home.
+const switchTo: Slug = slug !== undefined && isLocalized(slug) ? slug : '';
+---
+{LANGS.map((l) => (
+  <a
+    href={pathFor(switchTo, l.code)}
+    lang={l.tag}
+    hreflang={l.hreflang}
+    aria-current={l.code === lang && slug === switchTo ? 'page' : undefined}
+    class={otherScript(l, lang) ? 'other-script' : undefined}
+    data-lang-pick={l.code}
+  >{l.name}</a>
+))}
+
+<style>
+  .other-script { font-family: var(--font-system); }
+</style>

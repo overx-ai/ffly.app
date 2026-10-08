@@ -15,7 +15,7 @@ import { DEFAULT_LANG, LANGS, X_DEFAULT, localeOf, type Lang } from './i18n/loca
 export const SITE_PAGES = [
   { slug: '',        lastmod: '2026-10-06' },
   { slug: 'support', lastmod: '2026-10-07' },
-  { slug: 'privacy', lastmod: '2026-10-07' },
+  { slug: 'privacy', lastmod: '2026-10-08' },
   { slug: 'terms',   lastmod: '2026-10-07' },
   { slug: 'search',  lastmod: '2026-10-05' },
   { slug: 'guides',  lastmod: '2026-10-05' },

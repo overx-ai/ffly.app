@@ -26,3 +26,10 @@ export const X_DEFAULT = 'x-default';
 export const localeOf = (lang: Lang): Locale => LANGS.find((l) => l.code === lang)!;
 
 export const TRANSLATED_LANGS = LANGS.filter((l) => l.code !== DEFAULT_LANG);
+
+// Another language's words in another script (Русский on a Latin page) take the system font, so the page never
+// downloads a font for them.
+const LATIN = /^[\p{Script=Latin}\s]+$/u;
+export const otherScript = (other: Locale, page: Lang) => other.code !== page && !LATIN.test(other.name);
+
+export const shortCode = (l: Locale) => (l.prefix || l.code).toUpperCase();

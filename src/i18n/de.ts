@@ -25,6 +25,11 @@ const de = {
       languages: 'Sprache',
       disclaimer: `${APP.name} ist ein Suchwerkzeug, kein Reisebüro, und mit keiner Airline verbunden. Die Preise sind Richtwerte: Prüfe den Endpreis auf der Seite, auf der du buchst.`,
     },
+    langHint: {
+      text: 'Diese Seite gibt es auf Deutsch',
+      open: 'Öffnen',
+      close: 'Schließen',
+    },
     store: {
       download: 'Laden im App Store',
       soon: 'Bald im App Store',
