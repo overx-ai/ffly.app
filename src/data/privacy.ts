@@ -8,9 +8,7 @@ import {
   FEEDBACK,
   GA_MEASUREMENT_ID,
   OPERATOR,
-  OPERATOR_ADDRESS,
   OPERATOR_COUNTRY,
-  OPERATOR_PHONE,
   PREFS,
   SERVICE,
   SITE_HOST,
@@ -19,7 +17,7 @@ import {
   mailto,
 } from '../app';
 import { pathFor } from '../site-pages';
-import { legalSections } from './sections';
+import { ADDRESS_ON_REQUEST, legalSections } from './sections';
 import type { LegalDocument } from './types';
 
 // #app-store-labels is ios-ffly/Template/PrivacyInfo.xcprivacy and docs/compliance/data-inventory.yaml, in Apple's
@@ -71,9 +69,8 @@ const GOOGLE_ROLES = [
 
 const CONTACT_ROWS = `
           <li><strong>Controller:</strong> ${OPERATOR}</li>
-          <li><strong>Postal address:</strong> ${OPERATOR_ADDRESS}</li>
-          <li><strong>Phone:</strong> ${OPERATOR_PHONE}</li>
-          <li><strong>Email:</strong> ${mailto(CONTACT_EMAIL)}</li>`;
+          <li><strong>Email:</strong> ${mailto(CONTACT_EMAIL)}</li>
+          <li>${ADDRESS_ON_REQUEST}</li>`;
 
 export const PRIVACY: LegalDocument = {
   pageTitle: 'Privacy Policy',

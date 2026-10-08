@@ -3,7 +3,7 @@ id: 011
 title: "Privacy and terms, bulletproof and in lock-step with the app"
 status: done
 created: 2026-10-07
-updated: 2026-10-07
+updated: 2026-10-08
 repo: ffly-site
 release:
 depends_on: []
@@ -17,6 +17,11 @@ tasks: []
 > types), and both pages lack GDPR/CCPA/Apple basics. They are rewritten to match ios-ffly's manifest and its new
 > AppsFlyer attribution, name the vendors, show the owner's name and Minsk address, and use Belarus law. Owner: appoint
 > EU/UK Art. 27 representatives (the section stays hidden until then) and get a lawyer's read.
+
+> **Amended 2026-10-08 (owner):** the pages no longer show the postal address or a phone number; both offer the
+> address on request by email. `OPERATOR_ADDRESS` and `OPERATOR_PHONE` are gone, and `check-legal` fails on either
+> shape in any built page or `llms.txt`. The TL;DR's "Minsk address", S3's "postal address" and S6's
+> `OPERATOR_ADDRESS` below are superseded.
 
 ## Requirements
 - Owner, 2026-10-07: "make our privacy and terms bulletproof … check the bible". Answers: name the vendors; operator

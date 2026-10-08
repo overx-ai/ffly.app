@@ -224,7 +224,7 @@ for (const page of ['privacy', 'terms']) {
 }
 
 // Operator details the owner must supply (spec 011). Until each is filled, the pages are not fit to publish.
-const OPERATOR_PLACEHOLDERS = ['OPERATOR_ADDRESS', 'EU_REPRESENTATIVE', 'UK_REPRESENTATIVE', 'GOVERNING_LAW'];
+const OPERATOR_PLACEHOLDERS = ['EU_REPRESENTATIVE', 'UK_REPRESENTATIVE', 'GOVERNING_LAW'];
 const OPTIONAL = new Set(['EU_REPRESENTATIVE', 'UK_REPRESENTATIVE']);
 const unfilled = OPERATOR_PLACEHOLDERS.filter((name) => {
   const v = placeholderValue(name);
@@ -232,13 +232,17 @@ const unfilled = OPERATOR_PLACEHOLDERS.filter((name) => {
 });
 check(unfilled.length === 0, `src/app.ts: fill ${unfilled.join(', ')} (still REPLACE_ME): the legal pages cannot be published without them`);
 for (const [name, page, id] of [
-  ['OPERATOR_ADDRESS', 'privacy', 'who-we-are'], ['OPERATOR_PHONE', 'privacy', 'who-we-are'], ['EU_REPRESENTATIVE', 'privacy', 'representatives'],
-  ['UK_REPRESENTATIVE', 'privacy', 'representatives'], ['OPERATOR_ADDRESS', 'terms', 'contact'], ['OPERATOR_PHONE', 'terms', 'apple'],
+  ['EU_REPRESENTATIVE', 'privacy', 'representatives'], ['UK_REPRESENTATIVE', 'privacy', 'representatives'],
   ['GOVERNING_LAW', 'terms', 'governing-law'],
 ]) {
   const value = placeholderValue(name);
   if (value === '' && OPTIONAL.has(name)) continue;
   check(value !== undefined && (page === 'privacy' ? privacy : terms)(id).includes(value), `${page}: #${id} must show ${name} from src/app.ts`);
+}
+
+// Owner, 2026-10-08: no page shows a postal address or a phone number; the legal pages offer the address on request.
+for (const [page, id] of [['privacy', 'who-we-are'], ['privacy', 'contact'], ['terms', 'apple'], ['terms', 'contact']]) {
+  check(/postal address on request/.test((page === 'privacy' ? privacy : terms)(id)), `${page}: #${id} must offer the postal address on request`);
 }
 
 // Owner, 2026-10-07: the operator is a person; OverX is named only by the footer credit and the contact address.
@@ -655,6 +659,23 @@ for (const [where, text] of [['llms.txt', llms], ...htmlPages]) {
 // <link> tags are never shown, and the API preconnect names the host by design.
 const copyOf = (html) => copyText(withoutCss(html).replace(/<link\b[^>]*>/g, ''));
 const copyPages = [['llms.txt', copyText(llms)], ...htmlPages.map(([file, html]) => [file, copyOf(html)])];
+// Owner, 2026-10-08: no published page shows a postal address or a phone number, in any of the shapes either is written in.
+const CONTACT_LEAKS = [
+  [/\+\d{1,3}(?:[\s.()-]*\d){7,}/, 'an international phone number'],
+  [/\b(?:phone|tel|telephone)(?:\.\s*:?|\s*:)\s*[\d(+]/i, 'a phone number label'],
+  // An abbreviation followed by a capital is a saint, never a street: "2 nights St. John's" is a trip.
+  [/\b\d+[A-Za-z]?,?\s+(?:\p{Lu}[\p{L}'-]*\s+){1,3}(?:(?:Street|Road|Avenue|Lane|Boulevard|Blvd|Prospekt|Prospect|Drive|Highway)(?!\p{L})|(?:St|Rd|Ave|Blvd)\.(?!\s*\p{Lu}))/u, 'a street address (number first)'],
+  [/\p{Lu}[\p{L}'-]+\s+(?:Street|Road|Avenue|Lane|Boulevard|Prospekt|Prospect)\s*,?\s*\d+/u, 'a street address (street first)'],
+  // \b is ASCII-only, so the Cyrillic prefixes need a letter lookbehind.
+  [/(?<!\p{L})(?:ul|vul|str|ул|вул)\.\s*\p{Lu}[\p{L}'-]+,?\s*\d+/u, 'a street address (ul./vul./str.)'],
+  // A priced or measured number is a "flat fee", never a flat: "a flat 4.99 €", "a flat 10%".
+  [/\b(?:flat|apt\.?|apartment)\s+(?:no\.?\s*)?\d+[A-Za-z]?\b(?![.,]\d|\s*(?:%|[€$£]|EUR\b|USD\b|GBP\b))/i, 'a flat or apartment number'],
+];
+for (const [where, text] of copyPages) {
+  const shown = plainText(text);
+  for (const [pattern, what] of CONTACT_LEAKS) check(!pattern.test(shown), `${where}: must not show ${what}`);
+}
+for (const [file, html] of htmlPages) check(!/href="tel:/i.test(html), `${file}: must not link a phone number`);
 const banScans = [['Search bundle', bundle, MECHANICS], ...copyPages.map(([where, text]) => [where, text, COPY_BANS])];
 for (const [where, text, banned] of banScans) {
   for (const [pattern, what] of banned) {

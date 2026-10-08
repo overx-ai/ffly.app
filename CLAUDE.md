@@ -76,8 +76,11 @@ Those repos are the source of truth for copy, colours and claims.
   `src/data/types.ts`. TypeScript rather than the siblings' JSON so the email, operator and limits
   come from `src/app.ts`. English only.
 - The operator is a person: `OPERATOR` = `Yauheni Malashchytski` (owner, 2026-10-07: "don't mention overx, just my name"),
-  with `OPERATOR_ADDRESS`, `OPERATOR_PHONE` and `OPERATOR_COUNTRY` (Belarus) in `src/app.ts`. OverX appears only in the
+  with `OPERATOR_COUNTRY` (Belarus) in `src/app.ts`. OverX appears only in the
   footer credit and the contact address: `check-legal` fails on "OverX" in the main content of /privacy, /terms, /support.
+- **No page shows a postal address or a phone number** (owner, 2026-10-08). The legal pages say the address is given
+  on request by email (`ADDRESS_ON_REQUEST` in `src/data/sections.ts`); `check-legal` fails on a street address, a
+  flat number, a phone number or a `tel:` link in any built page or `llms.txt`.
 - Footer of every page carries "Created by overx.ai" linking to `https://overx.ai` (followed).
 
 ## Languages (spec 004)

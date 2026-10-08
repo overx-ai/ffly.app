@@ -4,16 +4,14 @@ import {
   EXTERNAL,
   GOVERNING_LAW,
   OPERATOR,
-  OPERATOR_ADDRESS,
   OPERATOR_COUNTRY,
-  OPERATOR_PHONE,
   SITE_HOST,
   WEB_SEARCH,
   externalLink,
   mailto,
 } from '../app';
 import { pathFor } from '../site-pages';
-import { legalSections } from './sections';
+import { ADDRESS_ON_REQUEST, legalSections } from './sections';
 import type { LegalDocument } from './types';
 
 // Section 6 is the App Store Guideline 3.1.2(c) auto-renewable subscription disclosure, Section 7 the one-time
@@ -237,8 +235,8 @@ export const TERMS: LegalDocument = {
           is subject to a US Government embargo, or that has been designated by the US Government as a "terrorist
           supporting" country, and that you are not listed on any US Government list of prohibited or restricted
           parties.</li>
-          <li><strong>Developer contact.</strong> Questions, complaints or claims about the app go to ${OPERATOR},
-          ${OPERATOR_ADDRESS}; phone ${OPERATOR_PHONE}; email ${mailto(CONTACT_EMAIL)}.</li>
+          <li><strong>Developer contact.</strong> Questions, complaints or claims about the app go to ${OPERATOR} by
+          email at ${mailto(CONTACT_EMAIL)}. ${ADDRESS_ON_REQUEST}</li>
           <li><strong>Third-party terms.</strong> When you use the app, you must comply with applicable third-party
           terms, such as your mobile network's terms and the terms of any airline or booking site you open from
           it.</li>
@@ -294,9 +292,8 @@ export const TERMS: LegalDocument = {
       content: `
         <ul>
           <li><strong>Operator:</strong> ${OPERATOR}</li>
-          <li><strong>Postal address:</strong> ${OPERATOR_ADDRESS}</li>
-          <li><strong>Phone:</strong> ${OPERATOR_PHONE}</li>
           <li><strong>Email:</strong> ${mailto(CONTACT_EMAIL)}</li>
+          <li>${ADDRESS_ON_REQUEST}</li>
           <li><strong>Support:</strong> <a href="${pathFor('support')}">ffly Support</a></li>
         </ul>`,
     },
