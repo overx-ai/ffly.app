@@ -396,7 +396,6 @@ const adNetwork = appConstant('AD_NETWORK_SCRIPT');
 check(adNetwork !== undefined, 'src/app.ts: the AD_NETWORK_SCRIPT declaration was not found, so the ads checks cannot run');
 const adNetworkOn = adNetwork !== undefined && adNetwork !== 'undefined';
 const adsenseOff = adsenseClient === 'undefined';
-const adsOff = adsenseOff && !adNetworkOn;
 const adNetworkSrc = adNetworkOn ? adNetwork.slice(1, -1) : undefined;
 const AD_SCRIPT = 'pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
 const CONSENT_SCRIPT = 'fundingchoicesmessages.google.com/i/';
@@ -421,7 +420,8 @@ const AD_CSP = {
 };
 cspAgrees(AD_CSP, !adsenseOff, 'ADSENSE_CLIENT');
 if (adNetworkSrc) cspAgrees({ 'script-src': [new URL(adNetworkSrc).host] }, true, 'AD_NETWORK_SCRIPT');
-check(/shows no ads/.test(website) === adsOff, 'Privacy: #website must say "shows no ads" exactly while ADSENSE_CLIENT and AD_NETWORK_SCRIPT are unset');
+check(/shows no ads/.test(website) === adsenseOff, 'Privacy: #website must say "shows no ads" exactly while ADSENSE_CLIENT is unset');
+check(/booking partner/.test(website) === adNetworkOn, 'Privacy: #website must disclose the booking partner\'s script exactly while AD_NETWORK_SCRIPT is set');
 
 // Analytics (spec 004): gtag.js only ever loads from the bundled consent module after Accept, never from page HTML.
 const gaId = appConstant('GA_MEASUREMENT_ID');
