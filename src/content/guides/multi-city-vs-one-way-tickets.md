@@ -3,7 +3,7 @@ title: Multi-city vs one-way tickets on Europe's budget airlines
 slug: multi-city-vs-one-way-tickets
 keyword: multi-city vs one-way tickets
 published: 2026-10-05
-updated: 2026-10-06
+updated: 2026-10-09
 cluster: B. Booking mechanics on low-cost carriers
 intent: comparison
 serp_format: 1,500-2,500 word comparison with a quick answer, a comparison table, pros and cons and an FAQ. Ranking pages are written for long-haul flights on full-service airlines.
@@ -26,6 +26,7 @@ experience_used:
   - 6 a.m. flights (sleep)
 internal_links:
   - /guides/cheapest-order-to-visit-cities (sibling, cluster A pillar)
+  - /guides/open-jaw-flights-europe (cluster B supporting, added 2026-10-09)
   - / (home)
   - /search
 hero_prompt: Two boarding passes side by side on a navy background, one long multi-city pass and a stack of short one-way passes, gold dotted route lines, flat vector, no text.
@@ -54,7 +55,7 @@ Each flight is its own booking. You can mix airlines, change one leg without tou
 
 ### Open jaw
 
-An open-jaw ticket is a return ticket where the destination or the origin isn't the same in both directions, for example flying into Lisbon and home from Athens. On budget airlines you get the same effect at no extra cost, because every leg is already a one-way.
+An open-jaw ticket is a return ticket where the destination or the origin isn't the same in both directions, for example flying into Lisbon and home from Athens. On budget airlines you get the same effect at no extra cost, because every leg is already a one-way. I show how to put one together in [open jaw flights in Europe](/guides/open-jaw-flights-europe).
 
 ### Airline multi-city tools
 
@@ -123,8 +124,8 @@ Yes. Ryanair MultiCity puts several Ryanair flights in one booking. Irish Travel
 ### Does Wizz Air have multi-city booking?
 Wizz Air has WIZZ Link, which combines Wizz Air flights into one self-transfer journey. It includes ConnectSure by Dohop, which helps if a disruption makes you miss the second flight.
 
-### What is an open-jaw ticket?
-A return ticket where the destination or the origin is different in each direction, such as flying into Lisbon and home from Athens. On budget airlines every leg is a one-way, so you can do this without a special ticket.
+### Can I mix airlines on one trip?
+Yes, with separate one-way tickets: each flight is its own booking, so you can take the cheapest airline for each hop. Ryanair MultiCity and WIZZ Link each stay within one airline, so neither can mix legs from different airlines.
 
 ### What happens if I miss a flight on a separate ticket?
 The next airline doesn't have to wait for you or rebook you, so you usually buy a new flight. That's why separate tickets need a buffer between flights, or a night's stay, when you connect.

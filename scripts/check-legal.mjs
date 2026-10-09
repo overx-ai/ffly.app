@@ -275,7 +275,7 @@ for (const text of answers) {
 
 // Guides: FAQPage and HowTo are parsed from the markdown (src/guide-markdown.ts), so a heading edit can drop them.
 const GUIDE_FAQ_QUESTIONS = 5;
-const HOWTO_GUIDES = ['cheapest-order-to-visit-cities'];
+const HOWTO_GUIDES = ['cheapest-order-to-visit-cities', 'open-jaw-flights-europe'];
 const guideNames = readdirSync(`${DIST}guides`, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
 const sitemap = readFileSync(`${DIST}sitemap.xml`, 'utf8');
 const isFile = (path) => existsSync(path) && statSync(path).isFile();

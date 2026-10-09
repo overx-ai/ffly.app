@@ -31,6 +31,9 @@
 - [Multi-city vs one-way tickets on Europe's budget airlines](https://ffly.app/guides/multi-city-vs-one-way-tickets):
   multi-city tickets, separate one-ways, open jaw and the airlines' own multi-city tools compared,
   and how to book separate flights safely.
+- [Open jaw flights in Europe, built from budget one-ways](https://ffly.app/guides/open-jaw-flights-europe):
+  what an open jaw flight is, why budget airlines' one-way fares make one cost nothing extra, and how to
+  build one step by step, with a real example.
 
 ## Facts
 - Platform: iPhone, iOS 17.0 or later. Created by OverX AI (https://overx.ai).

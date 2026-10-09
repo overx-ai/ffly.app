@@ -50,3 +50,8 @@ Read the first sentence of every paragraph in a row. If they sound like one voic
 - data-source names (Aviasales, Travelpayouts) outside the legal pages
 - technical words: cache, server, API, background, algorithm, scraping, crawler
 - medical claims about sleep ("healthier", "better sleep quality"); say "fewer 3 a.m. alarms", "a night you actually sleep"
+- "Google" or "Google Flights" in a guide: `check-legal` bans every processor name outside /privacy and /terms; say "a flight search" (2026-10-09)
+
+## Seen in drafts (one line each, newest last)
+- Turning a source's hedge into a punchline ("it isn't necessarily dearer, which also means it sometimes is"): state the hedge plainly and move on (2026-10-09)
+- Snark at the reader's likely choice ("before you decide the train is the romantic option"): give the practical step instead (2026-10-09)

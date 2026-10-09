@@ -19,8 +19,9 @@ export const SITE_PAGES = [
   { slug: 'terms',   lastmod: '2026-10-08' },
   { slug: 'search',  lastmod: '2026-10-05' },
   { slug: 'guides',  lastmod: '2026-10-05' },
-  { slug: 'guides/cheapest-order-to-visit-cities', lastmod: '2026-10-05' },
-  { slug: 'guides/multi-city-vs-one-way-tickets',  lastmod: '2026-10-06' },
+  { slug: 'guides/cheapest-order-to-visit-cities', lastmod: '2026-10-09' },
+  { slug: 'guides/multi-city-vs-one-way-tickets',  lastmod: '2026-10-09' },
+  { slug: 'guides/open-jaw-flights-europe',        lastmod: '2026-10-09' },
 ] as const;
 
 export type Slug = (typeof SITE_PAGES)[number]['slug'];
