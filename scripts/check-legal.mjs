@@ -392,11 +392,19 @@ function cspAgrees(hosts, on, constant) {
 // Ads (spec 003): no consent or ad script while ADSENSE_CLIENT is unset, and AdSense never before the consent message.
 const adsenseClient = appConstant('ADSENSE_CLIENT');
 check(adsenseClient !== undefined, 'src/app.ts: the ADSENSE_CLIENT declaration was not found, so the ads checks cannot run');
-const adsOff = adsenseClient === 'undefined';
+const adNetwork = appConstant('AD_NETWORK_SCRIPT');
+check(adNetwork !== undefined, 'src/app.ts: the AD_NETWORK_SCRIPT declaration was not found, so the ads checks cannot run');
+const adNetworkOn = adNetwork !== undefined && adNetwork !== 'undefined';
+const adsenseOff = adsenseClient === 'undefined';
+const adsOff = adsenseOff && !adNetworkOn;
+const adNetworkSrc = adNetworkOn ? adNetwork.slice(1, -1) : undefined;
 const AD_SCRIPT = 'pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
 const CONSENT_SCRIPT = 'fundingchoicesmessages.google.com/i/';
 for (const [file, html] of htmlPages) {
-  if (adsOff) {
+  if (adNetworkSrc) {
+    check([adNetworkSrc, adNetworkSrc.replace(/&/g, '&amp;')].some((src) => html.includes(`src="${src}"`)), `${file}: the AD_NETWORK_SCRIPT loader is missing`);
+  }
+  if (adsenseOff) {
     check(!/googlesyndication|fundingchoicesmessages|adsbygoogle/.test(html), `${file}: an ad or consent script loads while ADSENSE_CLIENT is unset`);
   } else {
     const ad = html.indexOf(AD_SCRIPT);
@@ -411,8 +419,9 @@ const AD_CSP = {
   'frame-src': ['googleads.g.doubleclick.net', 'tpc.googlesyndication.com', 'fundingchoicesmessages.google.com', 'www.google.com', 'ep2.adtrafficquality.google'],
   'img-src': ['pagead2.googlesyndication.com', 'tpc.googlesyndication.com', 'googleads.g.doubleclick.net', 'www.google.com', 'fundingchoicesmessages.google.com'],
 };
-cspAgrees(AD_CSP, !adsOff, 'ADSENSE_CLIENT');
-check(/shows no ads/.test(website) === adsOff, 'Privacy: #website must say "shows no ads" exactly while ADSENSE_CLIENT is unset');
+cspAgrees(AD_CSP, !adsenseOff, 'ADSENSE_CLIENT');
+if (adNetworkSrc) cspAgrees({ 'script-src': [new URL(adNetworkSrc).host] }, true, 'AD_NETWORK_SCRIPT');
+check(/shows no ads/.test(website) === adsOff, 'Privacy: #website must say "shows no ads" exactly while ADSENSE_CLIENT and AD_NETWORK_SCRIPT are unset');
 
 // Analytics (spec 004): gtag.js only ever loads from the bundled consent module after Accept, never from page HTML.
 const gaId = appConstant('GA_MEASUREMENT_ID');

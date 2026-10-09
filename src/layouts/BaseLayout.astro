@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import ConsentBanner from '../components/ConsentBanner.astro';
 import LangHint from '../components/LangHint.astro';
-import { ADSENSE_CLIENT, ADSENSE_SCRIPT, APP, APP_STORE_ID, CONSENT_SCRIPT, FFLY_API_BASE } from '../app';
+import { AD_NETWORK_SCRIPT, ADSENSE_CLIENT, ADSENSE_SCRIPT, APP, APP_STORE_ID, CONSENT_SCRIPT, FFLY_API_BASE } from '../app';
 import { DEFAULT_LANG, LANGS, localeOf, useLang, type Lang } from '../i18n';
 import { DEFAULT_OG_IMAGE, alternates, siteOrigin, urlFor, type Slug } from '../site-pages';
 import { breadcrumb, websiteSchema, type Crumb } from '../schema';
@@ -92,6 +92,7 @@ else if (slug !== undefined) schemas = [...structuredData, breadcrumb(title, slu
     {/* Google's certified consent message first, then AdSense, which waits for its consent signal. */}
     {ADSENSE_CLIENT && <script async src={CONSENT_SCRIPT(ADSENSE_CLIENT)} />}
     {ADSENSE_CLIENT && <script async src={ADSENSE_SCRIPT(ADSENSE_CLIENT)} crossorigin="anonymous" />}
+    {AD_NETWORK_SCRIPT && <script async data-cmp-ab="2" src={AD_NETWORK_SCRIPT} />}
 
     {schemas.map((s) => (
       <script type="application/ld+json" set:html={jsonLd(s)} />

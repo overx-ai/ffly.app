@@ -44,12 +44,15 @@ Those repos are the source of truth for copy, colours and claims.
 - **Ads only after consent.** While `ADSENSE_CLIENT` in `src/app.ts` is undefined, no consent or ad script loads
   and `AdSlot` renders nothing (`npm test` asserts it). Set it, and `AD_SLOTS`, to load Google's consent message
   and then AdSense; `/privacy` switches its ad copy on the same constant.
+  **Exception:** `AD_NETWORK_SCRIPT` in `src/app.ts` (a third-party ad network's loader) loads on every page with
+  no consent gate (owner, 2026-10-10, needed for the network's site verification). Its host is in the CSP `script-src`
+  and `/privacy` switches its ad copy on it; `npm test` checks all three. Undefined turns it off.
 - Deploy: `git push origin main`, then Vercel builds. `vercel.json` holds clean URLs, the
   security headers (CSP, nosniff, Referrer-Policy), immutable caching of `/_astro/`, `/fonts/` and `/places.json`, a week's caching
   of the icons and images, and the `Speculation-Rules` header naming `public/speculation-rules.json` (prefetch on
   hover or touch, never prerender; served as `application/speculationrules+json`); `npm test` checks them. The CSP
-  allows no inline script and no third-party host but `api.overx.ai` and the analytics hosts (`GA_CSP`, only while
-  `GA_MEASUREMENT_ID` is set): add any new one there.
+  allows no inline script and no third-party host but `api.overx.ai`, the analytics hosts (`GA_CSP`, only while
+  `GA_MEASUREMENT_ID` is set) and the `AD_NETWORK_SCRIPT` host: add any new one there.
   The ad and consent hosts (`AD_CSP` in `scripts/check-legal.mjs`) go in only with `ADSENSE_CLIENT`; `npm test`
   fails if the CSP and the constant disagree.
   Hosting and DNS: [docs/001-deployment.md](docs/001-deployment.md).

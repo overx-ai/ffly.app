@@ -1,4 +1,5 @@
 import {
+  AD_NETWORK_SCRIPT,
   ADSENSE_CLIENT,
   APP,
   CONSENT,
@@ -23,9 +24,10 @@ import type { LegalDocument } from './types';
 // #app-store-labels is ios-ffly/Template/PrivacyInfo.xcprivacy and docs/compliance/data-inventory.yaml, in Apple's
 // names: scripts/check-legal.mjs reads the inventory and fails on any difference. Change one, change all three, and
 // the App Store Connect privacy answers. Only this page and /terms name processors (Apple, RevenueCat, AppsFlyer,
-// Google); every other recipient is a category. The website's ad copy follows ADSENSE_CLIENT, its analytics copy
-// GA_MEASUREMENT_ID.
+// Google); every other recipient is a category. The website's ad copy follows ADSENSE_CLIENT and AD_NETWORK_SCRIPT,
+// its analytics copy GA_MEASUREMENT_ID.
 const ADS = Boolean(ADSENSE_CLIENT);
+const AD_NETWORK = Boolean(AD_NETWORK_SCRIPT);
 const ANALYTICS = Boolean(GA_MEASUREMENT_ID);
 const GOOGLE = ADS || ANALYTICS;
 const CONSENT_MONTHS = Math.round(CONSENT.days / 30);
@@ -82,7 +84,7 @@ export const PRIVACY: LegalDocument = {
     nothing that identifies you, until the trip starts, so its link keeps working. We collect usage analytics, crash
     and performance data to improve the app. If you allow tracking, ffly uses Apple's advertising identifier, with
     AppsFlyer, to measure which ads bring people to ffly; in the EEA, the UK and Switzerland, AppsFlyer uses your data
-    only after you also turn on Ad measurement. The app shows no ads${ADS ? ', and this website shows ads only after you choose' : ''}.
+    only after you also turn on Ad measurement. The app shows no ads${AD_NETWORK ? ', and this website shows ads from an advertising network' : ADS ? ', and this website shows ads only after you choose' : ''}.
     Apple handles payments. We never sell your data for money.`,
   sections: build({
     'who-we-are': {
@@ -323,12 +325,18 @@ export const PRIVACY: LegalDocument = {
         this page in your language, it remembers that there too, so the note does not come back. You can delete these
         cookies and this storage in your browser at any time.</p>
         ${ADS
-          ? `<p>This website shows ads from Google AdSense. Before any ad loads, Google's consent message asks whether
+          ? `<p>This website shows ads from Google AdSense. Before any AdSense ad loads, Google's consent message asks whether
         you agree to personalised ads, and remembers your choice. If you don't agree, you may still see ads that are
         not personalised, which Google may still measure and limit where the law allows. You can change your choice
         at any time from the link the consent message adds to the page. Google receives your IP address and details
         of your browser and device, and may set its own cookies.</p>`
-          : '<p>This website shows no ads.</p>'}
+          : ''}
+        ${AD_NETWORK
+          ? `<p>This website loads an advertising network on every page to show ads. The network receives your IP
+        address and details of your browser and device, and may set its own cookies to show and measure ads and to
+        limit fraud.</p>`
+          : ''}
+        ${ADS || AD_NETWORK ? '' : '<p>This website shows no ads.</p>'}
         ${ANALYTICS
           ? `<p>If you agree, this website uses Google Analytics, from Google, to measure visits, so we can see what
         helps and improve the site. It measures the pages you visit, how you use the site, your device and browser
@@ -359,8 +367,8 @@ export const PRIVACY: LegalDocument = {
           <li><strong>Our legitimate interests</strong>: usage analytics, crash and performance data, to improve ffly
           and fix faults; your IP address and search limits, to keep ffly fair and protect it from abuse; the Apple
           Search Ads campaign report, to learn which ads work; feedback and any email address you add, to answer you
-          and fix what you report; and remembering your search choices on this website. We have weighed these against
-          your interests, and you can object at any time (${ref('rights')}).</li>
+          and fix what you report; ${AD_NETWORK ? 'showing ads on this website, to fund ffly; ' : ''}and remembering
+          your search choices on this website. We have weighed these against your interests, and you can object at any time (${ref('rights')}).</li>
           <li><strong>Legal obligations</strong>: keeping the records the law requires and answering lawful requests
           from authorities.</li>
         </ul>`,
@@ -382,7 +390,9 @@ export const PRIVACY: LegalDocument = {
           ${externalLink(EXTERNAL.appsflyerPrivacy, "AppsFlyer's Privacy Policy")}.</li>${GOOGLE ? `
           <li><strong>Google LLC</strong> ${GOOGLE_ROLES.join(' and ')}, only if you agree (${ref('website')}).
           ${externalLink(EXTERNAL.googlePrivacy, "Google's Privacy Policy")}.</li>` : ''}
-          <li><strong>Our hosting providers</strong> run ffly and this website for us.</li>
+          <li><strong>Our hosting providers</strong> run ffly and this website for us.</li>${AD_NETWORK ? `
+          <li><strong>An advertising network</strong> shows ads on this website and receives your IP address and
+          details of your browser and device (${ref('website')}).</li>` : ''}
           <li><strong>A messaging service our team uses to read feedback</strong> receives a copy of each message
           (${ref('feedback')}).</li>
           <li><strong>A booking partner</strong> receives what you do on its site once you open a partner link
@@ -480,12 +490,18 @@ export const PRIVACY: LegalDocument = {
           feedback you send. We collect them from you and your device, for the purposes in ${ref('legal-bases')}, and
           keep them as ${ref('retention')} says.</li>
           <li><strong>Categories we disclose</strong> for business purposes: identifiers and commercial information to
-          RevenueCat and our hosting providers; identifiers and internet activity to AppsFlyer${ANALYTICS ? ', and on this website to Google if you agree' : ''}.</li>
+          RevenueCat and our hosting providers; identifiers and internet activity to AppsFlyer${ANALYTICS ? ', and on this website to Google if you agree' : ''}${AD_NETWORK
+            ? '; and identifiers and internet activity on this website to an advertising network' : ''}.</li>
           <li><strong>Sharing.</strong> Giving AppsFlyer your advertising identifier and related identifiers to
           measure which ads bring people to ffly counts as "sharing" for cross-context behavioural advertising under
           California law. To opt out, choose <strong>Ask App Not to Track</strong> when ffly asks, turn off tracking
           for ffly in ${ATT_SETTINGS}, or use ${externalLink(EXTERNAL.appsflyerOptout, "AppsFlyer's opt-out page")}.
-          This website honours the Global Privacy Control signal (${ref('website')}).</li>
+          ${AD_NETWORK
+            ? `The advertising network that shows ads on this website receives your IP address and details of your
+          browser and device, which may also count as sharing. `
+            : ''}This website honours the Global Privacy Control signal (${ref('website')})${AD_NETWORK
+            ? ', except for the advertising network, which loads on every visit, so the signal does not stop it'
+            : ''}.</li>
           <li><strong>No sale.</strong> We do not sell personal information for money, and have not done so in the
           past 12 months.</li>
           <li><strong>No sensitive personal information.</strong> We don't collect sensitive personal information as

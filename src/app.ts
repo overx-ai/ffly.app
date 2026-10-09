@@ -122,6 +122,9 @@ export const AD_SIZES = {
 } as const;
 export const CONSENT_SCRIPT = (client: string) => `https://fundingchoicesmessages.google.com/i/${client.replace(/^ca-/, '')}?ers=1`;
 export const ADSENSE_SCRIPT = (client: string) => `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`;
+// A third-party ad network's loader, on every page and not consent-gated (owner, 2026-10-10: its site verification
+// cannot pass behind the banner). Undefined removes the script, its CSP host and its /privacy copy.
+export const AD_NETWORK_SCRIPT: string | undefined = 'https://tpembars.com/NTgxNDYy.js?t=581462';
 
 // Google Analytics 4, loaded only after Accept in the consent banner (src/scripts/consent.ts). Undefined turns
 // off the banner, the footer "Cookie settings" control and analytics; /privacy switches its copy on it too.
