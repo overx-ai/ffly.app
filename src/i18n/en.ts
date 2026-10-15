@@ -236,6 +236,36 @@ const en = {
     upsellBody: `${APP.proName} shows the dates, flight times, airlines and booking links for every route.`,
     lockedSample: 'City → City → City · 00 Mon – 00 Mon',
     openApp: 'Open in app',
+    // Spec 014, shown only with CONTRACT_1_12 (sign-in only with SIGN_IN). Never name a provider other than Apple's own
+    // button: Google's renders its own text. Partner offers name no partner.
+    account: {
+      signIn: 'Sign in',
+      signOut: 'Sign out',
+      title: `Sign in to ${APP.name}`,
+      body: `Use the same account as in the ${APP.name} app, so your plan applies here too.`,
+      apple: 'Sign in with Apple',
+      close: 'Close',
+      alreadyPro: 'Already have Pro?',
+      sameAccount: 'Sign in with the same account',
+      signedIn: 'Signed in',
+      signedInPro: `Signed in with ${APP.proName}`,
+      signedOut: "You're signed out.",
+      popupBlocked: 'Allow pop-ups for this site, then try again.',
+      failed: "Couldn't sign you in. Try again.",
+    },
+    offers: {
+      bookDirect: 'Book direct',
+      bookPartner: 'Book via partner',
+      bookDirectFor: 'Book {from} to {to} direct',
+      bookPartnerFor: 'Book {from} to {to} via partner',
+      proTeaser: 'Pro found this route about {amount} cheaper.',
+      partnerOffers: 'Partner offers',
+      kit: { hotel: 'Hotels', esim: 'eSIM', insurance: 'Travel insurance', transfer: 'Airport transfers' },
+      kitOpen: 'See offer',
+      upsellTitle: `More with ${APP.proName}`,
+      free: 'Free: partner fares.',
+      pro: `${APP.proName}: the lowest fares we find, including direct airline fares, more cities and searches each day, and your searches go first.`,
+    },
     // Read by src/scripts/search.ts from the form's data-i18n attribute, so the one bundle serves every language.
     script: {
       messages: {

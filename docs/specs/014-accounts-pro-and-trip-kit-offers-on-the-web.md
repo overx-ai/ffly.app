@@ -1,7 +1,7 @@
 ---
 id: 014
 title: "Accounts, Pro and Trip kit offers on the web"
-status: approved
+status: in-progress
 priority: p1
 created: 2026-10-15
 updated: 2026-10-15
@@ -84,9 +84,9 @@ fares come from. Free copy: "partner fares". Pro copy: "the lowest fares we find
 
 | Route | Does | Answers |
 |---|---|---|
-| `POST /api/auth/apple` `{identityToken}` | auth `/apple/token` | as `/api/auth/token` |
-| `POST /api/auth/google` `{credential}` | auth `/google/token` | as `/api/auth/token` |
-| `POST /api/auth/token` | auth `/token` with the cookie's refresh token; rotates the cookie | `{access_token, expires_at}`, or 401 and a cleared cookie |
+| `POST /api/auth/apple` `{identityToken}` | auth `/apple/token` | as `/api/auth/token`, but a refusal leaves the cookie as it was |
+| `POST /api/auth/google` `{credential}` | auth `/google/token` | as `/api/auth/token`, but a refusal leaves the cookie as it was |
+| `POST /api/auth/token` | auth `/token` with the cookie's refresh token; rotates the cookie | `{access_token, expires_in}`, or 401 and a cleared cookie |
 | `DELETE /api/auth/session` | auth `/revoke`; clears the cookie | 204 |
 
 - **Client.** `src/scripts/auth-state.ts` (DOM-free, tested: token expiry and refresh timing, the header for a request,
@@ -142,24 +142,47 @@ fares come from. Free copy: "partner fares". Pro copy: "the lowest fares we find
 ## Tasks
 | ID | Description | Agent | Depends On | Status | Files |
 |----|-------------|-------|------------|--------|-------|
-| T1 | `docs/PINS.md` row for 1.12.0; 1.12.0 fixtures; consumer contract tests parsing them through the site's types (`leg.offers`, `pro_preview`, `trip_kit`, `/trip-kit`, `tier_limits`); `CONTRACT_1_12` | dev | - | todo | docs/PINS.md, tests/contract/ffly-api-1.12.test.ts, tests/fixtures/ffly-api-1.12/*.json, src/app.ts |
-| T2 | Hybrid output and the Vercel adapter; check-legal `DIST`; prerender stays on for every page | dev | - | todo | astro.config.mjs, package.json, package-lock.json, scripts/check-legal.mjs |
-| T3 | Server auth module and the four routes, with tests (cookie attributes, rotation, revoke, Origin, no-store, 401 path) | dev | T2 | todo | src/server/auth-session.ts, src/pages/api/auth/{apple,google,token,session}.ts, tests/auth-session.test.ts |
-| T4 | Client auth: `auth-state.ts` (tested), `auth.ts`, the sign-in row and sheet, `AUTH` constants, CSP and `AUTH_CSP` | dev | T3 | todo | src/scripts/auth-state.ts, src/scripts/auth.ts, src/components/SearchForm.astro, src/styles/search.css, src/app.ts, vercel.json, scripts/check-legal.mjs, tests/auth-state.test.ts |
-| T5 | `ffly-api.ts`: auth headers, 401 refresh and retry, `/meta` re-fetch on sign-in and sign-out, 1.12.0 types, `getTripKit` | dev | T1, T4 | todo | src/scripts/ffly-api.ts, src/scripts/search.ts, tests/ffly-api.test.ts |
-| T6 | Results: Book direct or via partner per leg, Pro teaser replacing `app_hint`, upsell with badges and "Sign in with the same account", limits from `/meta` | dev | T5 | todo | src/scripts/results.ts, src/scripts/search.ts, src/components/SearchForm.astro, src/styles/search.css, tests/results.test.ts |
-| T7 | Trip kit: progress block and per-route block, each headed "Partner offers" | dev | T5 | todo | src/scripts/search.ts, src/components/SearchForm.astro, src/styles/search.css |
-| T8 | Tracking: `track.ts`, `EVENTS`, Book and kit clicks, consent state exposed by `consent.ts` | dev | T6, T7 | todo | src/scripts/track.ts, src/scripts/consent.ts, src/scripts/search.ts, src/app.ts, tests/track.test.ts |
-| T9 | Copy in 13 languages (sign-in, plans, teaser, kit, errors); the "guaranteed" ban; /privacy `#website` cookie line | dev | T6, T7 | todo | src/i18n/{en,de,fr,es,it,nl,pl,pt,ru,sv,da,nb,fi}.ts, scripts/check-legal.mjs, src/data/privacy.ts |
-| T10 | Docs: CLAUDE.md (Tech Stack, auth, tracking), README Verification, PINS prose on preflight | dev | T8, T9 | todo | CLAUDE.md, README.md, docs/PINS.md |
+| T1 | `docs/PINS.md` row for 1.12.0; 1.12.0 fixtures; consumer contract tests parsing them through the site's types (`leg.offers`, `pro_preview`, `trip_kit`, `/trip-kit`, `tier_limits`); `CONTRACT_1_12` | dev | - | done | docs/PINS.md, tests/contract/ffly-api-1.12.test.ts, tests/fixtures/ffly-api-1.12/*.json, src/app.ts |
+| T2 | Hybrid output and the Vercel adapter; check-legal `DIST`; prerender stays on for every page | dev | - | done | astro.config.mjs, package.json, package-lock.json, scripts/check-legal.mjs, scripts/vercel-output.mjs, scripts/preview.mjs, src/server/no-image.ts |
+| T3 | Server auth module and the four routes, with tests (cookie attributes, rotation, revoke, Origin, no-store, 401 path) | dev | T2 | done | src/server/auth-session.ts, src/pages/api/auth/{apple,google,token,session}.ts, tests/auth-session.test.ts |
+| T4 | Client auth: `auth-state.ts` (tested), `auth.ts`, the sign-in row and sheet, `AUTH` constants, CSP and `AUTH_CSP` | dev | T3 | done | src/scripts/auth-state.ts, src/scripts/auth.ts, src/components/SearchForm.astro, src/styles/search.css, src/app.ts, vercel.json, scripts/check-legal.mjs, tests/auth-state.test.ts |
+| T5 | `ffly-api.ts`: auth headers, 401 refresh and retry, `/meta` re-fetch on sign-in and sign-out, 1.12.0 types, `getTripKit` | dev | T1, T4 | done | src/scripts/ffly-api.ts, src/scripts/search.ts, tests/ffly-api.test.ts |
+| T6 | Results: Book direct or via partner per leg, Pro teaser replacing `app_hint`, upsell with badges and "Sign in with the same account", limits from `/meta` | dev | T5 | done | src/scripts/results.ts, src/scripts/search.ts, src/components/SearchForm.astro, src/styles/search.css, tests/results.test.ts |
+| T7 | Trip kit: progress block and per-route block, each headed "Partner offers" | dev | T5 | done | src/scripts/search.ts, src/components/SearchForm.astro, src/styles/search.css |
+| T8 | Tracking: `track.ts`, `EVENTS`, Book and kit clicks, consent state exposed by `consent.ts` | dev | T6, T7 | done | src/scripts/track.ts, src/scripts/consent.ts, src/scripts/search.ts, src/app.ts, tests/track.test.ts |
+| T9 | Copy in 13 languages (sign-in, plans, teaser, kit, errors); the "guaranteed" ban; /privacy `#website` cookie line | dev | T6, T7 | done | src/i18n/{en,de,fr,es,it,nl,pl,pt,ru,sv,da,nb,fi}.ts, scripts/check-legal.mjs, src/data/privacy.ts |
+| T10 | Docs: CLAUDE.md (Tech Stack, auth, tracking), README Verification, PINS prose on preflight | dev | T8, T9 | done | CLAUDE.md, README.md, docs/PINS.md |
+
+## Status (2026-10-15)
+Built behind `CONTRACT_1_12` (false) on branch `feat/014-accounts-web`; it cannot be verified live yet. Left:
+- **ffly API 1.12.0 live** (1B-bots spec 574), then `CONTRACT_1_12 = true` in `src/app.ts`.
+- **The founder's ids** (1B-bots spec 573 T1, T2): the Services ID `ai.overx.ffly.web` with return URL
+  `https://ffly.app/auth/apple`, and the Google "ffly web" client, whose id goes into `AUTH.googleClientId`. No
+  environment variable and no secret: both are public ids in `src/app.ts`.
+- **In the same commit that turns sign-in on:** add `AUTH_CSP`'s hosts to `vercel.json` (`npm test` names them), bump
+  `/privacy`'s `lastmod` (its `#website` then names `ffly_session`), and set `APP_STORE_ID` when App Store Connect has it.
+- **Live verification:** README "Verification", the spec 014 list (Apple popup and Google on ffly.app, cookie attributes,
+  no token in storage, Pro caps from `/meta`, Partner offers, consented events, sign-out and an expired session).
+- **First preview deploy:** confirm `vercel.json`'s headers still apply with the adapter's output
+  (`curl -sI https://<preview>/ | grep -i content-security-policy`).
+- **Open with 1B-bots (review):** a lost `/token` answer after auth rotated the refresh token makes the next renewal a
+  reuse, which revokes every session of that account (iOS too); and an exchange can take 2 x `AUTH.timeoutMs` (16 s),
+  inside Vercel's default function limit but worth checking on the plan.
+
+Deviations: Astro 4 injects `/_image` into every hybrid build, so the function also serves it, pointed at a 404 stub
+(`src/server/no-image.ts`). The site sends no device id, so the cookie holds the refresh token alone. A `localStorage`
+flag (`ffly.account` = `1`, never a token) spares signed-out visitors a request on every load. Book and kit params use one
+`kind` key for the offer kind or kit category. `npm run preview` is now `scripts/preview.mjs` (`astro preview` does not
+support the adapter). The routes answer `expires_in`, not an absolute expiry, so the browser
+times renewal on its own clock.
 
 ## Acceptance Criteria
-- [ ] With `CONTRACT_1_12` false the built pages and the search behave exactly as today (no sign-in row, no new requests).
+- [x] With `CONTRACT_1_12` false the built pages and the search behave exactly as today (no sign-in row, no new requests).
 - [ ] Signed out: no request to Apple or Google hosts, no `Authorization` header, anonymous API GETs send no preflight.
 - [ ] Sign in with Apple (popup) and Google work on ffly.app; the cookie is `HttpOnly; Secure; SameSite=Strict; Path=/api/auth`; no access token in any storage, JS-readable cookie or URL.
 - [ ] A Pro account gets its caps and daily searches from `/meta` and per-leg Book direct or via partner; a Free visitor gets Free caps, the teaser and the App Store upsell. No limit is a literal in the site's code.
 - [ ] Trip kit shows in the progress card and under each route, each block headed "Partner offers".
 - [ ] Book and kit clicks send GA4 events only after Accept; with Reject or no choice the links still open.
 - [ ] Sign out clears the cookie and drops the page to Free; an expired session does the same without an error loop.
-- [ ] Consumer contract tests green against the 1.12.0 fixtures; `npm test` green.
-- [ ] Code review clean.
+- [x] Consumer contract tests green against the 1.12.0 fixtures; `npm test` green.
+- [x] Code review clean.

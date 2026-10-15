@@ -1,8 +1,9 @@
 # ffly-site
 
-Website for **ffly**, at `ffly.app`. Astro 4, static, one dependency (plus `vitest`, dev only). Zero client
-JavaScript, except the free web search widget on `/` (`#search`) and `/search`, the consent banner, and the language
-hint and header language menu (spec 012).
+Website for **ffly**, at `ffly.app`. Astro 4 in hybrid output with the Vercel adapter (spec 014): every page is
+prerendered, and only the sign-in routes under `/api/auth` run as a function. Two dependencies, `astro` and
+`@astrojs/vercel` (plus `vitest`, dev only). Zero client JavaScript, except the free web search widget on `/`
+(`#search`) and `/search`, the consent banner, and the language hint and header language menu (spec 012).
 
 Thirteen languages (specs 004, 010): English at the root, and German, French, Spanish, Italian, Dutch, Polish,
 Portuguese, Russian, Swedish, Danish, Norwegian and Finnish under `/de` `/fr` `/es` `/it` `/nl` `/pl` `/pt` `/ru` `/sv`
@@ -14,9 +15,9 @@ redirect.
 ```bash
 npm install
 npm run dev      # localhost:4321; add `-- --host` to reach it from a phone on the LAN
-npm run build    # -> dist/
-npm test         # vitest (tests/), build, then scripts/check-legal.mjs over dist (legal facts)
-npm run preview
+npm run build    # -> .vercel/output/ (static/ pages, functions/ the sign-in routes)
+npm test         # vitest (tests/), build, then scripts/check-legal.mjs over .vercel/output/static (legal facts)
+npm run preview  # serves .vercel/output as Vercel does; `astro preview` does not support the adapter
 ```
 
 ## Pages
@@ -90,7 +91,7 @@ for u in / /support /privacy /terms /search /guides; do
 # npm test already fails on trailing-slash or dead internal links, em dashes, "unlimited" in any of the
 # thirteen languages, offers/aggregateRating in JSON-LD, non-reciprocal hreflang and a head that differs from
 # the sitemap. Fare figures are left to a human read:
-grep -rohE --include='*.html' '€ ?[0-9][0-9.,]*' dist   # only the labelled EXAMPLE_TRIP totals
+grep -rohE --include='*.html' '€ ?[0-9][0-9.,]*' .vercel/output/static   # only the labelled EXAMPLE_TRIP totals
 
 # Canonicals and hreflang: a localized page is self-canonical with 13 alternates plus x-default -> the root;
 # an English-only page has its canonical and no alternates.
@@ -98,7 +99,27 @@ curl -s localhost:4329/de/search | grep -oE '<link rel="(canonical|alternate)"[^
 curl -s localhost:4329/support   | grep -oE '<link rel="(canonical|alternate)"[^>]*>'   # 1
 curl -s localhost:4329/sitemap.xml | grep -c 'xhtml:link'                              # 9 per localized URL
 curl -sI localhost:4329/ -H 'Accept-Language: de' | head -1                            # 200, never a redirect
+
+# Sign-in routes (spec 014): POST or DELETE only, this site's Origin only, never cached.
+curl -si -X POST localhost:4329/api/auth/token -H 'Origin: http://localhost:4329' | head -4  # 401, no-store, cookie cleared
+curl -si -X POST localhost:4329/api/auth/token -H 'Origin: https://evil.example' | head -1   # 403
+curl -si localhost:4329/api/auth/token | head -1                                             # 404
 ```
+
+Accounts, Pro and the Trip kit (spec 014), once `CONTRACT_1_12` and `AUTH.googleClientId` are set, on ffly.app (Apple and
+Google accept no other origin) with DevTools open:
+1. Signed out: `/search` sends nothing to `appleid.cdn-apple.com` or `accounts.google.com`, no `/api/auth` request, and
+   the API's GETs carry no `Authorization` and no preflight.
+2. Sign in with Apple (a popup) and with Google: the sheet closes, the row says "Signed in", `ffly_session` is
+   `HttpOnly; Secure; SameSite=Strict; Path=/api/auth`, and no token is in `localStorage`, `sessionStorage`,
+   `document.cookie` or the URL (`ffly.account` holds only `1`). `/meta` is asked again with `Authorization`.
+3. A Pro account's caps and daily searches follow `/meta`; its legs offer Book direct and Book via partner. A Free
+   visitor sees Book via partner, the "Pro found this route about €X cheaper" line and the upsell.
+4. During a search the progress card shows "Partner offers"; each route's details show its own.
+5. After Accept, Book and kit clicks send `book_click` and `kit_click` (`placement`, `kind`, `tier`); after Reject
+   they send nothing and still open.
+6. Sign out: the cookie is cleared and the caps drop to Free. Delete `ffly_session` by hand and reload: one "You're
+   signed out." line, no loop.
 
 Consent, in a private window with DevTools open on the Network tab:
 1. Load any page: the banner shows, and no request goes to `googletagmanager.com`, `google-analytics.com` or the

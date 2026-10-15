@@ -1,0 +1,8 @@
+{
+  "offers": [
+    { "kind": "esim", "seller": "Yesim", "url": "https://tp.media/r?marker=581462&sub_id=web_during&u=https%3A%2F%2Fyesim.app", "city": null, "check_in": null, "check_out": null },
+    { "kind": "insurance", "seller": "EKTA", "url": "https://tp.media/r?marker=581462&sub_id=web_during&u=https%3A%2F%2Fektatraveling.com", "city": null, "check_in": "2026-11-02", "check_out": "2026-11-12" },
+    { "kind": "hotel", "seller": "Trip.com", "url": "https://tp.media/r?marker=581462&sub_id=web_during&u=https%3A%2F%2Fwww.trip.com%2Fhotels%2Fbarcelona", "city": "BCN", "check_in": null, "check_out": null },
+    { "kind": "hotel", "seller": "Trip.com", "url": "https://tp.media/r?marker=581462&sub_id=web_during&u=https%3A%2F%2Fwww.trip.com%2Fhotels%2Frome", "city": "ROM", "check_in": null, "check_out": null }
+  ]
+}

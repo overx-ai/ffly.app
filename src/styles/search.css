@@ -506,3 +506,94 @@
   .results-table .placeholder-note td { justify-content: center; }
   .results-table .skeleton :is(.rank, .dates, .nights, .flights, .warn, .details) { display: none; }
 }
+
+/* Spec 014: sign-in, Book direct or via partner, the Pro teaser and the Trip kit, all behind CONTRACT_1_12. */
+.search-form .account-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-sm) 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
+.search-form .account-row .btn { min-height: 36px; padding: 0 16px; font-size: 14px; }
+.search-form #account-status:empty { display: none; }
+
+.search-ui .sheet {
+  width: min(420px, calc(100vw - 2 * var(--space-md)));
+  padding: var(--space-lg);
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+.search-ui .sheet::backdrop { background: rgba(7, 18, 48, 0.55); }
+.search-ui .sheet h2 { font-size: 1.4rem; margin-bottom: var(--space-sm); }
+.search-ui .sheet .providers { display: flex; flex-direction: column; align-items: stretch; gap: 12px; margin-block: var(--space-md); }
+.search-ui .sheet .form-error { color: var(--danger); font-weight: 600; margin-bottom: var(--space-md); }
+.search-ui .sheet .form-error:empty { display: none; }
+.search-ui .apple-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--black);
+  border-radius: var(--radius-pill);
+  background: var(--black);
+  color: var(--white);
+  font: 600 16px var(--font-system);
+  cursor: pointer;
+}
+.search-ui .apple-button:disabled { opacity: 0.5; cursor: default; }
+.search-ui .apple-button svg { width: 18px; height: 18px; fill: currentColor; }
+.search-ui .gis-button { display: flex; justify-content: center; min-height: 44px; }
+
+.search-ui .link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline 2px var(--gold);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.search-ui .plan-compare { margin: 0; padding-left: 1.2em; color: var(--ink-2); }
+
+.search-ui .kit { display: flex; flex-direction: column; gap: 6px; }
+.search-ui .kit-title { font: 600 11px var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.search-ui .kit-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.search-ui .kit-group { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; font-size: 14px; }
+.search-ui .kit-kind { font-weight: 700; min-width: 9em; }
+.search-ui .kit-links { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.search-ui #progress-kit { padding-top: var(--space-sm); border-top: 1px solid var(--rule); }
+
+.results-table .detail-row td { border-top: 0; padding-top: 0; background: var(--fill); }
+.results-table .kit-row .kit { padding: 10px 14px; background: var(--surface); border-radius: var(--radius-md); }
+.results-table .teaser-row td { background: none; padding-bottom: 12px; }
+.results-table .pro-teaser {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--gold-tint);
+  color: var(--navy-ink);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+@media (max-width: 760px) {
+  .results-table .kit-row { margin-top: -10px; border-top-left-radius: 0; border-top-right-radius: 0; background: var(--fill); }
+  .results-table .detail-row td { background: none; }
+  .results-table .teaser-row { padding: 0; border: 0; background: none; }
+  .results-table .teaser-row td { display: block; }
+  .search-ui .kit-kind { min-width: 0; flex-basis: 100%; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .search-ui .apple-button { background: var(--white); color: var(--black); border-color: var(--white); }
+}

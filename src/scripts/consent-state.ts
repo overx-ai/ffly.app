@@ -33,3 +33,12 @@ export function expiryCookies(names: string[], hostname: string): string[] {
   const scopes = ['', ...domains.map((domain) => `; Domain=.${domain}`)];
   return names.flatMap((name) => scopes.map((scope) => `${name}=; Max-Age=0; Path=/${scope}`));
 }
+
+export type Gtag = (...args: unknown[]) => void;
+let gtag: Gtag | undefined;
+
+// Set by the consent module once Accept has started Google Analytics; until then nothing can be measured.
+export const setAnalytics = (next: Gtag) => {
+  gtag = next;
+};
+export const analytics = () => gtag;

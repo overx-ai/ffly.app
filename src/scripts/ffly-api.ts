@@ -2,7 +2,8 @@ import { FFLY_API_BASE, WEB_SEARCH } from '../app';
 
 // Wire shapes of ffly API contract 1.3.0 (1B-bots apps/ffly-api/contract/openapi.json, spec 533), plus the
 // shared-search lookup of 1.5.0 (spec 535), the localized places of 1.7.0 and their country of 1.8.0, only the fields this page reads. The web channel gets routes 1-3 in
-// full and a locked tail, so most fields are optional.
+// full and a locked tail, so most fields are optional. 1.12.0 (spec 574, read only with CONTRACT_1_12) adds the caller's
+// Authorization, leg offers, the Pro preview and the Trip kit; their sellers are never read, so no partner is named.
 
 export interface Place {
   code: string;
@@ -21,7 +22,10 @@ export interface Meta {
   limits: { max_cities: number; max_ends: number; max_nights: number; max_window_days: number };
   tier_limits: { max_cities: number; max_ends?: number; searches_per_day: number | null };
   free_searches_left: number | null;
+  tier?: Tier;
 }
+
+export type Tier = 'free' | 'pro';
 
 export const endLimit = (meta: Pick<Meta, 'limits' | 'tier_limits'>) => Math.min(meta.tier_limits.max_ends ?? 1, meta.limits.max_ends);
 
@@ -59,6 +63,30 @@ export interface Leg {
   dep?: string | null;
   arr?: string | null;
   flags?: string[] | null;
+  offers?: Offer[] | null;
+}
+
+export type OfferKind = 'direct' | 'partner';
+
+export interface Offer {
+  kind: OfferKind;
+  url: string;
+}
+
+export interface ProPreview {
+  price: number;
+  saving: number;
+}
+
+export const KIT_KINDS = ['hotel', 'esim', 'insurance', 'transfer'] as const;
+export type KitKind = (typeof KIT_KINDS)[number];
+
+export interface TripKitOffer {
+  kind: string;
+  url: string;
+  city?: string | null;
+  check_in?: string | null;
+  check_out?: string | null;
 }
 
 export interface Route {
@@ -68,6 +96,8 @@ export interface Route {
   places?: string[] | null;
   nights?: number[] | null;
   legs?: Leg[] | null;
+  pro_preview?: ProPreview | null;
+  trip_kit?: TripKitOffer[] | null;
 }
 
 export interface Insights {
@@ -120,8 +150,31 @@ export class NotFound extends Error {}
 // Safari before 16 has no AbortSignal.timeout; there the request simply runs without one.
 export const timeout = () => AbortSignal.timeout?.(WEB_SEARCH.requestTimeoutMs);
 
-async function getJson<T>(path: string): Promise<T> {
-  const res = await fetch(`${FFLY_API_BASE}${path}`, { signal: timeout() });
+// Who calls ffly-api (spec 014). Unset, as with CONTRACT_1_12 off, every request is anonymous and header-free, so its
+// GETs stay simple CORS requests with no preflight.
+export interface Caller {
+  headers(): Promise<Record<string, string>>;
+  rejected(retried: boolean): Promise<void>;
+}
+
+let caller: Caller | undefined;
+export const setCaller = (next: Caller | undefined) => {
+  caller = next;
+};
+
+// ffly-api answering 401 to a signed-in call: refresh once and retry; a second 401 signs out and the call goes on as
+// Free. At most three attempts, never a loop.
+async function send(url: string, init: RequestInit = {}, attempt = 0): Promise<Response> {
+  const auth = caller ? await caller.headers() : {};
+  const res = await fetch(url, { ...init, headers: { ...init.headers, ...auth }, signal: timeout() });
+  if (res.status !== 401 || !('Authorization' in auth) || !caller || attempt > 1) return res;
+  await caller.rejected(attempt > 0);
+  return send(url, init, attempt + 1);
+}
+
+async function getJson<T>(path: string, withAccount = true): Promise<T> {
+  const url = `${FFLY_API_BASE}${path}`;
+  const res = await (withAccount ? send(url) : fetch(url, { signal: timeout() }));
   if (res.status === 404) throw new NotFound(path);
   if (!res.ok) throw new Error(`GET ${path}: ${res.status}`);
   return res.json() as Promise<T>;
@@ -151,11 +204,10 @@ export async function getPlaces(version?: string): Promise<PlacesAnswer> {
 export const getSearch = (id: string) => getJson<SearchView>(`/searches/${encodeURIComponent(id)}`);
 
 export async function createSearch(request: SearchRequest): Promise<SubmitOutcome> {
-  const res = await fetch(`${FFLY_API_BASE}/searches`, {
+  const res = await send(`${FFLY_API_BASE}/searches`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(request),
-    signal: timeout(),
   });
   const body = (await res.json().catch(() => ({}))) as { id?: unknown; reason?: unknown };
   switch (res.status) {
@@ -195,7 +247,7 @@ export async function lookupShared(request: SearchRequest): Promise<SharedOutcom
     ['max_nights', String(request.max_nights)],
   ]);
   try {
-    const view = await getJson<SearchView>(`/searches/shared?${query}`);
+    const view = await getJson<SearchView>(`/searches/shared?${query}`, false);
     const usable = typeof view.id === 'string' && Array.isArray(view.routes) && (view.status === 'done' || ACTIVE.includes(view.status));
     return usable ? { kind: 'hit', view } : { kind: 'miss' };
   } catch {
@@ -205,4 +257,15 @@ export async function lookupShared(request: SearchRequest): Promise<SharedOutcom
 
 export function searchedAt({ updated }: Pick<SearchView, 'updated'>): Date | undefined {
   return typeof updated === 'number' && Number.isFinite(updated) ? new Date(updated * 1000) : undefined;
+}
+
+// 1.12.0's Trip kit for a trip being searched: an eSIM, insurance and hotels for its cities and window.
+export async function getTripKit(cities: string[], from: string, to: string): Promise<TripKitOffer[]> {
+  const query = commaQuery([
+    ['cities', cities.join(',')],
+    ['from', from],
+    ['to', to],
+  ]);
+  const body = await getJson<{ offers?: unknown }>(`/trip-kit?${query}`);
+  return Array.isArray(body.offers) ? (body.offers as TripKitOffer[]) : [];
 }

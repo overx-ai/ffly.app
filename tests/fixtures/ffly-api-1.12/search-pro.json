@@ -1,0 +1,46 @@
+{
+  "id": "job-pro-1",
+  "status": "done",
+  "done": 30,
+  "total": 30,
+  "eta_s": null,
+  "request": { "start": "WAW", "ends": ["WAW"], "cities": ["BCN"], "date_from": "2026-11-02", "date_to": "2026-11-12", "min_nights": 2, "max_nights": 4 },
+  "routes": [
+    {
+      "locked": false,
+      "price": 98.5,
+      "n_cities": 1,
+      "includes_optional": [],
+      "places": ["WAW", "BCN", "WAW"],
+      "nights": [4],
+      "legs": [
+        {
+          "from_place": "WAW", "to_place": "BCN", "stops": 0, "origin": "WMI", "dest": "BCN", "day": "2026-11-02",
+          "price": 44.1, "carrier": "Ryanair", "dep": "09:15", "arr": "12:40", "flags": [],
+          "link": "https://www.ryanair.com/booking?from=WMI&to=BCN&date=2026-11-02",
+          "offers": [
+            { "kind": "direct", "seller": "Ryanair", "url": "https://www.ryanair.com/booking?from=WMI&to=BCN&date=2026-11-02", "price": 44.1 },
+            { "kind": "partner", "seller": "Aviasales", "url": "https://www.aviasales.com/search/WMI0211BCN1?marker=581462&sub_id=web_after", "price": 46.0 }
+          ]
+        },
+        {
+          "from_place": "BCN", "to_place": "WAW", "stops": 0, "origin": "BCN", "dest": "WAW", "day": "2026-11-06",
+          "price": 54.4, "carrier": "LOT", "dep": "16:00", "arr": "19:45", "flags": [],
+          "link": "https://www.lot.com/booking?from=BCN&to=WAW&date=2026-11-06",
+          "offers": [{ "kind": "direct", "seller": "LOT", "url": "https://www.lot.com/booking?from=BCN&to=WAW&date=2026-11-06", "price": 54.4 }]
+        }
+      ],
+      "pro_preview": null,
+      "trip_kit": null
+    }
+  ],
+  "insights": null,
+  "sources": null,
+  "more_routes": 0,
+  "app_hint": null,
+  "share_key": null,
+  "tier": "pro",
+  "error": null,
+  "created": 1792044000.0,
+  "updated": 1792044090.0
+}

@@ -1,0 +1,55 @@
+{
+  "id": "job-free-1",
+  "status": "done",
+  "done": 12,
+  "total": 12,
+  "eta_s": null,
+  "request": { "start": "WAW", "ends": ["WAW"], "cities": ["BCN", "ROM"], "date_from": "2026-11-02", "date_to": "2026-11-12", "min_nights": 2, "max_nights": 4 },
+  "routes": [
+    {
+      "locked": false,
+      "price": 182.4,
+      "n_cities": 2,
+      "includes_optional": [],
+      "places": ["WAW", "BCN", "ROM", "WAW"],
+      "nights": [3, 4],
+      "legs": [
+        {
+          "from_place": "WAW", "to_place": "BCN", "stops": 0, "origin": "WMI", "dest": "BCN", "day": "2026-11-02",
+          "price": 61.2, "carrier": "Ryanair", "dep": "09:15", "arr": "12:40", "flags": [],
+          "link": "https://www.aviasales.com/search/WMI0211BCN1?marker=581462&sub_id=web_after",
+          "offers": [{ "kind": "partner", "seller": "Aviasales", "url": "https://www.aviasales.com/search/WMI0211BCN1?marker=581462&sub_id=web_after", "price": 61.2 }]
+        },
+        {
+          "from_place": "BCN", "to_place": "ROM", "stops": 0, "origin": "BCN", "dest": "FCO", "day": "2026-11-05",
+          "price": 48.9, "carrier": "Vueling", "dep": "13:05", "arr": "15:00", "flags": [],
+          "link": "https://www.aviasales.com/search/BCN0511FCO1?marker=581462&sub_id=web_after",
+          "offers": [{ "kind": "partner", "seller": "Aviasales", "url": "https://www.aviasales.com/search/BCN0511FCO1?marker=581462&sub_id=web_after", "price": 48.9 }]
+        },
+        {
+          "from_place": "ROM", "to_place": "WAW", "stops": 0, "origin": "CIA", "dest": "WMI", "day": "2026-11-09",
+          "price": 72.3, "carrier": "Ryanair", "dep": "18:20", "arr": "21:05", "flags": [],
+          "link": "https://www.aviasales.com/search/CIA0911WMI1?marker=581462&sub_id=web_after",
+          "offers": [{ "kind": "partner", "seller": "Aviasales", "url": "https://www.aviasales.com/search/CIA0911WMI1?marker=581462&sub_id=web_after", "price": 72.3 }]
+        }
+      ],
+      "pro_preview": { "price": 151.6, "saving": 30.8 },
+      "trip_kit": [
+        { "kind": "hotel", "seller": "Trip.com", "url": "https://tp.media/r?marker=581462&sub_id=web_after&u=https%3A%2F%2Fwww.trip.com%2Fhotels%2Fbarcelona", "city": "BCN", "check_in": "2026-11-02", "check_out": "2026-11-05" },
+        { "kind": "hotel", "seller": "Agoda", "url": "https://tp.media/r?marker=581462&sub_id=web_after&u=https%3A%2F%2Fwww.agoda.com%2Frome", "city": "ROM", "check_in": "2026-11-05", "check_out": "2026-11-09" },
+        { "kind": "transfer", "seller": "Welcome Pickups", "url": "https://tp.media/r?marker=581462&sub_id=web_after&u=https%3A%2F%2Fwww.welcomepickups.com%2Fbarcelona", "city": "BCN", "check_in": null, "check_out": null },
+        { "kind": "esim", "seller": "Yesim", "url": "https://tp.media/r?marker=581462&sub_id=web_after&u=https%3A%2F%2Fyesim.app", "city": null, "check_in": "2026-11-02", "check_out": "2026-11-09" },
+        { "kind": "insurance", "seller": "EKTA", "url": "https://tp.media/r?marker=581462&sub_id=web_after&u=https%3A%2F%2Fektatraveling.com", "city": null, "check_in": "2026-11-02", "check_out": "2026-11-09" }
+      ]
+    }
+  ],
+  "insights": null,
+  "sources": null,
+  "more_routes": 0,
+  "app_hint": { "price": 151.6 },
+  "share_key": "5d41402abc4b2a76b9719d911017c592a7b0f2c1e4d9f0b3c6a8e1f2d3c4b5a6",
+  "tier": "free",
+  "error": null,
+  "created": 1792044000.0,
+  "updated": 1792044061.5
+}

@@ -1,5 +1,6 @@
 import { AD_NETWORK_SCRIPT, CONSENT_NEEDED, GA_MEASUREMENT_ID, GTAG_SCRIPT } from '../app';
-import { CHOICES, analyticsCookies, choiceCookie, expiryCookies, initialChoice, mustReload, readChoice, shouldShowBanner, type Choice } from './consent-state';
+import { CHOICES, analyticsCookies, choiceCookie, expiryCookies, initialChoice, mustReload, readChoice, setAnalytics, shouldShowBanner, type Choice, type Gtag } from './consent-state';
+import { loadScript } from './load-script';
 
 declare global {
   interface Window {
@@ -10,19 +11,13 @@ declare global {
   }
 }
 
-function appendScript(src: string, data: Record<string, string> = {}) {
-  const script = document.createElement('script');
-  script.async = true;
-  Object.assign(script.dataset, data);
-  script.src = src;
-  document.head.append(script);
-}
+const appendScript = (src: string, data?: Record<string, string>) => void loadScript(src, data).catch(() => undefined);
 
 // Consent Mode v2, basic: nothing from Google loads before Accept, and then only analytics storage is granted.
 function loadAnalytics(id: string) {
   window.dataLayer = window.dataLayer || [];
   // gtag.js only reads Arguments objects from the dataLayer; a pushed array is ignored.
-  const gtag: (...args: unknown[]) => void = function () {
+  const gtag: Gtag = function () {
     window.dataLayer.push(arguments);
   };
   gtag('consent', 'default', {
@@ -34,6 +29,7 @@ function loadAnalytics(id: string) {
   gtag('consent', 'update', { analytics_storage: 'granted' });
   gtag('js', new Date());
   gtag('config', id, { allow_google_signals: false, allow_ad_personalization_signals: false });
+  setAnalytics(gtag);
   appendScript(GTAG_SCRIPT(id));
 }
 

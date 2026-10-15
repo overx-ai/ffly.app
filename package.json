@@ -7,10 +7,11 @@
     "dev": "astro dev",
     "build": "astro build",
     "test": "vitest run && npm run build && node scripts/check-legal.mjs",
-    "preview": "astro preview",
+    "preview": "node scripts/preview.mjs",
     "places": "node scripts/places.mjs"
   },
   "dependencies": {
+    "@astrojs/vercel": "^7.8.2",
     "astro": "^4.16.0"
   },
   "devDependencies": {

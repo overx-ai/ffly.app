@@ -55,10 +55,39 @@ export const CONTACT_EMAIL = 'support@overx.ai';
 
 export const SERVICE = {
   apiHost: 'api.overx.ai',
+  authHost: 'auth.overx.ai',
   searchRetentionHours: 24,
 } as const;
 
 export const FFLY_API_BASE = `https://${SERVICE.apiHost}/ffly`;
+
+// ffly API contract 1.12.0 (1B-bots spec 574): sign-in, per-leg offers, the Pro teaser and the Trip kit (spec 014),
+// shared with spec 015. False until 1.12.0 is live: none of that UI renders and every API request stays anonymous.
+export const CONTRACT_1_12: boolean = false;
+
+// Sign in with Apple or Google on the web search (spec 014). The page hands the provider's token to this site's own
+// /api/auth routes, which trade it at overx-auth and keep only its refresh token, in an HttpOnly cookie; the access
+// token lives in page memory. Public ids only, no secret. TODO(owner): set googleClientId (the "ffly web" OAuth client,
+// 1B-bots spec 573 T2) once the Services ID is set up too (573 T1); sign-in stays hidden until then.
+export const AUTH = {
+  base: `https://${SERVICE.authHost}`,
+  routes: '/api/auth',
+  appleServiceId: 'ai.overx.ffly.web',
+  appleReturnUrl: `https://${SITE_HOST}/auth/apple`,
+  googleClientId: undefined as string | undefined,
+  cookie: 'ffly_session',
+  days: 180,
+  refreshSkewS: 60,
+  timeoutMs: 8000,
+  hintKey: 'ffly.account',
+} as const;
+export const SIGN_IN = CONTRACT_1_12 && AUTH.googleClientId !== undefined;
+export const APPLE_JS = 'https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js';
+export const GOOGLE_JS = 'https://accounts.google.com/gsi/client';
+
+// GA4 events of the web search (spec 014), sent only after Accept. Their params name a placement, an offer kind or
+// kit category, and the tier; never a city, date, price or account.
+export const EVENTS = { book: 'book_click', kit: 'kit_click' } as const;
 
 // The app's offline feedback queue (ios-ffly FeedbackQueueRules.expiry): an unsent message is dropped after this.
 export const FEEDBACK = {

@@ -1,6 +1,8 @@
-import { PREFS, WEB_SEARCH } from '../app';
+import { CONTRACT_1_12, EVENTS, PREFS, SIGN_IN, WEB_SEARCH } from '../app';
 import type { Dict } from '../i18n';
 import { fill, plural, type Plural, type Vars } from '../i18n/text';
+import { setupAccount } from './auth';
+import type { Change } from './auth-state';
 import { RangePicker, addDays, daysBetween, localToday, stepNights, type Nights } from './calendar';
 import { Combobox, matchPlaces } from './combobox';
 import {
@@ -12,14 +14,17 @@ import {
   endLimit,
   getMeta,
   getSearch,
+  getTripKit,
   lookupShared,
   searchedAt,
+  setCaller,
   type Insights,
   type Meta,
   type Place,
   type SearchRequest,
   type SearchView,
   type SubmitOutcome,
+  type Tier,
   type Trip,
 } from './ffly-api';
 import { ask, canAsk, routesReady } from './notify';
@@ -27,9 +32,10 @@ import { appHintLine, rotation } from './nudges';
 import { addPlace, countryNamer, fold, optionParts, placeName, placeNames, removePlace } from './places';
 import { PlacesStore, provisionalMeta, type PlaceSet } from './places-store';
 import { cookieString, fillPrefs, finishOf, namesPlaces, parseCookies, sameSearch, savedCookies, sharedRequest, shareUrl, type Prefs } from './prefs';
-import { routeRows, type RouteRow, type Warn } from './results';
+import { kitGroups, routeRows, type BookLink, type KitGroup, type LegRow, type RouteRow, type Warn } from './results';
 import { glideLinks } from './scroll';
 import { Ticker } from './ticker';
+import { track, type TrackEvent, type TrackParams } from './track';
 
 interface Saved {
   id: string;
@@ -47,8 +53,12 @@ const MINUTE_S = 60;
 const TEXT = JSON.parse(document.querySelector<HTMLElement>('[data-i18n]')!.dataset.i18n!) as Dict['widget']['script'] & {
   nights: Plural;
   loading: string;
+  offers?: Dict['widget']['offers'];
+  account?: Dict['widget']['account'];
 };
 const MESSAGES = TEXT.messages;
+// Spec 014's strings, on the page only with CONTRACT_1_12.
+const OFFERS = TEXT.offers!;
 const LOCALE = document.documentElement.lang;
 const count = (forms: Plural, n: number, vars?: Vars) => plural(LOCALE, forms, n, vars);
 
@@ -112,6 +122,7 @@ const el = {
   more: byId('more-routes'),
   coverage: byId('coverage'),
   upsell: byId('upsell'),
+  progressKit: document.getElementById('progress-kit'),
 };
 
 const clone = (id: string) => byId<HTMLTemplateElement>(id).content.firstElementChild!.cloneNode(true) as HTMLElement;
@@ -134,6 +145,7 @@ const nameOf = (code: string) => {
   const place = byCode.get(code);
   return place ? localName(place) : code;
 };
+const tier = (): Tier => meta?.tier ?? 'free';
 const maxCities = () => Math.min(meta.tier_limits.max_cities, meta.limits.max_cities);
 const maxEnds = () => endLimit(meta);
 const severalEnds = () => maxEnds() > 1;
@@ -518,6 +530,7 @@ function showPlaceholder(searching: boolean) {
 
 function clearOutcome(searching = false) {
   stopPolling();
+  kitRequestId = undefined;
   el.problem.hidden = true;
   el.upsell.hidden = true;
   el.progress.hidden = true;
@@ -533,7 +546,7 @@ function showProblem(message: string, retry?: () => void, upsell = false) {
   retryAction = retry;
   el.retry.hidden = !retry;
   el.problem.hidden = false;
-  el.upsell.hidden = !upsell;
+  el.upsell.hidden = !upsell || (CONTRACT_1_12 && tier() === 'pro');
 }
 
 function renderProgress(view: Pick<SearchView, 'status' | 'done' | 'total' | 'eta_s'>) {
@@ -600,17 +613,87 @@ function legRows(row: RouteRow): HTMLElement[] {
       '.leg-price': leg.price,
     });
     const book = part<HTMLAnchorElement>(tr, '.book');
-    if (leg.link) {
-      book.href = leg.link;
-      book.setAttribute('aria-label', fill(MESSAGES.book, { from: leg.from, to: leg.to }));
-    } else {
-      book.remove();
-    }
+    book.replaceWith(...leg.book.map((link) => bookButton(book, link, leg)));
     return tr;
   });
 }
 
-function renderRow(row: RouteRow): HTMLElement[] {
+type KitPlacement = 'progress' | 'route';
+
+// Links never wait for tracking: the event goes out (or not, without consent) and the browser opens the link.
+const tracked = <T extends HTMLElement>(node: T, event: TrackEvent, params: Omit<TrackParams, 'tier'>) => {
+  node.addEventListener('click', () => track(event, { ...params, tier: tier() }));
+  return node;
+};
+
+function bookButton(template: HTMLAnchorElement, link: BookLink, leg: LegRow): HTMLAnchorElement {
+  const book = template.cloneNode(true) as HTMLAnchorElement;
+  book.href = link.url;
+  let label = MESSAGES.book;
+  if (link.kind === 'direct') {
+    book.textContent = OFFERS.bookDirect;
+    label = OFFERS.bookDirectFor;
+  } else if (link.kind === 'partner') {
+    book.textContent = OFFERS.bookPartner;
+    label = OFFERS.bookPartnerFor;
+  }
+  book.setAttribute('aria-label', fill(label, { from: leg.from, to: leg.to }));
+  return CONTRACT_1_12 ? tracked(book, EVENTS.book, { placement: 'results', kind: link.kind }) : book;
+}
+
+function kitGroupItem(group: KitGroup, placement: KitPlacement): HTMLElement {
+  const item = clone('kit-group-template');
+  part(item, '.kit-kind').textContent = OFFERS.kit[group.kind];
+  const links = group.links.map((link) => {
+    const a = clone('kit-link-template') as HTMLAnchorElement;
+    a.href = link.url;
+    a.textContent = link.text || OFFERS.kitOpen;
+    return tracked(a, EVENTS.kit, { placement, kind: group.kind });
+  });
+  part(item, '.kit-links').replaceChildren(...links);
+  return item;
+}
+
+// "Partner offers": each kind of the Trip kit with its links, labelled by the site, never by the partner.
+function kitBlock(groups: KitGroup[], placement: KitPlacement): HTMLElement {
+  const block = clone('kit-template');
+  part(block, '.kit-list').replaceChildren(...groups.map((group) => kitGroupItem(group, placement)));
+  return block;
+}
+
+function detailRow(id: string, kind: string, content: HTMLElement): HTMLElement {
+  const tr = clone('detail-row-template');
+  tr.id = id;
+  tr.classList.add(kind);
+  part(tr, 'td').append(content);
+  return tr;
+}
+
+// With 1.12.0 the Pro preview replaces the app hint: one line, under the first route that has one.
+function teaserRow(row: RouteRow): HTMLElement {
+  const whole = new Intl.NumberFormat(LOCALE, { style: 'currency', currency: meta.currency, maximumFractionDigits: 0, minimumFractionDigits: 0 });
+  const line = document.createElement('p');
+  line.className = 'pro-teaser';
+  line.textContent = fill(OFFERS.proTeaser, { amount: whole.format(row.proSaving!) });
+  return detailRow(`route-${row.rank}-teaser`, 'teaser-row', line);
+}
+
+let kitRequestId: string | undefined;
+
+// The Trip kit while a search runs: it never delays the search, and an empty or failed answer shows nothing.
+async function showProgressKit(request: SearchRequest) {
+  const box = el.progressKit;
+  if (!box) return;
+  kitRequestId = request.client_request_id;
+  box.hidden = true;
+  const offers = await getTripKit(request.cities, request.date_from, request.date_to).catch(() => []);
+  const groups = kitGroups(offers, { name: nameOf, day: formatDay });
+  if (kitRequestId !== request.client_request_id || !groups.length) return;
+  box.replaceChildren(kitBlock(groups, 'progress'));
+  box.hidden = false;
+}
+
+function renderRow(row: RouteRow, teaser = false): HTMLElement[] {
   if (row.kind === 'locked') {
     const tr = clone('locked-row-template');
     setTexts(tr, { '.rank': String(row.rank), '.locked-text': count(MESSAGES.lockedRow, row.nCities), '.total': row.total });
@@ -632,11 +715,17 @@ function renderRow(row: RouteRow): HTMLElement[] {
       return chip;
     }),
   );
+  const after = teaser ? [teaserRow(row)] : [];
   const legs = legRows(row);
   const toggle = part<HTMLButtonElement>(tr, '.details-toggle');
   if (!legs.length) {
     toggle.remove();
-    return [tr];
+    return [tr, ...after];
+  }
+  if (row.kit.length) {
+    const kit = detailRow(`route-${row.rank}-kit`, 'kit-row', kitBlock(row.kit, 'route'));
+    kit.hidden = true;
+    legs.push(kit);
   }
   toggle.setAttribute('aria-controls', legs.map((l) => l.id).join(' '));
   const flip = () => {
@@ -650,7 +739,7 @@ function renderRow(row: RouteRow): HTMLElement[] {
   tr.addEventListener('click', (event) => {
     if (!(event.target as Element).closest('button, a')) flip();
   });
-  return [tr, ...legs];
+  return [tr, ...legs, ...after];
 }
 
 function pushAds() {
@@ -663,14 +752,15 @@ function pushAds() {
 }
 
 function renderResults(view: SearchView, request: SearchRequest) {
-  const { rows, more } = routeRows(view, { name: nameOf, money: formatMoney, day: formatDay });
+  const { rows, more } = routeRows(view, { name: nameOf, money: formatMoney, day: formatDay }, CONTRACT_1_12);
+  const teaserRank = rows.find((r) => r.proSaving !== undefined)?.rank;
   showText(el.resultsTitle, rows.length ? count(MESSAGES.found, rows.length) : MESSAGES.none);
   showText(el.resultsTrip, tripLine(request));
   el.resultsShared.hidden = true;
   el.resultsEmpty.hidden = rows.length > 0;
   showText(el.insights, view.insights ? insightsLine(view.insights) : '');
-  showText(el.appHint, appHintLine(view.app_hint, view.routes[0]?.price, formatMoney, TEXT.nudges.appHint) ?? '');
-  el.routeRows.replaceChildren(...rows.flatMap(renderRow));
+  showText(el.appHint, CONTRACT_1_12 ? '' : (appHintLine(view.app_hint, view.routes[0]?.price, formatMoney, TEXT.nudges.appHint) ?? ''));
+  el.routeRows.replaceChildren(...rows.flatMap((row) => renderRow(row, row.rank === teaserRank)));
   part(el.more, 'a').textContent = count(MESSAGES.more, more);
   el.more.hidden = more <= 0;
   showText(el.coverage, coverageLine(view.sources));
@@ -678,7 +768,7 @@ function renderResults(view: SearchView, request: SearchRequest) {
   el.placeholder.hidden = true;
   setSearching(false);
   el.progress.hidden = true;
-  el.upsell.hidden = !(more > 0 || rows.some((r) => r.kind !== 'full'));
+  el.upsell.hidden = CONTRACT_1_12 ? tier() === 'pro' : !(more > 0 || rows.some((r) => r.kind !== 'full'));
   el.submit.disabled = false;
   writeUrl(request);
   pushAds();
@@ -719,6 +809,7 @@ function resume(saved: Saved, resubmitted = false): Promise<void> {
   clearOutcome(true);
   el.submit.disabled = true;
   renderReconnecting();
+  if (CONTRACT_1_12) void showProgressKit(saved.request);
   return poll(saved, resubmitted);
 }
 
@@ -779,6 +870,7 @@ async function submit(request: SearchRequest, resubmitted = false): Promise<void
     case 'created': {
       if (meta.free_searches_left) meta.free_searches_left -= 1;
       renderQuota();
+      if (CONTRACT_1_12) void showProgressKit(request);
       const saved = { id: outcome.id, request };
       save(saved);
       return poll(saved, resubmitted);
@@ -996,6 +1088,8 @@ async function init(prefs: Prefs, metaAnswer = getMeta()): Promise<void> {
     return;
   }
   el.submit.disabled = false;
+  metaLive = true;
+  renderAccount();
   // Not before the places are asked for: checking the version reads the stored list, a parse kept off page start.
   void askedForPlaces.then(() => placesStore.refresh(meta)).then(usePlaces);
 
@@ -1012,11 +1106,30 @@ async function init(prefs: Prefs, metaAnswer = getMeta()): Promise<void> {
   return openShared(shared);
 }
 
+// Sign-in (spec 014): signing in or out asks /meta again, and applyMeta redraws the caps for the new tier.
+let metaLive = false;
+let signedOutLine = false;
+const account = SIGN_IN ? setupAccount(TEXT.account!, (change) => void accountChanged(change)) : undefined;
+const renderAccount = () => account?.render(tier() === 'pro', signedOutLine);
+
+async function accountChanged(change: Change) {
+  signedOutLine = change === 'expired';
+  renderAccount();
+  if (!metaLive) return;
+  try {
+    applyMeta(await getMeta());
+  } catch {
+    // The caps shown stay until the next /meta.
+  }
+  renderAccount();
+}
+
 glideLinks('search');
 setupStrip(parseCookies(document.cookie));
 picker.set(defaultWindow());
 el.fields.addEventListener('focusin', () => void loadPlaces());
 loadPlacesWhenIdle();
-const firstMeta = getMeta();
+setCaller(account?.auth);
+const firstMeta = account ? account.auth.resume().then(getMeta) : getMeta();
 firstMeta.catch(() => undefined);
 void openForm().then((prefs) => init(prefs, firstMeta));

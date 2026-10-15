@@ -1,8 +1,9 @@
 // Asserts legal and site facts in the built output (run after `astro build`). Regressions: docs/bugs/001, 002, 003.
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { VERCEL_OUTPUT, functionRoutes } from './vercel-output.mjs';
 
-const DIST = fileURLToPath(new URL('../dist/', import.meta.url));
+const DIST = fileURLToPath(new URL('static/', VERCEL_OUTPUT));
 const source = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 // A constant's initialiser in src/app.ts, or undefined when its declaration is missing.
 const appConstant = (name) => source('src/app.ts').match(new RegExp(`export const ${name}\\b[^=]*=\\s*([^;]+);`))?.[1].trim();
@@ -57,12 +58,19 @@ const adNetworkSrc = adNetworkOn ? adNetwork.slice(1, -1) : undefined;
 const adNetworkHost = adNetworkSrc ? new URL(adNetworkSrc).host : undefined;
 // Spec 013: the banner, Cookie settings and the consent cookie exist while anything waits for consent.
 const consentOn = gaOn || adNetworkOn;
+// Spec 014: sign-in exists while CONTRACT_1_12 is on and the Google web client id is set (AUTH in src/app.ts).
+const contract112 = appConstant('CONTRACT_1_12') === 'true';
+const authConstant = appConstant('AUTH') ?? '';
+const signInOn = contract112 && /googleClientId: '[^']+'/.test(authConstant);
+const sessionCookieName = authConstant.match(/cookie: '([^']+)'/)?.[1];
+const appleServiceId = authConstant.match(/appleServiceId: '([^']+)'/)?.[1];
 
 const failures = [];
 
 function check(ok, message) {
   if (!ok) failures.push(message);
 }
+check(sessionCookieName !== undefined && appleServiceId !== undefined, 'src/app.ts: AUTH must declare cookie and appleServiceId');
 
 function plainText(html) {
   return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -244,7 +252,8 @@ check(/pick a language/.test(website), 'Privacy: #website must say the language 
 // The consent cookie exists only while the banner does.
 const consentCookie = appConstant('CONSENT')?.match(/cookie: '([^']+)'/)?.[1];
 const siteCookies = [...source('src/app.ts').matchAll(/cookie: '([^']+)'/g)].map(([, name]) => name)
-  .filter((name) => name !== consentCookie || consentOn);
+  .filter((name) => (name !== consentCookie || consentOn) && (name !== sessionCookieName || signInOn));
+check(website.includes(sessionCookieName) === signInOn, `Privacy: #website must name ${sessionCookieName} exactly while sign-in is on`);
 for (const cookie of siteCookies) {
   check(website.includes(cookie), `Privacy: #website must name the cookie ${cookie}`);
 }
@@ -480,6 +489,27 @@ const GA_CSP = {
   'img-src': ['*.google-analytics.com', '*.googletagmanager.com'],
 };
 cspAgrees(GA_CSP, gaOn, 'GA_MEASUREMENT_ID');
+// Sign in with Apple and Google Identity Services (spec 014): their hosts open in the same change that shows sign-in.
+const AUTH_CSP = {
+  'script-src': ['appleid.cdn-apple.com', 'accounts.google.com'],
+  'frame-src': ['accounts.google.com'],
+  'connect-src': ['accounts.google.com'],
+  'style-src': ['accounts.google.com'],
+};
+cspAgrees(AUTH_CSP, signInOn, 'AUTH.googleClientId with CONTRACT_1_12');
+// Hybrid output (spec 014): every page is prerendered; the function serves the sign-in routes and Astro's inert /_image.
+let vercelConfig = { routes: [] };
+try {
+  vercelConfig = JSON.parse(readFileSync(new URL('config.json', VERCEL_OUTPUT), 'utf8'));
+} catch (error) {
+  check(false, `.vercel/output/config.json: ${error.message}`);
+}
+const functionSources = functionRoutes(vercelConfig).map((route) => route.src);
+const SERVER_PATHS = ['/api/auth/apple', '/api/auth/google', '/api/auth/token', '/api/auth/session', '/_image'];
+check(
+  functionSources.length === SERVER_PATHS.length && SERVER_PATHS.every((path) => functionSources.some((src) => new RegExp(src).test(path))),
+  `Build: the function must serve exactly ${SERVER_PATHS.join(', ')}, found ${functionSources.join(', ')}`,
+);
 for (const [file, html] of htmlPages) {
   check(!/googletagmanager|gtag\(/.test(html), `${file}: Google Analytics must load only from the consent module, never from the page`);
   const [banner = '', inner = ''] = html.match(/<div id="consent"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/) ?? [];
@@ -607,6 +637,8 @@ const bundle = readdirSync(`${DIST}_astro`)
   .filter((f) => f.endsWith('.js'))
   .map((f) => readFileSync(`${DIST}_astro/${f}`, 'utf8'))
   .join('');
+// Apple's sign-in script takes the Services ID as its client id: an identifier the bundle must carry, never copy.
+const bundleCopy = appleServiceId ? bundle.replaceAll(appleServiceId, '') : bundle;
 check(
   connectHosts.some((host) => bundle.includes(`"${host}"`)),
   'vercel.json: CSP connect-src must allow the API host the search bundle calls (SERVICE.apiHost)',
@@ -720,9 +752,26 @@ const UNLIMITED = [
   'rajaton', 'rajattom', 'rajoittamaton', 'ilman raj',
 ].map((term) => [bannedTerm(term), term]);
 // Copy rules for every published page, the legal ones included.
+// Founder (spec 014): never "cheapest guaranteed" or "lowest guaranteed", in any language, in one sentence or across a list.
+const GUARANTEED = /(?<!\p{L})(?:guarant|garant|garand|gegarand|gwarant|гарант|taat|takuu)/iu;
+const CHEAPEST = new RegExp(`(?<!\\p{L})(?:${[
+  'cheapest', 'lowest', 'günstigst', 'billigst', 'niedrigst', 'moins cher', 'plus bas', 'más barat', 'más baj', 'più econom',
+  'più bass', 'goedkoopst', 'laagst', 'najtańsz', 'najniższ', 'mais barat', 'mais baix', 'самы[ейх]? (?:дешёв|дешев|низк)',
+  'дешевле', 'lägst', 'billigast', 'lavest', 'halvin', 'edullisin', 'alhaisin',
+].join('|')})`, 'iu');
 for (const [where, text] of [['llms.txt', llms], ...htmlPages]) {
   check(!/\u2014|&mdash;|&#8212;|&#x2014;/i.test(text), `${where}: no em dashes in published copy`);
   for (const [pattern, term] of UNLIMITED) check(!pattern.test(text), `${where}: Pro is never "unlimited" (${term})`);
+  const promised = copyText(withoutCss(text)).split(/(?<=[.!?])\s|",/).find((sentence) => GUARANTEED.test(sentence) && CHEAPEST.test(sentence));
+  check(promised === undefined, `${where}: never promise the cheapest or lowest fare as guaranteed: "${promised?.slice(0, 80)}"`);
+}
+// The Trip kit reads as ads (founder, 2026-10-15): every block is headed "Partner offers", never a commission line.
+if (contract112) {
+  for (const [file, html] of htmlPages.filter(([, page]) => page.includes('id="search-form"'))) {
+    const heading = html.match(/<template id="kit-template">[\s\S]*?<p class="kit-title">([^<]*)<\/p>/)?.[1].trim();
+    check(Boolean(heading), `${file}: the Trip kit block needs its "Partner offers" heading`);
+  }
+  check(readHtml('search').includes('<p class="kit-title">Partner offers</p>'), '/search: the Trip kit block must be headed "Partner offers"');
 }
 // <link> tags are never shown, and the API preconnect names the host by design.
 const copyOf = (html) => copyText(withoutCss(html).replace(/<link\b[^>]*>/g, ''));
@@ -744,7 +793,7 @@ for (const [where, text] of copyPages) {
   for (const [pattern, what] of CONTACT_LEAKS) check(!pattern.test(shown), `${where}: must not show ${what}`);
 }
 for (const [file, html] of htmlPages) check(!/href="tel:/i.test(html), `${file}: must not link a phone number`);
-const banScans = [['Search bundle', bundle, MECHANICS], ...copyPages.map(([where, text]) => [where, text, COPY_BANS])];
+const banScans = [['Search bundle', bundleCopy, MECHANICS], ...copyPages.map(([where, text]) => [where, text, COPY_BANS])];
 for (const [where, text, banned] of banScans) {
   for (const [pattern, what] of banned) {
     check(!pattern.test(text), `${where}: must not name ${what}`);
@@ -754,7 +803,7 @@ for (const [where, text, banned] of banScans) {
 const NAMED_PROCESSORS = ['RevenueCat', 'AppsFlyer', 'Google'];
 const LEGAL_FILES = ['privacy/index.html', 'terms/index.html'];
 const processorBans = NAMED_PROCESSORS.map((name) => [name, bannedTerm(name)]);
-for (const [where, text] of [['Search bundle', bundle], ...copyPages]) {
+for (const [where, text] of [['Search bundle', bundleCopy], ...copyPages]) {
   if (LEGAL_FILES.includes(where)) continue;
   for (const [name, pattern] of processorBans) {
     if (where === 'Search bundle' && name === 'Google') continue;

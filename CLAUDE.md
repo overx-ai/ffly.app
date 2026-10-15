@@ -1,13 +1,18 @@
 # ffly-site (ffly.app)
 
 Marketing, support and legal site for **ffly** (`ai.overx.ffly`), the iPhone app for cheap
-multi-city trips. Astro 4, static output, deployed on Vercel. Client JavaScript only in the search widget (`/` and `/search`), the consent banner and the language module (every page).
+multi-city trips. Astro 4, hybrid output on Vercel: every page prerendered, only the sign-in routes run on a server (spec 014). Client JavaScript only in the search widget (`/` and `/search`), the consent banner and the language module (every page).
 
 The app source lives at `../../0E-extensions/ios-ffly`, the API at `1B-bots` `apps/ffly-api`.
 Those repos are the source of truth for copy, colours and claims.
 
 ## Tech Stack
-- Astro 4, `output: 'static'`, `trailingSlash: 'never'`. **One dependency: `astro`**, plus `vitest` (dev only) for `tests/`.
+- Astro 4, `output: 'hybrid'` with `@astrojs/vercel/serverless`, `trailingSlash: 'never'`. **Two dependencies: `astro` and
+  the adapter**, plus `vitest` (dev only) for `tests/`. Every page stays prerendered; only `src/pages/api/auth/*`
+  (`prerender = false`) run, as one Vercel function, beside Astro's `/_image`, pointed at a 404 stub
+  (`src/server/no-image.ts`; the site has no `astro:assets` images). The build writes `.vercel/output/` (`static/` is what
+  `check-legal` reads, `config.json` the routes it checks); `npm run preview` is `scripts/preview.mjs`, because
+  `astro preview` does not support the adapter.
 - **Zero client JavaScript, except the search widget, the consent module and the language module.** Theme switching
   is pure CSS, the FAQ and the header language menu are `<details>`. `ConsentBanner.astro` (in `BaseLayout`, every page)
   loads `src/scripts/consent.ts`, whose logic is the DOM-free, tested `consent-state.ts`. `LangHint.astro` (in
@@ -23,6 +28,34 @@ Those repos are the source of truth for copy, colours and claims.
   requests with no preflight. Never priority, filters or schedule. The pages carrying it preconnect to the API origin
   (`BaseLayout` `preconnectApi`). Its cookies and scroll time live in `src/app.ts`, its copy in `src/i18n/en.ts`
   (`widget.script`, shipped in SearchForm's `data-i18n` attribute).
+- **Accounts, Pro and the Trip kit (spec 014), behind `CONTRACT_1_12`** (`src/app.ts`, shared with spec 015; false until
+  ffly API 1.12.0 is live). Off, the site behaves as before: a 1.12.0 answer renders as 1.11's and no request carries a
+  header. On:
+  - **Sign-in**, only while `AUTH.googleClientId` is also set (`SIGN_IN`; the owner sets it once the Services ID
+    `AUTH.appleServiceId` and the Google web client exist, 1B-bots spec 573 T1/T2). The page gets an Apple identity token
+    (Apple JS, popup, scope `email`, `signIn()` inside the click) or a Google credential (GIS button plus One Tap), both
+    scripts loaded only when the visitor opens the sheet, and posts it to `/api/auth/{apple,google}`.
+    `src/server/auth-session.ts` trades it at overx-auth (`AUTH.base`); `/api/auth/token` refreshes, `/api/auth/session`
+    (DELETE) revokes. Every route: POST or DELETE only, this site's own `Origin`, `Cache-Control: no-store`, no secret.
+    The refresh token lives only in `AUTH.cookie` (`HttpOnly; Secure; SameSite=Strict; Path=/api/auth`); the access token
+    only in page memory (`src/scripts/auth-state.ts`), never in storage, a script-readable cookie or the URL.
+    `localStorage` `AUTH.hintKey` holds `1` once this browser signed in, so a visitor who never did costs no request.
+  - **API calls** (`ffly-api.ts` `setCaller`): no header while signed out (no preflight), `Authorization: Bearer` while
+    signed in on `/meta`, `/searches`, `/trip-kit`; never on `/places` or `/searches/shared`. A 401 refreshes once and
+    retries; a second signs out and goes on as Free. Signing in or out asks `/meta` again and `applyMeta` redraws the caps:
+    **no limit is ever a literal in the site**.
+  - **Results** (`results.ts`): Book direct or Book via partner per `leg.offers[]` (`rel="sponsored noopener"`, the URL as
+    the API sends it, https only), no commission line beside them (founder, 2026-10-15); `route.pro_preview` becomes one
+    "Pro found this route about €X cheaper" line under the first route that has one, replacing the app hint; the upsell
+    compares Free and Pro with no number and leads with "Already have Pro? Sign in with the same account".
+  - **Trip kit**: `GET /trip-kit` in the progress card, `route.trip_kit[]` in each route's details, each block headed
+    **"Partner offers"**, text only, labelled from the site's i18n by kind, never with the API's `seller`.
+  - **Tracking** (`track.ts`): Book and kit clicks send GA4 `EVENTS` (`placement`, `kind`, `tier`; never a city, date,
+    price or account) only once Accept has started analytics (`consent-state.ts` `analytics()`), by beacon, never
+    delaying or cancelling the click.
+  - **CSP**: `AUTH_CSP` in `check-legal` (Apple JS and GIS hosts in `script-src`, `frame-src`, `connect-src`,
+    `style-src`) must be in `vercel.json` exactly while sign-in is on, and /privacy `#website` names `AUTH.cookie` and the
+    storage note then (bump its `lastmod`). Bundle bans skip the Services ID, an identifier Apple's script needs.
 - **Shareable searches (spec 005).** The URL carries the whole trip: `from`, `back` (omitted when it is just `from`),
   `cities` (comma-separated, as in the app's share link), `dates=YYYY-MM-DD..YYYY-MM-DD`, `nights=min-max`
   (`shareQuery` in `prefs.ts`, written with `replaceState` on submit and on results). A complete link with a future
@@ -204,6 +237,8 @@ Those repos are the source of truth for copy, colours and claims.
   bundle id, endpoints or the API host, nor search limits such as "up to 8" cities. `MECHANICS` and
   `COPY_BANS` in `scripts/check-legal.mjs` ban them on every page (legal included), in `llms.txt`, and,
   except the API host, its URL and "HTTPS", in the JS bundle.
+- **Never "cheapest guaranteed"** (or lowest), in any language: `check-legal` fails on a guarantee word and a
+  cheapest or lowest word in one sentence (`GUARANTEED`, `CHEAPEST`).
 - **No em dashes in published copy.** British spelling, and each language's `tag` in `src/i18n/locales.ts`
   (`en-GB` for English) for every date and number.
   `npm test` fails on an em dash or "unlimited" (any language) on any page or in `llms.txt`.

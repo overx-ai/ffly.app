@@ -2,6 +2,7 @@ import {
   AD_NETWORK_SCRIPT,
   ADSENSE_CLIENT,
   APP,
+  AUTH,
   CONSENT,
   CONSENT_NEEDED,
   CONTACT_EMAIL,
@@ -13,6 +14,7 @@ import {
   OPERATOR_COUNTRY,
   PREFS,
   SERVICE,
+  SIGN_IN,
   SITE_HOST,
   UK_REPRESENTATIVE,
   externalLink,
@@ -74,6 +76,8 @@ const GOOGLE_ROLES = [
   ...(ANALYTICS ? ['measures visits to this website with Google Analytics'] : []),
   ...(ADS ? ['shows ads on this website with Google AdSense'] : []),
 ];
+
+const SIGNED_IN_NOTE = SIGN_IN ? ' If you sign in, it also notes there that you did, so the next page signs you back in.' : '';
 
 const DELETE_ACCOUNT = `If you have an account, you can delete it in the app's Settings, or by writing to ${mailto(CONTACT_EMAIL)}.`;
 
@@ -362,11 +366,12 @@ export const PRIVACY: LegalDocument = {
             `${cookie(PREFS.cities.cookie)}: the cities you picked, for ${PREFS.cities.days} days`,
             `${cookie(PREFS.nudge.cookie)}: which tip about the app it showed you last, for ${PREFS.nudge.days} days`,
             ...(CONSENT_NEEDED ? [`${cookie(CONSENT.cookie)}: your answer to the cookie banner, for about ${CONSENT_MONTHS} months`] : []),
+            ...(SIGN_IN ? [`${cookie(AUTH.cookie)}: keeps you signed in, if you sign in, until you sign out, for up to ${AUTH.days} days`] : []),
           ])}
         </ul>
         <p>It never remembers your travel dates. It also keeps the list of cities in your browser's storage, so the
         search opens quickly; that list is the same for everyone. Once you pick a language or close the note offering
-        this page in your language, it remembers that there too, so the note does not come back. You can delete these
+        this page in your language, it remembers that there too, so the note does not come back.${SIGNED_IN_NOTE} You can delete these
         cookies and this storage in your browser at any time.</p>
         ${ADS
           ? `<p>This website shows ads from Google AdSense. Before any AdSense ad loads, Google's consent message asks whether

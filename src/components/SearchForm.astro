@@ -3,7 +3,8 @@ import AppStrip from './AppStrip.astro';
 import AdSlot from './AdSlot.astro';
 import AppStoreBadge from './AppStoreBadge.astro';
 import PlaceCombo from './PlaceCombo.astro';
-import { APP_STORE_URL } from '../app';
+import { APP_STORE_URL, CONTRACT_1_12, SIGN_IN } from '../app';
+import { APPLE_LOGO } from '../icons';
 import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
 import '../styles/search.css';
 
@@ -17,8 +18,10 @@ const COLUMNS = ['rank', 'route', 'dates', 'nights', 'flights', 'warn', 'total',
 
 const openApp = APP_STORE_URL ?? '#app-side';
 const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" height="10" rx="2"/>';
+// Spec 014's strings ship only with its UI, so the page stays as it was while CONTRACT_1_12 is off.
+const v12 = CONTRACT_1_12 ? { offers: w.offers, account: w.account } : {};
 ---
-<div class="search-ui" data-i18n={JSON.stringify({ ...w.script, nights: t.common.nights, loading: w.loading })}>
+<div class="search-ui" data-i18n={JSON.stringify({ ...w.script, nights: t.common.nights, loading: w.loading, ...v12 })}>
   <noscript>
     <div class="card notice">
       <p>{w.noscript}</p>
@@ -119,6 +122,13 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
       </div>
       <p id="chip-nudge" class="chip-nudge" aria-live="polite" hidden></p>
     </fieldset>
+    {SIGN_IN && (
+      <div class="account-row">
+        <span id="account-status" class="note" aria-live="polite"></span>
+        <button id="sign-in" type="button" class="btn btn-soon" data-sign-in>{w.account.signIn}</button>
+        <button id="sign-out" type="button" class="btn btn-soon" hidden>{w.account.signOut}</button>
+      </div>
+    )}
   </form>
 
   <AppStrip lang={lang} />
@@ -143,6 +153,7 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
         <button id="notify-no" type="button" class="btn btn-soon">{w.notifyNo}</button>
       </div>
     </div>
+    {CONTRACT_1_12 && <div id="progress-kit" hidden></div>}
   </section>
 
   <section id="results" class="results" aria-labelledby="results-title" aria-live="polite">
@@ -181,10 +192,41 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
 
   <section id="upsell" class="card upsell" aria-labelledby="upsell-title" hidden>
     <p class="lbl">{t.common.appForIphone}</p>
-    <h2 id="upsell-title">{w.upsellTitle}</h2>
-    <p>{w.upsellBody}</p>
+    {CONTRACT_1_12 ? (
+      <Fragment>
+        <h2 id="upsell-title">{w.offers.upsellTitle}</h2>
+        <ul class="plan-compare">
+          <li>{w.offers.free}</li>
+          <li>{w.offers.pro}</li>
+        </ul>
+      </Fragment>
+    ) : (
+      <Fragment>
+        <h2 id="upsell-title">{w.upsellTitle}</h2>
+        <p>{w.upsellBody}</p>
+      </Fragment>
+    )}
+    {SIGN_IN && (
+      <p class="upsell-account">{w.account.alreadyPro} <button type="button" class="link-button" data-sign-in>{w.account.sameAccount}</button></p>
+    )}
     <AppStoreBadge lang={lang} />
   </section>
+
+  {SIGN_IN && (
+    <dialog id="sign-in-sheet" class="sheet" aria-labelledby="sign-in-title">
+      <h2 id="sign-in-title">{w.account.title}</h2>
+      <p class="note">{w.account.body}</p>
+      <div class="providers">
+        <button id="apple-sign-in" type="button" class="apple-button" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d={APPLE_LOGO} /></svg>
+          {w.account.apple}
+        </button>
+        <div id="gis-sign-in" class="gis-button"></div>
+      </div>
+      <p id="sign-in-error" class="form-error" role="alert"></p>
+      <button id="sign-in-close" type="button" class="btn btn-soon">{w.account.close}</button>
+    </dialog>
+  )}
 </div>
 
 <template id="place-option-template">
@@ -232,6 +274,26 @@ const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" 
     </td>
   </tr>
 </template>
+
+{CONTRACT_1_12 && (
+  <Fragment>
+    <template id="detail-row-template">
+      <tr class="detail-row"><td colspan={COLUMNS.length}></td></tr>
+    </template>
+    <template id="kit-template">
+      <div class="kit">
+        <p class="kit-title">{w.offers.partnerOffers}</p>
+        <ul class="kit-list"></ul>
+      </div>
+    </template>
+    <template id="kit-group-template">
+      <li class="kit-group"><span class="kit-kind"></span><span class="kit-links"></span></li>
+    </template>
+    <template id="kit-link-template">
+      <a class="kit-link" target="_blank" rel="sponsored noopener"></a>
+    </template>
+  </Fragment>
+)}
 
 <template id="locked-row-template">
   <tr class="locked-row">

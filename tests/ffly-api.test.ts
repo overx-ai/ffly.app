@@ -10,7 +10,9 @@ import {
   getSearch,
   lookupShared,
   searchedAt,
+  setCaller,
   versionOf,
+  type Caller,
   type Meta,
 } from '../src/scripts/ffly-api';
 
@@ -251,5 +253,50 @@ describe('request headers', () => {
     const headers = await sent(() => createSearch(buildRequest(trip, 'a')), { id: 'job-1' }, 202);
     expect(names(headers)).toEqual(['content-type']);
     expect(headers.get('content-type')).toBe('application/json');
+  });
+});
+
+describe('the caller (spec 014)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    setCaller(undefined);
+  });
+
+  const meta = { currency: 'EUR' };
+  const headersOf = (fetch: ReturnType<typeof vi.fn>, i: number) => ((fetch.mock.calls[i] as [string, RequestInit])[1].headers ?? {}) as Record<string, string>;
+  const caller = (tokens: (string | undefined)[]): Caller & { rejected: ReturnType<typeof vi.fn> } => {
+    let token = tokens.shift();
+    return {
+      headers: async () => (token ? { Authorization: `Bearer ${token}` } : {}),
+      rejected: vi.fn(async () => void (token = tokens.shift())),
+    };
+  };
+  const replies = (...statuses: number[]) => {
+    const fetch = vi.fn(async (_url: string, _init?: RequestInit) => new Response(JSON.stringify(meta), { status: statuses.shift() ?? 200 }));
+    vi.stubGlobal('fetch', fetch);
+    return fetch;
+  };
+
+  it('sends no header while signed out, so a GET needs no preflight', async () => {
+    const fetch = replies(200);
+    setCaller(caller([undefined]));
+    await getMeta();
+    expect(headersOf(fetch, 0)).toEqual({});
+  });
+
+  it('refreshes once on a 401, then signs out and goes on as Free: three calls at most', async () => {
+    const fetch = replies(401, 401, 200);
+    const signedIn = caller(['t1', 't2', undefined]);
+    setCaller(signedIn);
+    expect(await getMeta()).toEqual(meta);
+    expect([0, 1, 2].map((i) => headersOf(fetch, i).Authorization)).toEqual(['Bearer t1', 'Bearer t2', undefined]);
+    expect(signedIn.rejected.mock.calls).toEqual([[false], [true]]);
+  });
+
+  it('never sends the account to the shared lookup', async () => {
+    const fetch = replies(404);
+    setCaller(caller(['t1']));
+    await lookupShared(buildRequest(trip, 'id-1'));
+    expect(headersOf(fetch, 0)).toEqual({});
   });
 });

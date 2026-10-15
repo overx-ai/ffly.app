@@ -1,7 +1,7 @@
 ---
 status: current
 created: 2026-10-04
-updated: 2026-10-05
+updated: 2026-10-15
 ---
 
 # 001 - Deployment
@@ -17,10 +17,15 @@ the domain stays on **Namecheap BasicDNS**, the apex is primary and `www` redire
 
 ## 2. Vercel project
 - Vercel, Add New Project, import `overx-ai/ffly.app`. Framework preset **Astro** is detected:
-  build `astro build`, output `dist`, no adapter, **no environment variables**
-  (`astro.config.mjs` defaults `site` to `https://ffly.app`). Production branch `main`.
+  build `astro build`, **no environment variables** (`astro.config.mjs` defaults `site` to `https://ffly.app`).
+  Production branch `main`.
+- Since spec 014 the build uses `@astrojs/vercel` (hybrid output) and writes the Build Output API tree
+  `.vercel/output/`, which Vercel deploys as is, whatever the project's output directory says: every page stays a
+  static file under `static/`, and one Node function (`functions/_render.func`) serves `/api/auth/{apple,google,token,session}`
+  and Astro's inert `/_image` (404). The function holds no secret and needs no environment variable; it calls
+  `https://auth.overx.ai` only.
 - `vercel.json` supplies `cleanUrls` and `trailingSlash: false`, so `/support/` 308s to `/support`
-  and `dist/404.html` serves unknown paths. It also sets the CSP, `X-Content-Type-Options: nosniff`,
+  and `404.html` serves unknown paths. It also sets the CSP, `X-Content-Type-Options: nosniff`,
   `Referrer-Policy` and a one-year immutable `Cache-Control` on the hashed `/_astro/` files.
 - Settings, Domains: add `ffly.app` and `www.ffly.app`; make **`ffly.app` primary** so `www`
   308s to the apex, matching the apex canonicals. (tryrefresher.app: `www` 308 to apex, verified

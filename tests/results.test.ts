@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Leg, Route, SearchView } from '../src/scripts/ffly-api';
-import { routeRows, safeLink, warningsOf } from '../src/scripts/results';
+import { bookLinks, kitGroups, routeRows, safeLink, warningsOf } from '../src/scripts/results';
 
 const names: Record<string, string> = { WAW: 'Warsaw', MAD: 'Madrid', AMS: 'Amsterdam' };
 const format = {
@@ -71,7 +71,7 @@ describe('routeRows', () => {
       carrier: 'Ryanair',
       stops: 1,
       price: '€40',
-      link: 'https://example.com/book?marker=1',
+      book: [{ kind: 'link', url: 'https://example.com/book?marker=1' }],
       nights: 3,
     });
   });
@@ -105,5 +105,31 @@ describe('safeLink', () => {
     expect(safeLink('javascript:alert(1)')).toBeUndefined();
     expect(safeLink('not a url')).toBeUndefined();
     expect(safeLink(null)).toBeUndefined();
+  });
+});
+
+describe('bookLinks and kitGroups (contract 1.12.0)', () => {
+  const offers = [
+    { kind: 'direct' as const, url: 'https://airline.example/book' },
+    { kind: 'partner' as const, url: 'http://partner.example/insecure' },
+  ];
+
+  it('keeps https offers in the API order and falls back to the leg link without any', () => {
+    expect(bookLinks(leg({ offers }), true)).toEqual([{ kind: 'direct', url: 'https://airline.example/book' }]);
+    expect(bookLinks(leg({ offers: null }), true)).toEqual([{ kind: 'link', url: 'https://example.com/book?marker=1' }]);
+    expect(bookLinks(leg({ offers }), false)).toEqual([{ kind: 'link', url: 'https://example.com/book?marker=1' }]);
+    expect(bookLinks(leg({ offers: [], link: null }), true)).toEqual([]);
+  });
+
+  it('skips unknown kinds and unsafe links', () => {
+    const groups = kitGroups(
+      [
+        { kind: 'car', url: 'https://car.example' },
+        { kind: 'hotel', url: 'javascript:alert(1)', city: 'MAD' },
+        { kind: 'hotel', url: 'https://hotel.example', city: 'MAD' },
+      ],
+      format,
+    );
+    expect(groups).toEqual([{ kind: 'hotel', links: [{ text: 'Madrid', url: 'https://hotel.example' }] }]);
   });
 });
