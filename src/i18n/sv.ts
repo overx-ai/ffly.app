@@ -308,7 +308,9 @@ const sv = {
 
   consent: {
     label: 'Val av cookies',
-    text: 'Vi vill gärna mäta besök för att förbättra webbplatsen. Inget mäts om du inte godkänner.',
+    analytics: 'Vi vill gärna mäta besök för att förbättra webbplatsen.',
+    partner: `Ett skript från vår partner för flygbokningar hjälper till att finansiera ${APP.name}.`,
+    ask: 'Inget laddas om du inte godkänner.',
     accept: 'Godkänn',
     reject: 'Avvisa',
     privacy: 'Integritet',

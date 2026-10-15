@@ -308,7 +308,9 @@ const de = {
 
   consent: {
     label: 'Cookie-Auswahl',
-    text: 'Wir möchten Besuche messen, um diese Website zu verbessern. Gemessen wird nur, wenn du akzeptierst.',
+    analytics: 'Wir möchten Besuche messen, um diese Website zu verbessern.',
+    partner: `Ein Skript unseres Partners für Flugbuchungen hilft, ${APP.name} zu finanzieren.`,
+    ask: 'Geladen wird nur, wenn du akzeptierst.',
     accept: 'Akzeptieren',
     reject: 'Ablehnen',
     privacy: 'Datenschutz',

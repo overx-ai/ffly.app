@@ -6,7 +6,6 @@ import {
   OPERATOR,
   OPERATOR_COUNTRY,
   SITE_HOST,
-  WEB_SEARCH,
   externalLink,
   mailto,
 } from '../app';
@@ -27,18 +26,20 @@ const IDS = [
 const { ref, build } = legalSections(IDS);
 
 const APPLE_SUBSCRIPTIONS = 'Settings &rarr; your name &rarr; Subscriptions';
+// Spec 013: true for app 1.0 and v2 alike, so the legal pages never state a number of free searches.
+const LIMITS = 'Free searches and trip size are limited; the current limits are shown in the app and on the site.';
 const appleRefund = externalLink(EXTERNAL.appleRefund, 'reportaproblem.apple.com');
 
 export const TERMS: LegalDocument = {
   pageTitle: 'Terms of Use',
   description:
-    'Terms of Use for the ffly iPhone app: indicative fares, bookings made on airline or booking sites, partner links, the ffly Pro weekly and yearly auto-renewable subscriptions, the one-time Lifetime purchase, and your right to withdraw.',
+    'Terms of Use for the ffly iPhone app: indicative fares, bookings made on airline or booking sites, partner links and offers, the ffly Pro weekly and yearly auto-renewable subscriptions, the one-time Lifetime purchase, and your right to withdraw.',
   summaryTitle: 'The short version',
   summaryText: `ffly helps you plan cheap multi-city trips. It is a search tool, not a travel agent: fares come
     from third-party airline and fare-search websites, prices are indicative, and <strong>Book</strong> opens the
-    airline's site or a booking site, where you book. Some booking links are partner links: ffly may earn a
-    commission, at no extra cost to you. Your first ${APP.freeSearches} searches in the app are free and show every
-    route in full. ${APP.proName} is available as a weekly or yearly auto-renewing subscription, which you manage and
+    airline's site or a booking site, where you book. Some booking links are partner links, and ffly may also show
+    offers from partners; if you book or buy through one, ffly may earn a commission, at no extra cost to you.
+    ${LIMITS} ${APP.proName} is available as a weekly or yearly auto-renewing subscription, which you manage and
     cancel in your Apple ID account settings, or as a one-time ${APP.lifetimeName} purchase that does not renew.`,
   sections: build({
     agreement: {
@@ -70,8 +71,10 @@ export const TERMS: LegalDocument = {
         conditions. That company alone is responsible for the flight, its price, fees, schedule changes,
         cancellations, refunds, baggage and other conditions of carriage. Entry, visa and health requirements are
         your responsibility.</p>
-        <p><strong>Partner links.</strong> Some booking links are partner links. If you book through one, ffly may
-        earn a commission, at no extra cost to you.</p>`,
+        <p><strong>Partner links and offers.</strong> Some booking links are partner links, and ffly may also show
+        offers from partners, such as hotels, eSIMs, travel insurance and airport transfers. If you book or buy
+        through one, ffly may earn a commission, at no extra cost to you, and that partner's terms apply. Partners
+        don't pay for placement; routes follow the priority you choose.</p>`,
     },
     prices: {
       title: 'Prices and Information Are Indicative',
@@ -90,19 +93,19 @@ export const TERMS: LegalDocument = {
     'free-and-pro': {
       title: `Free and ${APP.proName}`,
       content: `
+        <p>${LIMITS}</p>
         <ul>
-          <li><strong>Free:</strong> ${APP.freeSearches} searches in the app, each showing every route in full, with
-          dates, flight times and booking links. Deleting and reinstalling ffly does not reset them. After that,
+          <li><strong>Free:</strong> searches in the app show every route in full, with dates, flight times and
+          booking links. Deleting and reinstalling ffly does not reset your free searches. Once you reach the limit,
           <strong>Find route</strong> offers ${APP.proName} before it searches, and the trips you already searched stay
           in your Trips list.</li>
-          <li><strong>${APP.proName}:</strong> every route in full, and no ${APP.freeSearches}-search limit, as a weekly
-          or yearly subscription (${ref('subscriptions')}) or a one-time ${APP.lifetimeName} purchase
-          (${ref('lifetime')}). ${APP.proName} is subject to fair use: a daily search limit protects ffly and the sites
-          we check fares on.</li>
+          <li><strong>${APP.proName}:</strong> every route in full and higher limits, as a weekly or yearly
+          subscription (${ref('subscriptions')}) or a one-time ${APP.lifetimeName} purchase (${ref('lifetime')}).
+          ${APP.proName} is subject to fair use: a daily search limit protects ffly and the sites we check fares
+          on.</li>
           <li><strong>Web search:</strong> searches at
-          <a href="${pathFor('search')}">${SITE_HOST}${pathFor('search')}</a> are free, limited to
-          ${WEB_SEARCH.freeSearchesPerDay} per day, and show the cities, nights and total price of the
-          top route, and only the price and number of cities of the other routes.</li>
+          <a href="${pathFor('search')}">${SITE_HOST}${pathFor('search')}</a> are free, within the limits shown there.
+          ${APP.proName} also applies to the web search on ${SITE_HOST} if you sign in with the same account.</li>
         </ul>
         <p>We may change the features of Free and ${APP.proName} over time. A change that reduces what a paid plan
         includes takes effect only from your next renewal, after the notice in ${ref('changes')}.</p>`,
@@ -112,7 +115,8 @@ export const TERMS: LegalDocument = {
       content: `
         <ul>
           <li><strong>${APP.proName}</strong> is offered as weekly and yearly auto-renewable subscriptions. The price
-          and length of each subscription are shown in the app, in your local currency, before you buy.</li>
+          and length of each subscription are shown in the app, in your local currency, before you buy, and you pay
+          the price as shown at purchase.</li>
           <li>Payment is charged to your Apple ID account at confirmation of purchase.</li>
           <li>The subscription renews automatically unless it is cancelled at least 24 hours before the end of the
           current period. Your account is charged for renewal within 24 hours before the end of the current
@@ -137,7 +141,8 @@ export const TERMS: LegalDocument = {
         <ul>
           <li>It is a <strong>one-time payment</strong>, charged to your Apple ID account at confirmation of
           purchase. It does not renew and there is no recurring charge.</li>
-          <li>The price is set by country on the App Store and is shown in the app before you confirm.</li>
+          <li>The price is set by country on the App Store and is shown in the app before you confirm; you pay the
+          price as shown at purchase.</li>
           <li>It restores on other devices signed in to the same Apple ID through <strong>Restore
           purchases</strong>.</li>
           <li><strong>Buying ${APP.lifetimeName} does not cancel an existing ${APP.proName} subscription.</strong>
@@ -249,7 +254,8 @@ export const TERMS: LegalDocument = {
       title: 'Termination',
       content: `
         <p>You may stop using ffly at any time by deleting the app; to stop paying, cancel your subscription as
-        described in ${ref('subscriptions')}. We may suspend access to the service for anyone who breaches these
+        described in ${ref('subscriptions')}. If you signed in, you can delete your account in the app's Settings or
+        by writing to ${mailto(CONTACT_EMAIL)}. We may suspend access to the service for anyone who breaches these
         Terms.</p>`,
     },
     privacy: {

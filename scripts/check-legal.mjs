@@ -47,6 +47,17 @@ function inventoryLabels(yaml) {
 }
 const LABELS = existsSync(INVENTORY) ? inventoryLabels(readFileSync(INVENTORY, 'utf8')) : PINNED_LABELS;
 
+const CONTACT = appConstant('CONTACT_EMAIL')?.replace(/'/g, '') ?? '';
+const isSet = (initialiser) => initialiser !== undefined && initialiser !== 'undefined';
+const gaId = appConstant('GA_MEASUREMENT_ID');
+const gaOn = isSet(gaId);
+const adNetwork = appConstant('AD_NETWORK_SCRIPT');
+const adNetworkOn = isSet(adNetwork);
+const adNetworkSrc = adNetworkOn ? adNetwork.slice(1, -1) : undefined;
+const adNetworkHost = adNetworkSrc ? new URL(adNetworkSrc).host : undefined;
+// Spec 013: the banner, Cookie settings and the consent cookie exist while anything waits for consent.
+const consentOn = gaOn || adNetworkOn;
+
 const failures = [];
 
 function check(ok, message) {
@@ -68,6 +79,8 @@ function copyText(text) {
 function readHtml(page) {
   return readFileSync(`${DIST}${page ? `${page}/` : ''}index.html`, 'utf8');
 }
+
+const mainOf = (page) => readHtml(page).match(/<main\b[\s\S]*?<\/main>/)?.[0] ?? '';
 
 // A missing section is itself a failure, so the "must not" checks cannot pass on an empty string.
 function readPage(page) {
@@ -95,8 +108,8 @@ const REPRESENTED = Boolean(placeholderValue('EU_REPRESENTATIVE') || placeholder
 const PRIVACY_IDS = [
   'who-we-are', ...(REPRESENTED ? ['representatives'] : []), 'app-store-labels', 'not-collected', 'searches', 'app-user-id', 'ip-address',
   'purchases', 'analytics', 'crash-performance', 'attribution', 'live-activity', 'feedback', 'on-device',
-  'booking-links', 'web-search', 'website', 'legal-bases', 'sharing', 'transfers', 'security', 'retention', 'rights',
-  'ccpa', 'children', 'changes', 'contact',
+  'booking-links', 'partner-offers', 'account', 'web-search', 'website', 'legal-bases', 'sharing', 'transfers',
+  'security', 'retention', 'rights', 'ccpa', 'children', 'changes', 'contact',
 ];
 const TERMS_IDS = [
   'agreement', 'service', 'not-a-travel-agent', 'prices', 'free-and-pro', 'subscriptions', 'lifetime', 'withdrawal',
@@ -135,6 +148,29 @@ for (const clause of ['acknowledge', 'licence', 'maintenance and support', 'warr
 check(/mandatory/.test(terms('liability')), 'Terms: liability needs the mandatory-law carve-out');
 check(/30 days/.test(terms('changes')), 'Terms: material changes need 30 days\' notice');
 check(/consumer/.test(terms('governing-law')) && /courts/.test(terms('governing-law')), 'Terms: governing law needs the courts and the consumer carve-out');
+// Spec 013: every line holds for app 1.0 (free searches counted on the device, no accounts) and for v2 (accounts, new
+// limits, partner offers), so no limit is stated as a number.
+const LIMITS = 'Free searches and trip size are limited; the current limits are shown in the app and on the site.';
+const termsSummary = copyText(plainText(termsHtml.match(/<aside class="summary"[^>]*>([\s\S]*?)<\/aside>/)?.[1] ?? ''));
+check(termsSummary.includes(LIMITS) && copyText(terms('free-and-pro')).includes(LIMITS), 'Terms: the summary and #free-and-pro must give the limits sentence');
+check(/if you sign in with the same account/.test(terms('free-and-pro')), 'Terms: #free-and-pro must say Pro applies to the web search if you sign in with the same account');
+for (const id of ['subscriptions', 'lifetime']) check(/as shown at purchase/.test(terms(id)), `Terms: #${id} must charge the price as shown at purchase`);
+const notAgent = copyText(terms('not-a-travel-agent'));
+check(
+  /hotels, eSIMs, travel insurance and airport transfers/.test(notAgent) && /ffly may earn a commission, at no extra cost to you, and that partner's terms apply/.test(notAgent),
+  "Terms: #not-a-travel-agent must disclose partner offers, the commission and the partner's terms",
+);
+check(notAgent.includes("Partners don't pay for placement; routes follow the priority you choose."), 'Terms: #not-a-travel-agent must say partners never pay for placement');
+const termination = copyText(terms('termination'));
+check(/delete your account in the app's Settings/.test(termination) && termination.includes(CONTACT), 'Terms: #termination must say how to delete an account');
+const SEARCH_COUNT = /\b\d+ (?:free )?searches\b|\b\d+-search\b/i;
+const PER_DAY = /\b\d+ (?:[a-z-]+ ){0,2}(?:a|per) day\b/i;
+for (const page of ['terms', 'privacy']) {
+  const counted = plainText(mainOf(page))
+    .split(/(?<=[.;:])\s/)
+    .filter((sentence) => SEARCH_COUNT.test(sentence) || (/search/i.test(sentence) && PER_DAY.test(sentence)));
+  check(counted.length === 0, `${page}: must state no free-search count, found "${counted[0]}"`);
+}
 const general = terms('general');
 for (const [term, what] of [[/unenforceable/, 'severability'], [/transfer/, 'assignment'], [/whole agreement/, 'entire agreement'], [/not a waiver/, 'no waiver']]) {
   check(term.test(general), `Terms: #general must carry ${what}`);
@@ -193,14 +229,22 @@ check(!/your installation identifier\.?<\/li>/.test(privacyHtml.match(/id="feedb
 check(/nothing that identifies you/.test(privacy('searches')), 'Privacy: fare sources must be said to get nothing that identifies you');
 check(!/not linked to your identity/.test(privacy('searches')), 'Privacy: trip searches must not be called unlinked');
 check(/same for every ffly user/.test(privacy('booking-links')), 'Privacy: the partner identifier must be said to be ffly-wide');
+check(/ffly may earn a commission/.test(privacy('partner-offers')), 'Privacy: #partner-offers must disclose the commission');
+const account = copyText(privacy('account'));
+for (const term of ['Apple', 'Google', 'private relay', "delete it in the app's Settings", CONTACT]) {
+  check(account.includes(term), `Privacy: #account must name ${term}`);
+}
+for (const id of ['app-user-id', 'ip-address', 'on-device', 'retention']) {
+  check(/per device \(your installation\), per account if you sign in, or per IP address/.test(privacy(id)), `Privacy: #${id} must say how free searches and fair use are counted`);
+}
 // Spec 003: the web search remembers places in functional cookies, never dates; notifications only on request.
 const website = privacy('website');
 check(/cookies/.test(website) && /never remembers your travel dates/.test(website), 'Privacy: #website must cover the search cookies and say dates are never kept');
 check(/pick a language/.test(website), 'Privacy: #website must say the language choice is remembered (spec 012)');
-// The consent cookie exists only while the banner does (GA_MEASUREMENT_ID set).
+// The consent cookie exists only while the banner does.
 const consentCookie = appConstant('CONSENT')?.match(/cookie: '([^']+)'/)?.[1];
 const siteCookies = [...source('src/app.ts').matchAll(/cookie: '([^']+)'/g)].map(([, name]) => name)
-  .filter((name) => name !== consentCookie || appConstant('GA_MEASUREMENT_ID') !== 'undefined');
+  .filter((name) => name !== consentCookie || consentOn);
 for (const cookie of siteCookies) {
   check(website.includes(cookie), `Privacy: #website must name the cookie ${cookie}`);
 }
@@ -246,9 +290,8 @@ for (const [page, id] of [['privacy', 'who-we-are'], ['privacy', 'contact'], ['t
 }
 
 // Owner, 2026-10-07: the operator is a person; OverX is named only by the footer credit and the contact address.
-const CONTACT = appConstant('CONTACT_EMAIL')?.replace(/'/g, '') ?? '';
 for (const page of ['privacy', 'terms', 'support']) {
-  const main = readHtml(page).match(/<main\b[\s\S]*?<\/main>/)?.[0] ?? '';
+  const main = mainOf(page);
   check(main !== '' && !/overx/i.test(main.replaceAll(CONTACT, '')), `${page}: must not mention OverX (the contact address aside)`);
 }
 // App Free is full since spec 016: nothing may call its routes hidden or blurred.
@@ -392,17 +435,13 @@ function cspAgrees(hosts, on, constant) {
 // Ads (spec 003): no consent or ad script while ADSENSE_CLIENT is unset, and AdSense never before the consent message.
 const adsenseClient = appConstant('ADSENSE_CLIENT');
 check(adsenseClient !== undefined, 'src/app.ts: the ADSENSE_CLIENT declaration was not found, so the ads checks cannot run');
-const adNetwork = appConstant('AD_NETWORK_SCRIPT');
 check(adNetwork !== undefined, 'src/app.ts: the AD_NETWORK_SCRIPT declaration was not found, so the ads checks cannot run');
-const adNetworkOn = adNetwork !== undefined && adNetwork !== 'undefined';
 const adsenseOff = adsenseClient === 'undefined';
-const adNetworkSrc = adNetworkOn ? adNetwork.slice(1, -1) : undefined;
 const AD_SCRIPT = 'pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
 const CONSENT_SCRIPT = 'fundingchoicesmessages.google.com/i/';
 for (const [file, html] of htmlPages) {
-  if (adNetworkSrc) {
-    check([adNetworkSrc, adNetworkSrc.replace(/&/g, '&amp;')].some((src) => html.includes(`src="${src}"`)), `${file}: the AD_NETWORK_SCRIPT loader is missing`);
-  }
+  // Founder, 2026-10-15: the partner script loads only from the consent module after Accept, never from the page.
+  if (adNetworkSrc) check(!html.includes(adNetworkHost), `${file}: the AD_NETWORK_SCRIPT host must not appear in the page`);
   if (adsenseOff) {
     check(!/googlesyndication|fundingchoicesmessages|adsbygoogle/.test(html), `${file}: an ad or consent script loads while ADSENSE_CLIENT is unset`);
   } else {
@@ -419,14 +458,22 @@ const AD_CSP = {
   'img-src': ['pagead2.googlesyndication.com', 'tpc.googlesyndication.com', 'googleads.g.doubleclick.net', 'www.google.com', 'fundingchoicesmessages.google.com'],
 };
 cspAgrees(AD_CSP, !adsenseOff, 'ADSENSE_CLIENT');
-if (adNetworkSrc) cspAgrees({ 'script-src': [new URL(adNetworkSrc).host] }, true, 'AD_NETWORK_SCRIPT');
+if (adNetworkSrc) cspAgrees({ 'script-src': [adNetworkHost] }, true, 'AD_NETWORK_SCRIPT');
 check(/shows no ads/.test(website) === adsenseOff, 'Privacy: #website must say "shows no ads" exactly while ADSENSE_CLIENT is unset');
-check(/booking partner/.test(website) === adNetworkOn, 'Privacy: #website must disclose the booking partner\'s script exactly while AD_NETWORK_SCRIPT is set');
+check(
+  adNetworkOn ? /booking partner's script only if you choose Accept/.test(copyText(website)) : !/booking partner/.test(website),
+  "Privacy: #website must say the booking partner's script loads only after Accept, exactly while AD_NETWORK_SCRIPT is set",
+);
+check(
+  /booking partner's script on this website only with your consent/.test(copyText(legalBases)) === adNetworkOn &&
+    (legalBases.match(/booking partner/g) ?? []).length === (adNetworkOn ? 1 : 0),
+  "Privacy: #legal-bases must put the booking partner's script on consent alone, exactly while AD_NETWORK_SCRIPT is set",
+);
+const gpc = ccpa.match(/This website honours the Global Privacy Control signal[^.]*\./)?.[0];
+check(gpc !== undefined && !/except|does not stop/.test(gpc), 'Privacy: #ccpa must honour the Global Privacy Control signal with no exception');
 
 // Analytics (spec 004): gtag.js only ever loads from the bundled consent module after Accept, never from page HTML.
-const gaId = appConstant('GA_MEASUREMENT_ID');
 check(gaId !== undefined, 'src/app.ts: the GA_MEASUREMENT_ID declaration was not found, so the analytics checks cannot run');
-const gaOn = gaId !== undefined && gaId !== 'undefined';
 const GA_CSP = {
   'script-src': ['www.googletagmanager.com'],
   'connect-src': ['*.google-analytics.com', '*.analytics.google.com', '*.googletagmanager.com'],
@@ -436,8 +483,8 @@ cspAgrees(GA_CSP, gaOn, 'GA_MEASUREMENT_ID');
 for (const [file, html] of htmlPages) {
   check(!/googletagmanager|gtag\(/.test(html), `${file}: Google Analytics must load only from the consent module, never from the page`);
   const [banner = '', inner = ''] = html.match(/<div id="consent"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/) ?? [];
-  if (!gaOn) {
-    check(!banner && !html.includes('data-consent-open'), `${file}: no consent banner or Cookie settings while GA_MEASUREMENT_ID is unset`);
+  if (!consentOn) {
+    check(!banner && !html.includes('data-consent-open'), `${file}: no consent banner or Cookie settings while GA_MEASUREMENT_ID and AD_NETWORK_SCRIPT are unset`);
     continue;
   }
   check(/^<div[^>]*\brole="region"[^>]*\shidden\b/.test(banner), `${file}: the consent banner must be a region, hidden until the script shows it`);
@@ -448,10 +495,19 @@ for (const [file, html] of htmlPages) {
   check(inner.includes('href="/privacy#website"'), `${file}: the consent banner must link /privacy#website`);
   if (html.includes('<footer')) check(html.includes('data-consent-open'), `${file}: the footer must carry Cookie settings`);
 }
+// Consent is specific (spec 013): the banner names each purpose that waits for it, and no other.
+const homeBanner = readHtml('').match(/<div id="consent"[\s\S]*?<\/p>/)?.[0] ?? '';
 check(
-  (/Google Analytics/.test(website) && /Cookie settings/.test(website) && /withdraw your consent/.test(website) &&
-    /measure visits to this website only with your consent/.test(legalBases)) === gaOn,
-  'Privacy: #website must cover analytics consent and Cookie settings, and #legal-bases consent, exactly while GA_MEASUREMENT_ID is set',
+  /measure visits/.test(homeBanner) === gaOn && /flight booking partner/.test(homeBanner) === adNetworkOn,
+  'Home: the consent banner must name analytics exactly while GA_MEASUREMENT_ID is set, and the partner script exactly while AD_NETWORK_SCRIPT is set',
+);
+check(
+  (/Google Analytics/.test(website) && /measure visits to this website only with your consent/.test(legalBases)) === gaOn,
+  'Privacy: #website must cover analytics, and #legal-bases its consent, exactly while GA_MEASUREMENT_ID is set',
+);
+check(
+  (/Cookie settings/.test(website) && /withdraw your consent/.test(website) && /Global Privacy Control/.test(website)) === consentOn,
+  'Privacy: #website must cover the banner, Global Privacy Control and Cookie settings exactly while anything waits for consent',
 );
 check(/runs no analytics/.test(website) !== gaOn, 'Privacy: #website must say "runs no analytics" exactly while GA_MEASUREMENT_ID is unset');
 
@@ -561,6 +617,7 @@ check(
   'Bundle: places.json must be fetched as /places.json?v={places_version}&l={site languages}',
 );
 check(bundle.includes('googletagmanager.com/gtag/js') === gaOn, 'Bundle: the consent module must carry gtag.js exactly while GA_MEASUREMENT_ID is set');
+if (adNetworkSrc) check(bundle.includes(adNetworkSrc), 'Bundle: the consent module must carry the AD_NETWORK_SCRIPT loader while it is set');
 
 // No page names a vendor (Apple aside) or describes how ffly works inside. /privacy and /terms alone name the
 // processors that handle app or visitor data (NAMED_PROCESSORS, owner 2026-10-07); every other recipient stays a
@@ -569,8 +626,10 @@ check(bundle.includes('googletagmanager.com/gtag/js') === gaOn, 'Bundle: the con
 const WIDGET_COPY = { 'coverage notice': ['messages', 'coverage'], 'poll retry line': ['messages', 'reconnecting'] };
 // Lookbehind rather than \b: \b is ASCII-only, so it would find "server" inside the French "réserver".
 const bannedTerm = (term) => new RegExp(`(?<![\\p{L}\\p{N}])${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'iu');
+// Partner offers name no partner on any page (spec 013); these sell through the Trip kit (1B-bots spec 574).
+const TRIP_KIT_PARTNERS = ['Trip.com', 'Agoda', 'Yesim', 'EKTA', 'KiwiTaxi', 'Welcome Pickups'];
 const MECHANICS = [
-  ...['AZair', 'Aviasales', 'Travelpayouts', 'Telegram', 'Vercel'].map((name) => [name, `the vendor ${name}`]),
+  ...['AZair', 'Aviasales', 'Travelpayouts', 'Telegram', 'Vercel', ...TRIP_KIT_PARTNERS].map((name) => [name, `the vendor ${name}`]),
   ...['cache', 'Keychain', 'server', 'memory', 'database', 'restart', 'endpoint', 'background', 'bundle id', 'install id', 'request id', 'ai.overx.ffly']
     .map((term) => [term, `the technical term "${term}"`]),
   ...['up to 8', 'up to 3 places', 'must or a maybe'].map((phrase) => [phrase, `the mechanics phrase "${phrase}"`]),
@@ -707,7 +766,7 @@ const PROCESSOR_POLICIES = {
   Apple: 'https://www.apple.com/legal/privacy/',
   RevenueCat: 'https://www.revenuecat.com/privacy/',
   AppsFlyer: 'https://www.appsflyer.com/legal/privacy-policy/',
-  ...(gaOn ? { Google: 'https://policies.google.com/privacy' } : {}),
+  Google: 'https://policies.google.com/privacy',
 };
 const sharing = privacy('sharing');
 for (const [name, policy] of Object.entries(PROCESSOR_POLICIES)) {

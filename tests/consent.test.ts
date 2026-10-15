@@ -35,8 +35,10 @@ class CookieJar {
 
 describe('choice cookie', () => {
   it('stores the choice for every page, for six months', () => {
-    expect(choiceCookie('granted')).toBe(`${CONSENT.cookie}=granted; Max-Age=${182 * 86400}; Path=/; SameSite=Lax; Secure`);
-    expect(choiceCookie('denied')).toMatch(/^ffly_consent=denied; .*Path=\//);
+    expect(choiceCookie('granted')).toBe(
+      `${CONSENT.cookie}=granted.${CONSENT.revision}; Max-Age=${182 * 86400}; Path=/; SameSite=Lax; Secure`,
+    );
+    expect(choiceCookie('denied').startsWith(`${CONSENT.cookie}=denied.${CONSENT.revision}; `)).toBe(true);
   });
 
   it('reads back what it wrote and ignores anything else', () => {
@@ -46,16 +48,20 @@ describe('choice cookie', () => {
     expect(readChoice(jar.header)).toBe('denied');
     jar.set(choiceCookie('granted'));
     expect(readChoice(jar.header)).toBe('granted');
-    expect(readChoice('ffly_consent=maybe')).toBeUndefined();
+    expect(readChoice(`${CONSENT.cookie}=maybe`)).toBeUndefined();
+  });
+
+  it('asks again when the choice was stored before the banner gained a purpose', () => {
+    expect(readChoice(`${CONSENT.cookie}=granted`)).toBeUndefined();
   });
 });
 
 describe('banner', () => {
-  it('shows only while analytics is configured and no choice is stored', () => {
-    expect(shouldShowBanner('G-TEST', undefined)).toBe(true);
-    expect(shouldShowBanner('G-TEST', 'granted')).toBe(false);
-    expect(shouldShowBanner('G-TEST', 'denied')).toBe(false);
-    expect(shouldShowBanner(undefined, undefined)).toBe(false);
+  it('shows only while something waits for consent and no choice is stored', () => {
+    expect(shouldShowBanner(true, undefined)).toBe(true);
+    expect(shouldShowBanner(true, 'granted')).toBe(false);
+    expect(shouldShowBanner(true, 'denied')).toBe(false);
+    expect(shouldShowBanner(false, undefined)).toBe(false);
   });
 
   it('reloads only when consent is withdrawn, so a loaded gtag stops', () => {
@@ -68,7 +74,7 @@ describe('banner', () => {
 
 describe('withdrawal', () => {
   it('finds the analytics cookies and nothing else', () => {
-    expect(analyticsCookies('_ga=GA1.1.1; _ga_JYLD2DWSJG=GS1; _gat=1; _gallery=x; ffly_from=WAW; ffly_consent=granted')).toEqual([
+    expect(analyticsCookies(`_ga=GA1.1.1; _ga_JYLD2DWSJG=GS1; _gat=1; _gallery=x; ffly_from=WAW; ${CONSENT.cookie}=granted.${CONSENT.revision}`)).toEqual([
       '_ga',
       '_ga_JYLD2DWSJG',
     ]);
@@ -92,14 +98,14 @@ describe('withdrawal', () => {
     jar.set(choiceCookie('denied'));
     for (const line of expiryCookies(analyticsCookies(jar.header), 'www.ffly.app')) jar.set(line);
     expect(analyticsCookies(jar.header)).toEqual([]);
-    expect(jar.header).toBe('ffly_from=WAW; ffly_consent=denied');
+    expect(jar.header).toBe(`ffly_from=WAW; ${CONSENT.cookie}=denied.${CONSENT.revision}`);
   });
 });
 
 describe('Global Privacy Control', () => {
   it('counts as Reject until the visitor chooses', () => {
     expect(initialChoice(undefined, true)).toBe('denied');
-    expect(shouldShowBanner('G-TEST', initialChoice(undefined, true))).toBe(false);
+    expect(shouldShowBanner(true, initialChoice(undefined, true))).toBe(false);
   });
 
   it('never overrides a stored choice, and is nothing without the signal', () => {

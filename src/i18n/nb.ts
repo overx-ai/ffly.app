@@ -308,7 +308,9 @@ const nb = {
 
   consent: {
     label: 'Valg av informasjonskapsler',
-    text: 'Vi vil gjerne måle besøk for å forbedre dette nettstedet. Ingenting måles med mindre du godtar.',
+    analytics: 'Vi vil gjerne måle besøk for å forbedre dette nettstedet.',
+    partner: `Et skript fra vår partner for flybestillinger hjelper med å finansiere ${APP.name}.`,
+    ask: 'Ingenting lastes inn med mindre du godtar.',
     accept: 'Godta',
     reject: 'Avvis',
     privacy: 'Personvern',

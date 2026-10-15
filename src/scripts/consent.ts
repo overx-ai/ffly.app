@@ -1,4 +1,4 @@
-import { GA_MEASUREMENT_ID, GTAG_SCRIPT } from '../app';
+import { AD_NETWORK_SCRIPT, CONSENT_NEEDED, GA_MEASUREMENT_ID, GTAG_SCRIPT } from '../app';
 import { CHOICES, analyticsCookies, choiceCookie, expiryCookies, initialChoice, mustReload, readChoice, shouldShowBanner, type Choice } from './consent-state';
 
 declare global {
@@ -8,6 +8,14 @@ declare global {
   interface Navigator {
     globalPrivacyControl?: boolean;
   }
+}
+
+function appendScript(src: string, data: Record<string, string> = {}) {
+  const script = document.createElement('script');
+  script.async = true;
+  Object.assign(script.dataset, data);
+  script.src = src;
+  document.head.append(script);
 }
 
 // Consent Mode v2, basic: nothing from Google loads before Accept, and then only analytics storage is granted.
@@ -26,13 +34,15 @@ function loadAnalytics(id: string) {
   gtag('consent', 'update', { analytics_storage: 'granted' });
   gtag('js', new Date());
   gtag('config', id, { allow_google_signals: false, allow_ad_personalization_signals: false });
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = GTAG_SCRIPT(id);
-  document.head.append(script);
+  appendScript(GTAG_SCRIPT(id));
 }
 
-function start(id: string) {
+function loadConsented() {
+  if (GA_MEASUREMENT_ID) loadAnalytics(GA_MEASUREMENT_ID);
+  if (AD_NETWORK_SCRIPT) appendScript(AD_NETWORK_SCRIPT, { cmpAb: '2' });
+}
+
+function start() {
   const banner = document.getElementById('consent');
   if (!banner) return;
   let choice = initialChoice(readChoice(document.cookie), navigator.globalPrivacyControl === true);
@@ -56,7 +66,7 @@ function start(id: string) {
     banner.hidden = true;
     if (hadFocus) restoreFocus();
     if (mustReload(previous, next)) location.reload();
-    else if (next === 'granted' && previous !== 'granted') loadAnalytics(id);
+    else if (next === 'granted' && previous !== 'granted') loadConsented();
   };
 
   for (const option of CHOICES) {
@@ -71,9 +81,9 @@ function start(id: string) {
   }
 
   // Withdrawal reloads the page: gtag rewrites its cookies as the old page unloads, so they are expired on the new one.
-  if (choice === 'granted') loadAnalytics(id);
+  if (choice === 'granted') loadConsented();
   else for (const cookie of expiryCookies(analyticsCookies(document.cookie), location.hostname)) document.cookie = cookie;
-  banner.hidden = !shouldShowBanner(id, choice);
+  banner.hidden = !shouldShowBanner(CONSENT_NEEDED, choice);
 }
 
-if (GA_MEASUREMENT_ID) start(GA_MEASUREMENT_ID);
+if (CONSENT_NEEDED) start();

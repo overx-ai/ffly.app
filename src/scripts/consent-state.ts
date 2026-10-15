@@ -4,21 +4,20 @@ import { cookieString, parseCookies } from './prefs';
 export const CHOICES = ['granted', 'denied'] as const;
 export type Choice = (typeof CHOICES)[number];
 
-const isChoice = (value: string | undefined): value is Choice => CHOICES.includes(value as Choice);
+const cookieValue = (choice: Choice) => `${choice}.${CONSENT.revision}`;
 
 export function readChoice(cookieHeader: string): Choice | undefined {
   const value = parseCookies(cookieHeader).get(CONSENT.cookie);
-  return isChoice(value) ? value : undefined;
+  return CHOICES.find((choice) => cookieValue(choice) === value);
 }
 
 // Global Privacy Control counts as Reject until the visitor chooses otherwise in Cookie settings (/privacy #ccpa).
 export const initialChoice = (stored: Choice | undefined, globalPrivacyControl: boolean): Choice | undefined =>
   stored ?? (globalPrivacyControl ? 'denied' : undefined);
 
-export const choiceCookie = (choice: Choice) => cookieString(CONSENT, choice);
+export const choiceCookie = (choice: Choice) => cookieString(CONSENT, cookieValue(choice));
 
-export const shouldShowBanner = (measurementId: string | undefined, choice: Choice | undefined) =>
-  Boolean(measurementId) && choice === undefined;
+export const shouldShowBanner = (consentNeeded: boolean, choice: Choice | undefined) => consentNeeded && choice === undefined;
 
 export const mustReload = (previous: Choice | undefined, next: Choice) => previous === 'granted' && next === 'denied';
 

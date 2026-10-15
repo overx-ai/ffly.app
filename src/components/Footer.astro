@@ -1,5 +1,5 @@
 ---
-import { CONTACT_EMAIL, DEVELOPER, GA_MEASUREMENT_ID, PUBLISHER } from '../app';
+import { CONSENT_NEEDED, CONTACT_EMAIL, DEVELOPER, PUBLISHER } from '../app';
 import LanguageLinks from './LanguageLinks.astro';
 import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
 import { hreflangOf, pathFor, type Slug } from '../site-pages';
@@ -26,7 +26,7 @@ const pageLinks = [
       {pageLinks.map((link) => (
         <a href={pathFor(link.slug, lang)} hreflang={hreflangOf(link.slug, lang)}>{link.label}</a>
       ))}
-      {GA_MEASUREMENT_ID && <button type="button" data-consent-open>{t.consent.settings}</button>}
+      {CONSENT_NEEDED && <button type="button" data-consent-open>{t.consent.settings}</button>}
       <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
       <span>&copy; {year} {DEVELOPER}</span>
       <span>{footer.createdBy} <a href={PUBLISHER.url} rel="noopener">{PUBLISHER.label}</a></span>

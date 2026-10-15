@@ -308,7 +308,9 @@ const nl = {
 
   consent: {
     label: 'Cookiekeuze',
-    text: 'We willen bezoeken meten om deze site te verbeteren. Er wordt niets gemeten tenzij je accepteert.',
+    analytics: 'We willen bezoeken meten om deze site te verbeteren.',
+    partner: `Een script van onze partner voor vluchtboekingen helpt ${APP.name} te financieren.`,
+    ask: 'Er wordt niets geladen tenzij je accepteert.',
     accept: 'Accepteren',
     reject: 'Weigeren',
     privacy: 'Privacy',

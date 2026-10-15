@@ -3,6 +3,7 @@ import {
   ADSENSE_CLIENT,
   APP,
   CONSENT,
+  CONSENT_NEEDED,
   CONTACT_EMAIL,
   EU_REPRESENTATIVE,
   EXTERNAL,
@@ -24,8 +25,9 @@ import type { LegalDocument } from './types';
 // #app-store-labels is ios-ffly/Template/PrivacyInfo.xcprivacy and docs/compliance/data-inventory.yaml, in Apple's
 // names: scripts/check-legal.mjs reads the inventory and fails on any difference. Change one, change all three, and
 // the App Store Connect privacy answers. Only this page and /terms name processors (Apple, RevenueCat, AppsFlyer,
-// Google); every other recipient is a category. The website's ad copy follows ADSENSE_CLIENT, its booking-partner
-// script copy AD_NETWORK_SCRIPT, its analytics copy GA_MEASUREMENT_ID.
+// Google); every other recipient is a category, and no partner is ever named. The website's ad copy follows
+// ADSENSE_CLIENT, its booking-partner script copy AD_NETWORK_SCRIPT, its analytics copy GA_MEASUREMENT_ID. Spec 013:
+// every line holds for app 1.0 (no accounts) and v2, so sign-in and partner offers are always conditional.
 const ADS = Boolean(ADSENSE_CLIENT);
 const PARTNER = Boolean(AD_NETWORK_SCRIPT);
 const ANALYTICS = Boolean(GA_MEASUREMENT_ID);
@@ -45,8 +47,8 @@ const REPRESENTATIVE_ROWS = REPRESENTATIVES.map(([role, who]) => `
 const ALL_IDS = [
   'who-we-are', 'representatives', 'app-store-labels', 'not-collected', 'searches', 'app-user-id', 'ip-address',
   'purchases', 'analytics', 'crash-performance', 'attribution', 'live-activity', 'feedback', 'on-device',
-  'booking-links', 'web-search', 'website', 'legal-bases', 'sharing', 'transfers', 'security', 'retention', 'rights',
-  'ccpa', 'children', 'changes', 'contact',
+  'booking-links', 'partner-offers', 'account', 'web-search', 'website', 'legal-bases', 'sharing', 'transfers',
+  'security', 'retention', 'rights', 'ccpa', 'children', 'changes', 'contact',
 ] as const;
 const IDS = ALL_IDS.filter((id) => id !== 'representatives' || REPRESENTATIVES.length > 0);
 const { number, ref, build } = legalSections(IDS);
@@ -61,13 +63,19 @@ const CONSENT_BASES = [
   "Apple's advertising identifier, only after you choose <strong>Allow</strong> when ffly asks (App Tracking Transparency)",
   `attribution with AppsFlyer in the EEA, the UK and Switzerland, only after you turn on ${AD_MEASUREMENT}`,
   ...(ANALYTICS ? ['we measure visits to this website only with your consent'] : []),
+  ...(PARTNER ? ["we load our flight booking partner's script on this website only with your consent"] : []),
   ...(ADS ? ['we show personalised ads on this website only with your consent'] : []),
 ];
+
+const QUOTAS = `Free searches and the ${APP.proName} fair-use limit are counted per device (your installation), per
+  account if you sign in, or per IP address.`;
 
 const GOOGLE_ROLES = [
   ...(ANALYTICS ? ['measures visits to this website with Google Analytics'] : []),
   ...(ADS ? ['shows ads on this website with Google AdSense'] : []),
 ];
+
+const DELETE_ACCOUNT = `If you have an account, you can delete it in the app's Settings, or by writing to ${mailto(CONTACT_EMAIL)}.`;
 
 const CONTACT_ROWS = `
           <li><strong>Controller:</strong> ${OPERATOR}</li>
@@ -76,16 +84,18 @@ const CONTACT_ROWS = `
 
 export const PRIVACY: LegalDocument = {
   pageTitle: 'Privacy Policy',
-  description: `How the ffly iPhone app and ${SITE_HOST} handle your data: no account, no location, the advertising identifier only if you allow tracking, and searches in the app deleted within ${SERVICE.searchRetentionHours} hours.`,
+  description: `How the ffly iPhone app and ${SITE_HOST} handle your data: no account needed, sign-in only if you choose it, no location, the advertising identifier only if you allow tracking, and searches in the app deleted within ${SERVICE.searchRetentionHours} hours.`,
   summaryTitle: 'The short version',
-  summaryText: `ffly has no account and no sign-in. We don't collect your name, phone number or location, and we
-    get your email address only if you add it to feedback. To find routes, we receive the trip you search for. We
+  summaryText: `ffly works without an account. If you choose to sign in with Apple or Google, we keep your email
+    address and an account identifier, so your plan applies wherever you sign in. We don't collect your name, phone
+    number or location, and we get your email address only if you add it to feedback or sign in. To find routes, we receive the trip you search for. We
     delete a search from the app within ${SERVICE.searchRetentionHours} hours, and keep a web search's result, with
     nothing that identifies you, until the trip starts, so its link keeps working. We collect usage analytics, crash
     and performance data to improve the app. If you allow tracking, ffly uses Apple's advertising identifier, with
     AppsFlyer, to measure which ads bring people to ffly; in the EEA, the UK and Switzerland, AppsFlyer uses your data
-    only after you also turn on Ad measurement. The app shows no ads${ADS ? ', and this website shows ads only after you choose' : ''}.
-    Apple handles payments. We never sell your data for money.`,
+    only after you also turn on Ad measurement. The app shows no ads, apart from the partner offers ffly may show for
+    your trip${ADS ? ', and this website shows ads only after you choose' : ''}. If you buy through a partner, ffly may
+    earn a commission. Apple handles payments. We never sell your data for money.`,
   sections: build({
     'who-we-are': {
       title: 'Who We Are',
@@ -114,8 +124,9 @@ export const PRIVACY: LegalDocument = {
           <li><strong>Data used to track you:</strong> ${label('Device ID')} (Apple's advertising identifier, only if you
           allow tracking; ${ref('attribution')}).</li>
           <li><strong>Data linked to you:</strong> ${label('Search History')} (your trip searches), ${label('Purchase History')}
-          (your ${APP.proName} purchases), ${label('User ID')} (a random identifier for your installation, not your Apple
-          ID), ${label('Email Address')} (only if you add one to feedback), ${label('Customer Support')} (the feedback you
+          (your ${APP.proName} purchases), ${label('User ID')} (a random identifier for your installation, or your account if
+          you sign in, never your Apple ID), ${label('Email Address')} (only if you add one to feedback or sign in),
+          ${label('Customer Support')} (the feedback you
           send) and ${label('Device ID')} (the device identifiers in ${ref('analytics')}).</li>
           <li><strong>Data not linked to you:</strong> ${label('Product Interaction')} (how the app is used),
           ${label('Crash Data')} and ${label('Performance Data')} (${ref('crash-performance')}).</li>
@@ -125,13 +136,14 @@ export const PRIVACY: LegalDocument = {
       title: 'What We Do Not Collect',
       content: `
         <ul>
-          <li><strong>No account.</strong> There's no sign-up, so we hold no name, phone number, password or
-          profile.</li>
+          <li><strong>No account needed.</strong> ffly works without signing up, and we hold no name, phone number,
+          password or profile. If you choose to sign in, we keep only what ${ref('account')} lists.</li>
           <li><strong>No location.</strong> You pick places by name.</li>
           <li><strong>No contacts, photos or files</strong> from your iPhone.</li>
           <li><strong>No payment details.</strong> Apple handles every payment. We never see your card or your
           Apple ID password.</li>
-          <li><strong>No ads in the app</strong>, and no sale of your data for money (${ref('ccpa')}).</li>
+          <li><strong>No ads in the app</strong>, apart from the partner offers ffly may show for your trip
+          (${ref('partner-offers')}), and no sale of your data for money (${ref('ccpa')}).</li>
         </ul>`,
     },
     searches: {
@@ -154,15 +166,17 @@ export const PRIVACY: LegalDocument = {
             `count your free searches and apply the daily fair-use limit of ${APP.proName}`,
           ])}
         </ul>
-        <p>RevenueCat keeps your purchases under it, so we treat it as linked to you. It is never sent to AppsFlyer.</p>`,
+        <p>${QUOTAS} RevenueCat keeps your purchases under this identifier, or under your account if you sign in, so
+        we treat it as linked to you. It is never sent to AppsFlyer.</p>`,
     },
     'ip-address': {
       title: 'Your IP Address',
       content: `
         <p>Like any internet service, we receive the IP address your connection comes from. We use it only to
-        apply daily free-search limits and to protect ffly from abuse, such as floods of messages. We don't use it
+        apply search limits and to protect ffly from abuse, such as floods of messages. We don't use it
         to locate you or to build a profile of you. The companies in ${ref('sharing')} also see it when ffly or this
-        website connects to them.</p>`,
+        website connects to them.</p>
+        <p>${QUOTAS}</p>`,
     },
     purchases: {
       title: 'Subscriptions and Purchases',
@@ -171,7 +185,7 @@ export const PRIVACY: LegalDocument = {
         ${APP.lifetimeName} purchase. Apple handles the payment, under
         ${externalLink(EXTERNAL.applePrivacy, "Apple's Privacy Policy")}.</p>
         <p>Our subscription provider, RevenueCat, confirms and restores your purchases for us. It receives your
-        installation identifier, the details of your ${APP.proName} purchases (product, price, dates and status, as
+        installation identifier, or your account identifier if you sign in, the details of your ${APP.proName} purchases (product, price, dates and status, as
         Apple reports them), your IP address and the device identifiers in ${ref('analytics')}, never your name,
         email address or card. It keeps your purchases under your identifier, so we treat your purchase history as
         linked to you. RevenueCat also passes subscription events, such as a purchase, a renewal or a cancellation, to
@@ -206,7 +220,7 @@ export const PRIVACY: LegalDocument = {
       title: 'Advertising Attribution',
       content: `
         <p>We want to know which ads and links bring people to ffly, so we spend on the ones that work. This is
-        measurement, not targeting: the app shows no ads, and nothing here decides what you see.</p>
+        measurement, not targeting: nothing here decides what ffly shows you.</p>
         <ul>
           <li><strong>Apple Search Ads.</strong> If you found ffly through an ad on the App Store, Apple gives the app a
           short-lived token, which ffly sends to us once and which we exchange with Apple for the campaign, ad group
@@ -267,15 +281,16 @@ export const PRIVACY: LegalDocument = {
         <ul>
           <li><strong>Trips:</strong> your saved searches and their results. Swipe a trip in the Trips list to
           delete it.</li>
-          <li><strong>Free-search count:</strong> how many free searches you've used. It stays on your iPhone even
-          after you delete the app, so reinstalling doesn't reset it.</li>
+          <li><strong>Free-search count:</strong> how many free searches you've used on this iPhone. It stays on your
+          iPhone even after you delete the app, so reinstalling doesn't reset it.</li>
           <li><strong>App settings:</strong> things like whether you've finished onboarding, your trip defaults and
           your Ad measurement choice.</li>
           <li><strong>Notifications:</strong> ffly can tell you when a search is ready. It asks first, the
           notifications come from your iPhone itself, and you can turn them off in iOS Settings.</li>
         </ul>
         <p>None of this is sent to us. Deleting the app removes it, except the free-search count and the installation
-        identifier in ${ref('analytics')}.</p>`,
+        identifier in ${ref('analytics')}.</p>
+        <p>${QUOTAS}</p>`,
     },
     'booking-links': {
       title: 'Booking Links and Other Websites',
@@ -286,6 +301,35 @@ export const PRIVACY: LegalDocument = {
         <p>For some fares, <strong>Book</strong> opens a booking partner's site, which may set its own cookies.
         That link carries ffly's partner identifier, so the partner can pay ffly a commission if you book, at no
         extra cost to you. The identifier is the same for every ffly user: it identifies ffly, not you.</p>`,
+    },
+    'partner-offers': {
+      title: 'Partner Offers',
+      content: `
+        <p>ffly may show offers from partners: a flight booking partner, and hotel, eSIM, travel insurance and airport
+        transfer partners. Opening an offer takes you to that partner's site, whose own terms and privacy policy
+        apply and which may set its own cookies. If you book or buy through one, ffly may earn a commission, at no
+        extra cost to you.</p>
+        <p>A partner link may carry an anonymous tag that names only the platform (the app or this website) and the
+        place the offer was shown, so we can count clicks. The tag is the same for every ffly user and never includes
+        anything that identifies you.</p>`,
+    },
+    account: {
+      title: 'Signing In',
+      content: `
+        <p>You can use ffly without an account. If you choose to sign in, you do so through our sign-in service, with
+        Apple or Google, which confirms who you are under its own privacy policy (${ref('sharing')}). We then
+        keep:</p>
+        <ul>
+          ${list([
+            'your email address, which with Sign in with Apple may be a private relay address that Apple forwards to you',
+            'an account identifier',
+          ])}
+        </ul>
+        <p>We use them only to apply your plan and limits wherever you sign in, in the app and on this website. We
+        keep them while your account exists and delete them when you delete it, except what the law requires us to
+        keep. ${DELETE_ACCOUNT}</p>
+        <p>On this website, Apple's and Google's sign-in tools load only when you choose to sign in, and signing out
+        removes the website's sign-in cookie.</p>`,
     },
     'web-search': {
       title: `Web Search on ${SITE_HOST}`,
@@ -317,7 +361,7 @@ export const PRIVACY: LegalDocument = {
             `${cookie(PREFS.from.cookie)} and ${cookie(PREFS.back.cookie)}: where you start and come back to, for ${PREFS.from.days} days`,
             `${cookie(PREFS.cities.cookie)}: the cities you picked, for ${PREFS.cities.days} days`,
             `${cookie(PREFS.nudge.cookie)}: which tip about the app it showed you last, for ${PREFS.nudge.days} days`,
-            ...(ANALYTICS ? [`${cookie(CONSENT.cookie)}: your answer to the cookie banner, for about ${CONSENT_MONTHS} months`] : []),
+            ...(CONSENT_NEEDED ? [`${cookie(CONSENT.cookie)}: your answer to the cookie banner, for about ${CONSENT_MONTHS} months`] : []),
           ])}
         </ul>
         <p>It never remembers your travel dates. It also keeps the list of cities in your browser's storage, so the
@@ -331,11 +375,12 @@ export const PRIVACY: LegalDocument = {
         at any time from the link the consent message adds to the page. Google receives your IP address and details
         of your browser and device, and may set its own cookies.</p>`
           : ''}
-        ${ADS ? '' : '<p>This website shows no ads.</p>'}
+        ${ADS ? '' : `<p>This website shows no ads, apart from the partner offers ffly may show for your trip (${ref('partner-offers')}).</p>`}
         ${PARTNER
-          ? `<p>Every page of this website loads a script from our booking partner, which can pay ffly a commission
-        when you book with it, at no extra cost to you. Loading it sends the partner your IP address and details of
-        your browser and device, and it keeps a small note in your browser's storage. It sets no cookies.</p>`
+          ? `<p>This website loads our flight booking partner's script only if you choose <strong>Accept</strong> in
+        the banner. The partner can pay ffly a commission when you book with it, at no extra cost to you. Loading the
+        script sends the partner your IP address and details of your browser and device, and it keeps a small note in
+        your browser's storage. It sets no cookies.</p>`
           : ''}
         ${ANALYTICS
           ? `<p>If you agree, this website uses Google Analytics, from Google, to measure visits, so we can see what
@@ -343,14 +388,16 @@ export const PRIVACY: LegalDocument = {
         type, and your approximate location, worked out from your IP address. Google receives your IP address and
         details of your browser and device, and sets the cookies ${GA_COOKIES.map(cookie).join(' and ')} to tell
         visits apart, for about 2 years. We have turned off Google's advertising features and signals, so this is not
-        used for advertising and builds no profile of you across other websites.
-        ${externalLink(EXTERNAL.googlePartnerSites, 'How Google uses data from sites that use its services')}.</p>
-        <p>Nothing is measured until you choose <strong>Accept</strong> in the banner, and if you choose
-        <strong>Reject</strong>, nothing loads. If your browser sends the Global Privacy Control signal, this website
-        treats it as <strong>Reject</strong> and doesn't show the banner. To change your choice or withdraw your
-        consent, choose <strong>Cookie settings</strong> at the bottom of any page. Withdrawing removes the analytics
-        cookies.</p>`
+        used for advertising and builds no profile of you across other websites. Nothing is measured until you choose
+        <strong>Accept</strong> in the banner.
+        ${externalLink(EXTERNAL.googlePartnerSites, 'How Google uses data from sites that use its services')}.</p>`
           : '<p>This website runs no analytics.</p>'}
+        ${CONSENT_NEEDED
+          ? `<p>If you choose <strong>Reject</strong>, nothing that needs your consent loads. If your browser sends the
+        Global Privacy Control signal, this website treats it as <strong>Reject</strong> and doesn't show the banner.
+        To change your choice or withdraw your consent, choose <strong>Cookie settings</strong> at the bottom of any
+        page.${ANALYTICS ? ' Withdrawing removes the analytics cookies.' : ''}</p>`
+          : ''}
         <p>Our hosting provider receives your IP address and basic details of each visit to deliver the page and
         protect the site.</p>`,
     },
@@ -360,15 +407,14 @@ export const PRIVACY: LegalDocument = {
         <p>Where the GDPR, the UK GDPR or similar laws apply, we rely on:</p>
         <ul>
           <li><strong>Performance of a contract</strong>, to provide ffly: running your searches, the installation
-          identifier, checking and restoring your purchases, the free-search count, and the push token that updates a
-          Live Activity.</li>
+          identifier, checking and restoring your purchases, the free-search count, the push token that updates a
+          Live Activity, and your account, if you sign in.</li>
           <li><strong>Your consent</strong>: ${CONSENT_BASES.join('; ')}. You can withdraw consent at any time, as
           ${ref('attribution')} and ${ref('website')} describe, without affecting what happened before.</li>
           <li><strong>Our legitimate interests</strong>: usage analytics, crash and performance data, to improve ffly
           and fix faults; your IP address and search limits, to keep ffly fair and protect it from abuse; the Apple
           Search Ads campaign report, to learn which ads work; feedback and any email address you add, to answer you
-          and fix what you report; ${PARTNER ? "loading our booking partner's script on this website, which helps fund ffly; " : ''}and remembering
-          your search choices on this website. We have weighed these against your interests, and you can object at any time (${ref('rights')}).</li>
+          and fix what you report; and remembering your search choices on this website. We have weighed these against your interests, and you can object at any time (${ref('rights')}).</li>
           <li><strong>Legal obligations</strong>: keeping the records the law requires and answering lawful requests
           from authorities.</li>
         </ul>`,
@@ -380,22 +426,25 @@ export const PRIVACY: LegalDocument = {
         its part of ffly needs.</p>
         <ul>
           <li><strong>Apple Inc.</strong> sells ${APP.proName} on the App Store and handles payments and refunds,
-          delivers Live Activity updates through its push notification service, and provides the Apple Search Ads
-          campaign report and SKAdNetwork. Apple does this as an independent company, under
+          delivers Live Activity updates through its push notification service, provides the Apple Search Ads
+          campaign report and SKAdNetwork, and, if you choose to sign in with Apple, confirms who you are
+          (${ref('account')}). Apple does this as an independent company, under
           ${externalLink(EXTERNAL.applePrivacy, "Apple's Privacy Policy")}.</li>
           <li><strong>RevenueCat, Inc.</strong>, our subscription provider, confirms and restores your
           ${APP.proName} purchases and passes subscription events to AppsFlyer (${ref('purchases')}).
           ${externalLink(EXTERNAL.revenuecatPrivacy, "RevenueCat's Privacy Policy")}.</li>
           <li><strong>AppsFlyer Ltd.</strong> measures which ads and links bring people to ffly (${ref('attribution')}).
-          ${externalLink(EXTERNAL.appsflyerPrivacy, "AppsFlyer's Privacy Policy")}.</li>${GOOGLE ? `
-          <li><strong>Google LLC</strong> ${GOOGLE_ROLES.join(' and ')}, only if you agree (${ref('website')}).
-          ${externalLink(EXTERNAL.googlePrivacy, "Google's Privacy Policy")}.</li>` : ''}
+          ${externalLink(EXTERNAL.appsflyerPrivacy, "AppsFlyer's Privacy Policy")}.</li>
+          <li><strong>Google LLC</strong>${GOOGLE ? ` ${GOOGLE_ROLES.join(' and ')}, only if you agree (${ref('website')}), and,` : ','} if
+          you choose to sign in with Google, confirms who you are as an independent company (${ref('account')}).
+          ${externalLink(EXTERNAL.googlePrivacy, "Google's Privacy Policy")}.</li>
           <li><strong>Our hosting providers</strong> run ffly and this website for us.</li>
           <li><strong>A messaging service our team uses to read feedback</strong> receives a copy of each message
           (${ref('feedback')}).</li>
-          <li><strong>A booking partner</strong> receives what you do on its site once you open a partner link
-          (${ref('booking-links')})${PARTNER ? `, and your IP address and browser details through its script on this
-          website (${ref('website')})` : ''}.</li>
+          <li><strong>Our partners</strong>, a flight booking partner and hotel, eSIM, travel insurance and airport
+          transfer partners, receive what you do on their sites once you open a partner link or offer
+          (${ref('booking-links')}, ${ref('partner-offers')})${PARTNER ? `, and the flight booking partner receives your
+          IP address and browser details through its script on this website, if you accept (${ref('website')})` : ''}.</li>
           <li><strong>Airline and fare-search websites</strong> receive the airports and dates of your search, never
           anything that identifies you (${ref('searches')}).</li>
         </ul>
@@ -430,8 +479,10 @@ export const PRIVACY: LegalDocument = {
           <li>Searches in the app are deleted within ${SERVICE.searchRetentionHours} hours, with the push token of
           their Live Activity. A web search's result is kept, without anything that identifies you, until the trip's
           first day, then deleted.</li>
-          <li>The free-search count for the web search resets daily, and so does the ${APP.proName} fair-use
+          <li>${QUOTAS} The web search's free-search count resets daily, and so does the ${APP.proName} fair-use
           count. We keep your in-app free-search count only as long as the Free limit needs it.</li>
+          <li>If you sign in, your email address and account identifier are kept while your account exists and
+          deleted when you delete it, except what the law requires us to keep.</li>
           <li>Feedback is kept to answer it and prevent abuse. You can ask us to delete it at any time.</li>
           <li>Usage analytics, crash and performance data and the device identifiers are kept only as long as we need
           them to understand how ffly is used and to fix faults, then combined into totals or deleted.</li>
@@ -459,13 +510,14 @@ export const PRIVACY: LegalDocument = {
             `withdraw your consent at any time, without affecting what happened before (${ref('attribution')}, ${ref('website')})`,
           ])}
         </ul>
-        <p>ffly has no account, so unless you added your email address to feedback, we usually can't tell which
-        records are yours. Tell us what you can, such as the email address you used or roughly when you sent
+        <p>If you haven't signed in, we usually can't tell which records are yours, unless you added your email
+        address to feedback. Tell us what you can, such as the email address you used or roughly when you sent
         feedback. We may ask for something that confirms your identity before we act, so we never hand your data to
         someone else. We answer within one month; if a request is complex, we may take up to two more months and will
         tell you why.</p>
         <ul>
           <li>Delete trips in the Trips list, or delete the app to remove the data on your iPhone.</li>
+          <li>${DELETE_ACCOUNT}</li>
           <li>Manage or cancel a ${APP.proName} subscription in your Apple ID account settings.</li>
           <li>Ask us to delete feedback you sent (${ref('feedback')}).</li>
           <li>Turn off tracking and Ad measurement (${ref('attribution')}).</li>
@@ -483,21 +535,20 @@ export const PRIVACY: LegalDocument = {
         states with similar laws the same rights.</p>
         <ul>
           <li><strong>Categories we collect:</strong> identifiers (the installation identifier, device identifiers,
-          the advertising identifier if you allow tracking, your IP address and an email address you add to feedback);
+          the advertising identifier if you allow tracking, your IP address, an email address you add to feedback, and the
+          email address and account identifier if you sign in);
           commercial information (your ${APP.proName} purchases); internet or other electronic network activity (usage
           events, crash and performance data, your searches, and website analytics if you agree); and the content of
           feedback you send. We collect them from you and your device, for the purposes in ${ref('legal-bases')}, and
           keep them as ${ref('retention')} says.</li>
           <li><strong>Categories we disclose</strong> for business purposes: identifiers and commercial information to
           RevenueCat and our hosting providers; identifiers and internet activity to AppsFlyer${ANALYTICS ? ', and on this website to Google if you agree' : ''}${PARTNER
-            ? '; and on this website, identifiers and internet activity to a booking partner' : ''}.</li>
+            ? '; and on this website, if you agree, identifiers and internet activity to our flight booking partner' : ''}.</li>
           <li><strong>Sharing.</strong> Giving AppsFlyer your advertising identifier and related identifiers to
           measure which ads bring people to ffly counts as "sharing" for cross-context behavioural advertising under
           California law. To opt out, choose <strong>Ask App Not to Track</strong> when ffly asks, turn off tracking
           for ffly in ${ATT_SETTINGS}, or use ${externalLink(EXTERNAL.appsflyerOptout, "AppsFlyer's opt-out page")}.
-          This website honours the Global Privacy Control signal (${ref('website')})${PARTNER
-            ? ", except for our booking partner's script, which loads on every visit, so the signal does not stop it"
-            : ''}.</li>
+          This website honours the Global Privacy Control signal (${ref('website')}).</li>
           <li><strong>No sale.</strong> We do not sell personal information for money, and have not done so in the
           past 12 months.</li>
           <li><strong>No sensitive personal information.</strong> We don't collect sensitive personal information as

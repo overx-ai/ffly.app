@@ -1,5 +1,5 @@
 ---
-import { GA_MEASUREMENT_ID } from '../app';
+import { AD_NETWORK_SCRIPT, CONSENT_NEEDED, GA_MEASUREMENT_ID } from '../app';
 import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
 import { hreflangOf, pathFor } from '../site-pages';
 
@@ -9,11 +9,13 @@ interface Props {
 
 const { lang = DEFAULT_LANG } = Astro.props;
 const { consent } = useLang(lang).t;
+// One sentence per purpose that waits for consent, so the banner never asks about something the site does not load.
+const text = [GA_MEASUREMENT_ID && consent.analytics, AD_NETWORK_SCRIPT && consent.partner, consent.ask].filter(Boolean).join(' ');
 ---
-{GA_MEASUREMENT_ID && (
+{CONSENT_NEEDED && (
   <div id="consent" class="consent" role="region" aria-label={consent.label} hidden>
     <p>
-      {consent.text}{' '}
+      {text}{' '}
       <a href={`${pathFor('privacy', lang)}#website`} hreflang={hreflangOf('privacy', lang)}>{consent.privacy}</a>
     </p>
     <div class="choices">

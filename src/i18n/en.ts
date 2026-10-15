@@ -316,7 +316,9 @@ const en = {
 
   consent: {
     label: 'Cookie choice',
-    text: "We'd like to measure visits to improve this site. Nothing is measured unless you accept.",
+    analytics: "We'd like to measure visits to improve this site.",
+    partner: `A script from our flight booking partner helps fund ${APP.name}.`,
+    ask: 'Nothing loads unless you accept.',
     accept: 'Accept',
     reject: 'Reject',
     privacy: 'Privacy',

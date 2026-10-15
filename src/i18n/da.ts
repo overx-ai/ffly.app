@@ -308,7 +308,9 @@ const da = {
 
   consent: {
     label: 'Valg af cookies',
-    text: 'Vi vil gerne måle besøg for at forbedre siden. Intet måles, medmindre du accepterer.',
+    analytics: 'Vi vil gerne måle besøg for at forbedre siden.',
+    partner: `Et script fra vores partner for flybookinger hjælper med at finansiere ${APP.name}.`,
+    ask: 'Intet indlæses, medmindre du accepterer.',
     accept: 'Accepter',
     reject: 'Afvis',
     privacy: 'Privatliv',

@@ -1,7 +1,7 @@
 ---
 id: 013
 title: "Legal pages ready for accounts and partner offers"
-status: approved
+status: done
 priority: p1
 created: 2026-10-15
 updated: 2026-10-15
@@ -16,9 +16,9 @@ source: META_STATE bridges/012-1b-bots-to-0e-extensions--ios-ffly.md
 
 # 013 - Legal pages ready for accounts and partner offers
 
-> **TL;DR** - /terms and /privacy hold true for both app 1.0 and v2: no free-search count, optional Apple or Google
-> sign-in, partner offers (unnamed) that may earn ffly a commission, and the partner script only after cookie consent.
-> `npm test` enforces it. Owner: publish before the iOS 1.0, at least 30 days ahead of accounts.
+> **TL;DR** - /terms and /privacy were rewritten to hold for app 1.0 and v2: no free-search count, optional Apple or
+> Google sign-in, unnamed partner offers that may earn a commission, and a no-paid-placement line. The partner script
+> moved behind cookie consent, asked again through a versioned consent cookie. check-legal gained assertions for all of it.
 
 **Amendment (founder, 2026-10-15), overrides anything below that disagrees:**
 - **Generic wording.** No partner names and no "OverX" or auth host anywhere on /terms or /privacy. Partners are "a
@@ -142,17 +142,17 @@ mechanics (no field names, endpoints or storage details) on legal pages.
 ## Tasks
 | ID | Description | Agent | Depends On | Status | Files |
 |----|-------------|-------|------------|--------|-------|
-| T1 | check-legal: every Architecture assertion, seen failing on the current build first | dev | - | todo | scripts/check-legal.mjs |
-| T2 | Terms R1-R5 | dev | T1 | todo | src/data/terms.ts |
-| T3 | Privacy R6-R10 and R11's copy (generic wording) | dev | T1 | todo | src/data/privacy.ts |
-| T4 | Partner script behind consent: tag out of `BaseLayout`, consented loaders, banner while either constant is set, banner text in 13 languages, tests | dev | T1 | todo | src/layouts/BaseLayout.astro, src/scripts/consent.ts, src/scripts/consent-state.ts, src/components/ConsentBanner.astro, src/i18n/{en,de,fr,es,it,nl,pl,pt,ru,sv,da,nb,fi}.ts, tests/consent.test.ts |
-| T5 | lastmod; CLAUDE.md (legal rules, consent exception removed, dated exceptions); `AD_NETWORK_SCRIPT` comment in `src/app.ts` | dev | T2, T3, T4 | todo | src/site-pages.ts, CLAUDE.md, src/app.ts |
+| T1 | check-legal: every Architecture assertion, seen failing on the current build first | dev | - | done | scripts/check-legal.mjs |
+| T2 | Terms R1-R5 | dev | T1 | done | src/data/terms.ts |
+| T3 | Privacy R6-R10 and R11's copy (generic wording) | dev | T1 | done | src/data/privacy.ts |
+| T4 | Partner script behind consent: tag out of `BaseLayout`, consented loaders, banner while either constant is set, banner text in 13 languages, tests | dev | T1 | done | src/layouts/BaseLayout.astro, src/scripts/consent.ts, src/scripts/consent-state.ts, src/components/ConsentBanner.astro, src/i18n/{en,de,fr,es,it,nl,pl,pt,ru,sv,da,nb,fi}.ts, tests/consent.test.ts |
+| T5 | lastmod; CLAUDE.md (legal rules, consent exception removed, dated exceptions); `AD_NETWORK_SCRIPT` comment in `src/app.ts` | dev | T2, T3, T4 | done | src/site-pages.ts, CLAUDE.md, src/app.ts |
 
 ## Acceptance Criteria
-- [ ] /terms and /privacy show no number of free searches; R1's sentence appears in the summary and `#free-and-pro`.
-- [ ] Every changed sentence was read against app 1.0 (no accounts, device-counted free searches) and v2, and holds in both.
-- [ ] /privacy names the eight partners in `#partner-offers` only; no other page, `llms.txt` or the bundle names them.
-- [ ] No built page references tpembars.com; in a headless browser it is requested only after Accept, never after Reject or with GPC, and on later pages only with a stored `granted`.
-- [ ] The banner shows with `GA_MEASUREMENT_ID` unset and `AD_NETWORK_SCRIPT` set, in all 13 languages.
-- [ ] `npm test` green; each new check-legal assertion seen failing on a tampered build.
-- [ ] Code review clean.
+- [x] /terms and /privacy show no number of free searches; R1's sentence appears in the summary and `#free-and-pro`.
+- [x] Every changed sentence was read against app 1.0 (no accounts, device-counted free searches) and v2, and holds in both.
+- [x] Per the amendment, no partner is named on /privacy, /terms, any other page, `llms.txt` or the bundle (`TRIP_KIT_PARTNERS` joins the vendor bans).
+- [x] No built page references tpembars.com; in a headless browser it is requested only after Accept, never after Reject or with GPC, and on later pages only with a stored `granted`.
+- [x] The banner shows with `GA_MEASUREMENT_ID` unset and `AD_NETWORK_SCRIPT` set, in all 13 languages.
+- [x] `npm test` green; each new check-legal assertion seen failing on a tampered build.
+- [x] Code review clean.

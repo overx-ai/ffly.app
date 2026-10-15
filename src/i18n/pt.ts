@@ -308,7 +308,9 @@ const pt = {
 
   consent: {
     label: 'Escolha de cookies',
-    text: 'Gostaríamos de medir as visitas para melhorar este site. Nada é medido a menos que aceite.',
+    analytics: 'Gostaríamos de medir as visitas para melhorar este site.',
+    partner: `Um script do nosso parceiro de reservas de voos ajuda a financiar o ${APP.name}.`,
+    ask: 'Nada é carregado a menos que aceite.',
     accept: 'Aceitar',
     reject: 'Rejeitar',
     privacy: 'Privacidade',

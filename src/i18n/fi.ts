@@ -308,7 +308,9 @@ const fi = {
 
   consent: {
     label: 'Evästevalinta',
-    text: 'Haluaisimme mitata käyntejä parantaaksemme tätä sivustoa. Mitään ei mitata, ellet hyväksy.',
+    analytics: 'Haluaisimme mitata käyntejä parantaaksemme tätä sivustoa.',
+    partner: `Lentovarauskumppanimme skripti auttaa rahoittamaan ${APP.name}-palvelua.`,
+    ask: 'Mitään ei ladata, ellet hyväksy.',
     accept: 'Hyväksy',
     reject: 'Hylkää',
     privacy: 'Tietosuoja',

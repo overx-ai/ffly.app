@@ -122,15 +122,19 @@ export const AD_SIZES = {
 } as const;
 export const CONSENT_SCRIPT = (client: string) => `https://fundingchoicesmessages.google.com/i/${client.replace(/^ca-/, '')}?ers=1`;
 export const ADSENSE_SCRIPT = (client: string) => `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`;
-// A third-party ad network's loader, on every page and not consent-gated (owner, 2026-10-10: its site verification
-// cannot pass behind the banner). Undefined removes the script, its CSP host and its /privacy copy.
+// The flight booking partner's loader, injected by the consent module only after Accept (founder, 2026-10-15: the
+// network's site verification is done, so it waits for consent like analytics). Undefined removes the script, its CSP
+// host and its /privacy copy.
 export const AD_NETWORK_SCRIPT: string | undefined = 'https://tpembars.com/NTgxNDYy.js?t=581462';
 
 // Google Analytics 4, loaded only after Accept in the consent banner (src/scripts/consent.ts). Undefined turns
-// off the banner, the footer "Cookie settings" control and analytics; /privacy switches its copy on it too.
+// off analytics; /privacy switches its copy on it too.
 export const GA_MEASUREMENT_ID: string | undefined = 'G-JYLD2DWSJG';
-// The visitor's choice, `granted` or `denied`, for every page of the site.
-export const CONSENT = { cookie: 'ffly_consent', days: 182 } as const satisfies Pref;
+// The visitor's choice, `granted` or `denied`, for every page of the site, stored with `revision`. Raise the revision
+// whenever the banner gains a purpose: consent must be specific, so a choice stored before it is asked again.
+export const CONSENT = { cookie: 'ffly_consent', days: 182, revision: 2 } as const satisfies Pref & { revision: number };
+// The banner, the footer "Cookie settings" and the consent cookie exist while anything waits for consent.
+export const CONSENT_NEEDED = Boolean(GA_MEASUREMENT_ID || AD_NETWORK_SCRIPT);
 export const GTAG_SCRIPT = (id: string) => `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
 
 // The articles at /guides (src/content/guides).

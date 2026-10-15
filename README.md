@@ -101,11 +101,17 @@ curl -sI localhost:4329/ -H 'Accept-Language: de' | head -1                     
 ```
 
 Consent, in a private window with DevTools open on the Network tab:
-1. Load any page: the banner shows, and no request goes to `googletagmanager.com` or `google-analytics.com`.
-2. Reject: the banner closes, `ffly_consent=denied`, and still nothing goes to Google after a reload.
-3. Footer "Cookie settings", then Accept: `gtag/js` loads, `collect` requests carry `gcs=G101` (ad storage
-   denied, analytics granted), and the choice holds on `/de` and `/support` (one cookie, `Path=/`).
-4. "Cookie settings", then Reject: the `_ga*` cookies are deleted.
+1. Load any page: the banner shows, and no request goes to `googletagmanager.com`, `google-analytics.com` or the
+   `AD_NETWORK_SCRIPT` host.
+2. Reject: the banner closes, `ffly_consent=denied.2` (the choice, then `CONSENT.revision`), and still none of them
+   load after a reload.
+3. Footer "Cookie settings", then Accept: `gtag/js` and the partner script (`data-cmp-ab="2"`) load, `collect`
+   requests carry `gcs=G101` (ad storage denied, analytics granted), and the choice holds on `/de` and `/support`
+   (one cookie, `Path=/`), where both load again.
+4. "Cookie settings", then Reject: the page reloads without them and the `_ga*` cookies are deleted.
+5. With Global Privacy Control on, no banner shows and none of them load.
+6. Set `ffly_consent=granted` by hand (a choice from before the partner purpose) and reload: the banner shows again
+   and none of them load.
 
 Language hint, in a browser set to Russian: `/` shows "Эта страница есть на русском" linking `/ru`, in the system
 font on `/de`; ✕ hides it for good; `/ru` shows none. The header globe on `/search` links `/ru/search`, on `/support` `/ru`.

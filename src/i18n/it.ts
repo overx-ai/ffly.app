@@ -308,7 +308,9 @@ const it = {
 
   consent: {
     label: 'Scelta sui cookie',
-    text: 'Vorremmo misurare le visite per migliorare questo sito. Non misuriamo nulla se non accetti.',
+    analytics: 'Vorremmo misurare le visite per migliorare questo sito.',
+    partner: `Uno script del nostro partner per le prenotazioni di voli aiuta a finanziare ${APP.name}.`,
+    ask: 'Non carichiamo nulla se non accetti.',
     accept: 'Accetta',
     reject: 'Rifiuta',
     privacy: 'Privacy',

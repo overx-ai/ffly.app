@@ -34,19 +34,25 @@ Those repos are the source of truth for copy, colours and claims.
 - **Back to (spec 006)** is a chip list like Cities, capped by `/meta` `tier_limits.max_ends` (`endLimit`; at 1 it is
   the old single field), sent as `ends` and as `back=A,B` in the URL and cookie; chip rules live in `places.ts`.
   Every place field has a clear button shown by CSS only while it has text (`PlaceCombo`).
-- **Analytics only after consent.** GA4 loads only after Accept in the first-party banner (spec 004): `GA_MEASUREMENT_ID`
-  and `CONSENT` in `src/app.ts`, `GA_CSP` in `scripts/check-legal.mjs`. gtag is defined in `consent.ts` and `gtag/js`
-  injected only after Accept (Consent Mode v2 basic, ad storage and signals off); no page HTML may reference it, and
-  the footer "Cookie settings" reopens the banner. Unset `GA_MEASUREMENT_ID` and the banner, the control, the CSP
-  hosts and the `/privacy` analytics copy all go. A browser sending Global Privacy Control counts as Reject until the
+- **Analytics and the partner script only after consent.** GA4 loads only after Accept in the first-party banner (spec
+  004): `GA_MEASUREMENT_ID` and `CONSENT` in `src/app.ts`, `GA_CSP` in `scripts/check-legal.mjs`. gtag is defined in
+  `consent.ts` and `gtag/js` injected only after Accept (Consent Mode v2 basic, ad storage and signals off); no page HTML
+  may reference it, and the footer "Cookie settings" reopens the banner. `AD_NETWORK_SCRIPT` (the flight booking
+  partner's loader) is gated the same way (founder, 2026-10-15, spec 013: the network's site verification is done):
+  `consent.ts` `loadConsented` injects both after Accept and on every later page with a stored Accept; Reject and GPC
+  load neither. The banner, its Cookie settings control and the consent cookie exist while either is set
+  (`CONSENT_NEEDED`), and the banner says one sentence per purpose (`consent.analytics`, `consent.partner`, then
+  `consent.ask`, in all 13 languages). Unset one and its CSP host, banner sentence and `/privacy` copy go. The cookie
+  stores the choice with `CONSENT.revision` (`granted.2`): **raise it whenever the banner gains a purpose**, so a choice
+  stored before is asked again (consent is specific). A browser sending Global Privacy Control counts as Reject until the
   visitor accepts in Cookie settings (`initialChoice`), as `/privacy` `#ccpa` promises. When ads go on, AdSense in the EEA needs a Google-certified CMP, so
   that step replaces this banner with Google's consent message, covering analytics too.
 - **Ads only after consent.** While `ADSENSE_CLIENT` in `src/app.ts` is undefined, no consent or ad script loads
   and `AdSlot` renders nothing (`npm test` asserts it). Set it, and `AD_SLOTS`, to load Google's consent message
   and then AdSense; `/privacy` switches its ad copy on the same constant.
-  **Exception:** `AD_NETWORK_SCRIPT` in `src/app.ts` (a third-party ad network's loader) loads on every page with
-  no consent gate (owner, 2026-10-10, needed for the network's site verification). Its host is in the CSP `script-src`
-  and `/privacy` switches its ad copy on it; `npm test` checks all three. Undefined turns it off.
+  No page's HTML may reference the `AD_NETWORK_SCRIPT` host; the bundle carries it while it is set, its host stays in
+  the CSP `script-src`, and `/privacy` `#website` and `#legal-bases` put it on consent; `npm test` checks all of it. If
+  the network's verification ever needs it ungated again, that is a new owner decision, never a silent change.
 - Deploy: `git push origin main`, then Vercel builds. `vercel.json` holds clean URLs, the
   security headers (CSP, nosniff, Referrer-Policy), immutable caching of `/_astro/`, `/fonts/` and `/places.json`, a week's caching
   of the icons and images, and the `Speculation-Rules` header naming `public/speculation-rules.json` (prefetch on
@@ -156,6 +162,17 @@ Those repos are the source of truth for copy, colours and claims.
   any plan. Both are submission requirements, and `check-legal` asserts 6 and 7 keep their numbers and titles. The
   layout numbers sections by order; cross-references come from the same order (`legalSections` in
   `src/data/sections.ts`, `privacySection` for /support), never a typed number.
+- **One wording for app 1.0 and v2 (spec 013, founder 2026-10-15).** Every line of /terms and /privacy holds both for
+  app 1.0 (free searches counted on the device, no accounts) and for v2 (accounts, new limits, partner offers): a
+  v2-only feature is conditional ("if you sign in", "ffly may show"), never a present-tense promise.
+  - No free-search count on either page (`check-legal` rejects one): /terms says "Free searches and trip size are
+    limited; the current limits are shown in the app and on the site." in the summary and `#free-and-pro`.
+  - /privacy `#account` (sign-in through "our sign-in service, with Apple or Google": email address, possibly an Apple
+    private relay address, and an account identifier) and `#partner-offers` ("ffly may earn a commission"); quotas are
+    counted "per device (your installation), per account if you sign in, or per IP address".
+  - /terms `#not-a-travel-agent` says "Partners don't pay for placement; routes follow the priority you choose."
+  - No partner, no "OverX" and no auth host on either page: partners are "a flight booking partner" and "hotel, eSIM,
+    travel insurance and airport transfer partners"; `TRIP_KIT_PARTNERS` in `check-legal` joins the vendor bans.
 - **Operator placeholders gate publishing (spec 011).** `check-legal` fails `npm test` on any `REPLACE_ME` in
   `src/app.ts`'s operator constants. `GOVERNING_LAW` is the Republic of Belarus; `EU_REPRESENTATIVE` / `UK_REPRESENTATIVE`
   are empty until the owner appoints them (2026-10-07), and /privacy then leaves `#representatives` out rather than
@@ -178,9 +195,9 @@ Those repos are the source of truth for copy, colours and claims.
 - "Favour sensible flight times over pre-dawn wake-ups and midnight landings", never a promise
   that no route has them.
 - ffly is a search tool, not a travel agent; fares are indicative; Book opens "the airline's site or a booking
-  site". Never name a data source or vendor (Aviasales, Travelpayouts, Telegram, Vercel...) on any page, the legal
-  ones included (only the processors above, on /privacy and /terms): they say "a booking partner" and disclose its
-  cookies, the partner identifier and the commission. Carriers are not named on the home, search and guides-index pages (any language) or in
+  site". Never name a data source, partner or vendor (Aviasales, Travelpayouts, the Trip kit partners, Telegram,
+  Vercel...) on any page, the legal ones included (only the processors above, on /privacy and /terms): they say "a
+  booking partner" and disclose its cookies, the partner identifier and the commission. Carriers are not named on the home, search and guides-index pages (any language) or in
   `llms.txt` (`CARRIERS` in `scripts/check-legal.mjs`); the guides and legal pages may name them, and search
   results show the carriers the API returns.
 - **Value, not mechanics**, on every page: no cache, Keychain, server, memory, database, background,

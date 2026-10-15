@@ -308,7 +308,9 @@ const fr = {
 
   consent: {
     label: 'Choix des cookies',
-    text: 'Nous aimerions mesurer les visites pour améliorer ce site. Rien n’est mesuré si vous n’acceptez pas.',
+    analytics: 'Nous aimerions mesurer les visites pour améliorer ce site.',
+    partner: `Un script de notre partenaire de réservation de vols aide à financer ${APP.name}.`,
+    ask: 'Rien n’est chargé si vous n’acceptez pas.',
     accept: 'Accepter',
     reject: 'Refuser',
     privacy: 'Confidentialité',

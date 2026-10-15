@@ -334,7 +334,9 @@ const es = {
 
   consent: {
     label: 'Aviso de cookies',
-    text: 'Nos gustaría medir las visitas para mejorar este sitio. No se mide nada si no aceptas.',
+    analytics: 'Nos gustaría medir las visitas para mejorar este sitio.',
+    partner: `Un script de nuestro socio de reservas de vuelos ayuda a financiar ${APP.name}.`,
+    ask: 'No se carga nada si no aceptas.',
     accept: 'Aceptar',
     reject: 'Rechazar',
     privacy: 'Privacidad',

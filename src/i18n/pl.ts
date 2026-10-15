@@ -357,7 +357,9 @@ const pl = {
 
   consent: {
     label: 'Wybór plików cookie',
-    text: 'Chcemy mierzyć odwiedziny, by ulepszać tę stronę. Nic nie jest mierzone, dopóki nie zaakceptujesz.',
+    analytics: 'Chcemy mierzyć odwiedziny, by ulepszać tę stronę.',
+    partner: `Skrypt naszego partnera rezerwacji lotów pomaga finansować ${APP.name}.`,
+    ask: 'Nic nie jest wczytywane, dopóki nie zaakceptujesz.',
     accept: 'Akceptuję',
     reject: 'Odrzucam',
     privacy: 'Prywatność',
