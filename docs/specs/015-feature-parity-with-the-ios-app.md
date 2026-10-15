@@ -1,10 +1,10 @@
 ---
 id: 015
 title: "Feature parity with the iOS app"
-status: approved
+status: done
 priority: p1
 created: 2026-10-15
-updated: 2026-10-15
+updated: 2026-10-16
 repo: ffly-site
 release:
 story:
@@ -16,10 +16,10 @@ source: META_STATE bridges/012-1b-bots-to-0e-extensions--ios-ffly.md
 
 # 015 - Feature parity with the iOS app
 
-> **TL;DR** - The web search gets every iOS app control (must/maybe cities, skipped flights, pinned dates, stops, flight
-> hours, airports, priority, travellers, trip type) and its saved routes, compare, history, share, visa flags and
-> rating, in 13 languages. Only plan limits differ, read from `/meta`; new fields stay hidden until ffly API 1.12.0.
-> Nothing to do.
+> **TL;DR** - The web search got the iOS app's controls (trip type, travellers, must/maybe cities, skipped flights, date
+> pins, connections, flight hours, airports, priority), saved routes, compare, history, share, visa flags and rating, in
+> 13 languages. Each option is sent only while `/meta` allows it: travellers today, the rest once API 1.12.0 is live and
+> spec 014 turns on `CONTRACT_1_12`.
 
 **Related**: [001 - Free web search](001-search-web-app.md), [005 - Compact search and shared links](005-compact-search-and-shared-links.md),
 [006 - Several back cities](006-clear-buttons-and-several-back-cities.md), [014 - Accounts, Pro and Trip kit offers on the web](014-accounts-pro-and-trip-kit-offers-on-the-web.md)
@@ -124,16 +124,16 @@ fares come from.
 ## Tasks
 | ID | Description | Agent | Depends On | Status | Files |
 |----|-------------|-------|------------|--------|-------|
-| T1 | `docs/PINS.md` rows for 1.10.0, 1.11.0 and the 1.12.0 web fields; fixtures; contract tests that `buildRequest` emits each field in the pinned schema's shape and that `REQUEST_LIMITS` equals its caps | dev | - | todo | docs/PINS.md, tests/contract/ffly-api-parity.test.ts, tests/fixtures/ffly-api-1.12/*.json |
-| T2 | Request model: trip type mapping, every R1-R8 field, validation as the API's, the per-field gate, `REQUEST_LIMITS`, `CONTRACT_1_12` if spec 014 has not added it; share-link round-trip | dev | T1 | todo | src/scripts/ffly-api.ts, src/scripts/prefs.ts, src/app.ts, tests/ffly-api.test.ts, tests/prefs.test.ts |
-| T3 | Form controls R1, R3-R9 in the "Options" panel; the four locked chips retired | dev | T2 | todo | src/components/SearchForm.astro, src/scripts/search.ts, src/styles/search.css |
-| T4 | Skip a flight: leg ⋯ menu, exclusions bar, Undo, re-run | dev | T2 | todo | src/scripts/search.ts, src/components/SearchForm.astro, src/styles/search.css |
-| T5 | Library: saved routes, history, compare (`library.ts`, tested) and their UI | dev | T2 | todo | src/scripts/library.ts, src/scripts/search.ts, src/components/SearchForm.astro, src/styles/search.css, src/app.ts, tests/library.test.ts |
-| T6 | Share: `share-text.ts` (tested) and the share button | dev | T5 | todo | src/scripts/share-text.ts, src/scripts/search.ts, tests/share-text.test.ts |
-| T7 | Visa flags: port rules and data with the MIT notice, passports UI, tests mirroring the app's | dev | T5 | todo | src/scripts/visa.ts, public/visa.json, public/visa-LICENSE.txt, src/scripts/search.ts, tests/visa.test.ts |
-| T8 | Route rating: stars, settled state, consented event, support link for low stars | dev | T5 | todo | src/scripts/library.ts, src/scripts/search.ts, src/components/SearchForm.astro |
-| T9 | Copy in 13 languages; nudge rotation revised | dev | T3, T4, T5, T6, T7, T8 | todo | src/i18n/{en,de,fr,es,it,nl,pl,pt,ru,sv,da,nb,fi}.ts |
-| T10 | /privacy `#website` sentence and its check-legal assertion; CLAUDE.md (search widget rules), README | dev | T9 | todo | src/data/privacy.ts, scripts/check-legal.mjs, src/site-pages.ts, CLAUDE.md, README.md |
+| T1 | `docs/PINS.md` rows for 1.10.0, 1.11.0 and the 1.12.0 web fields; fixtures; contract tests that `buildRequest` emits each field in the pinned schema's shape and that `REQUEST_LIMITS` equals its caps | dev | - | done | docs/PINS.md, tests/contract/ffly-api-parity.test.ts, tests/fixtures/ffly-api-1.12/*.json |
+| T2 | Request model: trip type mapping, every R1-R8 field, validation as the API's, the per-field gate, `REQUEST_LIMITS`, `CONTRACT_1_12` if spec 014 has not added it; share-link round-trip | dev | T1 | done | src/scripts/ffly-api.ts, src/scripts/prefs.ts, src/app.ts, tests/ffly-api.test.ts, tests/prefs.test.ts |
+| T3 | Form controls R1, R3-R9 in the "Options" panel; the four locked chips retired | dev | T2 | done | src/components/SearchForm.astro, src/scripts/search.ts, src/styles/search.css |
+| T4 | Skip a flight: leg ⋯ menu, exclusions bar, Undo, re-run | dev | T2 | done | src/scripts/search.ts, src/components/SearchForm.astro, src/styles/search.css |
+| T5 | Library: saved routes, history, compare (`library.ts`, tested) and their UI | dev | T2 | done | src/scripts/library.ts, src/scripts/search.ts, src/components/SearchForm.astro, src/styles/search.css, src/app.ts, tests/library.test.ts |
+| T6 | Share: `share-text.ts` (tested) and the share button | dev | T5 | done | src/scripts/share-text.ts, src/scripts/search.ts, tests/share-text.test.ts |
+| T7 | Visa flags: port rules and data with the MIT notice, passports UI, tests mirroring the app's | dev | T5 | done | src/scripts/visa.ts, public/visa.json, public/visa-LICENSE.txt, src/scripts/search.ts, tests/visa.test.ts |
+| T8 | Route rating: stars, settled state, consented event, support link for low stars | dev | T5 | done | src/scripts/library.ts, src/scripts/search.ts, src/components/SearchForm.astro |
+| T9 | Copy in 13 languages; nudge rotation revised | dev | T3, T4, T5, T6, T7, T8 | done | src/i18n/{en,de,fr,es,it,nl,pl,pt,ru,sv,da,nb,fi}.ts |
+| T10 | /privacy `#website` sentence and its check-legal assertion; CLAUDE.md (search widget rules), README | dev | T9 | done | src/data/privacy.ts, scripts/check-legal.mjs, src/site-pages.ts, CLAUDE.md, README.md |
 
 ## Acceptance Criteria
 - [ ] Against API 1.11.0 the form shows travellers and trip type only; every other new control is hidden, and a default search sends the same request as today.

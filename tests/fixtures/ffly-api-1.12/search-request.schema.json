@@ -1,0 +1,298 @@
+{
+  "_source": "1B-bots apps/ffly-api/contract/openapi.json 1.11.0 (origin/master 1b92c355d, 2026-10-15); 1.12.0 (spec 574) adds no request field",
+  "schemas": {
+    "SearchRequest": {
+      "properties": {
+        "start": {
+          "type": "string",
+          "maxLength": 3,
+          "minLength": 3,
+          "title": "Start"
+        },
+        "ends": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "maxItems": 3,
+          "minItems": 1,
+          "title": "Ends"
+        },
+        "cities": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "maxItems": 8,
+          "title": "Cities"
+        },
+        "date_from": {
+          "type": "string",
+          "format": "date",
+          "title": "Date From"
+        },
+        "date_to": {
+          "type": "string",
+          "format": "date",
+          "title": "Date To"
+        },
+        "min_nights": {
+          "type": "integer",
+          "maximum": 14.0,
+          "minimum": 1.0,
+          "title": "Min Nights"
+        },
+        "max_nights": {
+          "type": "integer",
+          "maximum": 14.0,
+          "minimum": 1.0,
+          "title": "Max Nights"
+        },
+        "airports": {
+          "additionalProperties": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "type": "object",
+          "title": "Airports",
+          "default": {}
+        },
+        "optional": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Optional",
+          "default": []
+        },
+        "priority": {
+          "type": "string",
+          "title": "Priority",
+          "default": "schedule"
+        },
+        "excluded": {
+          "items": {
+            "$ref": "#/components/schemas/ExcludedFlight"
+          },
+          "type": "array",
+          "maxItems": 50,
+          "title": "Excluded",
+          "default": []
+        },
+        "max_stops_per_leg": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "maximum": 3.0,
+              "minimum": 0.0
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Stops Per Leg"
+        },
+        "max_stops_total": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "maximum": 6.0,
+              "minimum": 0.0
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Stops Total"
+        },
+        "pinned": {
+          "items": {
+            "$ref": "#/components/schemas/Pin"
+          },
+          "type": "array",
+          "maxItems": 5,
+          "title": "Pinned",
+          "default": []
+        },
+        "schedule": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Schedule"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "travellers": {
+          "$ref": "#/components/schemas/Travellers",
+          "description": "Who flies: adults + children at most 9, infants (on a lap) at most one per adult. Prices stay per adult; only the booking links carry the party. Omitted from the `request` echo while it is the default",
+          "default": {
+            "adults": 1,
+            "children": 0,
+            "infants": 0
+          }
+        },
+        "client_request_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Client Request Id"
+        }
+      },
+      "type": "object",
+      "required": [
+        "start",
+        "ends",
+        "cities",
+        "date_from",
+        "date_to",
+        "min_nights",
+        "max_nights"
+      ],
+      "title": "SearchRequest"
+    },
+    "ExcludedFlight": {
+      "properties": {
+        "source": {
+          "type": "string",
+          "maxLength": 32,
+          "minLength": 1,
+          "title": "Source"
+        },
+        "origin": {
+          "type": "string",
+          "maxLength": 3,
+          "minLength": 3,
+          "title": "Origin"
+        },
+        "dest": {
+          "type": "string",
+          "maxLength": 3,
+          "minLength": 3,
+          "title": "Dest"
+        },
+        "day": {
+          "type": "string",
+          "format": "date",
+          "title": "Day"
+        },
+        "dep": {
+          "type": "string",
+          "pattern": "^(\\d{2}:\\d{2})?$",
+          "title": "Dep",
+          "default": ""
+        }
+      },
+      "type": "object",
+      "required": [
+        "source",
+        "origin",
+        "dest",
+        "day"
+      ],
+      "title": "ExcludedFlight",
+      "description": "A flight the traveller can't book (sold out, say), named by the fields a Pro leg returns."
+    },
+    "Pin": {
+      "properties": {
+        "city": {
+          "type": "string",
+          "maxLength": 3,
+          "minLength": 3,
+          "title": "City"
+        },
+        "date_from": {
+          "type": "string",
+          "format": "date",
+          "title": "Date From"
+        },
+        "date_to": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Date To"
+        }
+      },
+      "type": "object",
+      "required": [
+        "city",
+        "date_from"
+      ],
+      "title": "Pin",
+      "description": "The traveller is in `city` for every day of the range, and spends the night after the last one there."
+    },
+    "Schedule": {
+      "properties": {
+        "short_from": {
+          "type": "string",
+          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+          "title": "Short From",
+          "default": "10:00"
+        },
+        "short_to": {
+          "type": "string",
+          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+          "title": "Short To",
+          "default": "22:00"
+        },
+        "long_min_air_h": {
+          "type": "number",
+          "maximum": 24.0,
+          "exclusiveMinimum": 0.0,
+          "title": "Long Min Air H",
+          "default": 4.0
+        },
+        "long_overnight": {
+          "type": "boolean",
+          "title": "Long Overnight",
+          "default": true
+        }
+      },
+      "type": "object",
+      "title": "Schedule",
+      "description": "When the traveller likes to fly, in local time: legs outside it rank lower and are flagged, never dropped.\n\nA leg shorter than `long_min_air_h` in the air is short: it should leave from `short_from` on and land by\n`short_to`. With `long_overnight`, a long leg should be a night flight (LONG_NIGHT_DEPART_FROM/ARRIVE_BY)."
+    },
+    "Travellers": {
+      "properties": {
+        "adults": {
+          "type": "integer",
+          "maximum": 9.0,
+          "minimum": 1.0,
+          "title": "Adults",
+          "default": 1
+        },
+        "children": {
+          "type": "integer",
+          "maximum": 9.0,
+          "minimum": 0.0,
+          "title": "Children",
+          "default": 0
+        },
+        "infants": {
+          "type": "integer",
+          "maximum": 9.0,
+          "minimum": 0.0,
+          "title": "Infants",
+          "default": 0
+        }
+      },
+      "type": "object",
+      "title": "Travellers"
+    }
+  }
+}

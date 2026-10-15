@@ -78,6 +78,9 @@ const GOOGLE_ROLES = [
 ];
 
 const SIGNED_IN_NOTE = SIGN_IN ? ' If you sign in, it also notes there that you did, so the next page signs you back in.' : '';
+// Spec 015: the web search's saved routes, history, passports and ratings stay in the browser.
+const LIBRARY_NOTE = `Routes you save, your recent searches and the passports you set stay in your browser's storage and are never
+        sent to us. A rating you give a search is kept there too${ANALYTICS ? '; if you accept analytics, it is also counted in our visit measurement, without the trip it rates' : ', and is never sent to us either'}.`;
 
 const DELETE_ACCOUNT = `If you have an account, you can delete it in the app's Settings, or by writing to ${mailto(CONTACT_EMAIL)}.`;
 
@@ -369,9 +372,9 @@ export const PRIVACY: LegalDocument = {
             ...(SIGN_IN ? [`${cookie(AUTH.cookie)}: keeps you signed in, if you sign in, until you sign out, for up to ${AUTH.days} days`] : []),
           ])}
         </ul>
-        <p>It never remembers your travel dates. It also keeps the list of cities in your browser's storage, so the
+        <p>Its cookies never remember your travel dates. It also keeps the list of cities in your browser's storage, so the
         search opens quickly; that list is the same for everyone. Once you pick a language or close the note offering
-        this page in your language, it remembers that there too, so the note does not come back.${SIGNED_IN_NOTE} You can delete these
+        this page in your language, it remembers that there too, so the note does not come back.${SIGNED_IN_NOTE} ${LIBRARY_NOTE} You can delete these
         cookies and this storage in your browser at any time.</p>
         ${ADS
           ? `<p>This website shows ads from Google AdSense. Before any AdSense ad loads, Google's consent message asks whether

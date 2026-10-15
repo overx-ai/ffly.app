@@ -62,7 +62,8 @@ export const SERVICE = {
 export const FFLY_API_BASE = `https://${SERVICE.apiHost}/ffly`;
 
 // ffly API contract 1.12.0 (1B-bots spec 574): sign-in, per-leg offers, the Pro teaser and the Trip kit (spec 014),
-// shared with spec 015. False until 1.12.0 is live: none of that UI renders and every API request stays anonymous.
+// and the search options the web may send from 1.12.0 (spec 015). False until 1.12.0 is live: none of that UI renders,
+// every API request stays anonymous, and no option 1.11 refuses is ever sent.
 export const CONTRACT_1_12: boolean = false;
 
 // Sign in with Apple or Google on the web search (spec 014). The page hands the provider's token to this site's own
@@ -85,9 +86,45 @@ export const SIGN_IN = CONTRACT_1_12 && AUTH.googleClientId !== undefined;
 export const APPLE_JS = 'https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js';
 export const GOOGLE_JS = 'https://accounts.google.com/gsi/client';
 
-// GA4 events of the web search (spec 014), sent only after Accept. Their params name a placement, an offer kind or
-// kit category, and the tier; never a city, date, price or account.
-export const EVENTS = { book: 'book_click', kit: 'kit_click' } as const;
+// GA4 events of the web search (specs 014 and 015), sent only after Accept. Their params name a placement, an offer kind
+// or kit category, a rating and the tier; never a city, date, price or account.
+export const EVENTS = { book: 'book_click', kit: 'kit_click', rate: 'search_rating' } as const;
+
+// Contract caps of a search request (ffly API SearchRequest, unchanged by 1.12.0), never plan limits: those come only
+// from /meta. tests/contract/ffly-api-parity.test.ts reads them back from the pinned schema.
+export const REQUEST_LIMITS = {
+  pins: 5,
+  excluded: 50,
+  stopsPerLeg: 3,
+  stopsTotal: 6,
+  minAdults: 1,
+  seated: 9,
+  sourceLength: 32,
+} as const;
+
+// Flight hours (spec 015), as the app's Settings: a time list in quarter hours, the API's own defaults shown until the
+// visitor picks one. Only the short-leg fields are sent; the long-leg ones keep the API's defaults.
+export const FLIGHT_HOURS = { stepMinutes: 15, from: '10:00', to: '22:00' } as const;
+
+// Saved routes, history, passports and ratings (spec 015): this browser's own, in localStorage, never sent.
+export const LIBRARY = {
+  savedKey: 'ffly.saved',
+  historyKey: 'ffly.history',
+  passportsKey: 'ffly.passports',
+  ratingsKey: 'ffly.ratings',
+  maxSaved: 50,
+  maxHistory: 20,
+  maxRatings: 50,
+  compareMin: 2,
+  compareMax: 3,
+  stars: 5,
+  // The app's rating policy: one to three stars ask what went wrong.
+  lowStars: 3,
+} as const;
+
+// The app's MIT-licensed Passport Index table (ios-ffly spec 029, notice in public/visa-LICENSE.txt), fetched only once
+// a passport is set.
+export const VISA = { url: '/visa.json' } as const;
 
 // The app's offline feedback queue (ios-ffly FeedbackQueueRules.expiry): an unsent message is dropped after this.
 export const FEEDBACK = {

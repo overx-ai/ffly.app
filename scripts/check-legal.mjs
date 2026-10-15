@@ -247,7 +247,13 @@ for (const id of ['app-user-id', 'ip-address', 'on-device', 'retention']) {
 }
 // Spec 003: the web search remembers places in functional cookies, never dates; notifications only on request.
 const website = privacy('website');
-check(/cookies/.test(website) && /never remembers your travel dates/.test(website), 'Privacy: #website must cover the search cookies and say dates are never kept');
+check(/cookies never remember your travel dates/.test(website), 'Privacy: #website must cover the search cookies and say they never keep dates');
+// Spec 015: saved routes, history, passports and ratings stay in the browser; a rating reaches analytics only after Accept.
+check(
+  /Routes you save, your recent searches and the passports you set stay in your browser's storage and are never\s+sent to us/.test(website),
+  'Privacy: #website must say saved routes, history and passports stay in the browser and are never sent',
+);
+check(/counted in our visit measurement, without the trip it rates/.test(website) === gaOn, 'Privacy: #website must say a rating reaches analytics only after Accept, exactly while GA_MEASUREMENT_ID is set');
 check(/pick a language/.test(website), 'Privacy: #website must say the language choice is remembered (spec 012)');
 // The consent cookie exists only while the banner does.
 const consentCookie = appConstant('CONSENT')?.match(/cookie: '([^']+)'/)?.[1];

@@ -1,8 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FFLY_API_BASE } from '../src/app';
 import {
+  API_HOURS,
+  allowedFields,
+  allowedOnly,
   buildRequest,
   canLookup,
+  hasOptions,
   createSearch,
   endLimit,
   getMeta,
@@ -57,6 +61,52 @@ describe('buildRequest', () => {
   });
 });
 
+describe('the request options (spec 015)', () => {
+  const options = {
+    optional: ['AMS'],
+    pinned: [{ city: 'MAD', date_from: '2026-11-03' }],
+    max_stops_per_leg: 0,
+    schedule: { short_from: '07:00', short_to: '21:00' },
+    priority: 'price',
+    travellers: { adults: 2, children: 1, infants: 0 },
+  };
+  const everything = new Set(allowedFields({ tier_limits: { max_cities: 4, searches_per_day: 5, app_only_fields: [] } }, true));
+
+  it('sends an option only when it is set and allowed, so a default search is the request of before', () => {
+    expect(JSON.stringify(buildRequest({ ...trip, options: {} }, 'id-1', everything))).toBe(JSON.stringify(buildRequest(trip, 'id-1')));
+    const travellersOnly = buildRequest({ ...trip, options }, 'id-1', new Set(['travellers'] as const));
+    expect(travellersOnly).toEqual({ ...buildRequest(trip, 'id-1'), travellers: options.travellers });
+    const defaults = { travellers: { adults: 1, children: 0, infants: 0 }, optional: [], schedule: API_HOURS };
+    expect(JSON.stringify(buildRequest({ ...trip, options: defaults }, 'id-1', everything))).toBe(JSON.stringify(buildRequest(trip, 'id-1')));
+    expect(buildRequest({ ...trip, options }, 'id-1', everything)).toMatchObject(options);
+  });
+
+  it('drops from a request made earlier every option the API refuses now, and nothing else', () => {
+    const earlier = buildRequest({ ...trip, options }, 'id-1', everything);
+    const now = allowedOnly(earlier, new Set(['travellers'] as const));
+    expect(now).toEqual(buildRequest({ ...trip, options }, 'id-1', new Set(['travellers'] as const)));
+    expect(allowedOnly(earlier, everything)).toBe(earlier);
+  });
+
+  it('keeps client_request_id last and copies the options deeply', () => {
+    const pinned = [{ city: 'MAD', date_from: '2026-11-03' }];
+    const request = buildRequest({ ...trip, options: { pinned } }, 'z', everything);
+    pinned[0].city = 'AMS';
+    expect(request.pinned).toEqual([{ city: 'MAD', date_from: '2026-11-03' }]);
+    expect(Object.keys(request).at(-1)).toBe('client_request_id');
+  });
+
+  it('allows travellers on 1.11 and the other options only with CONTRACT_1_12 and an empty app-only list', () => {
+    const live = { tier_limits: { max_cities: 4, searches_per_day: 5, app_only_fields: ['excluded', 'pinned', 'max_stops_per_leg', 'max_stops_total', 'schedule', 'optional', 'airports', 'priority'] } };
+    expect([...allowedFields(live, false)]).toEqual(['travellers']);
+    expect([...allowedFields(live, true)]).toEqual(['travellers']);
+    expect(allowedFields({ tier_limits: { ...live.tier_limits, app_only_fields: [] } }, false)).toEqual(new Set(['travellers']));
+    expect(everything.size).toBe(9);
+    expect(allowedFields({ tier_limits: { max_cities: 4, searches_per_day: 5 } }, true).size).toBe(0);
+    expect(allowedFields({ tier_limits: { ...live.tier_limits, app_only_fields: [] } }, true, new Set(['schedule'])).has('schedule')).toBe(false);
+  });
+});
+
 describe('endLimit', () => {
   const meta = (tierEnds: number | undefined, maxEnds = 3) =>
     ({
@@ -88,8 +138,10 @@ describe('createSearch outcomes', () => {
     expect(await createSearch(buildRequest(trip, 'b'))).toEqual({ kind: 'busy' });
   });
 
-  it('maps 422 app_only apart from invalid input', async () => {
+  it('maps 422 app_only apart from invalid input, with the field the API refused', async () => {
     reply(422, { reason: 'app_only', field: 'schedule' });
+    expect(await createSearch(buildRequest(trip, 'a'))).toEqual({ kind: 'app_only', field: 'schedule' });
+    reply(422, { reason: 'app_only' });
     expect(await createSearch(buildRequest(trip, 'a'))).toEqual({ kind: 'app_only' });
     reply(422, { detail: [] });
     expect(await createSearch(buildRequest(trip, 'b'))).toEqual({ kind: 'invalid' });
@@ -154,6 +206,13 @@ describe('canLookup', () => {
     expect(canLookup(request, '2026-10-31')).toBe(true);
     expect(canLookup(request, '2026-11-01')).toBe(true);
     expect(canLookup(request, '2026-11-02')).toBe(false);
+  });
+
+  it('never looks up a trip with options: the lookup names the trip alone, and would open its plain search', () => {
+    const party = { ...buildRequest(trip, 'id-1'), travellers: { adults: 2, children: 0, infants: 0 } };
+    expect(hasOptions(party)).toBe(true);
+    expect(canLookup(party, '2026-10-31')).toBe(false);
+    expect(hasOptions({ ...party, travellers: { adults: 1, children: 0, infants: 0 }, optional: [] })).toBe(false);
   });
 });
 

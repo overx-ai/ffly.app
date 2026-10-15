@@ -11,6 +11,10 @@ Contracts this site codes against. Bump a row in the same change that adopts a n
 | ffly API meta without places | 1.9.0 | 1B-bots `docs/specs/540` (`GET /meta?places=false`: `places: []`, the rest unchanged) | `getMeta` in `src/scripts/ffly-api.ts` (spec 009) |
 | ffly API web end cap | 1.5.0 | 1B-bots `docs/specs/535` T8 (`/meta` `tier_limits.max_ends` = 2 for web) | `endLimit` in `src/scripts/ffly-api.ts` (spec 006) |
 | ffly API accounts, offers, Trip kit | 1.12.0 | 1B-bots `docs/specs/574` (`Authorization: Bearer`, `leg.offers[]`, `route.pro_preview`, `route.trip_kit[]`, `GET /trip-kit`, `/meta` `tier` and v2 `tier_limits`, CORS allowing `Authorization`) | `src/scripts/ffly-api.ts`, `results.ts` behind `CONTRACT_1_12`; fixtures `tests/fixtures/ffly-api-1.12/`, `tests/contract/ffly-api-1.12.test.ts` (spec 014) |
+| ffly API one-way trips | 1.10.0 | 1B-bots `docs/specs/568` (`cities: []` with `ends: [destination]`; ends in visited cities) | the trip type in `src/scripts/filters.ts` `tripLists`, `buildRequest` (spec 015) |
+| ffly API travellers | 1.11.0 | 1B-bots `docs/specs/570` (`travellers` `{adults, children, infants}`: adults + children at most 9, an infant per adult; prices per adult, the party carried into booking links; not in the web's `app_only_fields`) | `buildRequest`, `allowedFields`, `REQUEST_LIMITS` (spec 015) |
+| ffly API web search options | 1.12.0 | 1B-bots `docs/specs/574` (the web's `tier_limits.app_only_fields` empties: `optional`, `excluded`, `pinned`, `max_stops_per_leg`, `max_stops_total`, `schedule`, `airports`, `priority`; the request schema is 1.11.0's, pinned in `tests/fixtures/ffly-api-1.12/search-request.schema.json`) | `allowedFields` behind `CONTRACT_1_12`; `tests/contract/ffly-api-parity.test.ts` (spec 015) |
+| ios-ffly visa rules | spec 029, 2026-10-11 (`c01642f`) | ios-ffly `Template/Core/Services/VisaRules.swift` and `Template/Resources/visa_requirements.json` (MIT Passport Index) | `src/scripts/visa.ts`, `public/visa.json`, `public/visa-LICENSE.txt`; re-port when the app's table changes (spec 015) |
 | overx-auth web sign-in | 2026-10-15 | 1B-bots `docs/specs/573` (`POST /apple/token` `{identity_token}`, `/google/token` `{id_token}`, `/token` `{refresh_token}`, `/revoke`; answers `{access_token, refresh_token, expires_in, token_type}`; Services ID `ai.overx.ffly.web`) | `src/server/auth-session.ts`, `src/pages/api/auth/*` (spec 014) |
 
 The site sends no `X-Platform` header: a request without one is the web channel (1B-bots `apps/ffly-api/routes/deps.py`
@@ -43,3 +47,15 @@ The site reads no `seller` from an offer or the Trip kit, so no partner is ever 
 The browser never calls overx-auth (it has no CORS): `src/pages/api/auth/*` do, from this site's server, and keep only the
 refresh token, in `ffly_session` (`HttpOnly; Secure; SameSite=Strict; Path=/api/auth`). They send no `device_id`, so a
 refresh needs none; overx-auth's rotation grace covers two tabs refreshing at once.
+
+Spec 015 sends an option only when the visitor set it **and** `/meta` `tier_limits.app_only_fields` leaves it out; the
+1.12.0 fields also need `CONTRACT_1_12` (`allowedFields`). Live 1.11 lists all eight for the web, so today only
+`travellers` and the trip type reach the API, and a default search is byte-identical to the request before spec 015. A
+`/meta` without the list (the bundled snapshot, an older API) allows none. If a stale `/meta` lets a field through and the
+API answers `422 app_only` with that `field`, the site drops it from every later request and keeps the form filled.
+
+`GET /searches/shared` takes the trip alone (start, ends, cities, dates, nights), and the API keys a search by its whole
+request (`request_hash`), travellers included. A shared link that carries any option therefore only pre-fills the form
+(`canLookup`), never opens that trip's plain search. 1B-bots spec 574 R3 adds `GET /searches/shared?key=<share_key>`
+for such links; adopting it is a later change. Skipped flights never go in a link: `ExcludedFlight.source` names a fare
+source, which the site sends back as received and never shows.

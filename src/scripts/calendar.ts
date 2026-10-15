@@ -14,6 +14,12 @@ export interface Nights {
   max: number;
 }
 
+// The days a picker may offer beyond today: a date pin lies strictly inside the travel window.
+export interface Bounds {
+  first?: string;
+  last?: string;
+}
+
 const DAY_MS = 86_400_000;
 const WEEK = 7;
 const MONTHS_SHOWN = 2;
@@ -49,16 +55,20 @@ export function monthGrid(year: number, month: number): Day[][] {
   );
 }
 
-export function pickDay(range: Range, day: string, maxDays: number): Range {
+// With `sameDay`, picking the first day again makes a range of that one day.
+export function pickDay(range: Range, day: string, maxDays: number, sameDay = false): Range {
+  if (sameDay && range.from && !range.to && day === range.from) return { from: day, to: day };
   if (!range.from || range.to || day <= range.from || daysBetween(range.from, day) > maxDays) return { from: day };
   return { from: range.from, to: day };
 }
 
-export function dayState(day: string, range: Range, today: string, maxDays: number) {
+const outside = (day: string, { first, last }: Bounds) => Boolean((first && day < first) || (last && day > last));
+
+export function dayState(day: string, range: Range, today: string, maxDays: number, bounds: Bounds = {}) {
   const { from, to } = range;
   const choosingEnd = Boolean(from && !to);
   return {
-    disabled: day < today || (choosingEnd && day > from! && daysBetween(from!, day) > maxDays),
+    disabled: day < today || outside(day, bounds) || (choosingEnd && day > from! && daysBetween(from!, day) > maxDays),
     start: day === from,
     end: day === to,
     inRange: from !== undefined && (to ? day >= from && day <= to : day === from),
@@ -93,6 +103,9 @@ export interface PickerOptions {
   maxDays: () => number;
   format: (range: Required<Range>) => string;
   locale: string;
+  bounds?: () => Bounds;
+  sameDay?: boolean;
+  onPick?: (range: Required<Range>) => void;
 }
 
 // A two-month range popover with a roving tabindex: arrows move a day or a week, Enter picks, Esc cancels.
@@ -134,9 +147,17 @@ export class RangePicker {
     this.o.label.textContent = this.o.format(range);
   }
 
+  private bounds = () => this.o.bounds?.() ?? {};
+
+  // The first day that can take focus at or after `day`.
+  private firstOpen(day: string) {
+    const first = this.bounds().first ?? '';
+    return [day, localToday(), first].reduce((latest, d) => (d > latest ? d : latest));
+  }
+
   private open() {
     this.draft = { ...this.range };
-    this.focusDay = this.range.from > localToday() ? this.range.from : localToday();
+    this.focusDay = this.firstOpen(this.range.from);
     this.showMonthOf(this.focusDay);
     this.o.dialog.hidden = false;
     this.o.trigger.setAttribute('aria-expanded', 'true');
@@ -150,10 +171,12 @@ export class RangePicker {
   }
 
   private pick(iso: string) {
-    this.draft = pickDay(this.draft, iso, this.o.maxDays());
+    this.draft = pickDay(this.draft, iso, this.o.maxDays(), this.o.sameDay);
     this.focusDay = iso;
     if (this.draft.from && this.draft.to) {
-      this.set({ from: this.draft.from, to: this.draft.to });
+      const range = { from: this.draft.from, to: this.draft.to };
+      this.set(range);
+      this.o.onPick?.(range);
       this.close();
       return;
     }
@@ -167,7 +190,7 @@ export class RangePicker {
     event.preventDefault();
     const target = addDays(this.focusDay, step);
     // A disabled day cannot take focus, and the re-render would drop it to the page.
-    if (dayState(target, this.draft, localToday(), this.o.maxDays()).disabled) return;
+    if (dayState(target, this.draft, localToday(), this.o.maxDays(), this.bounds()).disabled) return;
     this.focusDay = target;
     const { first, last } = this.shown();
     if (target < first || target > last) {
@@ -195,7 +218,7 @@ export class RangePicker {
     this.view = monthAt(year, month);
     // Keep one day in view tabbable after paging months.
     const { first, last } = this.shown();
-    if (this.focusDay < first || this.focusDay > last) this.focusDay = first > localToday() ? first : localToday();
+    if (this.focusDay < first || this.focusDay > last) this.focusDay = this.firstOpen(first);
     this.render();
   }
 
@@ -233,7 +256,7 @@ export class RangePicker {
       for (const day of week) {
         const cell = row.insertCell();
         if (!day.inMonth) continue;
-        const state = dayState(day.iso, this.draft, today, this.o.maxDays());
+        const state = dayState(day.iso, this.draft, today, this.o.maxDays(), this.bounds());
         const button = document.createElement('button');
         button.type = 'button';
         button.dataset.iso = day.iso;

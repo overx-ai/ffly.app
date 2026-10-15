@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import en from '../src/i18n/en';
-import { appHintLine, rotation } from '../src/scripts/nudges';
+import { appHintLine, rotation, tipsOf } from '../src/scripts/nudges';
 
 const NUDGES = en.widget.script.nudges;
 
@@ -24,6 +24,15 @@ describe('rotation', () => {
   it('covers the six app features without a city count', () => {
     expect(n).toBe(6);
     expect(NUDGES.rotation.join(' ')).not.toMatch(/up to \d|unlimited/i);
+  });
+});
+
+describe('tipsOf', () => {
+  it('drops the flight hours tip once the web has flight hours, and only then', () => {
+    const hours = en.widget.appOnly.hours.nudge;
+    expect(tipsOf(NUDGES.rotation, hours, false)).toEqual(NUDGES.rotation);
+    expect(tipsOf(NUDGES.rotation, hours, true)).toEqual(NUDGES.rotation.filter((tip) => tip !== hours));
+    expect(tipsOf(NUDGES.rotation, hours, true)).toHaveLength(NUDGES.rotation.length - 1);
   });
 });
 

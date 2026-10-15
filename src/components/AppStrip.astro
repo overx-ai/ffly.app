@@ -1,12 +1,14 @@
 ---
 import AppStoreBadge from './AppStoreBadge.astro';
+import { CONTRACT_1_12 } from '../app';
 import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
+import { webNudges } from '../scripts/nudges';
 
 interface Props { lang?: Lang; }
 
 const { lang = DEFAULT_LANG } = Astro.props;
 const { t, fmt } = useLang(lang);
-const { nudges } = t.widget.script;
+const nudges = webNudges(t.widget, CONTRACT_1_12);
 const total = nudges.rotation.length;
 ---
 <aside id="app-side" class="app-strip" aria-label={t.appSide.title}>

@@ -1,6 +1,7 @@
-import { PREFS, type Pref } from '../app';
+import { PREFS, REQUEST_LIMITS, type Pref } from '../app';
 import { addDays, daysBetween, type Nights } from './calendar';
-import { commaQuery, type SearchRequest } from './ffly-api';
+import { ONE_ADULT, commaQuery, isSet, type Pin, type SearchRequest, type Travellers, type TripOptions } from './ffly-api';
+import { TRAVELLER_KINDS, lastDay, makePin, minutesOf, stepTravellers, withoutPinned } from './filters';
 
 export type Source = 'query' | 'cookie' | 'default';
 
@@ -20,6 +21,7 @@ export interface Prefs {
   cities: Filled<string[]>;
   dates: Filled<Dates | undefined>;
   nights: Filled<Nights | undefined>;
+  options: TripOptions;
 }
 
 export interface Limits {
@@ -28,10 +30,30 @@ export interface Limits {
 }
 
 // The app's share link opens the web search with ?from=&cities=&back= (place codes, lists comma-separated);
-// a web search adds dates=YYYY-MM-DD..YYYY-MM-DD and nights=min-max, which are read from the query only.
-const QUERY = { from: 'from', back: 'back', cities: 'cities', dates: 'dates', nights: 'nights' } as const;
+// a web search adds dates=YYYY-MM-DD..YYYY-MM-DD and nights=min-max, which are read from the query only, and each
+// option the visitor set (spec 015): maybe=MAD, pins=ROM:2026-11-05..2026-11-06, stops=0, connections=2,
+// hours=07:00-21:00, airports=LHR,LGW, priority=price, adults=2, children=1, infants=1. An empty cities= with a back
+// is a one-way trip. Skipped flights belong to the trip they were skipped on and never go in a link.
+const QUERY = {
+  from: 'from',
+  back: 'back',
+  cities: 'cities',
+  dates: 'dates',
+  nights: 'nights',
+  maybe: 'maybe',
+  pins: 'pins',
+  stops: 'stops',
+  connections: 'connections',
+  hours: 'hours',
+  airports: 'airports',
+  priority: 'priority',
+} as const;
 const DATES = /^(\d{4}-\d{2}-\d{2})\.\.(\d{4}-\d{2}-\d{2})$/;
 const NIGHTS = /^(\d{1,2})-(\d{1,2})$/;
+const PIN = /^([A-Z0-9]{3}):(\d{4}-\d{2}-\d{2})(?:\.\.(\d{4}-\d{2}-\d{2}))?$/;
+const HOURS = /^((?:[01]\d|2[0-3]):[0-5]\d)-((?:[01]\d|2[0-3]):[0-5]\d)$/;
+const COUNT = /^\d{1,2}$/;
+const PRIORITY = /^[a-z_]{1,32}$/;
 const NO_LIMITS: Limits = { maxNights: Infinity, maxWindowDays: Infinity };
 const DAY_S = 86_400;
 const ATTRIBUTES = 'Path=/; SameSite=Lax; Secure';
@@ -99,11 +121,77 @@ function readNights(raw: string | null, limits: Limits): Nights | undefined {
 export const namesPlaces = (query: URLSearchParams, cookies: Map<string, string>) =>
   (['from', 'back', 'cities'] as const).some((key) => query.get(QUERY[key]) || cookies.get(PREFS[key].cookie));
 
+const listOf = (raw: string | null) => (raw ?? '').split(',').map((item) => item.trim()).filter(Boolean);
+
+function readPins(raw: string | null, cities: string[]): Pin[] | undefined {
+  const pins: Pin[] = [];
+  for (const item of listOf(raw)) {
+    const [, city, from, to] = item.toUpperCase().match(PIN) ?? [];
+    if (!city || !cities.includes(city) || !isDay(from) || (to && !(isDay(to) && to > from))) continue;
+    if (!pins.some((pin) => pin.city === city)) pins.push(makePin(city, from, to));
+  }
+  return pins.length ? pins.slice(0, REQUEST_LIMITS.pins) : undefined;
+}
+
+function readCount(raw: string | null, max: number): number | undefined {
+  const n = Number(raw);
+  return raw && COUNT.test(raw) && n <= max ? n : undefined;
+}
+
+function readHours(raw: string | null) {
+  const [, from, to] = raw?.match(HOURS) ?? [];
+  return from && to && minutesOf(from) < minutesOf(to) ? { short_from: from, short_to: to } : undefined;
+}
+
+// A flat list of airport codes, each under the trip's city that has it.
+function readAirports(raw: string | null, places: string[], airportsOf: (city: string) => readonly string[]) {
+  const codes = listOf(raw).map((code) => code.toUpperCase());
+  const chosen = Object.fromEntries(
+    places
+      .map((city) => [city, airportsOf(city).filter((code) => codes.includes(code))] as const)
+      .filter(([city, picked]) => picked.length > 0 && picked.length < airportsOf(city).length),
+  );
+  return Object.keys(chosen).length ? chosen : undefined;
+}
+
+// A party the API would refuse is dropped whole, never clamped into another one.
+function readTravellers(query: URLSearchParams): Travellers | undefined {
+  if (!TRAVELLER_KINDS.some((kind) => query.has(kind))) return undefined;
+  const party = { ...ONE_ADULT };
+  for (const kind of TRAVELLER_KINDS) {
+    const raw = query.get(kind);
+    if (raw === null) continue;
+    const n = readCount(raw, REQUEST_LIMITS.seated);
+    if (n === undefined) return undefined;
+    party[kind] = n;
+  }
+  const kept = TRAVELLER_KINDS.reduce((t, kind) => stepTravellers(t, kind, 0), party);
+  return TRAVELLER_KINDS.every((kind) => kept[kind] === party[kind]) ? party : undefined;
+}
+
+function readOptions(query: URLSearchParams, start: string | undefined, ends: string[], cities: string[], airportsOf: (city: string) => readonly string[]): TripOptions {
+  const maybe = listOf(query.get(QUERY.maybe)).map((code) => code.toUpperCase()).filter((code) => cities.includes(code));
+  const pinned = readPins(query.get(QUERY.pins), cities);
+  const priority = query.get(QUERY.priority) ?? '';
+  const options: TripOptions = {
+    optional: withoutPinned([...new Set(maybe)], pinned ?? []),
+    pinned,
+    max_stops_per_leg: readCount(query.get(QUERY.stops), REQUEST_LIMITS.stopsPerLeg),
+    max_stops_total: readCount(query.get(QUERY.connections), REQUEST_LIMITS.stopsTotal),
+    schedule: readHours(query.get(QUERY.hours)),
+    airports: readAirports(query.get(QUERY.airports), [...(start ? [start] : []), ...ends, ...cities], airportsOf),
+    priority: PRIORITY.test(priority) ? priority : undefined,
+    travellers: readTravellers(query),
+  };
+  return Object.fromEntries(Object.entries(options).filter(([field]) => isSet(options, field as keyof TripOptions)));
+}
+
 export function fillPrefs(
   query: URLSearchParams,
   cookies: Map<string, string>,
   isPlace: (code: string) => boolean,
   limits: Limits = NO_LIMITS,
+  airportsOf: (city: string) => readonly string[] = () => [],
 ): Prefs {
   const one: Read<string> = (raw) => codesOf(raw, isPlace)[0];
   const many: Read<string[]> = (raw) => {
@@ -112,13 +200,34 @@ export function fillPrefs(
   };
   const fill = <T>(key: 'from' | 'back' | 'cities', read: Read<T>, fallback: T) =>
     first([['query', read(query.get(QUERY[key]))], ['cookie', read(cookies.get(PREFS[key].cookie))]], fallback);
+  const from = fill<string | undefined>('from', one, undefined);
+  const back = fill('back', many, []);
+  const oneWay = query.get(QUERY.cities) === '' && back.source === 'query';
+  const cities: Filled<string[]> = oneWay ? { value: [], source: 'query' } : fill('cities', many, []);
   return {
-    from: fill<string | undefined>('from', one, undefined),
-    back: fill('back', many, []),
-    cities: fill('cities', many, []),
+    from,
+    back,
+    cities,
     dates: first([['query', readDates(query.get(QUERY.dates), limits)]], undefined),
     nights: first([['query', readNights(query.get(QUERY.nights), limits)]], undefined),
+    options: readOptions(query, from.value, back.value, cities.value, airportsOf),
   };
+}
+
+const pinText = (pin: Pin) => `${pin.city}:${pin.date_from}${pin.date_to ? `..${lastDay(pin)}` : ''}`;
+
+function optionPairs(r: TripOptions): [string, string][] {
+  const pairs: [string, string | undefined][] = [
+    [QUERY.maybe, r.optional?.join(',')],
+    [QUERY.pins, r.pinned?.map(pinText).join(',')],
+    [QUERY.stops, r.max_stops_per_leg?.toString()],
+    [QUERY.connections, r.max_stops_total?.toString()],
+    [QUERY.hours, r.schedule && `${r.schedule.short_from}-${r.schedule.short_to}`],
+    [QUERY.airports, r.airports && Object.values(r.airports).flat().join(',')],
+    [QUERY.priority, r.priority],
+    ...(isSet(r, 'travellers') ? TRAVELLER_KINDS.map((kind): [string, string] => [kind, String(r.travellers![kind])]) : []),
+  ];
+  return pairs.filter((pair): pair is [string, string] => Boolean(pair[1]));
 }
 
 export function shareQuery(r: SearchRequest): string {
@@ -129,6 +238,7 @@ export function shareQuery(r: SearchRequest): string {
     [QUERY.cities, r.cities.join(',')],
     [QUERY.dates, `${r.date_from}..${r.date_to}`],
     [QUERY.nights, `${r.min_nights}-${r.max_nights}`],
+    ...optionPairs(r),
   ]);
 }
 
@@ -138,7 +248,7 @@ export const sameSearch = (a: SearchRequest, b: SearchRequest) => shareQuery(a) 
 
 // A link is a shared search only when it names the whole trip; a cookie never completes one.
 export function sharedRequest(prefs: Prefs, clientRequestId: string): SearchRequest | undefined {
-  const { from, back, cities, dates, nights } = prefs;
+  const { from, back, cities, dates, nights, options } = prefs;
   if (from.source !== 'query' || cities.source !== 'query' || !from.value || !dates.value || !nights.value) return undefined;
   return {
     start: from.value,
@@ -148,6 +258,7 @@ export function sharedRequest(prefs: Prefs, clientRequestId: string): SearchRequ
     date_to: dates.value.to,
     min_nights: nights.value.min,
     max_nights: nights.value.max,
+    ...options,
     client_request_id: clientRequestId,
   };
 }

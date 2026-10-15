@@ -8,6 +8,7 @@ export interface TrackParams {
   placement: 'results' | 'progress' | 'route';
   kind: string;
   tier: Tier;
+  value?: number;
 }
 
 // Fire and forget: never waits and never cancels the click, so a link opens the same with or without consent.

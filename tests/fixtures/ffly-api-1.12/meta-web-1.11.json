@@ -1,0 +1,47 @@
+{
+  "places": [],
+  "places_version": "9fb3fa318e12f72e",
+  "currency": "EUR",
+  "limits": {
+    "max_cities": 8,
+    "max_ends": 3,
+    "max_nights": 14,
+    "max_window_days": 42
+  },
+  "priorities": {
+    "schedule": {
+      "label": "Best schedule",
+      "hint": "Fewer pre-dawn wake-ups and midnight landings; evening hops between cities"
+    },
+    "balanced": {
+      "label": "Balanced",
+      "hint": "Better times when they cost only a little more"
+    },
+    "price": {
+      "label": "Cheapest",
+      "hint": "Lowest fare; only avoids paying a hotel night for a midnight landing"
+    }
+  },
+  "default_priority": "schedule",
+  "channel": "web",
+  "tier": "free",
+  "tier_limits": {
+    "max_cities": 4,
+    "max_ends": 2,
+    "locked": true,
+    "full_routes": 3,
+    "searches_per_day": 5,
+    "searches_lifetime": null,
+    "app_only_fields": [
+      "excluded",
+      "pinned",
+      "max_stops_per_leg",
+      "max_stops_total",
+      "schedule",
+      "optional",
+      "airports",
+      "priority"
+    ]
+  },
+  "free_searches_left": 5
+}

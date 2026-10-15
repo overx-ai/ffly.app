@@ -121,6 +121,18 @@ Google accept no other origin) with DevTools open:
 6. Sign out: the cookie is cleared and the caps drop to Free. Delete `ffly_session` by hand and reload: one "You're
    signed out." line, no loop.
 
+The app's features on the web (spec 015), on `/search` with DevTools open:
+1. Against today's API (1.11, `CONTRACT_1_12` off): the trip type (Round trip, One way, Multi-city) and Options ›
+   Travellers show; every other option stays hidden and its "In the app" chip stays. A default search posts exactly the
+   fields it posted before; a one-way one posts `cities: []` and `ends: [To]`; a party posts `travellers`.
+2. Options › Your passports: `visa.json` loads only once a passport is set, no request carries a passport, and routes
+   that stay in a country every passport needs a visa for show "Visa: …".
+3. Expand a route: Save and Share. Save keeps it in Your trips (compare two or three); Share opens the system sheet or
+   copies the itinerary and the link. Under the results, rate the search once; one to three stars link to `/support`.
+4. In a private window with site data blocked: the search still runs, and Save says it couldn't save in this browser.
+5. With `CONTRACT_1_12` on against 1.12.0: maybe chips, date pins, airports, connections, flight hours and priority
+   show; a leg's ⋯ menu skips a flight and runs the search again, and Undo brings the result back without a search.
+
 Consent, in a private window with DevTools open on the Network tab:
 1. Load any page: the banner shows, and no request goes to `googletagmanager.com`, `google-analytics.com` or the
    `AD_NETWORK_SCRIPT` host.

@@ -95,23 +95,23 @@ export function matchPlaces(places: readonly Place[], query: string, opts: { exc
     .map((m) => m.place);
 }
 
-export interface ComboOptions {
+export interface ComboOptions<T> {
   input: HTMLInputElement;
   list: HTMLElement;
-  options: (query: string) => Place[];
-  renderOption: (place: Place) => HTMLElement;
+  options: (query: string) => T[];
+  renderOption: (item: T) => HTMLElement;
   renderNotice: (text: string) => HTMLElement;
   notice?: () => string | undefined;
-  onPick: (place: Place) => void;
+  onPick: (item: T) => void;
 }
 
 // ARIA 1.2 combobox: focus stays in the input, the active row is announced through aria-activedescendant.
-export class Combobox {
+export class Combobox<T = Place> {
   private state = CLOSED;
-  private items: Place[] = [];
+  private items: T[] = [];
   private noticeText: string | undefined;
 
-  constructor(private readonly o: ComboOptions) {
+  constructor(private readonly o: ComboOptions<T>) {
     o.input.addEventListener('input', () => this.open());
     o.input.addEventListener('focus', () => this.open());
     o.input.addEventListener('blur', () => this.close());
@@ -155,9 +155,9 @@ export class Combobox {
   }
 
   private pick(index: number) {
-    const place = this.items[index];
+    const item = this.items[index];
     this.close();
-    if (place) this.o.onPick(place);
+    if (item) this.o.onPick(item);
   }
 
   private render() {
@@ -165,8 +165,8 @@ export class Combobox {
     const { open, active } = this.state;
     const rows = this.noticeText
       ? [this.o.renderNotice(this.noticeText)]
-      : this.items.map((place, i) => {
-          const row = this.o.renderOption(place);
+      : this.items.map((item, i) => {
+          const row = this.o.renderOption(item);
           row.id = `${list.id}-${i}`;
           row.dataset.index = String(i);
           row.setAttribute('aria-selected', String(i === active));

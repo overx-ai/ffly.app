@@ -21,11 +21,12 @@ Those repos are the source of truth for copy, colours and claims.
   or a click outside.
   `SearchForm.astro` (specs 001 and 003) sits on `/` under `#search` and on `/search`, and ships one bundled
   script: `src/scripts/search.ts` over small DOM-free modules (`ffly-api`, `combobox`, `calendar`, `prefs`,
-  `nudges`, `results`, `notify`, `scroll`, `ticker`, `places`, `places-store`) that `tests/` covers. Plain TypeScript, no framework, custom controls
-  only (no `<select>`, `<datalist>`, date or number input), rendering via `textContent`/`<template>` only (never
+  `nudges`, `results`, `notify`, `scroll`, `ticker`, `places`, `places-store`, `filters`, `library`, `share-text`, `visa`)
+  that `tests/` covers. Plain TypeScript, no framework, custom controls
+  only (no `<select>`, `<datalist>`, date, time or number input), rendering via `textContent`/`<template>` only (never
   `innerHTML` with API data). It calls `FFLY_API_BASE` (contract pinned in `docs/PINS.md`) anonymously and with no
   custom header (no `X-Platform`, never `X-Client-Id`): the API's default channel is web, so its GETs are simple CORS
-  requests with no preflight. Never priority, filters or schedule. The pages carrying it preconnect to the API origin
+  requests with no preflight. The pages carrying it preconnect to the API origin
   (`BaseLayout` `preconnectApi`). Its cookies and scroll time live in `src/app.ts`, its copy in `src/i18n/en.ts`
   (`widget.script`, shipped in SearchForm's `data-i18n` attribute).
 - **Accounts, Pro and the Trip kit (spec 014), behind `CONTRACT_1_12`** (`src/app.ts`, shared with spec 015; false until
@@ -56,6 +57,40 @@ Those repos are the source of truth for copy, colours and claims.
   - **CSP**: `AUTH_CSP` in `check-legal` (Apple JS and GIS hosts in `script-src`, `frame-src`, `connect-src`,
     `style-src`) must be in `vercel.json` exactly while sign-in is on, and /privacy `#website` names `AUTH.cookie` and the
     storage note then (bump its `lastmod`). Bundle bans skip the Services ID, an identifier Apple's script needs.
+- **Every app feature on the web (spec 015); only the plan limits differ, and those come from `/meta`.**
+  - **One request model.** `buildRequest` sends the trip, then each option only when the visitor set it **and**
+    `allowedFields` allows it: absent from `/meta` `tier_limits.app_only_fields`, and for the 1.12.0 fields (`optional`,
+    `excluded`, `pinned`, `max_stops_per_leg`, `max_stops_total`, `schedule`, `airports`, `priority`) `CONTRACT_1_12` on.
+    A `/meta` without the list allows none. So a default search is byte-identical to the request before spec 015, and
+    1.11 (which lists all eight for the web) gets only `travellers`. A `422 app_only` naming a field drops it for the
+    page view ("That option isn't on the web yet.") and keeps the form filled. `submit` passes every request through the
+    gate again (`allowedOnly`), so a skipped flight's, a retry's or a kept one's never carries a field refused since.
+    Flight hours equal to the API's defaults (`API_HOURS`, held to the pinned schema) count as unset.
+  - **Controls** (`SearchForm.astro`): the trip type above the trip (round trip is `cities: [To]`, `ends: [From]`;
+    one way `cities: []`, `ends: [To]`, API 1.10.0; multi-city today's form), and a closed **Options** panel (CLS 0):
+    travellers, What matters most? (`/meta` `priorities`, labels from the site's i18n), direct flights only and max
+    connections, flight hours (a time list, `time-list.ts`), a city's date pin (`calendar.ts` with bounds and one-day
+    picks) and airports, and passports. Must or maybe is a toggle on each city chip. Each shows while its field is
+    allowed (`data-field`/`data-any`); each "In the app" chip (`data-locked-field`) shows while its field is refused, and
+    "More cities" (a plan limit, spec 014's copy) always. Rules as the API's, in `filters.ts`; caps in `REQUEST_LIMITS`
+    (`src/app.ts`, held to the pinned schema by `tests/contract/ffly-api-parity.test.ts`). The flight hours tip leaves
+    the app strip's rotation with `CONTRACT_1_12` (`tipsOf`).
+  - **After results:** a leg's ⋯ menu skips a flight (`excluded`, built from the leg; its `source` is sent back as
+    received and never shown, logged or put in a link) and runs the search again; the skipped-flights bar's Undo brings
+    the previous result back from the page without a search. Each full route's details carry Save and Share
+    (`share-text.ts`, the app's RouteShareText: `navigator.share` with the text and the link, else the clipboard).
+    Visa flags (`visa.ts`, the app's VisaRules and MIT Passport Index table in `public/visa.json` with
+    `public/visa-LICENSE.txt`, fetched only once a passport is set; passports never leave the browser). A rating
+    (`#rating`, settled once given; one to three stars link to /support) goes out only as GA4 `EVENTS.rate` through
+    `track()` after Accept.
+  - **Your trips** (`#library-sheet`, a `<dialog>`): saved routes (`LIBRARY.maxSaved`, compare two or three) and
+    recent searches (`LIBRARY.maxHistory`), each kept whole (`library.ts`) because a web result expires at its first
+    day; with storage off or full the search still runs and Save says so. Keys and caps in `LIBRARY`; /privacy
+    `#website` says they stay in the browser (`check-legal` asserts it).
+  - **Shared links** carry each set option readably (`maybe`, `pins=ROM:2026-11-05..2026-11-06`, `stops`,
+    `connections`, `hours=07:00-21:00`, `airports`, `priority`, `adults`/`children`/`infants`; an empty `cities=` with
+    `back` is one way), never skipped flights. A link with any option only pre-fills (`canLookup`): the shared lookup
+    names the trip alone.
 - **Shareable searches (spec 005).** The URL carries the whole trip: `from`, `back` (omitted when it is just `from`),
   `cities` (comma-separated, as in the app's share link), `dates=YYYY-MM-DD..YYYY-MM-DD`, `nights=min-max`
   (`shareQuery` in `prefs.ts`, written with `replaceState` on submit and on results). A complete link with a future

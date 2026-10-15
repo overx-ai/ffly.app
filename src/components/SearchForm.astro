@@ -3,9 +3,12 @@ import AppStrip from './AppStrip.astro';
 import AdSlot from './AdSlot.astro';
 import AppStoreBadge from './AppStoreBadge.astro';
 import PlaceCombo from './PlaceCombo.astro';
-import { APP_STORE_URL, CONTRACT_1_12, SIGN_IN } from '../app';
+import { APP_STORE_URL, CONTRACT_1_12, LIBRARY, SIGN_IN } from '../app';
 import { APPLE_LOGO } from '../icons';
 import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
+import type { OptionField } from '../scripts/ffly-api';
+import { TRAVELLER_KINDS, TRIP_TYPES } from '../scripts/filters';
+import { webNudges } from '../scripts/nudges';
 import '../styles/search.css';
 
 interface Props { lang?: Lang; }
@@ -20,8 +23,17 @@ const openApp = APP_STORE_URL ?? '#app-side';
 const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" height="10" rx="2"/>';
 // Spec 014's strings ship only with its UI, so the page stays as it was while CONTRACT_1_12 is off.
 const v12 = CONTRACT_1_12 ? { offers: w.offers, account: w.account } : {};
+// Spec 015: a locked chip shows while the API refuses the field of its control; "More cities" is a plan limit and stays.
+const LOCKED_FIELD: Partial<Record<keyof typeof w.appOnly, OptionField>> = {
+  hours: 'schedule',
+  direct: 'max_stops_per_leg',
+  date: 'pinned',
+  skip: 'excluded',
+};
+const nudges = webNudges(w, CONTRACT_1_12);
+const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.priorities)[];
 ---
-<div class="search-ui" data-i18n={JSON.stringify({ ...w.script, nights: t.common.nights, loading: w.loading, ...v12 })}>
+<div class="search-ui" data-i18n={JSON.stringify({ ...w.script, nudges, columns: w.columns, nights: t.common.nights, loading: w.loading, ...v12 })}>
   <noscript>
     <div class="card notice">
       <p>{w.noscript}</p>
@@ -34,12 +46,19 @@ const v12 = CONTRACT_1_12 ? { offers: w.offers, account: w.account } : {};
     <fieldset id="search-fields" class="fields" disabled>
       <legend class="sr-only">{w.legend}</legend>
 
+      <div class="trip-type" role="group" aria-labelledby="trip-type-label">
+        <span id="trip-type-label" class="sr-only">{w.tripType.label}</span>
+        {TRIP_TYPES.map((type) => (
+          <button type="button" class="segment" data-trip-type={type} aria-pressed={String(type === 'multi')}>{w.tripType[type]}</button>
+        ))}
+      </div>
+
       <div class="trip-row">
         <div class="field">
           <label id="from-label" for="from">{w.from} <span class="remembered" data-remembered="from" hidden>{w.remembered}</span></label>
           <PlaceCombo id="from" placeholder={w.typeCity} clear={w.clear} />
         </div>
-        <div class="field">
+        <div id="back-field" class="field">
           <label id="back-label" for="back">
             <span id="back-one">{w.back}</span><span id="back-any" hidden>{w.backAny}</span>
             <span id="ends-count" class="count" hidden></span>
@@ -50,6 +69,10 @@ const v12 = CONTRACT_1_12 ? { offers: w.offers, account: w.account } : {};
             <PlaceCombo id="back" placeholder={w.sameAsFrom} describedBy="back-hint" clear={w.clear} />
           </div>
           <p id="back-hint" class="sr-only">{w.backHint}</p>
+        </div>
+        <div id="to-field" class="field" hidden>
+          <label id="to-label" for="to">{w.to}</label>
+          <PlaceCombo id="to" placeholder={w.typeCity} clear={w.clear} />
         </div>
         <div class="field">
           <span id="window-label" class="field-label">{w.window}</span>
@@ -67,7 +90,7 @@ const v12 = CONTRACT_1_12 ? { offers: w.offers, account: w.account } : {};
             </div>
           </div>
         </div>
-        <fieldset class="field">
+        <fieldset id="nights-field" class="field">
           <legend class="field-label">{w.nights}</legend>
           <div class="steppers">
             {[
@@ -90,7 +113,7 @@ const v12 = CONTRACT_1_12 ? { offers: w.offers, account: w.account } : {};
       </div>
 
       <div class="cities-row">
-        <div class="field">
+        <div id="cities-field" class="field">
           <label id="city-label" for="city">
             {w.cities} <span id="city-count" class="count"></span>
             <span class="remembered" data-remembered="cities" hidden>{w.remembered}</span>
@@ -107,10 +130,12 @@ const v12 = CONTRACT_1_12 ? { offers: w.offers, account: w.account } : {};
       <p id="form-error" class="form-error" role="alert"></p>
 
       <div class="app-row">
+        <button id="options-toggle" type="button" class="row-button" aria-expanded="false" aria-controls="options">{w.options.toggle}</button>
+        <button id="library-open" type="button" class="row-button" aria-haspopup="dialog">{w.library.open}</button>
         <span id="in-app-label" class="field-label">{w.inApp}</span>
         <ul class="locked-chips" aria-labelledby="in-app-label">
-          {Object.values(w.appOnly).map((o) => (
-            <li>
+          {Object.entries(w.appOnly).map(([key, o]) => (
+            <li data-locked-field={LOCKED_FIELD[key as keyof typeof w.appOnly]}>
               <button type="button" class="locked-chip" data-nudge={o.nudge} aria-pressed="false" aria-controls="chip-nudge">
                 <svg viewBox="0 0 24 24" aria-hidden="true" set:html={LOCK} />
                 {o.label}
@@ -121,6 +146,71 @@ const v12 = CONTRACT_1_12 ? { offers: w.offers, account: w.account } : {};
         <p id="quota-note" class="note"></p>
       </div>
       <p id="chip-nudge" class="chip-nudge" aria-live="polite" hidden></p>
+
+      <div id="options" class="options" hidden>
+        <fieldset class="option" data-any="travellers" hidden>
+          <legend class="field-label">{w.options.travellers}</legend>
+          <div class="option-controls">
+            {TRAVELLER_KINDS.map((kind) => (
+              <div class="stepper labelled" data-traveller={kind}>
+                <span id={`${kind}-label`} class="stepper-label">{w.options[kind]}</span>
+                <button type="button" data-step="-1" aria-label={fmt.text(w.options.fewer, { label: w.options[kind] })}>&minus;</button>
+                <output id={`${kind}-count`} aria-labelledby={`${kind}-label`} aria-live="polite"></output>
+                <button type="button" data-step="1" aria-label={fmt.text(w.options.more, { label: w.options[kind] })}>+</button>
+              </div>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset class="option" data-any="priority" hidden>
+          <legend class="field-label">{w.options.priority}</legend>
+          <div class="option-controls">
+            {PRIORITIES.map((id) => (
+              <button type="button" class="segment" data-priority={id} aria-pressed="false" hidden>{w.options.priorities[id]}</button>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset class="option" data-any="max_stops_per_leg max_stops_total" hidden>
+          <legend class="field-label">{w.options.connections}</legend>
+          <div class="option-controls">
+            <button id="direct-only" type="button" class="segment" data-field="max_stops_per_leg" aria-pressed="false" hidden>{w.options.directOnly}</button>
+            <div class="stepper labelled" data-connections data-field="max_stops_total" hidden>
+              <span id="connections-label" class="stepper-label">{w.options.maxConnections}</span>
+              <button type="button" data-step="-1" aria-label={w.options.fewerConnections}>&minus;</button>
+              <output id="connections-count" aria-labelledby="connections-label" aria-live="polite"></output>
+              <button type="button" data-step="1" aria-label={w.options.moreConnections}>+</button>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset class="option" data-any="schedule" hidden>
+          <legend class="field-label">{w.options.hours}</legend>
+          <div class="option-controls">
+            {[
+              { id: 'takeoff', label: w.options.takeoff },
+              { id: 'landing', label: w.options.landing },
+            ].map((h) => (
+              <div class="hour popover-anchor">
+                <span id={`${h.id}-label`} class="stepper-label">{h.label}</span>
+                <button id={h.id} type="button" class="picker" aria-haspopup="listbox" aria-expanded="false" aria-controls={`${h.id}-list`} aria-labelledby={`${h.id}-label ${h.id}`}></button>
+                <ul id={`${h.id}-list`} class="listbox time-list" role="listbox" tabindex="-1" aria-labelledby={`${h.id}-label`} hidden></ul>
+              </div>
+            ))}
+          </div>
+          <p class="hint">{w.options.hoursHint}</p>
+        </fieldset>
+        <fieldset id="places-option" class="option" data-any="pinned airports" hidden>
+          <legend class="field-label">{w.options.places}</legend>
+          <p class="hint" data-field="pinned" hidden>{w.options.pinHint}</p>
+          <ul id="place-options" class="place-options"></ul>
+        </fieldset>
+        <div class="option field">
+          <label id="passport-label" for="passport" class="field-label">{w.options.passports}</label>
+          <div class="place-box">
+            <ul id="passports" class="chips" aria-label={w.options.passports}></ul>
+            <PlaceCombo id="passport" placeholder={w.options.addPassport} describedBy="passport-hint" clear={w.clear} />
+          </div>
+          <p id="passport-hint" class="hint">{w.options.passportsHint}</p>
+        </div>
+      </div>
     </fieldset>
     {SIGN_IN && (
       <div class="account-row">
@@ -164,6 +254,11 @@ const v12 = CONTRACT_1_12 ? { offers: w.offers, account: w.account } : {};
       <button id="search-again" type="button" class="btn btn-soon">{w.searchAgain}</button>
     </p>
     <p id="results-empty" class="note" hidden>{w.empty}</p>
+    <div id="skipped" class="skipped" hidden>
+      <span id="skipped-label" class="lbl"></span>
+      <ul id="skipped-list" class="skipped-list" aria-labelledby="skipped-label"></ul>
+      <button id="skipped-undo" type="button" class="btn btn-soon" hidden></button>
+    </div>
     <p id="insights" class="insights" hidden></p>
     <p id="app-hint" class="app-hint" hidden></p>
     <div class="table-wrap">
@@ -185,6 +280,20 @@ const v12 = CONTRACT_1_12 ? { offers: w.offers, account: w.account } : {};
       </table>
     </div>
     <p id="more-routes" hidden><a href="#app-side"></a></p>
+    <p id="visa-note" class="quiet" hidden></p>
+    <div id="rating" class="rating" hidden>
+      <p id="rating-title" class="rating-title">{w.rating.title}</p>
+      <p id="rating-thanks" class="rating-title" hidden>{w.rating.thanks}</p>
+      <div id="rating-stars" class="stars" role="group" aria-labelledby="rating-title">
+        {Array.from({ length: LIBRARY.stars }, (_, i) => (
+          <button type="button" class="star" data-stars={i + 1} aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z" /></svg>
+          </button>
+        ))}
+      </div>
+      <a id="rating-support" href="/support" hidden>{w.rating.support}</a>
+      <button id="rating-dismiss" type="button" class="link-button">{w.notifyNo}</button>
+    </div>
     <p class="quiet">{w.disclosure}</p>
     <p id="coverage" class="quiet" hidden></p>
     <AdSlot slot="searchResults" size="banner" />
@@ -212,6 +321,27 @@ const v12 = CONTRACT_1_12 ? { offers: w.offers, account: w.account } : {};
     <AppStoreBadge lang={lang} />
   </section>
 
+  <dialog id="library-sheet" class="sheet library-sheet" aria-labelledby="library-title">
+    <h2 id="library-title">{w.library.open}</h2>
+    <section class="library-block" aria-labelledby="saved-title">
+      <h3 id="saved-title">{w.library.saved}</h3>
+      <p id="saved-empty" class="note">{w.library.savedEmpty}</p>
+      <p id="compare-hint" class="hint" hidden></p>
+      <ul id="saved-list" class="library-list"></ul>
+      <div id="compare" class="compare" hidden>
+        <h3 id="compare-title"></h3>
+        <div class="table-wrap"><table class="compare-table"><tbody id="compare-rows"></tbody></table></div>
+      </div>
+      <p class="quiet">{w.library.savedNote}</p>
+    </section>
+    <section class="library-block" aria-labelledby="history-title">
+      <h3 id="history-title">{w.library.history}</h3>
+      <p id="history-empty" class="note">{w.library.historyEmpty}</p>
+      <ul id="history-list" class="library-list"></ul>
+    </section>
+    <button id="library-close" type="button" class="btn btn-soon">{w.library.close}</button>
+  </dialog>
+
   {SIGN_IN && (
     <dialog id="sign-in-sheet" class="sheet" aria-labelledby="sign-in-title">
       <h2 id="sign-in-title">{w.account.title}</h2>
@@ -238,7 +368,15 @@ const v12 = CONTRACT_1_12 ? { offers: w.offers, account: w.account } : {};
 </template>
 
 <template id="chip-template">
-  <li class="chip"><span class="chip-name"></span><button type="button" class="chip-remove">&times;</button></li>
+  <li class="chip"><span class="chip-name"></span><button type="button" class="chip-mode" aria-pressed="false" hidden></button><button type="button" class="chip-remove">&times;</button></li>
+</template>
+
+<template id="place-option-row-template">
+  <li class="place-option"><span class="place-option-name"></span><span class="pin popover-anchor" hidden><button type="button" class="picker pin-picker" aria-haspopup="dialog" aria-expanded="false"><span class="pin-text"></span></button><button type="button" class="chip-remove pin-remove" hidden>&times;</button><div class="calendar" role="dialog" hidden><div class="cal-nav"><button type="button" class="cal-prev" aria-label={w.prevMonth}>&lsaquo;</button><p class="hint">{w.calendarHint}</p><button type="button" class="cal-next" aria-label={w.nextMonth}>&rsaquo;</button></div><div class="cal-months"></div></div></span><span class="airport-toggles" hidden></span></li>
+</template>
+
+<template id="library-row-template">
+  <li class="library-row"><div class="library-text"><span class="library-route"></span><span class="library-meta note"></span></div><div class="library-actions"><button type="button" class="btn btn-soon library-compare" aria-pressed="false" hidden></button><button type="button" class="btn btn-soon library-open"></button><button type="button" class="btn btn-soon library-remove"></button></div></li>
 </template>
 
 <template id="route-row-template">
@@ -270,16 +408,23 @@ const v12 = CONTRACT_1_12 ? { offers: w.offers, account: w.account } : {};
         <span class="leg-stops"></span>
         <span class="leg-price"></span>
         <a class="btn book" target="_blank" rel="sponsored noopener">{w.book}</a>
+        <span class="leg-warn" hidden></span>
+        <span class="leg-menu popover-anchor" hidden><button type="button" class="leg-more" aria-haspopup="menu" aria-expanded="false">&middot;&middot;&middot;</button><span class="menu" role="menu" hidden><button type="button" class="menu-item leg-skip" role="menuitem"></button></span></span>
       </div>
     </td>
   </tr>
 </template>
 
+<template id="detail-row-template">
+  <tr class="detail-row"><td colspan={COLUMNS.length}></td></tr>
+</template>
+
+<template id="route-actions-template">
+  <div class="route-actions"><button type="button" class="btn btn-soon route-save" aria-pressed="false"></button><button type="button" class="btn btn-soon route-share"></button><span class="route-status note" role="status"></span></div>
+</template>
+
 {CONTRACT_1_12 && (
   <Fragment>
-    <template id="detail-row-template">
-      <tr class="detail-row"><td colspan={COLUMNS.length}></td></tr>
-    </template>
     <template id="kit-template">
       <div class="kit">
         <p class="kit-title">{w.offers.partnerOffers}</p>

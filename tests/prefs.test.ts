@@ -60,6 +60,7 @@ describe('fillPrefs', () => {
       cities: { value: [], source: 'default' },
       dates: { value: undefined, source: 'default' },
       nights: { value: undefined, source: 'default' },
+      options: {},
     });
   });
 
@@ -143,6 +144,43 @@ describe('share links', () => {
       expect(shared).toEqual({ ...r, client_request_id: 'id-2' });
       expect(sameSearch(shared!, r)).toBe(true);
     }
+  });
+
+  it('round-trips every option the visitor set, readable, and leaves skipped flights out', () => {
+    const airports: Record<string, string[]> = { MAD: ['MAD', 'TOJ'] };
+    const options = {
+      optional: ['AMS'],
+      pinned: [{ city: 'MAD', date_from: '2026-11-03', date_to: '2026-11-04' }],
+      max_stops_per_leg: 0,
+      max_stops_total: 2,
+      schedule: { short_from: '07:00', short_to: '21:30' },
+      airports: { MAD: ['MAD'] },
+      priority: 'price',
+      travellers: { adults: 2, children: 1, infants: 1 },
+    };
+    const excluded = [{ source: 'x', origin: 'WMI', dest: 'MAD', day: '2026-11-01', dep: '06:00' }];
+    const query = shareQuery({ ...request, ...options, excluded });
+    expect(query).toBe(
+      'from=WAW&back=VNO&cities=MAD,AMS&dates=2026-11-01..2026-11-08&nights=2-4&maybe=AMS&pins=MAD:2026-11-03..2026-11-04' +
+        '&stops=0&connections=2&hours=07:00-21:30&airports=MAD&priority=price&adults=2&children=1&infants=1',
+    );
+    const prefs = fillPrefs(new URLSearchParams(query), new Map(), isPlace, undefined, (city) => airports[city] ?? []);
+    expect(sharedRequest(prefs, 'id-1')).toEqual({ ...request, ...options });
+  });
+
+  it('drops an option the API would refuse rather than guess', () => {
+    const read = (query: string) => fillPrefs(new URLSearchParams(`from=WAW&cities=MAD&${query}`), new Map(), isPlace).options;
+    expect(read('adults=1&infants=2')).toEqual({});
+    expect(read('adults=5&children=5')).toEqual({});
+    expect(read('stops=4&connections=7&hours=22:00-07:00&maybe=FCO&pins=AMS:2026-11-03')).toEqual({});
+    expect(read('pins=MAD:2026-11-05..2026-11-03,MAD:2026-11-03')).toEqual({ pinned: [{ city: 'MAD', date_from: '2026-11-03' }] });
+  });
+
+  it('reads an empty cities with a place to finish as a one-way trip, never the remembered cities', () => {
+    const oneWay = { ...request, ends: ['FCO'], cities: [] };
+    expect(shareQuery(oneWay)).toBe('from=WAW&back=FCO&cities=&dates=2026-11-01..2026-11-08&nights=2-4');
+    const prefs = fillPrefs(new URLSearchParams(shareQuery(oneWay)), parseCookies('ffly_cities=MAD'), isPlace);
+    expect(sharedRequest(prefs, 'id-1')).toEqual(oneWay);
   });
 
   it('is a shared search only when places, dates and nights all come from the query', () => {

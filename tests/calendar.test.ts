@@ -36,6 +36,20 @@ describe('pickDay', () => {
   });
 });
 
+describe('date pins (spec 015)', () => {
+  it('pick one day by picking it twice, only when the picker allows it', () => {
+    expect(pickDay({ from: '2026-11-05' }, '2026-11-05', 3, true)).toEqual({ from: '2026-11-05', to: '2026-11-05' });
+    expect(pickDay({ from: '2026-11-05' }, '2026-11-05', 3)).toEqual({ from: '2026-11-05' });
+  });
+
+  it('disable the days outside their bounds', () => {
+    const bounds = { first: '2026-11-02', last: '2026-11-07' };
+    expect(dayState('2026-11-01', {}, '2026-10-05', 30, bounds).disabled).toBe(true);
+    expect(dayState('2026-11-02', {}, '2026-10-05', 30, bounds).disabled).toBe(false);
+    expect(dayState('2026-11-08', {}, '2026-10-05', 30, bounds).disabled).toBe(true);
+  });
+});
+
 describe('dayState', () => {
   const today = '2026-10-05';
   it('disables past days', () => {

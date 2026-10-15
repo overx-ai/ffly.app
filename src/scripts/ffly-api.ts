@@ -1,9 +1,10 @@
-import { FFLY_API_BASE, WEB_SEARCH } from '../app';
+import { FFLY_API_BASE, FLIGHT_HOURS, WEB_SEARCH } from '../app';
 
 // Wire shapes of ffly API contract 1.3.0 (1B-bots apps/ffly-api/contract/openapi.json, spec 533), plus the
 // shared-search lookup of 1.5.0 (spec 535), the localized places of 1.7.0 and their country of 1.8.0, only the fields this page reads. The web channel gets routes 1-3 in
 // full and a locked tail, so most fields are optional. 1.12.0 (spec 574, read only with CONTRACT_1_12) adds the caller's
 // Authorization, leg offers, the Pro preview and the Trip kit; their sellers are never read, so no partner is named.
+// Spec 015 sends the request's options: one-way trips (1.10.0) and travellers (1.11.0) today, the rest from 1.12.0.
 
 export interface Place {
   code: string;
@@ -20,14 +21,77 @@ export interface Meta {
   places_version?: string | null;
   currency: string;
   limits: { max_cities: number; max_ends: number; max_nights: number; max_window_days: number };
-  tier_limits: { max_cities: number; max_ends?: number; searches_per_day: number | null };
+  tier_limits: { max_cities: number; max_ends?: number; searches_per_day: number | null; app_only_fields?: string[] };
   free_searches_left: number | null;
   tier?: Tier;
+  priorities?: Record<string, { label: string; hint?: string }>;
+  default_priority?: string;
 }
 
 export type Tier = 'free' | 'pro';
 
 export const endLimit = (meta: Pick<Meta, 'limits' | 'tier_limits'>) => Math.min(meta.tier_limits.max_ends ?? 1, meta.limits.max_ends);
+
+export interface Travellers {
+  adults: number;
+  children: number;
+  infants: number;
+}
+
+export const ONE_ADULT: Travellers = { adults: 1, children: 0, infants: 0 };
+
+// A flight the traveller can't book, named by a full leg's own fields. `source` is echoed back as received, never shown.
+export interface ExcludedFlight {
+  source: string;
+  origin: string;
+  dest: string;
+  day: string;
+  dep: string;
+}
+
+// In `city` every day from `date_from` through `date_to` (one day without it), and the night after the last one.
+export interface Pin {
+  city: string;
+  date_from: string;
+  date_to?: string;
+}
+
+export interface Schedule {
+  short_from: string;
+  short_to: string;
+}
+
+export const API_HOURS: Schedule = { short_from: FLIGHT_HOURS.from, short_to: FLIGHT_HOURS.to };
+
+// The request beyond the trip. Each is sent only when the visitor set it and the API allows it (allowedFields).
+export interface TripOptions {
+  optional?: string[];
+  excluded?: ExcludedFlight[];
+  pinned?: Pin[];
+  max_stops_per_leg?: number;
+  max_stops_total?: number;
+  schedule?: Schedule;
+  airports?: Record<string, string[]>;
+  priority?: string;
+  travellers?: Travellers;
+}
+
+export type OptionField = keyof TripOptions;
+
+export const OPTION_FIELDS = [
+  'optional',
+  'excluded',
+  'pinned',
+  'max_stops_per_leg',
+  'max_stops_total',
+  'schedule',
+  'airports',
+  'priority',
+  'travellers',
+] as const satisfies readonly OptionField[];
+
+// 1.11 answers these 422 app_only on the web; 1.12.0 (1B-bots spec 574) lets the web send them.
+export const V12_FIELDS: readonly OptionField[] = OPTION_FIELDS.filter((field) => field !== 'travellers');
 
 export interface Trip {
   start: string;
@@ -37,9 +101,10 @@ export interface Trip {
   dateTo: string;
   minNights: number;
   maxNights: number;
+  options?: TripOptions;
 }
 
-export interface SearchRequest {
+export interface SearchRequest extends TripOptions {
   start: string;
   ends: string[];
   cities: string[];
@@ -59,9 +124,11 @@ export interface Leg {
   day?: string | null;
   price?: number | null;
   carrier?: string | null;
+  source?: string | null;
   link?: string | null;
   dep?: string | null;
   arr?: string | null;
+  checked_at?: number | null;
   flags?: string[] | null;
   offers?: Offer[] | null;
 }
@@ -126,8 +193,48 @@ export interface SearchView {
   updated?: number | null;
 }
 
-// The web sends the trip only: priority, filters (stops, excluded, pinned) and schedule are app-only (422 app_only).
-export const buildRequest = (trip: Trip, clientRequestId: string): SearchRequest => ({
+// A field goes out only while /meta's tier_limits.app_only_fields leaves it out; 1.12.0's need CONTRACT_1_12 too. A
+// /meta without the list (the bundled snapshot, an older API) allows none, and a field the API refused stays out.
+export function allowedFields(meta: Pick<Meta, 'tier_limits'>, v12: boolean, refused: ReadonlySet<string> = new Set()): Set<OptionField> {
+  const appOnly = meta.tier_limits.app_only_fields;
+  if (!Array.isArray(appOnly)) return new Set();
+  return new Set(OPTION_FIELDS.filter((field) => (v12 || !V12_FIELDS.includes(field)) && !appOnly.includes(field) && !refused.has(field)));
+}
+
+const sameTravellers = (a: Travellers, b: Travellers) => a.adults === b.adults && a.children === b.children && a.infants === b.infants;
+const sameHours = (a: Schedule, b: Schedule) => a.short_from === b.short_from && a.short_to === b.short_to;
+
+// An option left at the API's default is no option: it is never sent, so a default search is today's request.
+export function isSet(options: TripOptions, field: OptionField): boolean {
+  const value = options[field];
+  if (value === undefined || value === null) return false;
+  if (Array.isArray(value)) return value.length > 0;
+  if (field === 'travellers') return !sameTravellers(value as Travellers, ONE_ADULT);
+  if (field === 'schedule') return !sameHours(value as Schedule, API_HOURS);
+  if (field === 'airports') return Object.keys(value).length > 0;
+  return true;
+}
+
+// A request made earlier (a skipped flight's, a kept one, a retry) loses every option the API has refused since.
+export function allowedOnly(request: SearchRequest, allowed: ReadonlySet<OptionField>): SearchRequest {
+  const dropped = OPTION_FIELDS.filter((field) => field in request && !allowed.has(field));
+  if (!dropped.length) return request;
+  const kept = { ...request };
+  for (const field of dropped) delete kept[field];
+  return kept;
+}
+
+// A deep copy, so a later edit of the form cannot change a sent request.
+export function optionsOf(options: TripOptions | undefined, allowed: ReadonlySet<OptionField>): TripOptions {
+  const given = options ?? {};
+  const sent = OPTION_FIELDS.filter((field) => allowed.has(field) && isSet(given, field));
+  return JSON.parse(JSON.stringify(Object.fromEntries(sent.map((field) => [field, given[field]]))));
+}
+
+export const hasOptions = (request: TripOptions) => OPTION_FIELDS.some((field) => isSet(request, field));
+
+// One request model for every trip type: the trip, then only the options the visitor set and the API allows.
+export const buildRequest = (trip: Trip, clientRequestId: string, allowed: ReadonlySet<OptionField> = new Set()): SearchRequest => ({
   start: trip.start,
   ends: trip.ends.length ? [...trip.ends] : [trip.start],
   cities: [...trip.cities],
@@ -135,6 +242,7 @@ export const buildRequest = (trip: Trip, clientRequestId: string): SearchRequest
   date_to: trip.dateTo,
   min_nights: trip.minNights,
   max_nights: trip.maxNights,
+  ...optionsOf(trip.options, allowed),
   client_request_id: clientRequestId,
 });
 
@@ -142,7 +250,8 @@ export const ACTIVE: readonly SearchStatus[] = ['fetching', 'planning'];
 
 export type SubmitOutcome =
   | { kind: 'created'; id: string }
-  | { kind: 'quota' | 'city_limit' | 'invalid' | 'app_only' | 'busy' | 'web_unavailable' | 'error' };
+  | { kind: 'app_only'; field?: string }
+  | { kind: 'quota' | 'city_limit' | 'invalid' | 'busy' | 'web_unavailable' | 'error' };
 
 export class NotFound extends Error {}
 
@@ -209,7 +318,7 @@ export async function createSearch(request: SearchRequest): Promise<SubmitOutcom
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(request),
   });
-  const body = (await res.json().catch(() => ({}))) as { id?: unknown; reason?: unknown };
+  const body = (await res.json().catch(() => ({}))) as { id?: unknown; reason?: unknown; field?: unknown };
   switch (res.status) {
     case 202:
       return typeof body.id === 'string' ? { kind: 'created', id: body.id } : { kind: 'error' };
@@ -218,7 +327,8 @@ export async function createSearch(request: SearchRequest): Promise<SubmitOutcom
     case 429:
       return { kind: 'quota' };
     case 422:
-      return { kind: body.reason === 'app_only' ? 'app_only' : 'invalid' };
+      if (body.reason !== 'app_only') return { kind: 'invalid' };
+      return typeof body.field === 'string' ? { kind: 'app_only', field: body.field } : { kind: 'app_only' };
     case 503:
       return { kind: body.reason === 'web_unavailable' ? 'web_unavailable' : 'busy' };
     default:
@@ -228,11 +338,14 @@ export async function createSearch(request: SearchRequest): Promise<SubmitOutcom
 
 export type SharedOutcome = { kind: 'hit'; view: SearchView } | { kind: 'miss' };
 
-export const canLookup = (request: SearchRequest, today: string) => request.date_from >= today;
+// The lookup's parameters name the trip alone, and the API keys a search by its whole request: a link with any option
+// set would open that trip's plain search, so it only pre-fills (1B-bots spec 574 R3 adds a key for those).
+export const isCurrent = (request: SearchRequest, today: string) => request.date_from >= today;
+export const canLookup = (request: SearchRequest, today: string) => isCurrent(request, today) && !hasOptions(request);
 
-// Lists go comma-separated and readable (cities=MAD,AMS), as in the app's share link and the shared lookup.
+// Lists go comma-separated and readable (cities=MAD,AMS, pins=ROM:2026-11-05), as in the app's share link.
 export const commaQuery = (pairs: [string, string][]) =>
-  pairs.map(([key, value]) => `${key}=${encodeURIComponent(value).replace(/%2C/g, ',')}`).join('&');
+  pairs.map(([key, value]) => `${key}=${encodeURIComponent(value).replace(/%2C/g, ',').replace(/%3A/g, ':')}`).join('&');
 
 // A stored web search, free of quota: a finished result, or an identical search still running (poll it by id).
 // Anything else (an older API's 404 or 405, a 422, a CORS or network failure) is a miss: the caller only pre-fills.
