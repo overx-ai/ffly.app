@@ -17,8 +17,16 @@ source: META_STATE bridges/012-1b-bots-to-0e-extensions--ios-ffly.md
 # 013 - Legal pages ready for accounts and partner offers
 
 > **TL;DR** - /terms and /privacy hold true for both app 1.0 and v2: no free-search count, optional Apple or Google
-> sign-in through auth.overx.ai, named partner offers that may earn ffly a commission, and the partner script only
-> after cookie consent. `npm test` enforces it. Owner: publish before the iOS 1.0, at least 30 days ahead of accounts.
+> sign-in, partner offers (unnamed) that may earn ffly a commission, and the partner script only after cookie consent.
+> `npm test` enforces it. Owner: publish before the iOS 1.0, at least 30 days ahead of accounts.
+
+**Amendment (founder, 2026-10-15), overrides anything below that disagrees:**
+- **Generic wording.** No partner names and no "OverX" or auth host anywhere on /terms or /privacy. Partners are "a
+  flight booking partner" and "hotel, eSIM, travel insurance and airport transfer partners"; sign-in is "our sign-in
+  service, with Apple or Google". Today's check-legal bans (`MECHANICS`, the OverX ban) stay whole: no exceptions.
+- **The partner script is gated.** The owner confirmed on 2026-10-15 that the network's site verification is done.
+- **Ranking.** /terms `#not-a-travel-agent` adds: "Partners don't pay for placement; routes follow the priority you
+  choose." 
 
 **Related**: [011 - Privacy and terms, bulletproof](011-legal-pages-bulletproof.md) (the structure and gates this
 extends), [004 - Localization and analytics](004-localization-and-analytics.md) (the consent banner).
@@ -51,20 +59,19 @@ mechanics (no field names, endpoints or storage details) on legal pages.
   writing to `CONTACT_EMAIL`.
 
 **Privacy (`src/data/privacy.ts`)**
-- R6 **New `#account` section, "Signing In".** Optional sign-in with Apple or Google through auth.overx.ai, OverX's own
-  account service. What is kept: an email address (with Sign in with Apple, possibly a private relay address Apple
+- R6 **New `#account` section, "Signing In".** Optional sign-in with Apple or Google, through our sign-in
+  service. What is kept: an email address (with Sign in with Apple, possibly a private relay address Apple
   forwards to you) and an account identifier. Why: to apply your plan and limits wherever you sign in, in the app and on
   the website. How long: while the account exists, deleted when you delete it, except what the law requires us to keep
   (no number of days unless 1B-bots spec 573 states one). How to delete: in the app's Settings, or by writing to
   `CONTACT_EMAIL`. On this website, Apple's and Google's sign-in tools load only when you choose to sign in, and signing
   out removes the website's sign-in cookie.
-- R7 **New `#partner-offers` section, "Partner Offers".** ffly may show offers from partners: flights (Aviasales,
-  through Travelpayouts), hotels (Trip.com, Agoda), an eSIM (Yesim), travel insurance (EKTA) and airport transfers
-  (Welcome Pickups, KiwiTaxi). Opening one takes you to that partner's site, whose terms and privacy policy apply and
+- R7 **New `#partner-offers` section, "Partner Offers".** ffly may show offers from partners: a flight booking
+  partner, and hotel, eSIM, travel insurance and airport transfer partners (unnamed). Opening one takes you to that partner's site, whose terms and privacy policy apply and
   which may set its own cookies; "ffly may earn a commission", at no extra cost to you. Clicks are counted with an
   anonymous tag naming the platform (the app or this website) and the place the offer was shown: the same for every
   ffly user, never anything that identifies you. In plain words, as the house rule requires: never the field name
-  `sub_id`. The partners are named only as partners whose offers ffly shows, never as where fares come from.
+  `sub_id`. No partner is named.
 - R8 **Quotas.** `#app-user-id`, `#ip-address`, `#on-device` and `#retention` say free searches and the fair-use limit
   are counted per device (installation), per account if you sign in, or per IP address.
 - R9 **Every "no account" line becomes optional sign-in**: `description`, the summary ("ffly has no account and no
@@ -90,11 +97,11 @@ mechanics (no field names, endpoints or storage details) on legal pages.
 - R12 `scripts/check-legal.mjs` (failing first) enforces the new required phrases and rejects a hardcoded free-search
   count (details in Architecture).
 - R13 `src/site-pages.ts` lastmod for `privacy` and `terms` is the publish date (Effective = Last updated). CLAUDE.md:
-  the legal rules, the `AD_NETWORK_SCRIPT` exception removed, and the two dated exceptions of R6/R7 recorded.
+  the legal rules, the `AD_NETWORK_SCRIPT` exception removed (verification done, owner 2026-10-15).
 
 ## Architecture
-- Copy stays in `src/data/{terms,privacy}.ts`, facts in `src/app.ts` (CLAUDE.md). Add `SERVICE.authHost =
-  'auth.overx.ai'` beside `SERVICE.apiHost`; `#account` and spec 014 both read it. New ids go into `IDS` / `ALL_IDS`
+- Copy stays in `src/data/{terms,privacy}.ts`, facts in `src/app.ts` (CLAUDE.md). `SERVICE.authHost` is spec 014's,
+  never legal copy. New ids go into `IDS` / `ALL_IDS`
   and check-legal's `TERMS_IDS` / `PRIVACY_IDS`; cross-references come from `legalSections`, never a typed number.
   `#subscriptions` and `#lifetime` keep numbers 6 and 7, so new privacy sections go after `#booking-links` and terms
   gets no new section.
@@ -106,13 +113,11 @@ mechanics (no field names, endpoints or storage details) on legal pages.
 - **check-legal** (mirrors its existing patterns):
   - required phrases: R1's limits sentence verbatim, "as shown at purchase" in `#subscriptions` and `#lifetime`, "if
     you sign in with the same account", the partner-offer commission in `#not-a-travel-agent`; `#account` names Apple,
-    Google, private relay, account deletion in Settings and `CONTACT_EMAIL`; `#partner-offers` names every partner and
-    "ffly may earn a commission";
+    Google, private relay, account deletion in Settings and `CONTACT_EMAIL`; `#partner-offers` says "ffly may earn a
+    commission" and names no partner;
   - **no free-search count** on /terms or /privacy: no `\d+ (free )?searches`, no `\d+-search`, no digit before "a day"
     or "per day" next to "search";
-  - `NAMED_PARTNERS` (the eight names) allowed only inside /privacy `#partner-offers`: still banned on every other page,
-    in `llms.txt` and in the bundle (today `MECHANICS` bans Aviasales and Travelpayouts everywhere, legal included);
-  - the OverX ban (line 252) exempts `#account` only;
+  - `MECHANICS` and the OverX ban (line 252) unchanged, with no exceptions;
   - `AD_NETWORK_SCRIPT`: no page's HTML references its host (inverts lines 403-405); the bundle carries it exactly
     while set; the CSP keeps its host while set; `#website` says it waits for consent; `#ccpa` has no GPC exception;
   - the banner checks (lines 436-450) and the consent-cookie filter (lines 201-203) key on "GA or partner script set".
@@ -122,9 +127,7 @@ mechanics (no field names, endpoints or storage details) on legal pages.
 |------|--------|------------|--------|
 | A sentence true only in v2 ("you can sign in") ships with 1.0 | false statement to App Review and users | conditional phrasing; review every changed line against both 1.0 and v2 before merge | founder |
 | Accounts are a new kind of data, and `#changes` promises 30 days' notice | v2 launches in breach of the policy's own clause | publish this spec at least 30 days before accounts go live; Effective date = publish date | privacy `#changes` |
-| Naming Aviasales hints at where fares come from | fare sources are confidential | the names appear only in `#partner-offers`, framed as offers ffly shows, never beside fare checking (`#searches` stays generic) | founder copy rule |
-| Partner names and auth.overx.ai collide with the 2026-10-07 rules (vendors only as processors; no OverX in legal text) | check-legal fails, or the rule silently erodes | founder approval 2026-10-15 is newer; exceptions limited to `#partner-offers` and `#account`, recorded with the date in CLAUDE.md, still banned everywhere else | CLAUDE.md |
-| The partner network re-checks site verification behind the banner | the network may flag ffly.app | owner confirms verification is already complete before merge; if it lapses, that is a new owner decision, never a silent un-gate | CLAUDE.md, owner 2026-10-10 |
+| The partner network re-checks site verification behind the banner | the network may flag ffly.app | owner confirmed verification done (2026-10-15); if it lapses, that is a new owner decision, never a silent un-gate | CLAUDE.md, owner 2026-10-10 |
 | Home, /support, `llms.txt` and two guides still say "3 searches" | none for 1.0 (true); stale in v2 | out of scope: they describe the shipped app and change with the v2 release; the count ban covers /terms and /privacy only | audit |
 | auth.overx.ai stores more than email and id (a name, say) | `#account` incomplete | the field list follows what 1B-bots spec 573 stores; scope `email` only on the web (spec 014) | 573 |
 | A label set change in ios-ffly v2's inventory | check-legal fails on `#app-store-labels` | expected: change both in lock-step then, as 011 requires | 011 |
@@ -141,7 +144,7 @@ mechanics (no field names, endpoints or storage details) on legal pages.
 |----|-------------|-------|------------|--------|-------|
 | T1 | check-legal: every Architecture assertion, seen failing on the current build first | dev | - | todo | scripts/check-legal.mjs |
 | T2 | Terms R1-R5 | dev | T1 | todo | src/data/terms.ts |
-| T3 | Privacy R6-R10 and R11's copy; `SERVICE.authHost` | dev | T1 | todo | src/data/privacy.ts, src/app.ts |
+| T3 | Privacy R6-R10 and R11's copy (generic wording) | dev | T1 | todo | src/data/privacy.ts |
 | T4 | Partner script behind consent: tag out of `BaseLayout`, consented loaders, banner while either constant is set, banner text in 13 languages, tests | dev | T1 | todo | src/layouts/BaseLayout.astro, src/scripts/consent.ts, src/scripts/consent-state.ts, src/components/ConsentBanner.astro, src/i18n/{en,de,fr,es,it,nl,pl,pt,ru,sv,da,nb,fi}.ts, tests/consent.test.ts |
 | T5 | lastmod; CLAUDE.md (legal rules, consent exception removed, dated exceptions); `AD_NETWORK_SCRIPT` comment in `src/app.ts` | dev | T2, T3, T4 | todo | src/site-pages.ts, CLAUDE.md, src/app.ts |
 

@@ -21,6 +21,10 @@ source: META_STATE bridges/012-1b-bots-to-0e-extensions--ios-ffly.md
 > clicks become consented GA4 events. Owner: set the Google client id and `APP_STORE_ID`; nothing shows before ffly API
 > 1.12.0.
 
+**Amendment (founder, 2026-10-15), overrides anything below that disagrees:** booking links carry no commission
+line (Terms and Privacy disclose it, and commission never changes the order of results). Each Trip kit block is headed
+**"Partner offers"** instead of the sentence "ffly may earn a commission", so the offers read as ads (EU UCPD, US FTC).
+
 **Related**: [001 - Free web search](001-search-web-app.md), [004 - Localization and analytics](004-localization-and-analytics.md)
 (consent, GA4), [013 - Legal pages ready for accounts and partner offers](013-legal-pages-ready-for-accounts-and-partner-offers.md)
 (the `#account` and `#partner-offers` copy this relies on).
@@ -52,7 +56,7 @@ fares come from. Free copy: "partner fares". Pro copy: "the lowest fares we find
 
 **Trip kit offers**
 - R9 During the search, in the progress card: `GET /trip-kit` with the cities and the date window. After it, under each
-  route (in its expanded details): `route.trip_kit[]`. Each block carries "ffly may earn a commission". The web always
+  route (in its expanded details): `route.trip_kit[]`. Each block is headed "Partner offers". The web always
   shows them (no Pro setting on the web yet). Text only, no partner images.
 
 **Tracking**
@@ -144,7 +148,7 @@ fares come from. Free copy: "partner fares". Pro copy: "the lowest fares we find
 | T4 | Client auth: `auth-state.ts` (tested), `auth.ts`, the sign-in row and sheet, `AUTH` constants, CSP and `AUTH_CSP` | dev | T3 | todo | src/scripts/auth-state.ts, src/scripts/auth.ts, src/components/SearchForm.astro, src/styles/search.css, src/app.ts, vercel.json, scripts/check-legal.mjs, tests/auth-state.test.ts |
 | T5 | `ffly-api.ts`: auth headers, 401 refresh and retry, `/meta` re-fetch on sign-in and sign-out, 1.12.0 types, `getTripKit` | dev | T1, T4 | todo | src/scripts/ffly-api.ts, src/scripts/search.ts, tests/ffly-api.test.ts |
 | T6 | Results: Book direct or via partner per leg, Pro teaser replacing `app_hint`, upsell with badges and "Sign in with the same account", limits from `/meta` | dev | T5 | todo | src/scripts/results.ts, src/scripts/search.ts, src/components/SearchForm.astro, src/styles/search.css, tests/results.test.ts |
-| T7 | Trip kit: progress block and per-route block, commission line on each | dev | T5 | todo | src/scripts/search.ts, src/components/SearchForm.astro, src/styles/search.css |
+| T7 | Trip kit: progress block and per-route block, each headed "Partner offers" | dev | T5 | todo | src/scripts/search.ts, src/components/SearchForm.astro, src/styles/search.css |
 | T8 | Tracking: `track.ts`, `EVENTS`, Book and kit clicks, consent state exposed by `consent.ts` | dev | T6, T7 | todo | src/scripts/track.ts, src/scripts/consent.ts, src/scripts/search.ts, src/app.ts, tests/track.test.ts |
 | T9 | Copy in 13 languages (sign-in, plans, teaser, kit, errors); the "guaranteed" ban; /privacy `#website` cookie line | dev | T6, T7 | todo | src/i18n/{en,de,fr,es,it,nl,pl,pt,ru,sv,da,nb,fi}.ts, scripts/check-legal.mjs, src/data/privacy.ts |
 | T10 | Docs: CLAUDE.md (Tech Stack, auth, tracking), README Verification, PINS prose on preflight | dev | T8, T9 | todo | CLAUDE.md, README.md, docs/PINS.md |
@@ -154,7 +158,7 @@ fares come from. Free copy: "partner fares". Pro copy: "the lowest fares we find
 - [ ] Signed out: no request to Apple or Google hosts, no `Authorization` header, anonymous API GETs send no preflight.
 - [ ] Sign in with Apple (popup) and Google work on ffly.app; the cookie is `HttpOnly; Secure; SameSite=Strict; Path=/api/auth`; no access token in any storage, JS-readable cookie or URL.
 - [ ] A Pro account gets its caps and daily searches from `/meta` and per-leg Book direct or via partner; a Free visitor gets Free caps, the teaser and the App Store upsell. No limit is a literal in the site's code.
-- [ ] Trip kit shows in the progress card and under each route, each block with "ffly may earn a commission".
+- [ ] Trip kit shows in the progress card and under each route, each block headed "Partner offers".
 - [ ] Book and kit clicks send GA4 events only after Accept; with Reject or no choice the links still open.
 - [ ] Sign out clears the cookie and drops the page to Free; an expired session does the same without an error loop.
 - [ ] Consumer contract tests green against the 1.12.0 fixtures; `npm test` green.
