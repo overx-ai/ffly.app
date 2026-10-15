@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/vercel-runtime.mjs",
     "test": "vitest run && npm run build && node scripts/check-legal.mjs",
     "preview": "node scripts/preview.mjs",
     "places": "node scripts/places.mjs"
