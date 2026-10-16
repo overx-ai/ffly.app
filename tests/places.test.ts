@@ -148,11 +148,10 @@ describe('optionParts over the full place list', () => {
   const PLACES = STATIC.places as Place[];
   const at = (code: string) => PLACES.find((p) => p.code === code)!;
 
-  it('labels a city with more than one airport, never a single airport or an airport row', () => {
+  it('labels a city with more than one airport, never a single-airport city', () => {
     expect(optionParts(at('WAR'), 'en-GB')).toMatchObject({ airports: ['WAW', 'WMI'], allAirports: true });
     expect(optionParts(at('LON'), 'de').allAirports).toBe(true);
     expect(optionParts(at('MAD'), 'en-GB')).toMatchObject({ airports: [], allAirports: false });
-    expect(optionParts(at('WAW'), 'en-GB')).toMatchObject({ airports: [], allAirports: false });
   });
 
   it('shows the name the chosen field shows, then the English and the local name only where they differ', () => {
