@@ -14,6 +14,8 @@ const de = {
       plans: 'Kostenlos und Pro',
       search: 'Suche',
       support: 'Hilfe',
+      signIn: 'Anmelden',
+      account: 'Konto',
     },
     footer: {
       label: 'Fußzeile',
@@ -289,15 +291,13 @@ const de = {
       failed: 'Die Anmeldung hat nicht geklappt. Versuch es noch einmal.',
     },
     offers: {
-      bookDirect: 'Direkt buchen',
-      bookDirectFor: 'Flug von {from} nach {to} direkt buchen',
       proTeaser: 'Pro hat diese Route etwa {amount} günstiger gefunden.',
       partnerOffers: 'Partnerangebote',
       kit: { hotel: 'Hotels', esim: 'eSIM', insurance: 'Reiseversicherung', transfer: 'Flughafentransfers' },
       kitOpen: 'Zum Angebot',
       upsellTitle: `Mehr mit ${APP.proName}`,
       free: 'Kostenlos: Partnerpreise.',
-      pro: `${APP.proName}: die niedrigsten Preise, die wir finden, auch direkt bei Airlines, mehr Städte und Suchen pro Tag, und deine Suchen kommen zuerst dran.`,
+      pro: `${APP.proName}: die niedrigsten Preise, die wir finden, mehr Städte und Suchen pro Tag, und deine Suchen kommen zuerst dran.`,
     },
     script: {
       messages: {
@@ -407,7 +407,7 @@ const de = {
           { one: '{n} vollständige Suche kostenlos in der App.', other: '{n} vollständige Suchen kostenlos in der App.' },
           'Teile eine Reise aus der App als Bordkarte.',
           'Füge einer Reise in der App mehr Städte hinzu.',
-          'In der App findest du deine Reisen jederzeit wieder.',
+          'Deine Reisen werden in der App und auf der Website gespeichert.',
         ],
       },
       notify: {
@@ -449,15 +449,15 @@ const de = {
           body: 'Daten, Flugzeiten, Airlines und Buchungslinks für jede Route, in der App genauso wie im Web.',
         },
         pro: {
-          line: 'Die niedrigsten Preise, die wir finden, auch direkt bei Airlines',
-          body: 'Mehr Städte und Zielorte, mehr Suchen, und deine Suche kommt zuerst dran, wenn viel los ist. Buche jeden Flug direkt oder über einen Partner, sofern einer angeboten wird. Wöchentlich, jährlich oder „{lifetime}“ als Einmalkauf, Preise in der App.',
+          line: 'Die niedrigsten Preise, die wir finden',
+          body: `Mehr Städte und Zielorte, mehr Suchen, und deine Suche kommt zuerst dran, wenn viel los ist. ${APP.proName} findet dieselbe Reise oft günstiger. Wöchentlich, jährlich oder „{lifetime}“ als Einmalkauf, Preise in der App.`,
         },
         promise: 'Keine Werbung in der App, abgesehen von Partnerangeboten für deine Reise. Wir verkaufen deine Daten nicht.',
       },
       faq: {
         free: {
           answer: {
-            other: `Ja. Die kostenlose Version von ${APP.name} zeigt jede Route vollständig, mit Partnerpreisen. {web} ${APP.proName} bietet zusätzlich mehr Städte, die niedrigsten Preise, die wir finden, auch direkt bei Airlines, und mehr Suchen.`,
+            other: `Ja. Die kostenlose Version von ${APP.name} zeigt jede Route vollständig, mit Partnerpreisen. {web} ${APP.proName} bietet zusätzlich mehr Städte, die niedrigsten Preise, die wir finden, und mehr Suchen.`,
           },
           web: { one: 'Du kannst {every} einmal suchen, in der App und im Web.', other: 'Du kannst {every} {n}-mal suchen, in der App und im Web.' },
           webFree: 'Die kostenlose Version funktioniert in der App und im Web gleich.',
@@ -487,16 +487,16 @@ const de = {
           lockedRow: { one: `{n} Stadt · Daten und Flüge mit ${APP.proName}`, other: `{n} Städte · Daten und Flüge mit ${APP.proName}` },
         },
         nudges: {
-          priceLine: `${APP.proName}: die niedrigsten Preise, die wir finden, auch direkt bei Airlines.`,
+          priceLine: `${APP.proName}: die niedrigsten Preise, die wir finden, mehr Städte und mehr Suchen.`,
           queue: `Mit ${APP.proName} kommt deine Suche zuerst dran, wenn viel los ist.`,
           cityCap: `Mehr Städte mit ${APP.proName}`,
           appHint: `Dieselbe Reise mit ${APP.proName}: ab {from}, {less} weniger.`,
           rotation: [
             'Jede Route vollständig, kostenlos in der App und im Web.',
             'Teile eine Reise aus der App als Bordkarte.',
-            'In der App findest du deine Reisen jederzeit wieder.',
+            'Deine Reisen werden in der App und auf der Website gespeichert.',
             `Mehr Städte und Zielorte mit ${APP.proName}.`,
-            `Mit ${APP.proName} buchst du jeden Flug direkt oder, wo angeboten, über einen Partner.`,
+            `${APP.proName} findet dieselbe Reise oft günstiger.`,
             `Mehr Suchen mit ${APP.proName}.`,
           ],
         },

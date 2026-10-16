@@ -14,6 +14,8 @@ const da = {
       plans: 'Gratis og Pro',
       search: 'Søg',
       support: 'Hjælp',
+      signIn: 'Log ind',
+      account: 'Konto',
     },
     footer: {
       label: 'Sidefod',
@@ -289,15 +291,13 @@ const da = {
       failed: 'Du kunne ikke logges ind. Prøv igen.',
     },
     offers: {
-      bookDirect: 'Book direkte',
-      bookDirectFor: 'Book {from} til {to} direkte',
       proTeaser: 'Pro fandt denne rute cirka {amount} billigere.',
       partnerOffers: 'Partnertilbud',
       kit: { hotel: 'Hoteller', esim: 'eSIM', insurance: 'Rejseforsikring', transfer: 'Lufthavnstransfer' },
       kitOpen: 'Se tilbuddet',
       upsellTitle: `Mere med ${APP.proName}`,
       free: 'Gratisversion: partnerpriser.',
-      pro: `${APP.proName}: de laveste priser, vi finder, også direkte hos flyselskaberne, flere byer og søgninger om dagen, og dine søgninger kommer først.`,
+      pro: `${APP.proName}: de laveste priser, vi finder, flere byer og søgninger om dagen, og dine søgninger kommer først.`,
     },
     script: {
       messages: {
@@ -407,7 +407,7 @@ const da = {
           { one: '{n} fuld søgning gratis i appen.', other: '{n} fulde søgninger gratis i appen.' },
           'Del en rejse som boardingkort fra appen.',
           'Tilføj flere byer til en rejse i appen.',
-          'I appen finder du altid dine rejser igen.',
+          'Dine rejser gemmes i appen og på hjemmesiden.',
         ],
       },
       notify: {
@@ -449,15 +449,15 @@ const da = {
           body: 'Datoer, flytider, flyselskaber og bookinglinks for hver rute, det samme i appen som på nettet.',
         },
         pro: {
-          line: 'De laveste priser, vi finder, også direkte hos flyselskaberne',
-          body: 'Flere byer og steder at slutte, flere søgninger, og din søgning kommer først, når der er travlt. Book hvert fly direkte, eller via en partner, hvor det tilbydes. Ugentlig, årlig eller »{lifetime}« som engangskøb. Priserne står i appen.',
+          line: 'De laveste priser, vi finder',
+          body: `Flere byer og steder at slutte, flere søgninger, og din søgning kommer først, når der er travlt. ${APP.proName} finder ofte den samme rejse billigere. Ugentlig, årlig eller »{lifetime}« som engangskøb. Priserne står i appen.`,
         },
         promise: 'Ingen reklamer i appen, bortset fra partnertilbud til din rejse. Vi sælger ikke dine data.',
       },
       faq: {
         free: {
           answer: {
-            other: `Ja. Gratisversionen af ${APP.name} viser hver rute fuldt ud, med partnerpriser. {web} ${APP.proName} giver dig flere byer, de laveste priser, vi finder, også direkte hos flyselskaberne, og flere søgninger.`,
+            other: `Ja. Gratisversionen af ${APP.name} viser hver rute fuldt ud, med partnerpriser. {web} ${APP.proName} giver dig flere byer, de laveste priser, vi finder, og flere søgninger.`,
           },
           web: { one: 'Du kan søge én gang {every}, i appen og på nettet.', other: 'Du kan søge {n} gange {every}, i appen og på nettet.' },
           webFree: 'Gratisversionen fungerer på samme måde i appen og på nettet.',
@@ -487,16 +487,16 @@ const da = {
           lockedRow: { one: `{n} by · datoer og fly med ${APP.proName}`, other: `{n} byer · datoer og fly med ${APP.proName}` },
         },
         nudges: {
-          priceLine: `${APP.proName}: de laveste priser, vi finder, også direkte hos flyselskaberne.`,
+          priceLine: `${APP.proName}: de laveste priser, vi finder, flere byer og flere søgninger.`,
           queue: `Med ${APP.proName} kommer din søgning først, når der er travlt.`,
           cityCap: `Flere byer med ${APP.proName}`,
           appHint: `Samme rejse med ${APP.proName}: fra {from}, {less} mindre.`,
           rotation: [
             'Hver rute fuldt ud, gratis i appen og på nettet.',
             'Del en rejse som boardingkort fra appen.',
-            'I appen finder du altid dine rejser igen.',
+            'Dine rejser gemmes i appen og på hjemmesiden.',
             `Flere byer og steder at slutte med ${APP.proName}.`,
-            `Med ${APP.proName} booker du hvert fly direkte, eller via en partner, hvor det tilbydes.`,
+            `${APP.proName} finder ofte den samme rejse billigere.`,
             `Flere søgninger med ${APP.proName}.`,
           ],
         },

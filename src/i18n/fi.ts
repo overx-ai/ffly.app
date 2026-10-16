@@ -14,6 +14,8 @@ const fi = {
       plans: 'Ilmainen ja Pro',
       search: 'Haku',
       support: 'Tuki',
+      signIn: 'Kirjaudu sisään',
+      account: 'Tili',
     },
     footer: {
       label: 'Alatunniste',
@@ -289,15 +291,13 @@ const fi = {
       failed: 'Kirjautuminen ei onnistunut. Yritä uudelleen.',
     },
     offers: {
-      bookDirect: 'Varaa suoraan',
-      bookDirectFor: 'Varaa suoraan: {from} – {to}',
       proTeaser: 'Pro löysi tämän reitin noin {amount} halvemmalla.',
       partnerOffers: 'Kumppanien tarjoukset',
       kit: { hotel: 'Hotellit', esim: 'eSIM', insurance: 'Matkavakuutus', transfer: 'Lentokenttäkuljetukset' },
       kitOpen: 'Katso tarjous',
       upsellTitle: `Enemmän: ${APP.proName}`,
       free: 'Ilmaisversio: kumppanien hinnat.',
-      pro: `${APP.proName}: halvimmat löytämämme hinnat, myös suoraan lentoyhtiöiltä, enemmän kaupunkeja ja hakuja päivässä, ja hakusi menevät ensin.`,
+      pro: `${APP.proName}: halvimmat löytämämme hinnat, enemmän kaupunkeja ja hakuja päivässä, ja hakusi menevät ensin.`,
     },
     script: {
       messages: {
@@ -407,7 +407,7 @@ const fi = {
           { one: '{n} täysi haku ilmaiseksi sovelluksessa.', other: '{n} täyttä hakua ilmaiseksi sovelluksessa.' },
           'Jaa matka sovelluksesta tarkastuskorttina.',
           'Lisää matkaan kaupunkeja sovelluksessa.',
-          'Matkasi tallentuvat sovellukseen.',
+          'Matkasi tallentuvat sovellukseen ja sivustolle.',
         ],
       },
       notify: {
@@ -449,15 +449,15 @@ const fi = {
           body: 'Jokaisen reitin päivät, lentoajat, lentoyhtiöt ja varauslinkit, samat sovelluksessa ja verkossa.',
         },
         pro: {
-          line: 'Halvimmat löytämämme hinnat, myös suoraan lentoyhtiöiltä',
-          body: 'Lisää kaupunkeja, paluupaikkoja ja hakuja, ja hakusi menee ensin ruuhka-aikoina. Varaa jokainen lento suoraan tai kumppanin kautta, jos sellainen on tarjolla. Viikoittainen, vuosittainen tai kertaostos ”{lifetime}”, hinnat sovelluksessa.',
+          line: 'Halvimmat löytämämme hinnat',
+          body: `Lisää kaupunkeja, paluupaikkoja ja hakuja, ja hakusi menee ensin ruuhka-aikoina. ${APP.proName} löytää saman matkan usein halvemmalla. Viikoittainen, vuosittainen tai kertaostos ”{lifetime}”, hinnat sovelluksessa.`,
         },
         promise: 'Sovelluksessa ei ole mainoksia, paitsi kumppanien tarjouksia matkaasi varten. Emme myy tietojasi.',
       },
       faq: {
         free: {
           answer: {
-            other: `Kyllä. Ilmaisversio näyttää jokaisen reitin kokonaan, kumppanien hinnoilla. {web} ${APP.proName} tuo lisää kaupunkeja, halvimmat löytämämme hinnat, myös suoraan lentoyhtiöiltä, ja lisää hakuja.`,
+            other: `Kyllä. Ilmaisversio näyttää jokaisen reitin kokonaan, kumppanien hinnoilla. {web} ${APP.proName} tuo lisää kaupunkeja, halvimmat löytämämme hinnat ja lisää hakuja.`,
           },
           web: { one: 'Voit hakea kerran {every} sekä sovelluksessa että verkossa.', other: 'Voit hakea {n} kertaa {every} sekä sovelluksessa että verkossa.' },
           webFree: 'Ilmaisversio toimii samoin sovelluksessa ja verkossa.',
@@ -490,16 +490,16 @@ const fi = {
           },
         },
         nudges: {
-          priceLine: `${APP.proName}: halvimmat löytämämme hinnat, myös suoraan lentoyhtiöiltä.`,
+          priceLine: `${APP.proName}: halvimmat löytämämme hinnat, lisää kaupunkeja ja lisää hakuja.`,
           queue: `${APP.proName}: hakusi menee ensin ruuhka-aikoina.`,
           cityCap: `Enemmän kaupunkeja: ${APP.proName}`,
           appHint: `${APP.proName} löytää saman matkan alkaen {from}, {less} vähemmän.`,
           rotation: [
             'Jokainen reitti kokonaan, ilmaiseksi sovelluksessa ja verkossa.',
             'Jaa matka sovelluksesta tarkastuskorttina.',
-            'Matkasi tallentuvat sovellukseen.',
+            'Matkasi tallentuvat sovellukseen ja sivustolle.',
             `${APP.proName} tuo lisää kaupunkeja ja paluupaikkoja.`,
-            `${APP.proName}: varaa jokainen lento suoraan tai kumppanin kautta, jos sellainen on tarjolla.`,
+            `${APP.proName} löytää saman matkan usein halvemmalla.`,
             `${APP.proName} tuo lisää hakuja.`,
           ],
         },

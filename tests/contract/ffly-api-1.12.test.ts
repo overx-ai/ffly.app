@@ -57,9 +57,9 @@ describe('a Free search view', () => {
 });
 
 describe('a Pro search view', () => {
-  it('offers Book direct, then via partner, in the API order, and no teaser', () => {
+  it('keeps one Book per leg, the first offer in the API order, and no teaser', () => {
     const [row] = routeRows(searchPro as SearchView, format, true).rows;
-    expect(row.legs[0].book.map((link) => link.kind)).toEqual(['direct', 'partner']);
+    expect(row.legs[0].book.map((link) => link.kind)).toEqual(['direct']);
     expect(row.legs[1].book.map((link) => link.kind)).toEqual(['direct']);
     expect(row.proSaving).toBeUndefined();
     expect(row.kit).toEqual([]);

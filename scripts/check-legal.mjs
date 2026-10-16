@@ -773,8 +773,11 @@ const CHEAPEST = new RegExp(`(?<!\\p{L})(?:${[
   'più bass', 'goedkoopst', 'laagst', 'najtańsz', 'najniższ', 'mais barat', 'mais baix', 'самы[ейх]? (?:дешёв|дешев|низк)',
   'дешевле', 'lägst', 'billigast', 'lavest', 'halvin', 'edullisin', 'alhaisin',
 ].join('|')})`, 'iu');
+// Founder (2026-10-17): copy never names where fares come from.
+const FARE_SOURCE = /direct airline|airlines directly|book direct\b/i;
 for (const [where, text] of [['llms.txt', llms], ...htmlPages]) {
   check(!/\u2014|&mdash;|&#8212;|&#x2014;/i.test(text), `${where}: no em dashes in published copy`);
+  check(!FARE_SOURCE.test(text), `${where}: never name where fares come from ("${text.match(FARE_SOURCE)?.[0]}")`);
   for (const [pattern, term] of UNLIMITED) check(!pattern.test(text), `${where}: Pro is never "unlimited" (${term})`);
   const promised = copyText(withoutCss(text)).split(/(?<=[.!?])\s|",/).find((sentence) => GUARANTEED.test(sentence) && CHEAPEST.test(sentence));
   check(promised === undefined, `${where}: never promise the cheapest or lowest fare as guaranteed: "${promised?.slice(0, 80)}"`);

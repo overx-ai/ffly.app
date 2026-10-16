@@ -84,6 +84,8 @@ export const AUTH = {
   refreshSkewS: 60,
   timeoutMs: 8000,
   hintKey: 'ffly.account',
+  // Also the search form's Sign in button id, so a signed-in visitor following the header link lands on the account row.
+  signInHash: '#sign-in',
 } as const;
 export function signInProviders(contract: boolean, auth: Pick<typeof AUTH, 'appleServiceId' | 'appleRegistered' | 'googleClientId'>): Provider[] {
   if (!contract) return [];

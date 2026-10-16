@@ -146,6 +146,13 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
           ))}
         </ul>
         <p id="quota-note" class="note"></p>
+        {SIGN_IN && (
+          <div class="account">
+            <span id="account-status" class="note" aria-live="polite"></span>
+            <button id="sign-in" type="button" class="btn" data-sign-in>{w.account.signIn}</button>
+            <button id="sign-out" type="button" class="btn btn-soon" hidden>{w.account.signOut}</button>
+          </div>
+        )}
       </div>
       <p id="chip-nudge" class="chip-nudge" aria-live="polite" hidden></p>
 
@@ -214,13 +221,6 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
         </div>
       </div>
     </fieldset>
-    {SIGN_IN && (
-      <div class="account-row">
-        <span id="account-status" class="note" aria-live="polite"></span>
-        <button id="sign-in" type="button" class="btn btn-soon" data-sign-in>{w.account.signIn}</button>
-        <button id="sign-out" type="button" class="btn btn-soon" hidden>{w.account.signOut}</button>
-      </div>
-    )}
   </form>
 
   <AppStrip lang={lang} />
@@ -358,7 +358,7 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
         {SIGN_IN_PROVIDERS.includes('google') && <div id="gis-sign-in" class="gis-button" hidden></div>}
       </div>
       <p id="sign-in-error" class="form-error" role="alert"></p>
-      <button id="sign-in-close" type="button" class="btn btn-soon">{w.account.close}</button>
+      <button id="sign-in-close" type="button" class="link-button sheet-close">{w.account.close}</button>
     </dialog>
   )}
 </div>

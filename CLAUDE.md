@@ -43,13 +43,16 @@ Those repos are the source of truth for copy, colours and claims.
     The refresh token lives only in `AUTH.cookie` (`HttpOnly; Secure; SameSite=Strict; Path=/api/auth`); the access token
     only in page memory (`src/scripts/auth-state.ts`), never in storage, a script-readable cookie or the URL.
     `localStorage` `AUTH.hintKey` holds `1` once this browser signed in, so a visitor who never did costs no request.
+    The header's Sign in link (`.nav-sign-in`) opens the sheet on `/` and `/search` and becomes Account (to
+    `#account-status`) once signed in; elsewhere it goes to `/search#sign-in` (`AUTH.signInHash`), which opens the sheet
+    for a signed-out visitor and is then dropped from the URL, so a reload loads no provider script.
   - **API calls** (`ffly-api.ts` `setCaller`): no header while signed out (no preflight), `Authorization: Bearer` while
     signed in on `/meta`, `/searches`, `/trip-kit`; never on `/places` or `/searches/shared`. A 401 refreshes once and
     retries; a second signs out and goes on as Free. Signing in or out asks `/meta` again and `applyMeta` redraws the caps:
     **no limit is ever a literal in the site**. The web's searches per window (ffly API 1.13.0, `searchWindow`) word the
     quota note and spent line (`quota.ts`) and, through `web-meta.json`, the home FAQ; without them no count is named.
     A Pro account (`proCaller`) sees no app strip, queue line, quota note or city-cap notice (spec 016).
-  - **Results** (`results.ts`): Book direct (Pro direct-airline offer) or plain Book (partner) per `leg.offers[]` (`rel="sponsored noopener"`, the URL as
+  - **Results** (`results.ts`): one plain Book per leg, the first of `leg.offers[]` whatever its kind (founder, 2026-10-17) (`rel="sponsored noopener"`, the URL as
     the API sends it, https only), no commission line beside them (founder, 2026-10-15); `route.pro_preview` becomes one
     "Pro found this route about €X cheaper" line under the first route that has one, replacing the app hint; the upsell
     compares Free and Pro with no number and leads with "Already have Pro? Sign in with the same account".
@@ -262,7 +265,9 @@ Those repos are the source of truth for copy, colours and claims.
 
 ## Copy rules
 - **Never "unlimited".** Pro has a fair-use cap. The 1.0 Pro line is "Every route in full, and no 3-search limit"; v2's
-  is "The lowest fares we find, including direct airline fares", and Free's says "partner fares".
+  is "The lowest fares we find", and Free's says "partner fares".
+- **Never name where fares come from**, in any language (founder, 2026-10-17); `check-legal` fails on the known English
+  phrasings on any page. Pro sells on price: "often finds the same trip for less".
 - **No web search count in copy** (spec 016): the web's limit is `/meta`'s. `check-legal` fails on a web search count on
   any English page or in `llms.txt`, except the home FAQ's, which must equal `web-meta.json`'s window. Support, guides
   and `llms.txt` name no count at all, so they hold for 1.0 and v2.

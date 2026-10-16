@@ -83,7 +83,8 @@ export function bookLinks(leg: Leg, v12: boolean): BookLink[] {
     const url = safeLink(offer.url);
     return url && (offer.kind === 'direct' || offer.kind === 'partner') ? [{ kind: offer.kind, url }] : [];
   });
-  if (fromOffers.length) return fromOffers;
+  // One Book per leg (founder, 2026-10-17): telling two apart would name where the fare comes from.
+  if (fromOffers.length) return fromOffers.slice(0, 1);
   const link = safeLink(leg.link);
   return link ? [{ kind: 'link', url: link }] : [];
 }

@@ -1,6 +1,6 @@
 ---
 import LanguageLinks from './LanguageLinks.astro';
-import { APP } from '../app';
+import { APP, AUTH, SIGN_IN } from '../app';
 import { DEFAULT_LANG, localeOf, shortCode, useLang, type Lang } from '../i18n';
 import { hreflangOf, pathFor, type Slug } from '../site-pages';
 
@@ -26,6 +26,15 @@ const code = shortCode(localeOf(lang));
       <a class="wide" href={`${home}#plans`}>{nav.plans}</a>
       <a href={`${home}#search`}>{nav.search}</a>
       <a href={pathFor('support', lang)} hreflang={hreflangOf('support', lang)}>{nav.support}</a>
+      {SIGN_IN && (
+        <a class="nav-sign-in" href={`${pathFor('search', lang)}${AUTH.signInHash}`} data-sign-in data-account-label={nav.account}>
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" />
+          </svg>
+          <span>{nav.signIn}</span>
+        </a>
+      )}
       <details class="lang-menu">
         <summary aria-label={`${footer.languages} (${code})`}>
           <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
@@ -58,21 +67,26 @@ const code = shortCode(localeOf(lang));
     gap: var(--space-md);
     padding-block: 10px;
   }
+  /* The name wraps onto a clipped second line when the nav leaves no room for it, so it shows wherever it fits. */
   .brand {
-    flex: none;
+    flex: 0 1 auto;
+    min-width: 44px;
     display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
     align-items: center;
     gap: 10px;
+    height: 44px;
+    overflow: hidden;
     color: var(--ink);
     font-family: var(--font-display);
     font-weight: 800;
     font-size: 24px;
     letter-spacing: -0.03em;
-    min-height: 44px;
     text-decoration: none;
   }
   .brand img { border-radius: 11px; }
-  nav { display: flex; align-items: center; gap: var(--space-lg); }
+  nav { flex: none; display: flex; align-items: center; gap: var(--space-lg); }
   nav a {
     color: var(--ink-2);
     font-size: 15px;
@@ -82,6 +96,8 @@ const code = shortCode(localeOf(lang));
     text-decoration: none;
   }
   nav a:hover { color: var(--ink); }
+  .nav-sign-in { white-space: nowrap; }
+  .nav-sign-in svg { display: none; }
   .lang-menu { position: relative; }
   .lang-menu summary {
     display: inline-flex;
@@ -127,23 +143,29 @@ const code = shortCode(localeOf(lang));
   }
   .lang-panel :global(a:hover) { background: var(--fill); }
   .lang-panel :global([aria-current]) { background: var(--fill); font-weight: 700; }
+  /* Below this the sign-in link is an icon the size of the language button, its label kept for screen readers. */
+  @media (max-width: 900px) {
+    .nav-sign-in {
+      justify-content: center;
+      min-width: 44px;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-pill);
+    }
+    .nav-sign-in:hover { border-color: var(--ink-2); }
+    .nav-sign-in svg { display: block; }
+    .nav-sign-in span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  }
   @media (max-width: 760px) {
     nav { gap: var(--space-md); }
     nav .wide { display: none; }
   }
-  @media (max-width: 400px) {
-    .bar, nav { gap: 12px; }
+  @media (max-width: 420px) {
+    .bar, nav { gap: 8px; }
     .lang-menu summary { padding-inline: 0; justify-content: center; }
     .lang-menu summary span { display: none; }
   }
   @media (max-width: 359px) {
-    .brand span {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip-path: inset(50%);
-      white-space: nowrap;
-    }
+    .bar, nav { gap: 6px; }
+    nav a { font-size: 13px; }
   }
 </style>

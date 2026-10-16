@@ -27,6 +27,7 @@ declare global {
 
 // Apple's answers when the visitor closes the popup themselves: nothing went wrong.
 const CANCELLED = ['popup_closed_by_user', 'user_cancelled_authorize'];
+const GIS_MAX_WIDTH = 400;
 
 const byId = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -56,6 +57,11 @@ export function setupAccount(text: AccountText, onChange: (change: Change) => vo
   const status = byId('account-status');
   const signInButton = byId('sign-in');
   const signOutButton = byId<HTMLButtonElement>('sign-out');
+  const providers = sheet.querySelector<HTMLElement>('.providers')!;
+  const navLink = document.querySelector<HTMLAnchorElement>('.nav-sign-in');
+  const navLabel = navLink?.querySelector('span');
+  const navSignedOut = { href: navLink?.getAttribute('href') ?? '', label: navLabel?.textContent ?? '' };
+  const navSignedIn = { href: `#${status.id}`, label: navLink?.dataset.accountLabel ?? '' };
 
   const auth = new AuthState({
     fetch: (url, init) => fetch(url, init),
@@ -87,20 +93,38 @@ export function setupAccount(text: AccountText, onChange: (change: Change) => vo
     apple!.disabled = false;
   };
   const initGoogle = () => {
-    const id = window.google!.accounts.id;
-    id.initialize({
+    window.google!.accounts.id.initialize({
       client_id: AUTH.googleClientId,
       callback: ({ credential }: { credential: string }) => void finish('google', { credential }),
       itp_support: true,
       use_fedcm_for_prompt: true,
     });
+  };
+  // Drawn once, while the sheet is open: Google sizes its button from the width it is given, and a closed sheet has none.
+  let googleDrawn = false;
+  const drawGoogle = () => {
+    if (googleDrawn || !sheet.open) return;
+    googleDrawn = true;
     const button = byId('gis-sign-in');
-    id.renderButton(button, { type: 'standard', theme: 'outline', size: 'large', shape: 'pill', text: 'signin_with', locale: document.documentElement.lang });
+    window.google!.accounts.id.renderButton(button, {
+      type: 'standard',
+      theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'outline' : 'filled_black',
+      size: 'large',
+      shape: 'pill',
+      text: 'signin_with',
+      logo_alignment: 'center',
+      width: Math.min(GIS_MAX_WIDTH, providers.clientWidth),
+      locale: document.documentElement.lang,
+    });
     button.hidden = false;
   };
   const load: Record<Provider, () => Promise<unknown>> = {
     apple: () => loadOnce(APPLE_JS, initApple),
-    google: () => loadOnce(GOOGLE_JS, initGoogle).then(() => window.google?.accounts.id.prompt()),
+    google: () =>
+      loadOnce(GOOGLE_JS, initGoogle).then(() => {
+        drawGoogle();
+        window.google?.accounts.id.prompt();
+      }),
   };
 
   // signIn() runs inside the click, or the browser blocks Apple's popup.
@@ -120,11 +144,19 @@ export function setupAccount(text: AccountText, onChange: (change: Change) => vo
   });
 
   // One Tap is offered once per opening, never again until the visitor opens the sheet again.
+  const open = () => {
+    error.textContent = '';
+    sheet.showModal();
+    for (const provider of SIGN_IN_PROVIDERS) load[provider]().catch(() => undefined);
+  };
   for (const opener of document.querySelectorAll<HTMLElement>('[data-sign-in]')) {
-    opener.addEventListener('click', () => {
-      error.textContent = '';
-      sheet.showModal();
-      for (const provider of SIGN_IN_PROVIDERS) load[provider]().catch(() => undefined);
+    opener.addEventListener('click', (event) => {
+      if (opener instanceof HTMLAnchorElement) {
+        // Signed in, the header link is Account and goes to the account row.
+        if (auth.signedIn) return;
+        event.preventDefault();
+      }
+      open();
     });
   }
   byId('sign-in-close').addEventListener('click', () => sheet.close());
@@ -138,11 +170,29 @@ export function setupAccount(text: AccountText, onChange: (change: Change) => vo
     return expired ? text.signedOut : '';
   };
 
+  const renderNavLink = () => {
+    if (!navLink || !navLabel) return;
+    const state = auth.signedIn ? navSignedIn : navSignedOut;
+    navLink.setAttribute('href', state.href);
+    navLabel.textContent = state.label;
+  };
+
   const render = (pro: boolean, expired = false) => {
     status.textContent = statusLine(pro, expired);
     signInButton.hidden = auth.signedIn;
     signOutButton.hidden = !auth.signedIn;
+    renderNavLink();
   };
 
-  return { auth, render };
+  // A link from another page (the header's, which runs no script there) asks for the sheet with the fragment. It is
+  // dropped once read, so a reload or Back loads no provider script unasked (/privacy). The page's first /meta waits
+  // on this, so it must not throw: showModal() can on a sheet the visitor opened in the meantime.
+  const resume = async () => {
+    await auth.resume();
+    if (location.hash !== AUTH.signInHash) return;
+    history.replaceState(history.state, '', location.pathname + location.search);
+    if (!auth.signedIn && !sheet.open) open();
+  };
+
+  return { auth, render, resume };
 }

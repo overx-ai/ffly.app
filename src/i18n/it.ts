@@ -14,6 +14,8 @@ const it = {
       plans: 'Gratis e Pro',
       search: 'Cerca',
       support: 'Assistenza',
+      signIn: 'Accedi',
+      account: 'Account',
     },
     footer: {
       label: 'Piè di pagina',
@@ -289,15 +291,13 @@ const it = {
       failed: 'Accesso non riuscito. Riprova.',
     },
     offers: {
-      bookDirect: 'Prenota direttamente',
-      bookDirectFor: 'Prenota il volo da {from} a {to} direttamente',
       proTeaser: 'Pro ha trovato questo itinerario a circa {amount} in meno.',
       partnerOffers: 'Offerte dei partner',
       kit: { hotel: 'Hotel', esim: 'eSIM', insurance: 'Assicurazione di viaggio', transfer: 'Transfer aeroportuali' },
       kitOpen: 'Vedi l’offerta',
       upsellTitle: `Di più con ${APP.proName}`,
       free: 'Gratis: tariffe dei partner.',
-      pro: `${APP.proName}: le tariffe più basse che troviamo, anche quelle dirette delle compagnie aeree, più città e ricerche al giorno, e le tue ricerche passano per prime.`,
+      pro: `${APP.proName}: le tariffe più basse che troviamo, più città e ricerche al giorno, e le tue ricerche passano per prime.`,
     },
     script: {
       messages: {
@@ -407,7 +407,7 @@ const it = {
           { one: '{n} ricerca completa gratis nell’app.', other: '{n} ricerche complete gratis nell’app.' },
           'Condividi un viaggio come carta d’imbarco dall’app.',
           'Aggiungi altre città a un viaggio, nell’app.',
-          'I tuoi viaggi restano salvati nell’app.',
+          'I tuoi viaggi restano salvati nell’app e sul sito.',
         ],
       },
       notify: {
@@ -449,15 +449,15 @@ const it = {
           body: 'Date, orari dei voli, compagnie aeree e link di prenotazione di ogni itinerario, uguali nell’app e sul web.',
         },
         pro: {
-          line: 'Le tariffe più basse che troviamo, anche quelle dirette delle compagnie aeree',
-          body: 'Più città e luoghi d’arrivo, più ricerche, e la tua ricerca passa per prima quando c’è molta richiesta. Prenota ogni volo direttamente o tramite partner, dove disponibile. Settimanale, annuale o {lifetime} (acquisto singolo), con i prezzi indicati nell’app.',
+          line: 'Le tariffe più basse che troviamo',
+          body: `Più città e luoghi d’arrivo, più ricerche, e la tua ricerca passa per prima quando c’è molta richiesta. ${APP.proName} trova spesso lo stesso viaggio a un prezzo più basso. Settimanale, annuale o {lifetime} (acquisto singolo), con i prezzi indicati nell’app.`,
         },
         promise: 'Nessuna pubblicità nell’app, a parte le offerte dei partner per il tuo viaggio. Non vendiamo i tuoi dati.',
       },
       faq: {
         free: {
           answer: {
-            other: `Sì. Il piano Gratis di ${APP.name} mostra ogni itinerario completo, con le tariffe dei partner. {web} ${APP.proName} aggiunge più città, le tariffe più basse che troviamo, anche quelle dirette delle compagnie aeree, e più ricerche.`,
+            other: `Sì. Il piano Gratis di ${APP.name} mostra ogni itinerario completo, con le tariffe dei partner. {web} ${APP.proName} aggiunge più città, le tariffe più basse che troviamo e più ricerche.`,
           },
           web: { one: 'Puoi cercare una volta {every}, nell’app e sul web.', other: 'Puoi cercare {n} volte {every}, nell’app e sul web.' },
           webFree: 'Il piano Gratis funziona allo stesso modo nell’app e sul web.',
@@ -487,16 +487,16 @@ const it = {
           lockedRow: { one: `{n} città · date e voli con ${APP.proName}`, other: `{n} città · date e voli con ${APP.proName}` },
         },
         nudges: {
-          priceLine: `${APP.proName}: le tariffe più basse che troviamo, anche quelle dirette delle compagnie aeree.`,
+          priceLine: `${APP.proName}: le tariffe più basse che troviamo, più città e più ricerche.`,
           queue: `Con ${APP.proName}, la tua ricerca passa per prima quando c’è molta richiesta.`,
           cityCap: `Più città con ${APP.proName}`,
           appHint: `Stesso viaggio con ${APP.proName}: da {from}, {less} in meno.`,
           rotation: [
             'Ogni itinerario completo, gratis nell’app e sul web.',
             'Condividi un viaggio come carta d’imbarco dall’app.',
-            'I tuoi viaggi restano salvati nell’app.',
+            'I tuoi viaggi restano salvati nell’app e sul sito.',
             `Più città e luoghi d’arrivo con ${APP.proName}.`,
-            `Con ${APP.proName}, prenota ogni volo direttamente o tramite partner, dove disponibile.`,
+            `Con ${APP.proName} lo stesso viaggio spesso costa meno.`,
             `Più ricerche con ${APP.proName}.`,
           ],
         },

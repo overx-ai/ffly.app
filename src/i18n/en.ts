@@ -21,6 +21,8 @@ const base = {
       plans: 'Free and Pro',
       search: 'Search',
       support: 'Support',
+      signIn: 'Sign in',
+      account: 'Account',
     },
     footer: {
       label: 'Footer',
@@ -300,15 +302,13 @@ const base = {
       failed: "Couldn't sign you in. Try again.",
     },
     offers: {
-      bookDirect: 'Book direct',
-      bookDirectFor: 'Book {from} to {to} direct',
       proTeaser: 'Pro found this route about {amount} cheaper.',
       partnerOffers: 'Partner offers',
       kit: { hotel: 'Hotels', esim: 'eSIM', insurance: 'Travel insurance', transfer: 'Airport transfers' },
       kitOpen: 'See offer',
       upsellTitle: `More with ${APP.proName}`,
       free: 'Free: partner fares.',
-      pro: `${APP.proName}: the lowest fares we find, including direct airline fares, more cities and searches each day, and your searches go first.`,
+      pro: `${APP.proName}: the lowest fares we find, more cities and searches each day, and your searches go first.`,
     },
     // Read by src/scripts/search.ts from the form's data-i18n attribute, so the one bundle serves every language.
     script: {
@@ -420,7 +420,7 @@ const base = {
           p({ one: '{n} full search free in the app.', other: '{n} full searches free in the app.' }),
           'Share a trip as a boarding pass from the app.',
           'Add more cities to a trip in the app.',
-          'Your trips are saved in the app.',
+          'Your trips are saved in the app and on the site.',
         ],
       },
       notify: {
@@ -465,15 +465,15 @@ const v2 = {
         body: 'Dates, flight times, airlines and booking links for every route, the same in the app and on the web.',
       },
       pro: {
-        line: 'The lowest fares we find, including direct airline fares',
-        body: "More cities and places to finish, more searches, and your search goes first when it's busy. Book each flight direct, or via a partner where one is offered. Weekly, yearly or a one-time {lifetime} purchase, priced in the app.",
+        line: 'The lowest fares we find',
+        body: "More cities and places to finish, more searches, and your search goes first when it's busy. It often finds the same trip for less. Weekly, yearly or a one-time {lifetime} purchase, priced in the app.",
       },
       promise: "No ads in the app, apart from partner offers for your trip. We don't sell your data.",
     },
     faq: {
       free: {
         answer: p({
-          other: `Yes. ${APP.name} Free shows every route in full, with partner fares. {web} ${APP.proName} adds more cities, the lowest fares we find, including direct airline fares, and more searches.`,
+          other: `Yes. ${APP.name} Free shows every route in full, with partner fares. {web} ${APP.proName} adds more cities, the lowest fares we find and more searches.`,
         }),
         web: p({ one: 'You can search once {every}, in the app and on the web.', other: 'You can search {n} times {every}, in the app and on the web.' }),
         webFree: 'Free works the same in the app and on the web.',
@@ -497,16 +497,16 @@ const v2 = {
         lockedRow: p({ one: `{n} city · dates and flights with ${APP.proName}`, other: `{n} cities · dates and flights with ${APP.proName}` }),
       },
       nudges: {
-        priceLine: `${APP.proName}: the lowest fares we find, including direct airline fares.`,
+        priceLine: `${APP.proName}: the lowest fares we find, more cities and more searches.`,
         queue: `With ${APP.proName}, your search goes first when it's busy.`,
         cityCap: `More cities with ${APP.proName}`,
         appHint: `Same trip with ${APP.proName}: from {from}, {less} less.`,
         rotation: [
           'Every route in full, free in the app and on the web.',
           'Share a trip as a boarding pass from the app.',
-          'Your trips are saved in the app.',
+          'Your trips are saved in the app and on the site.',
           `More cities and places to finish with ${APP.proName}.`,
-          `With ${APP.proName}, book each flight direct, or via a partner where offered.`,
+          `${APP.proName} often finds the same trip for less.`,
           `More searches with ${APP.proName}.`,
         ],
       },

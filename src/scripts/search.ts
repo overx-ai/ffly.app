@@ -835,12 +835,7 @@ const tracked = <T extends HTMLElement>(node: T, event: TrackEvent, params: Omit
 function bookButton(template: HTMLAnchorElement, link: BookLink, leg: LegRow): HTMLAnchorElement {
   const book = template.cloneNode(true) as HTMLAnchorElement;
   book.href = link.url;
-  let label = MESSAGES.book;
-  if (link.kind === 'direct') {
-    book.textContent = OFFERS.bookDirect;
-    label = OFFERS.bookDirectFor;
-  }
-  book.setAttribute('aria-label', fill(label, { from: leg.from, to: leg.to }));
+  book.setAttribute('aria-label', fill(MESSAGES.book, { from: leg.from, to: leg.to }));
   return CONTRACT_1_12 ? tracked(book, EVENTS.book, { placement: 'results', kind: link.kind }) : book;
 }
 
@@ -1988,6 +1983,7 @@ async function accountChanged(change: Change) {
 }
 
 glideLinks('search');
+glideLinks('account-status');
 setupStrip(parseCookies(document.cookie));
 picker.set(defaultWindow());
 passports = library.passports();
@@ -1996,6 +1992,6 @@ void loadVisa();
 el.fields.addEventListener('focusin', () => void loadPlaces());
 loadPlacesWhenIdle();
 setCaller(account?.auth);
-const firstMeta = account ? account.auth.resume().then(getMeta) : getMeta();
+const firstMeta = account ? account.resume().then(getMeta) : getMeta();
 firstMeta.catch(() => undefined);
 void openForm().then((prefs) => init(prefs, firstMeta));

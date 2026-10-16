@@ -14,6 +14,8 @@ const pt = {
       plans: 'Gratuito e Pro',
       search: 'Pesquisa',
       support: 'Apoio',
+      signIn: 'Iniciar sessão',
+      account: 'Conta',
     },
     footer: {
       label: 'Rodapé',
@@ -289,15 +291,13 @@ const pt = {
       failed: 'Não foi possível iniciar sessão. Tente novamente.',
     },
     offers: {
-      bookDirect: 'Reservar diretamente',
-      bookDirectFor: 'Reservar voo de {from} para {to} diretamente',
       proTeaser: 'O Pro encontrou este itinerário cerca de {amount} mais barato.',
       partnerOffers: 'Ofertas de parceiros',
       kit: { hotel: 'Hotéis', esim: 'eSIM', insurance: 'Seguro de viagem', transfer: 'Transferes do aeroporto' },
       kitOpen: 'Ver oferta',
       upsellTitle: `Mais com o ${APP.proName}`,
       free: 'Gratuito: tarifas de parceiros.',
-      pro: `${APP.proName}: as tarifas mais baixas que encontramos, incluindo tarifas diretas das companhias aéreas, mais cidades e pesquisas por dia, e as suas pesquisas passam à frente.`,
+      pro: `${APP.proName}: as tarifas mais baixas que encontramos, mais cidades e pesquisas por dia, e as suas pesquisas passam à frente.`,
     },
     script: {
       messages: {
@@ -407,7 +407,7 @@ const pt = {
           { one: '{n} pesquisa completa gratuita na app.', other: '{n} pesquisas completas gratuitas na app.' },
           'Partilhe uma viagem como cartão de embarque a partir da app.',
           'Adicione mais cidades a uma viagem, na app.',
-          'As suas viagens ficam guardadas na app.',
+          'As suas viagens ficam guardadas na app e no site.',
         ],
       },
       notify: {
@@ -449,15 +449,15 @@ const pt = {
           body: 'Datas, horários dos voos, companhias aéreas e ligações de reserva de todos os itinerários, iguais na app e na web.',
         },
         pro: {
-          line: 'As tarifas mais baixas que encontramos, incluindo tarifas diretas das companhias aéreas',
-          body: 'Mais cidades e locais para terminar, mais pesquisas, e a sua pesquisa passa à frente quando há muita procura. Reserve cada voo diretamente ou, quando disponível, através de parceiro. Semanal, anual ou {lifetime}, uma compra única, com preços indicados na app.',
+          line: 'As tarifas mais baixas que encontramos',
+          body: `Mais cidades e locais para terminar, mais pesquisas, e a sua pesquisa passa à frente quando há muita procura. O ${APP.proName} encontra muitas vezes a mesma viagem por menos. Semanal, anual ou {lifetime}, uma compra única, com preços indicados na app.`,
         },
         promise: 'Sem anúncios na app, exceto ofertas de parceiros para a sua viagem. Não vendemos os seus dados.',
       },
       faq: {
         free: {
           answer: {
-            other: `Sim. O plano Gratuito do ${APP.name} mostra todos os itinerários completos, com tarifas de parceiros. {web} O ${APP.proName} acrescenta mais cidades, as tarifas mais baixas que encontramos, incluindo tarifas diretas das companhias aéreas, e mais pesquisas.`,
+            other: `Sim. O plano Gratuito do ${APP.name} mostra todos os itinerários completos, com tarifas de parceiros. {web} O ${APP.proName} acrescenta mais cidades, as tarifas mais baixas que encontramos e mais pesquisas.`,
           },
           web: { one: 'Pode pesquisar uma vez {every}, na app e na web.', other: 'Pode pesquisar {n} vezes {every}, na app e na web.' },
           webFree: 'O plano Gratuito funciona da mesma forma na app e na web.',
@@ -487,16 +487,16 @@ const pt = {
           lockedRow: { one: `{n} cidade · datas e voos com o ${APP.proName}`, other: `{n} cidades · datas e voos com o ${APP.proName}` },
         },
         nudges: {
-          priceLine: `${APP.proName}: as tarifas mais baixas que encontramos, incluindo tarifas diretas das companhias aéreas.`,
+          priceLine: `${APP.proName}: as tarifas mais baixas que encontramos, mais cidades e mais pesquisas.`,
           queue: `Com o ${APP.proName}, a sua pesquisa passa à frente quando há muita procura.`,
           cityCap: `Mais cidades com o ${APP.proName}`,
           appHint: `A mesma viagem com o ${APP.proName}: desde {from}, {less} a menos.`,
           rotation: [
             'Todos os itinerários completos, grátis na app e na web.',
             'Partilhe uma viagem como cartão de embarque a partir da app.',
-            'As suas viagens ficam guardadas na app.',
+            'As suas viagens ficam guardadas na app e no site.',
             `Mais cidades e locais para terminar com o ${APP.proName}.`,
-            `Com o ${APP.proName}, reserve cada voo diretamente ou, quando disponível, através de parceiro.`,
+            `O ${APP.proName} encontra muitas vezes a mesma viagem por menos.`,
             `Mais pesquisas com o ${APP.proName}.`,
           ],
         },

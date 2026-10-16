@@ -14,6 +14,8 @@ const sv = {
       plans: 'Gratis och Pro',
       search: 'Sök',
       support: 'Hjälp',
+      signIn: 'Logga in',
+      account: 'Konto',
     },
     footer: {
       label: 'Sidfot',
@@ -289,15 +291,13 @@ const sv = {
       failed: 'Det gick inte att logga in. Försök igen.',
     },
     offers: {
-      bookDirect: 'Boka direkt',
-      bookDirectFor: 'Boka {from} till {to} direkt',
       proTeaser: 'Pro hittade den här rutten cirka {amount} billigare.',
       partnerOffers: 'Partnererbjudanden',
       kit: { hotel: 'Hotell', esim: 'eSIM', insurance: 'Reseförsäkring', transfer: 'Flygplatstransfer' },
       kitOpen: 'Se erbjudandet',
       upsellTitle: `Mer med ${APP.proName}`,
       free: 'Gratisversion: partnerpriser.',
-      pro: `${APP.proName}: de lägsta priserna vi hittar, även direkt hos flygbolagen, fler städer och sökningar per dag, och dina sökningar går först.`,
+      pro: `${APP.proName}: de lägsta priserna vi hittar, fler städer och sökningar per dag, och dina sökningar går först.`,
     },
     script: {
       messages: {
@@ -407,7 +407,7 @@ const sv = {
           { one: '{n} fullständig sökning gratis i appen.', other: '{n} fullständiga sökningar gratis i appen.' },
           'Dela en resa som boardingkort från appen.',
           'Lägg till fler städer i en resa i appen.',
-          'I appen hittar du alltid dina resor igen.',
+          'Dina resor sparas i appen och på webbplatsen.',
         ],
       },
       notify: {
@@ -449,15 +449,15 @@ const sv = {
           body: 'Datum, flygtider, flygbolag och bokningslänkar för varje rutt, likadant i appen och på webben.',
         },
         pro: {
-          line: 'De lägsta priserna vi hittar, även direkt hos flygbolagen',
-          body: 'Fler städer och platser att sluta på, fler sökningar, och din sökning går först när många söker samtidigt. Boka varje flyg direkt, eller via en partner där det erbjuds. Veckovis, årsvis eller ”{lifetime}” som engångsköp. Priserna finns i appen.',
+          line: 'De lägsta priserna vi hittar',
+          body: `Fler städer och platser att sluta på, fler sökningar, och din sökning går först när många söker samtidigt. ${APP.proName} hittar ofta samma resa billigare. Veckovis, årsvis eller ”{lifetime}” som engångsköp. Priserna finns i appen.`,
         },
         promise: 'Ingen reklam i appen, förutom partnererbjudanden för din resa. Vi säljer inte dina uppgifter.',
       },
       faq: {
         free: {
           answer: {
-            other: `Ja. Gratisversionen av ${APP.name} visar varje rutt i sin helhet, med partnerpriser. {web} ${APP.proName} ger dig dessutom fler städer, de lägsta priserna vi hittar, även direkt hos flygbolagen, och fler sökningar.`,
+            other: `Ja. Gratisversionen av ${APP.name} visar varje rutt i sin helhet, med partnerpriser. {web} ${APP.proName} ger dig dessutom fler städer, de lägsta priserna vi hittar och fler sökningar.`,
           },
           web: { one: 'Du kan söka en gång {every}, i appen och på webben.', other: 'Du kan söka {n} gånger {every}, i appen och på webben.' },
           webFree: 'Gratisversionen fungerar likadant i appen och på webben.',
@@ -487,16 +487,16 @@ const sv = {
           lockedRow: { one: `{n} stad · datum och flyg med ${APP.proName}`, other: `{n} städer · datum och flyg med ${APP.proName}` },
         },
         nudges: {
-          priceLine: `${APP.proName}: de lägsta priserna vi hittar, även direkt hos flygbolagen.`,
+          priceLine: `${APP.proName}: de lägsta priserna vi hittar, fler städer och fler sökningar.`,
           queue: `Med ${APP.proName} går din sökning först när många söker samtidigt.`,
           cityCap: `Fler städer med ${APP.proName}`,
           appHint: `Samma resa med ${APP.proName}: från {from}, {less} mindre.`,
           rotation: [
             'Varje rutt i sin helhet, gratis i appen och på webben.',
             'Dela en resa som boardingkort från appen.',
-            'I appen hittar du alltid dina resor igen.',
+            'Dina resor sparas i appen och på webbplatsen.',
             `Fler städer och platser att sluta på med ${APP.proName}.`,
-            `Med ${APP.proName} bokar du varje flyg direkt, eller via en partner där det erbjuds.`,
+            `${APP.proName} hittar ofta samma resa billigare.`,
             `Fler sökningar med ${APP.proName}.`,
           ],
         },

@@ -14,6 +14,8 @@ const pl = {
       plans: 'Darmowy i Pro',
       search: 'Szukaj',
       support: 'Pomoc',
+      signIn: 'Zaloguj się',
+      account: 'Konto',
     },
     footer: {
       label: 'Stopka',
@@ -308,15 +310,13 @@ const pl = {
       failed: 'Nie udało się zalogować. Spróbuj ponownie.',
     },
     offers: {
-      bookDirect: 'Rezerwuj bezpośrednio',
-      bookDirectFor: 'Rezerwuj bezpośrednio: {from} → {to}',
       proTeaser: 'Pro znalazł tę trasę o około {amount} taniej.',
       partnerOffers: 'Oferty partnerów',
       kit: { hotel: 'Hotele', esim: 'eSIM', insurance: 'Ubezpieczenie podróżne', transfer: 'Transfery lotniskowe' },
       kitOpen: 'Zobacz ofertę',
       upsellTitle: `Więcej w ${APP.proName}`,
       free: 'Darmowy: ceny partnerów.',
-      pro: `${APP.proName}: najniższe ceny, jakie znajdujemy, także bezpośrednio u linii lotniczych, więcej miast i wyszukiwań dziennie, a twoje wyszukiwania idą pierwsze.`,
+      pro: `${APP.proName}: najniższe ceny, jakie znajdujemy, więcej miast i wyszukiwań dziennie, a twoje wyszukiwania idą pierwsze.`,
     },
     script: {
       messages: {
@@ -468,7 +468,7 @@ const pl = {
           },
           'W aplikacji udostępnisz podróż jako kartę pokładową.',
           'W aplikacji dodasz do podróży więcej miast.',
-          'Twoje podróże zapisują się w aplikacji.',
+          'Twoje podróże zapisują się w aplikacji i na stronie.',
         ],
       },
       notify: {
@@ -510,15 +510,15 @@ const pl = {
           body: 'Daty, godziny lotów, linie lotnicze i linki do rezerwacji każdej trasy, tak samo w aplikacji i w przeglądarce.',
         },
         pro: {
-          line: 'Najniższe ceny, jakie znajdujemy, także bezpośrednio u linii lotniczych',
-          body: 'Więcej miast i miejsc końcowych, więcej wyszukiwań, a przy dużym ruchu twoje wyszukiwanie idzie pierwsze. Każdy lot zarezerwujesz bezpośrednio lub, jeśli jest taka opcja, przez partnera. Subskrypcja tygodniowa lub roczna albo plan „{lifetime}” kupowany jednorazowo; ceny znajdziesz w aplikacji.',
+          line: 'Najniższe ceny, jakie znajdujemy',
+          body: `Więcej miast i miejsc końcowych, więcej wyszukiwań, a przy dużym ruchu twoje wyszukiwanie idzie pierwsze. ${APP.proName} często znajduje tę samą podróż taniej. Subskrypcja tygodniowa lub roczna albo plan „{lifetime}” kupowany jednorazowo; ceny znajdziesz w aplikacji.`,
         },
         promise: 'W aplikacji nie ma reklam, poza ofertami partnerów dla twojej podróży. Nie sprzedajemy twoich danych.',
       },
       faq: {
         free: {
           answer: {
-            other: `Tak. W planie Darmowym ${APP.name} pokazuje każdą trasę w całości, z cenami partnerów. {web} ${APP.proName} dodaje więcej miast, najniższe ceny, jakie znajdujemy, także bezpośrednio u linii lotniczych, i więcej wyszukiwań.`,
+            other: `Tak. W planie Darmowym ${APP.name} pokazuje każdą trasę w całości, z cenami partnerów. {web} ${APP.proName} dodaje więcej miast, najniższe ceny, jakie znajdujemy, i więcej wyszukiwań.`,
           },
           web: {
             one: 'Możesz szukać raz {every}, w aplikacji i w przeglądarce.',
@@ -572,16 +572,16 @@ const pl = {
           },
         },
         nudges: {
-          priceLine: `${APP.proName}: najniższe ceny, jakie znajdujemy, także bezpośrednio u linii lotniczych.`,
+          priceLine: `${APP.proName}: najniższe ceny, jakie znajdujemy, więcej miast i więcej wyszukiwań.`,
           queue: `W ${APP.proName} przy dużym ruchu twoje wyszukiwanie idzie pierwsze.`,
           cityCap: `Więcej miast w ${APP.proName}`,
           appHint: `Ta sama podróż w ${APP.proName}: od {from}, o {less} taniej.`,
           rotation: [
             'Każda trasa w całości, za darmo w aplikacji i w przeglądarce.',
             'W aplikacji udostępnisz podróż jako kartę pokładową.',
-            'Twoje podróże zapisują się w aplikacji.',
+            'Twoje podróże zapisują się w aplikacji i na stronie.',
             `Więcej miast i miejsc końcowych w ${APP.proName}.`,
-            `W ${APP.proName} każdy lot zarezerwujesz bezpośrednio lub, jeśli jest taka opcja, przez partnera.`,
+            `${APP.proName} często znajduje tę samą podróż taniej.`,
             `Więcej wyszukiwań w ${APP.proName}.`,
           ],
         },

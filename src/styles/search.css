@@ -264,9 +264,10 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* App-only options: one line that scrolls sideways when it runs out of room, the free-search note at its end. */
+/* App-only options: chips that scroll sideways when they run out of room, the free-search note, then the account. */
 .search-form .app-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px 12px;
   border-top: 1px solid var(--rule);
@@ -460,9 +461,7 @@
   .search-form .trip-row:has(#back-field[hidden]) :is(#from-list, #to-list) { left: 0; right: 0; width: auto; }
   .search-form .cities-row { grid-template-columns: minmax(0, 1fr); }
   .search-form .cities-row .btn { width: 100%; }
-  .search-form .app-row { flex-wrap: wrap; }
   .search-form .locked-chips { flex-basis: 100%; order: 1; }
-  .search-form #quota-note { margin-left: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -510,18 +509,18 @@
   .results-table .skeleton :is(.rank, .dates, .nights, .flights, .warn, .details) { display: none; }
 }
 
-/* Spec 014: sign-in, the direct and partner Book buttons, the Pro teaser and the Trip kit, all behind CONTRACT_1_12. */
-.search-form .account-row {
+/* Spec 014: sign-in, the Book buttons, the Pro teaser and the Trip kit, all behind CONTRACT_1_12. */
+.search-form .account {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--space-sm) 12px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--rule);
+  gap: 6px 12px;
+  margin-left: auto;
 }
-.search-form .account-row .btn { min-height: 36px; padding: 0 16px; font-size: 14px; }
+.search-form .account .btn { min-height: 30px; padding: 0 14px; font-size: 13px; }
+.search-form .account > * { scroll-margin-top: var(--header-height); }
+.search-form #account-status { font-size: 13px; }
 .search-form #account-status:empty { display: none; }
 
 .search-ui .sheet {
@@ -543,7 +542,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 44px;
+  min-height: 40px;
   padding: 0 20px;
   border: 1px solid var(--black);
   border-radius: var(--radius-pill);
@@ -554,7 +553,8 @@
 }
 .search-ui .apple-button:disabled { opacity: 0.5; cursor: default; }
 .search-ui .apple-button svg { width: 18px; height: 18px; fill: currentColor; }
-.search-ui .gis-button { display: flex; justify-content: center; min-height: 44px; }
+/* An iframe whose colour scheme differs from its parent's gets an opaque backdrop: Google's button is light. */
+.search-ui .gis-button { display: flex; justify-content: center; min-height: 40px; color-scheme: light; }
 
 .search-ui .link-button {
   padding: 0;
@@ -567,6 +567,7 @@
   text-underline-offset: 3px;
   cursor: pointer;
 }
+.search-ui .sheet .sheet-close { display: block; min-height: 44px; margin-inline: auto; }
 .search-ui .plan-compare { margin: 0; padding-left: 1.2em; color: var(--ink-2); }
 
 .search-ui .kit { display: flex; flex-direction: column; gap: 6px; }
@@ -753,7 +754,8 @@
   .results-table .leg-more,
   .results-table .route-actions .btn,
   .search-ui .library-actions .btn,
-  .search-ui .skipped .btn { min-height: 44px; }
+  .search-ui .skipped .btn,
+  .search-form .account .btn { min-height: 44px; }
   .results-table .leg-more { min-width: 44px; }
   .search-ui .rating :is(a, .link-button) { display: inline-flex; align-items: center; min-height: 44px; }
 }

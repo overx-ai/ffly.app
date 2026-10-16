@@ -14,6 +14,8 @@ const nl = {
       plans: 'Gratis en Pro',
       search: 'Zoeken',
       support: 'Hulp',
+      signIn: 'Inloggen',
+      account: 'Account',
     },
     footer: {
       label: 'Voettekst',
@@ -289,15 +291,13 @@ const nl = {
       failed: 'Inloggen is niet gelukt. Probeer het opnieuw.',
     },
     offers: {
-      bookDirect: 'Boek direct',
-      bookDirectFor: 'Boek {from} naar {to} direct',
       proTeaser: 'Pro vond deze route zo’n {amount} goedkoper.',
       partnerOffers: 'Partneraanbiedingen',
       kit: { hotel: 'Hotels', esim: 'eSIM', insurance: 'Reisverzekering', transfer: 'Luchthaventransfers' },
       kitOpen: 'Bekijk aanbod',
       upsellTitle: `Meer met ${APP.proName}`,
       free: 'Gratis: partnerprijzen.',
-      pro: `${APP.proName}: de laagste prijzen die we vinden, ook rechtstreeks bij airlines, meer steden en zoekopdrachten per dag, en jouw zoekopdrachten gaan voor.`,
+      pro: `${APP.proName}: de laagste prijzen die we vinden, meer steden en zoekopdrachten per dag, en jouw zoekopdrachten gaan voor.`,
     },
     script: {
       messages: {
@@ -407,7 +407,7 @@ const nl = {
           { one: '{n} volledige zoekopdracht gratis in de app.', other: '{n} volledige zoekopdrachten gratis in de app.' },
           'Deel een reis als instapkaart vanuit de app.',
           'Voeg in de app meer steden toe aan een reis.',
-          'Je reizen worden bewaard in de app.',
+          'Je reizen worden bewaard in de app en op de site.',
         ],
       },
       notify: {
@@ -449,15 +449,15 @@ const nl = {
           body: 'Datums, vluchttijden, airlines en boekingslinks voor elke route, hetzelfde in de app en op het web.',
         },
         pro: {
-          line: 'De laagste prijzen die we vinden, ook rechtstreeks bij airlines',
-          body: 'Meer steden en eindbestemmingen, meer zoekopdrachten, en jouw zoekopdracht gaat voor als het druk is. Boek elke vlucht direct, of via een partner als er een wordt aangeboden. Wekelijks, jaarlijks of {lifetime} (eenmalige aankoop), met de prijzen in de app.',
+          line: 'De laagste prijzen die we vinden',
+          body: `Meer steden en eindbestemmingen, meer zoekopdrachten, en jouw zoekopdracht gaat voor als het druk is. ${APP.proName} vindt dezelfde reis vaak voor minder. Wekelijks, jaarlijks of {lifetime} (eenmalige aankoop), met de prijzen in de app.`,
         },
         promise: 'Geen advertenties in de app, behalve partneraanbiedingen voor je reis. We verkopen je gegevens niet.',
       },
       faq: {
         free: {
           answer: {
-            other: `Ja. De gratis versie van ${APP.name} toont elke route volledig, met partnerprijzen. {web} ${APP.proName} geeft je daarnaast meer steden, de laagste prijzen die we vinden, ook rechtstreeks bij airlines, en meer zoekopdrachten.`,
+            other: `Ja. De gratis versie van ${APP.name} toont elke route volledig, met partnerprijzen. {web} ${APP.proName} geeft je daarnaast meer steden, de laagste prijzen die we vinden en meer zoekopdrachten.`,
           },
           web: { one: 'Je kunt {every} één keer zoeken, in de app en op het web.', other: 'Je kunt {every} {n} keer zoeken, in de app en op het web.' },
           webFree: 'De gratis versie werkt hetzelfde in de app en op het web.',
@@ -487,16 +487,16 @@ const nl = {
           lockedRow: { one: `{n} stad · datums en vluchten met ${APP.proName}`, other: `{n} steden · datums en vluchten met ${APP.proName}` },
         },
         nudges: {
-          priceLine: `${APP.proName}: de laagste prijzen die we vinden, ook rechtstreeks bij airlines.`,
+          priceLine: `${APP.proName}: de laagste prijzen die we vinden, meer steden en meer zoekopdrachten.`,
           queue: `Met ${APP.proName} gaat jouw zoekopdracht voor als het druk is.`,
           cityCap: `Meer steden met ${APP.proName}`,
           appHint: `Dezelfde reis met ${APP.proName}: vanaf {from}, {less} minder.`,
           rotation: [
             'Elke route volledig, gratis in de app en op het web.',
             'Deel een reis als instapkaart vanuit de app.',
-            'Je reizen worden bewaard in de app.',
+            'Je reizen worden bewaard in de app en op de site.',
             `Meer steden en eindbestemmingen met ${APP.proName}.`,
-            `Met ${APP.proName} boek je elke vlucht direct, of via een partner als die er is.`,
+            `${APP.proName} vindt dezelfde reis vaak voor minder.`,
             `Meer zoekopdrachten met ${APP.proName}.`,
           ],
         },
