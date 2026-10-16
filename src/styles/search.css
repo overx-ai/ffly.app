@@ -332,10 +332,11 @@
 }
 .search-ui .notify-buttons { display: flex; gap: var(--space-sm); }
 
-.search-ui .results { display: flex; flex-direction: column; gap: 12px; }
-.search-ui .shared-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm) var(--space-md); color: var(--ink-2); font-size: 14px; }
-.search-ui .shared-line .btn { padding: 6px 16px; min-height: 36px; font-size: 14px; }
-.search-ui .results h2 { font-size: clamp(1.6rem, 4vw, 2rem); }
+.search-ui .results { display: flex; flex-direction: column; gap: var(--space-sm); }
+.search-ui .results-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-sm) var(--space-md); }
+.search-ui .results-head:not(:has(> :not([hidden]))) { display: none; }
+.search-ui .results-head .btn { padding: 6px 16px; min-height: 36px; font-size: 14px; }
+.search-ui .results h2 { font-size: clamp(1.35rem, 3vw, 1.6rem); }
 .search-ui .insights {
   padding: var(--space-md) var(--space-lg);
   border-left: 3px solid var(--gold);
@@ -666,7 +667,29 @@
   cursor: pointer;
 }
 .search-form .chip-mode:disabled { cursor: default; }
-.search-form .chip.maybe { border-style: dashed; background: none; }
+/* A must city is gold, a maybe city a dashed outline; only chips that carry the must/maybe toggle. */
+.search-form .chip:not(.maybe):has(> .chip-mode:not([hidden])) { border-color: var(--must-line); background: var(--must-bg); }
+.search-form .chip:not(.maybe) > .chip-mode { color: var(--must-ink); border-left-color: var(--must-line); }
+.search-form .chip.maybe {
+  --dash: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100%25' height='100%25' rx='18' fill='none' stroke='%23000' stroke-width='3' stroke-dasharray='5 8'/%3E%3C/svg%3E");
+  position: relative;
+  border-color: transparent;
+  background: none;
+  color: var(--maybe-ink);
+  font-weight: 500;
+}
+.search-form .chip.maybe .chip-mode { color: var(--maybe-ink); border-left-color: var(--maybe-line); }
+/* CSS dashed can't space its dashes: an SVG mask draws a sparse dash in the theme colour. rx is half the chip height. */
+.search-form .chip.maybe::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: var(--maybe-line);
+  -webkit-mask: var(--dash) center / 100% 100% no-repeat;
+  mask: var(--dash) center / 100% 100% no-repeat;
+  pointer-events: none;
+}
 
 .search-ui .skipped {
   display: flex;
@@ -755,7 +778,9 @@
   .results-table .route-actions .btn,
   .search-ui .library-actions .btn,
   .search-ui .skipped .btn,
-  .search-form .account .btn { min-height: 44px; }
+  .search-form .account .btn,
+  .search-ui .results-head .btn { min-height: 44px; }
+  .search-form .chip.maybe { --dash: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100%25' height='100%25' rx='23' fill='none' stroke='%23000' stroke-width='3' stroke-dasharray='5 8'/%3E%3C/svg%3E"); }
   .results-table .leg-more { min-width: 44px; }
   .search-ui .rating :is(a, .link-button) { display: inline-flex; align-items: center; min-height: 44px; }
 }

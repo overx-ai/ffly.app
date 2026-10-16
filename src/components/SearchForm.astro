@@ -249,19 +249,17 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
   </section>
 
   <section id="results" class="results" aria-labelledby="results-title" aria-live="polite">
-    <h2 id="results-title" hidden>{w.emptyState}</h2>
+    <div class="results-head">
+      <h2 id="results-title" hidden>{w.emptyState}</h2>
+      <button id="search-again" type="button" class="btn btn-soon" hidden>{w.searchAgain}</button>
+    </div>
     <p id="results-trip" class="note" hidden></p>
-    <p id="results-shared" class="shared-line" hidden>
-      <span id="results-searched"></span>
-      <button id="search-again" type="button" class="btn btn-soon">{w.searchAgain}</button>
-    </p>
     <p id="results-empty" class="note" hidden>{w.empty}</p>
     <div id="skipped" class="skipped" hidden>
       <span id="skipped-label" class="lbl"></span>
       <ul id="skipped-list" class="skipped-list" aria-labelledby="skipped-label"></ul>
       <button id="skipped-undo" type="button" class="btn btn-soon" hidden></button>
     </div>
-    <p id="insights" class="insights" hidden></p>
     <p id="app-hint" class="app-hint" hidden></p>
     <div class="table-wrap">
       <table class="results-table">
@@ -281,6 +279,7 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
         <tbody id="route-rows"></tbody>
       </table>
     </div>
+    <p id="insights" class="insights" hidden></p>
     <p id="more-routes" hidden><a href="#app-side"></a></p>
     <p id="visa-note" class="quiet" hidden></p>
     <div id="rating" class="rating" hidden>

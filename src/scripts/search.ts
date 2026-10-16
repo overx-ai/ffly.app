@@ -159,8 +159,6 @@ const el = {
   results: byId('results'),
   resultsTitle: byId('results-title'),
   resultsTrip: byId('results-trip'),
-  resultsShared: byId('results-shared'),
-  resultsSearched: byId('results-searched'),
   searchAgain: byId<HTMLButtonElement>('search-again'),
   placeholder: byId('route-placeholder'),
   resultsEmpty: byId('results-empty'),
@@ -708,7 +706,7 @@ function setSearching(on: boolean) {
 
 // The table stays on the page: before any search it shows the empty state, while one runs its placeholders pulse.
 function showPlaceholder(searching: boolean) {
-  for (const node of [el.resultsTitle, el.resultsTrip, el.resultsShared, el.resultsEmpty, el.insights, el.appHint, el.more, el.coverage, el.visaNote, el.rating]) {
+  for (const node of [el.resultsTitle, el.resultsTrip, el.searchAgain, el.resultsEmpty, el.insights, el.appHint, el.more, el.coverage, el.visaNote, el.rating]) {
     node.hidden = true;
   }
   el.routeRows.replaceChildren();
@@ -775,9 +773,9 @@ function coverageLine(sources: SearchView['sources']): string {
 }
 
 // A one-way trip reads as going to the place it ends in.
-function tripLine(r: SearchRequest): string {
+function tripLine(r: SearchRequest, template = MESSAGES.trip): string {
   const finish = r.cities.length ? finishOf(r) : [];
-  return fill(MESSAGES.trip, {
+  return fill(template, {
     start: nameOf(r.start),
     cities: r.cities.length ? listOf.format(r.cities.map(nameOf)) : anyOf.format(r.ends.map(nameOf)),
     finish: finish.length ? fill(MESSAGES.finishingIn, { name: anyOf.format(finish.map(nameOf)) }) : '',
@@ -963,7 +961,7 @@ function renderResults(view: SearchView, request: SearchRequest) {
   const searched = searchedSeconds(view);
   showText(el.resultsTitle, rows.length ? count(MESSAGES.found, rows.length) : MESSAGES.none);
   showText(el.resultsTrip, tripLine(request));
-  el.resultsShared.hidden = true;
+  el.searchAgain.hidden = true;
   el.resultsEmpty.hidden = rows.length > 0;
   renderSkipped(request);
   showText(el.insights, view.insights ? insightsLine(view.insights) : '');
@@ -991,11 +989,13 @@ function searchedLine(view: SearchView): string {
   return date ? fill(MESSAGES.searchedOn, { date: searchedFormat.format(date) }) : '';
 }
 
-// A stored result someone shared: shown as it was found, with its time and a way to run it afresh.
+// A stored result someone shared: shown as it was found, with its time and a way to run it afresh. The time runs on
+// after the trip line without the template's closing full stop; the filled line's last one may be a date's ("1. Dez.").
 function showShared(view: SearchView, request: SearchRequest) {
   renderResults(view, request);
-  el.resultsSearched.textContent = searchedLine(view);
-  el.resultsShared.hidden = false;
+  const searched = searchedLine(view);
+  if (searched) showText(el.resultsTrip, `${tripLine(request, MESSAGES.trip.replace(/\.$/, ''))} · ${searched}`);
+  el.searchAgain.hidden = false;
 }
 
 // A finished hit is rendered as it is and never polled: after an API restart its id is gone. An identical search

@@ -182,6 +182,11 @@
   --accent:   var(--navy-ink);
   --danger:   var(--red);
   --on-gold:  var(--navy);
+  --must-bg:   var(--gold);
+  --must-line: var(--gold);
+  --must-ink:  var(--on-gold);
+  --maybe-ink:  var(--ink-2);
+  --maybe-line: var(--gold);
   --night:    var(--navy);
   --on-night: var(--navy-mist);
   --shadow:   0 1px 0 rgba(7, 18, 48, 0.06), 0 30px 60px -30px rgba(7, 18, 48, 0.45);
@@ -224,6 +229,9 @@
     --ink:      var(--navy-mist);
     --ink-2:    var(--navy-haze);
     --accent:   var(--gold);
+    --must-bg:   color-mix(in srgb, var(--gold) 14%, transparent);
+    --must-line: var(--gold);
+    --must-ink:  var(--gold);
     --danger:   var(--red-bright);
     --shadow:   0 30px 60px -30px rgba(0, 0, 0, 0.8);
   }

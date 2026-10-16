@@ -388,8 +388,8 @@ const ru = {
         hide: 'Скрыть',
         warn: { stops: 'Пересадки', early: 'Ранний вылет', late: 'Поздний прилёт' },
         coverage: 'Сейчас не удалось проверить часть цен.',
-        trip: 'Начало: {start}. Города: {cities}{finish}. Даты: {from} – {to}.',
-        finishingIn: '. Обратно: {name}',
+        trip: '{start} → {cities}{finish} · {from} – {to}',
+        finishingIn: ' → {name}',
         compared: {
           one: 'Сравнено цен: {fares} · дней поиска: {n}.',
           few: 'Сравнено цен: {fares} · дней поиска: {n}.',

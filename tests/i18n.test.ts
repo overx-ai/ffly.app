@@ -103,6 +103,10 @@ describe('fill and abbreviations', () => {
     expect(fill('{from} bis {to}.', { from: 'So., 15. Nov.', to: 'So., 22. Nov.' })).toBe('So., 15. Nov. bis So., 22. Nov.');
     expect(fill('{to}.', { to: '22 Nov' })).toBe('22 Nov.');
   });
+
+  it("ends every language's trip line on its last date, so a shared result's time can run on after it", () => {
+    for (const { code } of LANGS) expect(DICTIONARIES[code].widget.script.messages.trip, code).toMatch(/\{to\}\.?$/);
+  });
 });
 
 describe('editions (spec 016)', () => {
