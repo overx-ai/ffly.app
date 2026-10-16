@@ -63,9 +63,9 @@ export const SERVICE = {
 export const FFLY_API_BASE = `https://${SERVICE.apiHost}/ffly`;
 
 // ffly API contract 1.12.0 (1B-bots spec 574): sign-in, per-leg offers, the Pro teaser and the Trip kit (spec 014),
-// and the search options the web may send from 1.12.0 (spec 015). False until 1.12.0 is live: none of that UI renders,
-// every API request stays anonymous, and no option 1.11 refuses is ever sent.
-export const CONTRACT_1_12: boolean = false;
+// and the search options the web may send from 1.12.0 (spec 015), and the v2 copy edition (spec 016). On since
+// 2026-10-16, with ffly-api tiers v2 (founder: the web runs v2 now). Sign-in still waits for a ready provider.
+export const CONTRACT_1_12: boolean = true;
 
 // Sign in with Apple or Google on the web search (spec 014). The page hands the provider's token to this site's own
 // /api/auth routes, which trade it at overx-auth and keep only its refresh token, in an HttpOnly cookie; the access
