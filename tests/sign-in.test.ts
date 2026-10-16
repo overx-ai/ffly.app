@@ -18,8 +18,10 @@ describe('sign-in providers', () => {
   it('read the same in check-legal as on the site', () => {
     const auth = APP_SOURCE.match(/export const AUTH\b[^=]*=\s*([^;]+);/)![1];
     expect(readyProviders(CONTRACT_1_12, auth)).toEqual(SIGN_IN_PROVIDERS);
-    expect(readyProviders(true, auth.replace(/appleRegistered: false\b/, 'appleRegistered: true'))).toEqual(['apple']);
-    expect(readyProviders(true, auth.replace(/googleClientId: [^,]+,/, `googleClientId: '${GOOGLE_ID}',`))).toEqual(['google']);
+    const only = (apple: boolean, google: string) =>
+      auth.replace(/appleRegistered: \w+/, `appleRegistered: ${apple}`).replace(/googleClientId: [^,]+,/, `googleClientId: ${google},`);
+    expect(readyProviders(true, only(true, 'undefined'))).toEqual(['apple']);
+    expect(readyProviders(true, only(false, `'${GOOGLE_ID}'`))).toEqual(['google']);
   });
 
   it("open each provider's own script host, and Apple none of Google's", () => {

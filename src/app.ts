@@ -69,14 +69,14 @@ export const CONTRACT_1_12: boolean = true;
 
 // Sign in with Apple or Google on the web search (spec 014). The page hands the provider's token to this site's own
 // /api/auth routes, which trade it at overx-auth and keep only its refresh token, in an HttpOnly cookie; the access
-// token lives in page memory. Public ids only, no secret. Each provider goes live on its own (spec 016). TODO(owner):
-// set appleRegistered once the Services ID and its return URL are registered (1B-bots spec 573 T1), and googleClientId
-// to the "ffly web" OAuth client (573 T2), each with its CSP hosts in vercel.json (npm test names them).
+// token lives in page memory. Public ids only, no secret. Each provider goes live on its own (spec 016). Apple: the
+// Services ID and its return URL were registered 2026-10-16 (1B-bots spec 573 T1). TODO(owner): googleClientId to the
+// "ffly web" OAuth client (573 T2), with its CSP hosts in vercel.json (npm test names them).
 export const AUTH = {
   base: `https://${SERVICE.authHost}`,
   routes: '/api/auth',
   appleServiceId: 'ai.overx.ffly.web',
-  appleRegistered: false as boolean,
+  appleRegistered: true as boolean,
   appleReturnUrl: `https://${SITE_HOST}/auth/apple`,
   googleClientId: undefined as string | undefined,
   cookie: 'ffly_session',
