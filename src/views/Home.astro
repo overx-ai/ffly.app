@@ -6,11 +6,13 @@ import StoreCtas from '../components/StoreCtas.astro';
 import RouteMap from '../components/RouteMap.astro';
 import BoardingPass from '../components/BoardingPass.astro';
 import SearchForm from '../components/SearchForm.astro';
-import { APP, EXAMPLE_TRIP, WEB_SEARCH } from '../app';
+import { APP, EXAMPLE_TRIP } from '../app';
 import { useLang, type Lang } from '../i18n';
 import { formatDate, hreflangOf, pageLink, pathFor, type Slug } from '../site-pages';
 import { appSchema, faqSchema, organizationSchema } from '../schema';
 import type { FaqItem } from '../data/types';
+import { searchWindow } from '../scripts/ffly-api';
+import { WEB_META } from '../scripts/places-store';
 
 interface Props { lang: Lang; }
 
@@ -47,13 +49,16 @@ const plans = [
 ];
 
 const { faq: q } = home;
+// Spec 016: the web's searches per window from the bundled /meta snapshot (npm run places); no count until it has one.
+const webWindow = searchWindow(WEB_META.tier_limits);
+const web = webWindow ? fmt.plural(q.free.web, webWindow.searches, { every: fmt.plural(q.free.every, webWindow.hours) }) : q.free.webFree;
 const faq: FaqItem[] = [
   q.whatIs,
   { question: q.different.question, answer: fmt.text(q.different.answer, { link: guideLink('guides/cheapest-order-to-visit-cities', t.common.guideLinks.cheapestOrder) }) },
   q.airlines,
   {
     question: q.free.question,
-    answer: fmt.plural(q.free.answer, APP.freeSearches, { perDay: fmt.plural(q.free.perDay, WEB_SEARCH.freeSearchesPerDay) }),
+    answer: fmt.plural(q.free.answer, APP.freeSearches, { web }),
   },
   { question: q.tickets.question, answer: fmt.text(q.tickets.answer, { link: guideLink('guides/multi-city-vs-one-way-tickets', t.common.guideLinks.multiCity) }) },
   q.android,

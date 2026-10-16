@@ -1,6 +1,8 @@
 // Asserts legal and site facts in the built output (run after `astro build`). Regressions: docs/bugs/001, 002, 003.
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { APP_CLAIM, stringsOf } from './copy-rules.mjs';
+import { PROVIDER_CSP, readyProviders } from './sign-in.mjs';
 import { VERCEL_OUTPUT, functionRoutes } from './vercel-output.mjs';
 
 const DIST = fileURLToPath(new URL('static/', VERCEL_OUTPUT));
@@ -58,10 +60,11 @@ const adNetworkSrc = adNetworkOn ? adNetwork.slice(1, -1) : undefined;
 const adNetworkHost = adNetworkSrc ? new URL(adNetworkSrc).host : undefined;
 // Spec 013: the banner, Cookie settings and the consent cookie exist while anything waits for consent.
 const consentOn = gaOn || adNetworkOn;
-// Spec 014: sign-in exists while CONTRACT_1_12 is on and the Google web client id is set (AUTH in src/app.ts).
+// Spec 016: sign-in exists while CONTRACT_1_12 is on and at least one provider is ready (AUTH in src/app.ts).
 const contract112 = appConstant('CONTRACT_1_12') === 'true';
 const authConstant = appConstant('AUTH') ?? '';
-const signInOn = contract112 && /googleClientId: '[^']+'/.test(authConstant);
+const providers = readyProviders(contract112, authConstant);
+const signInOn = providers.length > 0;
 const sessionCookieName = authConstant.match(/cookie: '([^']+)'/)?.[1];
 const appleServiceId = authConstant.match(/appleServiceId: '([^']+)'/)?.[1];
 
@@ -141,7 +144,7 @@ for (const [num, id, title] of FIXED_TERMS_SECTIONS) {
 }
 check(/through the ffly app or ffly\.app/.test(terms('acceptable-use')), 'Terms Acceptable Use must allow ffly.app');
 check(/web search/i.test(terms('free-and-pro')), 'Terms section 5 must describe the web search');
-check(/every route in full/.test(terms('free-and-pro').split('ffly Pro:')[0]), 'Terms: app Free searches show every route in full (spec 016, T-023)');
+check(/every route in full/.test(terms('free-and-pro').split('ffly Pro:')[0]), 'Terms: app Free searches show every route in full (ios-ffly spec 016, T-023)');
 // Cached partner fares carry no checked time (ffly-api spec 532), so no page may promise one for every fare.
 check(!/when each\s+fare was last checked/.test(terms('prices')), 'Terms: must not promise a checked time for every fare');
 check(/up to a week old and show no checked time/.test(terms('prices')), 'Terms: must say cached fares may be up to a week old and show no checked time');
@@ -242,6 +245,14 @@ const account = copyText(privacy('account'));
 for (const term of ['Apple', 'Google', 'private relay', "delete it in the app's Settings", CONTACT]) {
   check(account.includes(term), `Privacy: #account must name ${term}`);
 }
+// Spec 016: the app signs in with Apple and Google; the website's sentence names the providers it offers once it does.
+const webSignIn = account.match(/On this website, (.+?) sign-in tools load/)?.[1] ?? '';
+check(webSignIn !== '', "Privacy: #account must say when the website's sign-in tools load");
+if (signInOn) {
+  for (const [provider, name] of [['apple', 'Apple'], ['google', 'Google']]) {
+    check(webSignIn.includes(name) === providers.includes(provider), `Privacy: #account must name ${name}'s sign-in on this website exactly while it is ready`);
+  }
+}
 for (const id of ['app-user-id', 'ip-address', 'on-device', 'retention']) {
   check(/per device \(your installation\), per account if you sign in, or per IP address/.test(privacy(id)), `Privacy: #${id} must say how free searches and fair use are counted`);
 }
@@ -309,7 +320,7 @@ for (const page of ['privacy', 'terms', 'support']) {
   const main = mainOf(page);
   check(main !== '' && !/overx/i.test(main.replaceAll(CONTACT, '')), `${page}: must not mention OverX (the contact address aside)`);
 }
-// App Free is full since spec 016: nothing may call its routes hidden or blurred.
+// App Free is full since ios-ffly spec 016: nothing may call its routes hidden or blurred.
 for (const page of ['privacy', 'terms', 'support', '']) {
   check(!/partially hidden|blurred|blurs|hidden results/i.test(plainText(withoutCss(readHtml(page)))), `${page || 'home'}: app Free shows every route in full, never "hidden" or "blurred"`);
 }
@@ -495,14 +506,11 @@ const GA_CSP = {
   'img-src': ['*.google-analytics.com', '*.googletagmanager.com'],
 };
 cspAgrees(GA_CSP, gaOn, 'GA_MEASUREMENT_ID');
-// Sign in with Apple and Google Identity Services (spec 014): their hosts open in the same change that shows sign-in.
-const AUTH_CSP = {
-  'script-src': ['appleid.cdn-apple.com', 'accounts.google.com'],
-  'frame-src': ['accounts.google.com'],
-  'connect-src': ['accounts.google.com'],
-  'style-src': ['accounts.google.com'],
-};
-cspAgrees(AUTH_CSP, signInOn, 'AUTH.googleClientId with CONTRACT_1_12');
+// Sign in with Apple and Google Identity Services (specs 014, 016): each provider's hosts open in the change that makes it
+// ready, and only its own.
+for (const [provider, hosts] of Object.entries(PROVIDER_CSP)) {
+  cspAgrees(hosts, providers.includes(provider), `the ${provider} sign-in (AUTH with CONTRACT_1_12)`);
+}
 // Hybrid output (spec 014): every page is prerendered; the function serves the sign-in routes and Astro's inert /_image.
 let vercelConfig = { routes: [] };
 try {
@@ -782,6 +790,34 @@ if (contract112) {
 // <link> tags are never shown, and the API preconnect names the host by design.
 const copyOf = (html) => copyText(withoutCss(html).replace(/<link\b[^>]*>/g, ''));
 const copyPages = [['llms.txt', copyText(llms)], ...htmlPages.map(([file, html]) => [file, copyOf(html)])];
+// Spec 016: the web's limit is /meta's. No English page or llms.txt states a web search count but the home FAQ, which
+// states web-meta.json's window exactly while that has one (npm run places copies it from /meta).
+const { searches_per_window: perWindow, window_hours: windowHours } = JSON.parse(source('src/data/web-meta.json')).tier_limits;
+// As searchWindow reads it, in en.ts's singular and plural (home.faq.free.web, every).
+const positive = (n) => typeof n === 'number' && n > 0;
+const windowPhrase = positive(perWindow) && positive(windowHours)
+  ? `${perWindow === 1 ? 'once' : `${perWindow} times`} every ${windowHours === 1 ? 'hour' : `${windowHours} hours`}`
+  : undefined;
+const englishCopy = copyPages.filter(([where]) => !LANGS.some(({ prefix }) => prefix && where.startsWith(`${prefix}/`)));
+// Visible sentences: JSON-LD repeats the page's own text without the spaces that end a sentence.
+const sentencesOf = (text) => plainText(text.replace(/<script\b[\s\S]*?<\/script>/g, '')).split(/(?<=[.;:!?])\s/);
+const WEB_COUNT = /\b\d+ (?:[a-z]+ ){0,2}(?:searches|times)\b/i;
+for (const [where, text] of englishCopy) {
+  const counted = sentencesOf(windowPhrase ? text.replaceAll(windowPhrase, '') : text).find((s) => /\bweb\b/i.test(s) && WEB_COUNT.test(s));
+  check(counted === undefined, `${where}: no web search count but /meta's (spec 016), found "${counted?.slice(0, 80)}"`);
+}
+const homeText = plainText(readHtml(''));
+check(
+  windowPhrase ? homeText.includes(windowPhrase) : !/\b(?:times|once) every\b/.test(homeText),
+  `Home: the FAQ must state the web search window exactly as web-meta.json has it (${windowPhrase ?? 'none: no count'})`,
+);
+// With v2 copy on, "cheaper" and "goes first" are ffly Pro's, never the app's: the pages and the widget's strings.
+if (contract112) {
+  for (const [where, lines] of [['/search widget', stringsOf(englishWidget)], ...englishCopy.map(([file, text]) => [file, sentencesOf(text)])]) {
+    const claim = lines.find((line) => APP_CLAIM.test(line));
+    check(claim === undefined, `${where}: v2 makes no app-cheaper or app-queue claim (spec 016), found "${claim?.slice(0, 80)}"`);
+  }
+}
 // Owner, 2026-10-08: no published page shows a postal address or a phone number, in any of the shapes either is written in.
 const CONTACT_LEAKS = [
   [/\+\d{1,3}(?:[\s.()-]*\d){7,}/, 'an international phone number'],

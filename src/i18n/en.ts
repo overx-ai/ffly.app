@@ -1,4 +1,5 @@
 import { APP } from '../app';
+import type { Override } from './edition';
 import type { Plural } from './text';
 
 // The source dictionary. Every other language `satisfies Dict` (typeof this), so a missing key fails the build.
@@ -7,7 +8,7 @@ import type { Plural } from './text';
 
 const p = (forms: Plural) => forms;
 
-const en = {
+const base = {
   common: {
     skipLink: 'Skip to content',
     appForIphone: `${APP.name} for iPhone`,
@@ -110,10 +111,13 @@ const en = {
       free: {
         question: `Is ${APP.name} free?`,
         answer: p({
-          one: `Your first search in the app is free and in full, and you can try a search on the web {perDay}. ${APP.proName} is for every trip after.`,
-          other: `Your first {n} searches in the app are free and in full, and you can try a search on the web {perDay}. ${APP.proName} is for every trip after.`,
+          one: `Your first search in the app is free and in full. {web} ${APP.proName} is for every trip after.`,
+          other: `Your first {n} searches in the app are free and in full. {web} ${APP.proName} is for every trip after.`,
         }),
-        perDay: p({ one: 'once a day', other: '{n} times a day' }),
+        // Spec 016: {n} searches every {every}, from /meta's window (web-meta.json); webFree when there is none.
+        web: p({ one: 'On the web, you can search once {every}.', other: 'On the web, you can search {n} times {every}.' }),
+        every: p({ one: 'every hour', other: 'every {n} hours' }),
+        webFree: 'You can also try a search on the web, free.',
       },
       tickets: {
         question: `Does ${APP.name} sell tickets?`,
@@ -322,8 +326,12 @@ const en = {
         cityLimit: p({ one: 'The free web search takes up to {n} city.', other: 'The free web search takes up to {n} cities.' }),
         cityCount: '{n} of {max}',
         pickCity: 'Pick each city from the list.',
-        quota: "You've used today's free web searches. The app has more.",
-        left: p({ one: '{n} free web search left today.', other: '{n} free web searches left today.' }),
+        quota: "You've used your free web searches for now. Try again later.",
+        quotaWindow: p({
+          one: "You've used your free web searches for now. More in up to {n} hour.",
+          other: "You've used your free web searches for now. More in up to {n} hours.",
+        }),
+        left: p({ one: '{n} free web search left.', other: '{n} free web searches left.' }),
         invalid: 'Some trip details were not accepted. Check them and try again.',
         appOnly: "That option isn't on the web yet.",
         to: 'Choose where you go from the list.',
@@ -411,7 +419,7 @@ const en = {
         rotation: [
           'Choose the hours you like to fly, in the app.',
           'In the app your search skips the queue.',
-          `${APP.freeSearches} full searches free in the app.`,
+          p({ one: '{n} full search free in the app.', other: '{n} full searches free in the app.' }),
           'Share a trip as a boarding pass from the app.',
           'Add more cities to a trip in the app.',
           'Your trips are saved in the app.',
@@ -447,5 +455,67 @@ const en = {
     ],
   },
 };
+
+// Spec 016: the v2 money model's copy, served instead of the keys above while CONTRACT_1_12 is on (editionOf). Free is the
+// same in the app and on the web; "cheaper", "goes first" and "more cities" are Pro claims, never app claims.
+const v2 = {
+  home: {
+    plans: {
+      title: p({ other: `Free in the app and on the web. ${APP.proName} for bigger trips and the lowest fares we find.` }),
+      free: {
+        line: p({ other: 'Every route in full, with partner fares' }),
+        body: 'Dates, flight times, airlines and booking links for every route, the same in the app and on the web.',
+      },
+      pro: {
+        line: 'The lowest fares we find, including direct airline fares',
+        body: "More cities and places to finish, more searches, and your search goes first when it's busy. Book each flight direct or via a partner. Weekly, yearly or a one-time {lifetime} purchase, priced in the app.",
+      },
+      promise: "No ads in the app, apart from partner offers for your trip. We don't sell your data.",
+    },
+    faq: {
+      free: {
+        answer: p({
+          other: `Yes. ${APP.name} Free shows every route in full, with partner fares. {web} ${APP.proName} adds more cities, the lowest fares we find, including direct airline fares, and more searches.`,
+        }),
+        web: p({ one: 'You can search once {every}, in the app and on the web.', other: 'You can search {n} times {every}, in the app and on the web.' }),
+        webFree: 'Free works the same in the app and on the web.',
+      },
+      android: {
+        answer: `${APP.name} is an iPhone app. On any other device, search on the web, where Free works the same.`,
+      },
+    },
+  },
+  search: {
+    lead: `Tell ${APP.name} the cities you want to see. It finds the order and the dates that make the whole trip cost the least, with the flights and booking links of every route.`,
+  },
+  widget: {
+    script: {
+      messages: {
+        cityLimit: p({ one: `On Free, a trip takes up to {n} city. ${APP.proName} takes more.`, other: `On Free, a trip takes up to {n} cities. ${APP.proName} takes more.` }),
+        quota: "You've used your searches for now. Try again later.",
+        quotaWindow: p({ one: "You've used your searches for now. More in up to {n} hour.", other: "You've used your searches for now. More in up to {n} hours." }),
+        left: p({ one: '{n} free search left.', other: '{n} free searches left.' }),
+        more: p({ one: `{n} more route with ${APP.proName}`, other: `{n} more routes with ${APP.proName}` }),
+        lockedRow: p({ one: `{n} city · dates and flights with ${APP.proName}`, other: `{n} cities · dates and flights with ${APP.proName}` }),
+      },
+      nudges: {
+        priceLine: `${APP.proName}: the lowest fares we find, including direct airline fares.`,
+        queue: `With ${APP.proName}, your search goes first when it's busy.`,
+        cityCap: `More cities with ${APP.proName}`,
+        appHint: `Same trip with ${APP.proName}: from {from}, {less} less.`,
+        rotation: [
+          'Every route in full, free in the app and on the web.',
+          'Share a trip as a boarding pass from the app.',
+          'Your trips are saved in the app.',
+          `More cities and places to finish with ${APP.proName}.`,
+          `With ${APP.proName}, book each flight direct or via a partner.`,
+          `More searches with ${APP.proName}.`,
+        ],
+      },
+    },
+  },
+} satisfies Override<typeof base>;
+
+const en = { ...base, v2 };
 
 export default en;

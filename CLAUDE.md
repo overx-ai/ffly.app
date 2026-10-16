@@ -32,10 +32,12 @@ Those repos are the source of truth for copy, colours and claims.
 - **Accounts, Pro and the Trip kit (spec 014), behind `CONTRACT_1_12`** (`src/app.ts`, shared with spec 015; false until
   ffly API 1.12.0 is live). Off, the site behaves as before: a 1.12.0 answer renders as 1.11's and no request carries a
   header. On:
-  - **Sign-in**, only while `AUTH.googleClientId` is also set (`SIGN_IN`; the owner sets it once the Services ID
-    `AUTH.appleServiceId` and the Google web client exist, 1B-bots spec 573 T1/T2). The page gets an Apple identity token
-    (Apple JS, popup, scope `email`, `signIn()` inside the click) or a Google credential (GIS button plus One Tap), both
-    scripts loaded only when the visitor opens the sheet, and posts it to `/api/auth/{apple,google}`.
+  - **Sign-in**, per provider (spec 016): `SIGN_IN_PROVIDERS` (`signInProviders`) holds Apple once `AUTH.appleRegistered`
+    is true (the Services ID `AUTH.appleServiceId` registered with its return URL, 1B-bots spec 573 T1) and Google once
+    `AUTH.googleClientId` is set (573 T2); `SIGN_IN` is on while either is. Only a ready provider's button renders and only
+    its script loads, so Apple can go live without Google. The page gets an Apple identity token (Apple JS, popup, scope
+    `email`, `signIn()` inside the click) or a Google credential (GIS button plus One Tap), each script loaded only when
+    the visitor opens the sheet, and posts it to `/api/auth/{apple,google}`.
     `src/server/auth-session.ts` trades it at overx-auth (`AUTH.base`); `/api/auth/token` refreshes, `/api/auth/session`
     (DELETE) revokes. Every route: POST or DELETE only, this site's own `Origin`, `Cache-Control: no-store`, no secret.
     The refresh token lives only in `AUTH.cookie` (`HttpOnly; Secure; SameSite=Strict; Path=/api/auth`); the access token
@@ -44,7 +46,9 @@ Those repos are the source of truth for copy, colours and claims.
   - **API calls** (`ffly-api.ts` `setCaller`): no header while signed out (no preflight), `Authorization: Bearer` while
     signed in on `/meta`, `/searches`, `/trip-kit`; never on `/places` or `/searches/shared`. A 401 refreshes once and
     retries; a second signs out and goes on as Free. Signing in or out asks `/meta` again and `applyMeta` redraws the caps:
-    **no limit is ever a literal in the site**.
+    **no limit is ever a literal in the site**. The web's searches per window (ffly API 1.13.0, `searchWindow`) word the
+    quota note and spent line (`quota.ts`) and, through `web-meta.json`, the home FAQ; without them no count is named.
+    A Pro account (`proCaller`) sees no app strip, queue line, quota note or city-cap notice (spec 016).
   - **Results** (`results.ts`): Book direct or Book via partner per `leg.offers[]` (`rel="sponsored noopener"`, the URL as
     the API sends it, https only), no commission line beside them (founder, 2026-10-15); `route.pro_preview` becomes one
     "Pro found this route about €X cheaper" line under the first route that has one, replacing the app hint; the upsell
@@ -54,9 +58,11 @@ Those repos are the source of truth for copy, colours and claims.
   - **Tracking** (`track.ts`): Book and kit clicks send GA4 `EVENTS` (`placement`, `kind`, `tier`; never a city, date,
     price or account) only once Accept has started analytics (`consent-state.ts` `analytics()`), by beacon, never
     delaying or cancelling the click.
-  - **CSP**: `AUTH_CSP` in `check-legal` (Apple JS and GIS hosts in `script-src`, `frame-src`, `connect-src`,
-    `style-src`) must be in `vercel.json` exactly while sign-in is on, and /privacy `#website` names `AUTH.cookie` and the
-    storage note then (bump its `lastmod`). Bundle bans skip the Services ID, an identifier Apple's script needs.
+  - **CSP**: `PROVIDER_CSP` in `scripts/sign-in.mjs` (Apple JS's host in `script-src`; GIS's in `script-src`,
+    `frame-src`, `connect-src`, `style-src`): each provider's hosts must be in `vercel.json` exactly while it is ready
+    (`check-legal` reads readiness from `AUTH` as the site does, and a test holds the two to one answer). While sign-in is
+    on, /privacy `#website` names `AUTH.cookie` and the storage note, and `#account`'s website sentence the ready
+    providers (bump its `lastmod`). Bundle bans skip the Services ID, an identifier Apple's script needs.
 - **Every app feature on the web (spec 015); only the plan limits differ, and those come from `/meta`.**
   - **One request model.** `buildRequest` sends the trip, then each option only when the visitor set it **and**
     `allowedFields` allows it: absent from `/meta` `tier_limits.app_only_fields`, and for the 1.12.0 fields (`optional`,
@@ -72,9 +78,9 @@ Those repos are the source of truth for copy, colours and claims.
     connections, flight hours (a time list, `time-list.ts`), a city's date pin (`calendar.ts` with bounds and one-day
     picks) and airports, and passports. Must or maybe is a toggle on each city chip. Each shows while its field is
     allowed (`data-field`/`data-any`); each "In the app" chip (`data-locked-field`) shows while its field is refused, and
-    "More cities" (a plan limit, spec 014's copy) always. Rules as the API's, in `filters.ts`; caps in `REQUEST_LIMITS`
-    (`src/app.ts`, held to the pinned schema by `tests/contract/ffly-api-parity.test.ts`). The flight hours tip leaves
-    the app strip's rotation with `CONTRACT_1_12` (`tipsOf`).
+    "More cities" (a plan limit) always in 1.0, never in v2 (spec 016); the group hides while no chip shows. Rules as the
+    API's, in `filters.ts`; caps in `REQUEST_LIMITS` (`src/app.ts`, held to the pinned schema by
+    `tests/contract/ffly-api-parity.test.ts`). The v2 rotation has no flight hours tip.
   - **After results:** a leg's ⋯ menu skips a flight (`excluded`, built from the leg; its `source` is sent back as
     received and never shown, logged or put in a link) and runs the search again; the skipped-flights bar's Undo brings
     the previous result back from the page without a search. Each full route's details carry Save and Share
@@ -177,6 +183,12 @@ Those repos are the source of truth for copy, colours and claims.
   uses the system font, so a Latin page never fetches Onest. `check-legal` asserts the header menu equals the footer
   list and the card is on exactly the localized pages with every string filled.
 - Copy lives in `src/i18n/{lang}.ts`, each `satisfies Dict`; never hardcode copy in a view.
+- **Two editions (spec 016).** Each dictionary's `v2` block holds the v2 money model's copy (Free the same in the app and
+  on the web; "cheaper", "goes first" and "more cities" said of ffly Pro, never of the app), in the dictionary's own
+  shape. `useLang` serves `editionOf(dict, CONTRACT_1_12)`, the one place that picks 1.0 or v2; `overlay` replaces a
+  plural or a list whole. A 1.0 line that v2 makes false gets a `v2` key, never a branch in a view. Spec 014's flag-only
+  UI (`widget.offers`, `widget.account`) keeps its own keys. `APP_CLAIM` (`scripts/copy-rules.mjs`) holds English v2 to
+  no app claim, in `tests/i18n.test.ts` and, with the flag on, in `check-legal`.
 - Shared terms (plan names, Book, priorities) come from ios-ffly `Scripts/l10n/{lang}.json`; German says "du".
 - City names come from the API's `names` in the page's language (`placeName`: exact tag, then base language, then the
   English `name`), nominative and never inflected: copy never puts a city into a grammatical case. Polish and Russian plurals need
@@ -249,8 +261,11 @@ Those repos are the source of truth for copy, colours and claims.
   **This repo is now the source of truth**; do not re-extract.
 
 ## Copy rules
-- **Never "unlimited".** Pro has a daily fair-use cap. The Pro line is
-  "Every route in full, and no 3-search limit".
+- **Never "unlimited".** Pro has a fair-use cap. The 1.0 Pro line is "Every route in full, and no 3-search limit"; v2's
+  is "The lowest fares we find, including direct airline fares", and Free's says "partner fares".
+- **No web search count in copy** (spec 016): the web's limit is `/meta`'s. `check-legal` fails on a web search count on
+  any English page or in `llms.txt`, except the home FAQ's, which must equal `web-meta.json`'s window. Support, guides
+  and `llms.txt` name no count at all, so they hold for 1.0 and v2.
 - **No prices**, in copy or JSON-LD (`offers`). No ratings or download counts. Fare figures appear only
   as real example searches, and each one carries its date and a "not a price you'll get" caveat:
   - `EXAMPLE_TRIP` on the home page (a live search, ios-ffly spec 001), labelled "Example search";

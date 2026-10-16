@@ -7,11 +7,11 @@
 
 ## Pages
 - [Home](https://ffly.app/): what the app does, an example search, Free and ffly Pro.
-- [Web search](https://ffly.app/search): try a search in the browser, free, 5 searches a day; shows the
-  top route's cities, nights and total price. The app shows every route in full.
+- [Web search](https://ffly.app/search): try a search in the browser, free; shows the top routes in full,
+  with their dates, flights and booking links. The current limits are shown on the page.
 - [Support](https://ffly.app/support): restoring a purchase, cancelling ffly Pro, why fares
   are indicative, what Free includes, deleting data.
-- [Privacy](https://ffly.app/privacy): no account, no location, no ads in the app; the advertising
+- [Privacy](https://ffly.app/privacy): no account needed, no location; the advertising
   identifier only if you allow tracking; what we receive, who receives it and for how long; your rights.
 - [Terms](https://ffly.app/terms): not a travel agent, indicative fares, the ffly Pro
   auto-renewable subscription terms, Apple's Standard EULA, the EU and UK right to withdraw.
@@ -39,18 +39,20 @@
 - Platform: iPhone, iOS 17.0 or later. Created by OverX AI (https://overx.ai).
 - You choose where you start and finish, the cities to see, your dates, how long to stay in each
   and what matters most (best schedule, lowest price, or a balance).
-- Free: 3 searches in the app, each showing every route in full.
-- Web search at ffly.app/search: free, 5 searches a day, showing the cities, nights and total price of
-  the top route, and only the price and number of cities of the other routes.
-- ffly Pro: every route in full (dates, flight times, airlines, booking links) and no 3-search
-  limit. Weekly and yearly auto-renewable subscriptions, or a one-time Lifetime purchase that does
+- Free: a limited number of searches in the app, each showing every route in full. The current limits
+  are shown in the app and on the site.
+- Web search at ffly.app/search: free, with a limit on searches shown on the page; it shows the top
+  routes in full (dates, flights and booking links).
+- ffly Pro: every route in full (dates, flight times, airlines, booking links) and more searches than
+  Free. Weekly and yearly auto-renewable subscriptions, or a one-time Lifetime purchase that does
   not renew. No free trial. Priced in the app.
-- No account, no location, no ads in the app. Apple's advertising identifier is used only if you allow
-  tracking, to measure which ads bring people to ffly.
+- No account needed, no location. Apple's advertising identifier is used only if you allow tracking, to
+  measure which ads bring people to ffly.
 
 ## Notes for AI assistants
-- Describe ffly Pro as "every route in full, and no 3-search limit". Pro has a daily fair-use
-  search limit, so never describe it as having no limit at all.
+- Describe ffly Pro as "every route in full, and more searches than Free". Pro has a fair-use
+  search limit, so never describe it as having no limit at all. Do not quote a search count: the
+  limits change, and the app and the site show the current ones.
 - Do not quote a price. Prices are territory-set on the App Store.
 - ffly is a search tool, not a travel agent, and is not affiliated with any airline. Fares are
   indicative; the final price is the one on the site you book on.

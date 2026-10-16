@@ -104,10 +104,12 @@ const nl = {
       free: {
         question: `Is ${APP.name} gratis?`,
         answer: {
-          one: `Je eerste zoekopdracht in de app is gratis en volledig, en op het web kun je {perDay} een zoekopdracht proberen. ${APP.proName} is voor elke reis daarna.`,
-          other: `Je eerste {n} zoekopdrachten in de app zijn gratis en volledig, en op het web kun je {perDay} een zoekopdracht proberen. ${APP.proName} is voor elke reis daarna.`,
+          one: `Je eerste zoekopdracht in de app is gratis en volledig. {web} ${APP.proName} is voor elke reis daarna.`,
+          other: `Je eerste {n} zoekopdrachten in de app zijn gratis en volledig. {web} ${APP.proName} is voor elke reis daarna.`,
         },
-        perDay: { one: 'één keer per dag', other: '{n} keer per dag' },
+        web: { one: 'Op het web kun je {every} één keer zoeken.', other: 'Op het web kun je {every} {n} keer zoeken.' },
+        every: { one: 'elk uur', other: 'elke {n} uur' },
+        webFree: 'Je kunt ook gratis een zoekopdracht proberen op het web.',
       },
       tickets: {
         question: `Verkoopt ${APP.name} tickets?`,
@@ -312,8 +314,12 @@ const nl = {
         cityLimit: { one: 'Gratis zoeken op het web kan met maximaal {n} stad.', other: 'Gratis zoeken op het web kan met maximaal {n} steden.' },
         cityCount: '{n} van {max}',
         pickCity: 'Kies elke stad uit de lijst.',
-        quota: 'Je hebt de gratis zoekopdrachten op het web voor vandaag gebruikt. In de app kun je meer zoeken.',
-        left: { one: 'Nog {n} gratis zoekopdracht op het web vandaag.', other: 'Nog {n} gratis zoekopdrachten op het web vandaag.' },
+        quota: 'Je hebt je gratis zoekopdrachten op het web voorlopig gebruikt. Probeer het later opnieuw.',
+        quotaWindow: {
+          one: 'Je hebt je gratis zoekopdrachten op het web voorlopig gebruikt. Binnen {n} uur kun je weer zoeken.',
+          other: 'Je hebt je gratis zoekopdrachten op het web voorlopig gebruikt. Binnen {n} uur kun je weer zoeken.',
+        },
+        left: { one: 'Nog {n} gratis zoekopdracht op het web.', other: 'Nog {n} gratis zoekopdrachten op het web.' },
         invalid: 'Sommige reisgegevens zijn niet geaccepteerd. Controleer ze en probeer het opnieuw.',
         appOnly: 'Die optie is nog niet beschikbaar op het web.',
         to: 'Kies uit de lijst waar je naartoe gaat.',
@@ -400,7 +406,7 @@ const nl = {
         rotation: [
           'Kies in de app de tijden waarop je graag vliegt.',
           'In de app slaat je zoekopdracht de wachtrij over.',
-          `${APP.freeSearches} volledige zoekopdrachten gratis in de app.`,
+          { one: '{n} volledige zoekopdracht gratis in de app.', other: '{n} volledige zoekopdrachten gratis in de app.' },
           'Deel een reis als instapkaart vanuit de app.',
           'Voeg in de app meer steden toe aan een reis.',
           'Je reizen worden bewaard in de app.',
@@ -434,6 +440,70 @@ const nl = {
       'Routes gesorteerd op wat jij belangrijk vindt: tijden, prijs of een balans',
       'Boek elke vlucht op de site van de airline of op een boekingssite',
     ],
+  },
+
+  v2: {
+    home: {
+      plans: {
+        title: { other: `Gratis in de app en op het web. ${APP.proName} voor grotere reizen en de laagste prijzen die we vinden.` },
+        free: {
+          line: { other: 'Elke route volledig, met partnerprijzen' },
+          body: 'Datums, vluchttijden, airlines en boekingslinks voor elke route, hetzelfde in de app en op het web.',
+        },
+        pro: {
+          line: 'De laagste prijzen die we vinden, ook rechtstreeks bij airlines',
+          body: 'Meer steden en eindbestemmingen, meer zoekopdrachten, en jouw zoekopdracht gaat voor als het druk is. Boek elke vlucht direct of via een partner. Wekelijks, jaarlijks of {lifetime} (eenmalige aankoop), met de prijzen in de app.',
+        },
+        promise: 'Geen advertenties in de app, behalve partneraanbiedingen voor je reis. We verkopen je gegevens niet.',
+      },
+      faq: {
+        free: {
+          answer: {
+            other: `Ja. De gratis versie van ${APP.name} toont elke route volledig, met partnerprijzen. {web} ${APP.proName} geeft je daarnaast meer steden, de laagste prijzen die we vinden, ook rechtstreeks bij airlines, en meer zoekopdrachten.`,
+          },
+          web: { one: 'Je kunt {every} één keer zoeken, in de app en op het web.', other: 'Je kunt {every} {n} keer zoeken, in de app en op het web.' },
+          webFree: 'De gratis versie werkt hetzelfde in de app en op het web.',
+        },
+        android: {
+          answer: `${APP.name} is een iPhone-app. Op elk ander apparaat zoek je op het web, waar de gratis versie hetzelfde werkt.`,
+        },
+      },
+    },
+    search: {
+      lead: `Vertel ${APP.name} welke steden je wilt zien. Het vindt de volgorde en de datums waarmee de hele reis het minst kost, met de vluchten en boekingslinks van elke route.`,
+    },
+    widget: {
+      script: {
+        messages: {
+          cityLimit: {
+            one: `In de gratis versie kan een reis maximaal {n} stad hebben. Met ${APP.proName} kunnen het er meer zijn.`,
+            other: `In de gratis versie kan een reis maximaal {n} steden hebben. Met ${APP.proName} kunnen het er meer zijn.`,
+          },
+          quota: 'Je hebt je zoekopdrachten voorlopig gebruikt. Probeer het later opnieuw.',
+          quotaWindow: {
+            one: 'Je hebt je zoekopdrachten voorlopig gebruikt. Binnen {n} uur kun je weer zoeken.',
+            other: 'Je hebt je zoekopdrachten voorlopig gebruikt. Binnen {n} uur kun je weer zoeken.',
+          },
+          left: { one: 'Nog {n} gratis zoekopdracht.', other: 'Nog {n} gratis zoekopdrachten.' },
+          more: { one: `Nog {n} route met ${APP.proName}`, other: `Nog {n} routes met ${APP.proName}` },
+          lockedRow: { one: `{n} stad · datums en vluchten met ${APP.proName}`, other: `{n} steden · datums en vluchten met ${APP.proName}` },
+        },
+        nudges: {
+          priceLine: `${APP.proName}: de laagste prijzen die we vinden, ook rechtstreeks bij airlines.`,
+          queue: `Met ${APP.proName} gaat jouw zoekopdracht voor als het druk is.`,
+          cityCap: `Meer steden met ${APP.proName}`,
+          appHint: `Dezelfde reis met ${APP.proName}: vanaf {from}, {less} minder.`,
+          rotation: [
+            'Elke route volledig, gratis in de app en op het web.',
+            'Deel een reis als instapkaart vanuit de app.',
+            'Je reizen worden bewaard in de app.',
+            `Meer steden en eindbestemmingen met ${APP.proName}.`,
+            `Met ${APP.proName} boek je elke vlucht direct of via een partner.`,
+            `Meer zoekopdrachten met ${APP.proName}.`,
+          ],
+        },
+      },
+    },
   },
 } satisfies Dict;
 

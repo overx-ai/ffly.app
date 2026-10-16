@@ -15,6 +15,7 @@ import {
   PREFS,
   SERVICE,
   SIGN_IN,
+  SIGN_IN_PROVIDERS,
   SITE_HOST,
   UK_REPRESENTATIVE,
   externalLink,
@@ -76,6 +77,10 @@ const GOOGLE_ROLES = [
   ...(ANALYTICS ? ['measures visits to this website with Google Analytics'] : []),
   ...(ADS ? ['shows ads on this website with Google AdSense'] : []),
 ];
+
+// Spec 016: the app signs in with Apple and Google; the website names the providers it offers once sign-in is on there.
+const PROVIDER_NAMES = { apple: "Apple's", google: "Google's" } as const;
+const WEB_SIGN_IN = (SIGN_IN ? SIGN_IN_PROVIDERS : (['apple', 'google'] as const)).map((p) => PROVIDER_NAMES[p]).join(' and ');
 
 const SIGNED_IN_NOTE = SIGN_IN ? ' If you sign in, it also notes there that you did, so the next page signs you back in.' : '';
 // Spec 015: the web search's saved routes, history, passports and ratings stay in the browser.
@@ -335,7 +340,7 @@ export const PRIVACY: LegalDocument = {
         <p>We use them only to apply your plan and limits wherever you sign in, in the app and on this website. We
         keep them while your account exists and delete them when you delete it, except what the law requires us to
         keep. ${DELETE_ACCOUNT}</p>
-        <p>On this website, Apple's and Google's sign-in tools load only when you choose to sign in, and signing out
+        <p>On this website, ${WEB_SIGN_IN} sign-in tools load only when you choose to sign in, and signing out
         removes the website's sign-in cookie.</p>`,
     },
     'web-search': {

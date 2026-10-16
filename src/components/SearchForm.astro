@@ -3,7 +3,7 @@ import AppStrip from './AppStrip.astro';
 import AdSlot from './AdSlot.astro';
 import AppStoreBadge from './AppStoreBadge.astro';
 import PlaceCombo from './PlaceCombo.astro';
-import { APP_STORE_URL, CONTRACT_1_12, LIBRARY, SIGN_IN } from '../app';
+import { APP_STORE_URL, CONTRACT_1_12, LIBRARY, SIGN_IN, SIGN_IN_PROVIDERS } from '../app';
 import { APPLE_LOGO } from '../icons';
 import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
 import type { OptionField } from '../scripts/ffly-api';
@@ -14,7 +14,7 @@ import '../styles/search.css';
 interface Props { lang?: Lang; }
 
 const { lang = DEFAULT_LANG } = Astro.props;
-const { t, fmt } = useLang(lang);
+const { t, fmt, tag } = useLang(lang);
 const w = t.widget;
 const col = w.columns;
 const COLUMNS = ['rank', 'route', 'dates', 'nights', 'flights', 'warn', 'total', 'details'] as const;
@@ -23,14 +23,16 @@ const openApp = APP_STORE_URL ?? '#app-side';
 const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" height="10" rx="2"/>';
 // Spec 014's strings ship only with its UI, so the page stays as it was while CONTRACT_1_12 is off.
 const v12 = CONTRACT_1_12 ? { offers: w.offers, account: w.account } : {};
-// Spec 015: a locked chip shows while the API refuses the field of its control; "More cities" is a plan limit and stays.
+// Spec 015: a locked chip shows while the API refuses the field of its control. "More cities" is a plan limit with no
+// field: 1.0 always lists it, and v2, which says it through ffly Pro, never does (spec 016).
 const LOCKED_FIELD: Partial<Record<keyof typeof w.appOnly, OptionField>> = {
   hours: 'schedule',
   direct: 'max_stops_per_leg',
   date: 'pinned',
   skip: 'excluded',
 };
-const nudges = webNudges(w, CONTRACT_1_12);
+const appChips = Object.entries(w.appOnly).filter(([key]) => !(CONTRACT_1_12 && key === 'cities'));
+const nudges = webNudges(w.script.nudges, tag);
 const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.priorities)[];
 ---
 <div class="search-ui" data-i18n={JSON.stringify({ ...w.script, nudges, columns: w.columns, nights: t.common.nights, loading: w.loading, ...v12 })}>
@@ -134,7 +136,7 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
         <button id="library-open" type="button" class="row-button" aria-haspopup="dialog">{w.library.open}</button>
         <span id="in-app-label" class="field-label">{w.inApp}</span>
         <ul class="locked-chips" aria-labelledby="in-app-label">
-          {Object.entries(w.appOnly).map(([key, o]) => (
+          {appChips.map(([key, o]) => (
             <li data-locked-field={LOCKED_FIELD[key as keyof typeof w.appOnly]}>
               <button type="button" class="locked-chip" data-nudge={o.nudge} aria-pressed="false" aria-controls="chip-nudge">
                 <svg viewBox="0 0 24 24" aria-hidden="true" set:html={LOCK} />
@@ -235,7 +237,7 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
       <span id="progress-fill"></span>
     </div>
     <p id="progress-detail" class="note"></p>
-    <p class="queue-nudge">{w.script.nudges.queue}</p>
+    <p id="queue-nudge" class="queue-nudge">{w.script.nudges.queue}</p>
     <div id="notify-ask" class="notify-ask" hidden>
       <p>{w.notifyAsk}</p>
       <div class="notify-buttons">
@@ -347,11 +349,13 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
       <h2 id="sign-in-title">{w.account.title}</h2>
       <p class="note">{w.account.body}</p>
       <div class="providers">
-        <button id="apple-sign-in" type="button" class="apple-button" disabled>
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d={APPLE_LOGO} /></svg>
-          {w.account.apple}
-        </button>
-        <div id="gis-sign-in" class="gis-button"></div>
+        {SIGN_IN_PROVIDERS.includes('apple') && (
+          <button id="apple-sign-in" type="button" class="apple-button" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d={APPLE_LOGO} /></svg>
+            {w.account.apple}
+          </button>
+        )}
+        {SIGN_IN_PROVIDERS.includes('google') && <div id="gis-sign-in" class="gis-button" hidden></div>}
       </div>
       <p id="sign-in-error" class="form-error" role="alert"></p>
       <button id="sign-in-close" type="button" class="btn btn-soon">{w.account.close}</button>

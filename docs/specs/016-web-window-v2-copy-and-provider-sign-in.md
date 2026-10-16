@@ -1,7 +1,7 @@
 ---
 id: 016
 title: "Web search window, v2 copy and sign-in per provider"
-status: approved
+status: done
 priority: p1
 created: 2026-10-16
 updated: 2026-10-16
@@ -16,9 +16,9 @@ source: META_STATE bridges/012-1b-bots-to-0e-extensions--ios-ffly.md (founder 20
 
 # 016 - Web search window, v2 copy and sign-in per provider
 
-> **TL;DR** - The web's search limit will come from ffly API 1.13.0's `/meta` window, worded without a count until
-> then. Every app claim gets a true v2 version behind `CONTRACT_1_12`, chosen in one place; Apple and Google sign-in
-> turn on separately, and Pro sees no Free nudges. Owner: once 1.13.0 is live, re-pin and run `npm run places`.
+> **TL;DR** - The site took the web's search limit from ffly API 1.13.0's `/meta` window (the home FAQ says 10 every
+> 12 hours) and gave every app claim a true v2 version behind `CONTRACT_1_12`, picked in `editionOf`. Apple and Google
+> sign-in went per provider, and Pro lost the Free nudges. Owner: run `npm run places` to refresh the stale snapshot.
 
 **Related**: [014 - Accounts, Pro and Trip kit offers on the web](014-accounts-pro-and-trip-kit-offers-on-the-web.md)
 (sign-in, `CONTRACT_1_12`, the R6 rule that no limit is a literal), [015 - Feature parity with the iOS app](015-feature-parity-with-the-ios-app.md)
@@ -126,34 +126,63 @@ including direct airline fares". "Cheaper", "goes first" and "more cities" are P
 ## Cross-Repo Interfaces
 | Direction | Contract | Pinned version | Owner repo/spec | Fallback until available |
 |-----------|----------|----------------|-----------------|--------------------------|
-| consumes | ffly API `/meta.tier_limits.searches_per_window` (10 Free and web, 100 Pro), `window_hours` (12 Free and web, 24 Pro), `searches_per_day` as the daily total, `free_searches_left` per window | 1.13.0 | 1B-bots spec 575 | fields absent: count-free copy; the quota note still counts `free_searches_left` |
+| consumes | ffly API `/meta.tier_limits.searches_per_window` (10 Free and web, 100 Pro), `window_hours` (12 Free and web, 24 Pro), both required and nullable, `searches_per_day` as the daily total, `free_searches_left` per window | 1.13.0, published (1B-bots `apps/ffly-api/contract/openapi.json` at `2c1201318`) | 1B-bots spec 575 | no window (older API, or null): count-free copy; the quota note still counts `free_searches_left` |
 
 ## Tasks
 | ID | Description | Agent | Depends On | Status | Files |
 |----|-------------|-------|------------|--------|-------|
-| T1 | `docs/PINS.md` row for 1.13.0; 1.13.0 fixtures; contract test through `searchWindow` and `quota.ts`; `Meta` window fields; `places.mjs` carries them | dev | - | open | docs/PINS.md, tests/fixtures/ffly-api-1.13/*.json, tests/contract/ffly-api-1.13.test.ts, src/scripts/ffly-api.ts, scripts/places.mjs |
-| T2 | Editions: `overlay`, `editionOf`, `isPlural`; `useLang` serves the edition | dev | - | open | src/i18n/edition.ts, src/i18n/index.ts, src/i18n/text.ts |
-| T3 | Limit copy from `/meta`: `quota.ts`, the widget's quota note and spent line, Home's FAQ window, the plural tip, `tipsOf` and `freeSearchesPerDay` removed | dev | T1, T2 | open | src/scripts/quota.ts, src/scripts/search.ts, src/scripts/nudges.ts, src/views/Home.astro, src/app.ts, src/components/AppStrip.astro, src/components/SearchForm.astro |
-| T4 | English: the live keys and the `v2` block | dev | T2 | open | src/i18n/en.ts |
-| T5 | The same keys in 12 languages, in each file's tone | dev | T4 | open | src/i18n/{de,fr,es,it,nl,pl,pt,ru,sv,da,nb,fi}.ts |
-| T6 | Pro on the web: `renderPlan`, the city box, `city_limit` for Pro; "More cities" chip 1.0 only, the "In the app" group hidden while empty | dev | T3 | open | src/scripts/search.ts, src/components/SearchForm.astro |
-| T7 | Sign-in per provider: `AUTH.appleRegistered`, `signInProviders`, `auth.ts`, the sheet, `scripts/sign-in.mjs`, check-legal CSP and /privacy website sentence | dev | - | open | src/app.ts, src/scripts/auth.ts, src/components/SearchForm.astro, scripts/sign-in.mjs, scripts/check-legal.mjs, src/data/privacy.ts |
-| T8 | Count-free English pages: support, three guides (`updated`), `llms.txt`; `SITE_PAGES` lastmods | dev | - | open | src/data/support.ts, src/content/guides/*.md, public/llms.txt, src/site-pages.ts |
-| T9 | Tests: limit copy with and without the window, provider readiness and CSP, Pro hiding the Free nudges, editions and the v2 claim pin; check-legal web-count and app-claim pins | dev | T3, T5, T6, T7 | open | tests/quota.test.ts, tests/sign-in.test.ts, tests/nudges.test.ts, tests/i18n.test.ts, scripts/check-legal.mjs |
-| T10 | Docs: CLAUDE.md (editions, copy rules, sign-in per provider), PINS prose | dev | T9 | open | CLAUDE.md, docs/PINS.md |
+| T1 | `docs/PINS.md` row for 1.13.0; 1.13.0 fixtures; contract test through `searchWindow` and `quota.ts`; `Meta` window fields; `places.mjs` carries them | dev | - | done | docs/PINS.md, tests/fixtures/ffly-api-1.13/*.json, tests/contract/ffly-api-1.13.test.ts, tests/contract/json-schema.ts, tests/contract/ffly-api-parity.test.ts, src/scripts/ffly-api.ts, scripts/places.mjs, src/data/web-meta.json |
+| T2 | Editions: `overlay`, `editionOf`, `isPlural`; `useLang` serves the edition | dev | - | done | src/i18n/edition.ts, src/i18n/index.ts, src/i18n/text.ts |
+| T3 | Limit copy from `/meta`: `quota.ts`, the widget's quota note and spent line, Home's FAQ window, the plural tip, `tipsOf` and `freeSearchesPerDay` removed | dev | T1, T2 | done | src/scripts/quota.ts, src/scripts/search.ts, src/scripts/nudges.ts, src/views/Home.astro, src/app.ts, src/components/AppStrip.astro, src/components/SearchForm.astro |
+| T4 | English: the live keys and the `v2` block | dev | T2 | done | src/i18n/en.ts |
+| T5 | The same keys in 12 languages, in each file's tone | dev | T4 | done | src/i18n/{de,fr,es,it,nl,pl,pt,ru,sv,da,nb,fi}.ts |
+| T6 | Pro on the web: `renderPlan`, the city box, `city_limit` for Pro; "More cities" chip 1.0 only, the "In the app" group hidden while empty | dev | T3 | done | src/scripts/search.ts, src/components/SearchForm.astro |
+| T7 | Sign-in per provider: `AUTH.appleRegistered`, `signInProviders`, `auth.ts`, the sheet, `scripts/sign-in.mjs`, check-legal CSP and /privacy website sentence | dev | - | done | src/app.ts, src/scripts/auth.ts, src/components/SearchForm.astro, scripts/sign-in.mjs, scripts/check-legal.mjs, src/data/privacy.ts |
+| T8 | Count-free English pages: support, three guides (`updated`), `llms.txt`; `SITE_PAGES` lastmods | dev | - | done | src/data/support.ts, src/content/guides/*.md, public/llms.txt, src/site-pages.ts |
+| T9 | Tests: limit copy with and without the window, provider readiness and CSP, Pro hiding the Free nudges, editions and the v2 claim pin; check-legal web-count and app-claim pins | dev | T3, T5, T6, T7 | done | tests/quota.test.ts, tests/sign-in.test.ts, tests/nudges.test.ts, tests/i18n.test.ts, scripts/check-legal.mjs, scripts/copy-rules.mjs |
+| T10 | Docs: CLAUDE.md (editions, copy rules, sign-in per provider), PINS prose | dev | T9 | done | CLAUDE.md, docs/PINS.md |
+
+## Status (2026-10-16)
+Built on branch `feat/016-v2-claims`; `npm test` green (26 files, 262 tests, build, check-legal). A throwaway build with
+`CONTRACT_1_12` on and Apple alone ready rendered the v2 copy in all 13 languages, the Apple button only, the Pro price
+and queue lines, no "More cities" chip, and /privacy naming Apple alone; check-legal then failed only on Apple's missing
+CSP host, as designed. ffly API 1.13.0 went live during the build (coordinator, 2026-10-16), so the pin is the published
+`MetaResponse`, verbatim, and the web fixture is the live `/meta`.
+
+Left:
+- **Places snapshot**: live `/meta` `places_version` is `9fb3fa318e12f72e`, `public/places.json` and `web-meta.json` are
+  still `e93bc417e214621a`, so first visits fetch `/places` from the API. `npm run places` refreshes both (it also keeps
+  the window); not done here, to keep a 3,493-place data diff out of this change.
+- Spec 014's owner items stand: `CONTRACT_1_12`, then each provider (`AUTH.appleRegistered`, `AUTH.googleClientId`)
+  with its `PROVIDER_CSP` hosts in `vercel.json` in the same commit.
+
+Deviations:
+- `web-meta.json`'s `tier_limits` were set to the live values by hand (10, 12, 20), not by `npm run places`, for the
+  reason above; `places_version` stays equal to `public/places.json`'s, as check-legal requires.
+- The app-claim pin is check-legal's on a flag-on build (pages and the widget payload), plus a vitest over every
+  language's v2 dictionary, since production builds with the flag off.
+- `widget.upsellTitle`/`upsellBody` stay 1.0 only: under the flag the upsell already renders spec 014's
+  `widget.offers` comparison, so they get no v2 key.
+- /privacy's website sentence keeps naming both providers while sign-in is off (the page is unchanged today) and names
+  the ready ones once it is on; the app-wide Apple and Google lines stay (ios-ffly spec 034).
+- Beyond the inventory: support "How do I delete my data?" now opens "ffly works without an account; if you have one,
+  you can delete it in the app's Settings", and `llms.txt` drops "no ads in the app" and says "No account needed",
+  each false in v2.
+- Shared helpers: `tests/contract/json-schema.ts` (the parity test's validator, reused), `scripts/copy-rules.mjs`
+  (`APP_CLAIM`, `stringsOf`) and `scripts/sign-in.mjs` (`PROVIDER_CSP`, `readyProviders`).
 
 ## Acceptance Criteria
-- [ ] With the flag off, the built pages keep every 1.0 claim; the only changes are the limit lines (R1), the plural tip
+- [x] With the flag off, the built pages keep every 1.0 claim; the only changes are the limit lines (R1), the plural tip
       and the count-free English pages.
-- [ ] No English page or `llms.txt` states a web search count; with a window in `web-meta.json` the home FAQ states
+- [x] No English page or `llms.txt` states a web search count; with a window in `web-meta.json` the home FAQ states
       exactly its numbers.
-- [ ] With and without `searches_per_window`/`window_hours`, the quota note and spent line read as R1 (vitest).
-- [ ] The v2 edition of every language rewrites every claim key; English v2 has no app-cheaper or app-queue claim; the
+- [x] With and without `searches_per_window`/`window_hours`, the quota note and spent line read as R1 (vitest).
+- [x] The v2 edition of every language rewrites every claim key; English v2 has no app-cheaper or app-queue claim; the
       rotation has 6 tips in both editions; key parity passes.
-- [ ] Apple alone, Google alone, both and neither give the right `SIGN_IN`, buttons, scripts, CSP hosts and /privacy
+- [x] Apple alone, Google alone, both and neither give the right `SIGN_IN`, buttons, scripts, CSP hosts and /privacy
       sentence; check-legal's readiness equals the site's (vitest).
-- [ ] A Pro `/meta` hides the strip, the queue line, the quota note and the city-limit notice (vitest on `quotaNote`
-      and the strip rule).
-- [ ] `CONTRACT_1_12` stays false and no id is set.
-- [ ] Consumer contract tests green against the 1.13.0 fixtures; `npm test` green.
-- [ ] Code review clean.
+- [x] A Pro `/meta` hides the strip, the queue line, the quota note and the city-limit notice (vitest on `quotaNote`
+      and `proCaller`).
+- [x] `CONTRACT_1_12` stays false and no id is set.
+- [x] Consumer contract tests green against the 1.13.0 fixtures; `npm test` green.
+- [x] Code review clean.

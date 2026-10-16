@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { DICTIONARIES, LANGS, editionOf } from '../src/i18n';
 import en from '../src/i18n/en';
-import { appHintLine, rotation, tipsOf } from '../src/scripts/nudges';
+import { proCaller } from '../src/scripts/ffly-api';
+import { appHintLine, rotation, webNudges } from '../src/scripts/nudges';
 
 const NUDGES = en.widget.script.nudges;
 
@@ -21,18 +23,32 @@ describe('rotation', () => {
     expect(rotation(String(n + 1), n)).toEqual({ index: 1, next: 2 });
   });
 
-  it('covers the six app features without a city count', () => {
-    expect(n).toBe(6);
-    expect(NUDGES.rotation.join(' ')).not.toMatch(/up to \d|unlimited/i);
+  it('covers six tips without a city count, in 1.0 and in v2', () => {
+    for (const v2 of [false, true]) {
+      const tips = webNudges(editionOf(en, v2).widget.script.nudges, 'en-GB').rotation;
+      expect(tips).toHaveLength(6);
+      expect(tips.join(' ')).not.toMatch(/up to \d|unlimited/i);
+    }
   });
 });
 
-describe('tipsOf', () => {
-  it('drops the flight hours tip once the web has flight hours, and only then', () => {
-    const hours = en.widget.appOnly.hours.nudge;
-    expect(tipsOf(NUDGES.rotation, hours, false)).toEqual(NUDGES.rotation);
-    expect(tipsOf(NUDGES.rotation, hours, true)).toEqual(NUDGES.rotation.filter((tip) => tip !== hours));
-    expect(tipsOf(NUDGES.rotation, hours, true)).toHaveLength(NUDGES.rotation.length - 1);
+describe('webNudges', () => {
+  it("counts the app's free searches in each language's own plural", () => {
+    expect(webNudges(NUDGES, 'en-GB').rotation[2]).toBe('3 full searches free in the app.');
+    for (const { code, tag } of LANGS) {
+      const tip = webNudges(DICTIONARIES[code].widget.script.nudges, tag).rotation[2];
+      expect(tip, code).toMatch(/(^|\D)3(\D|$)/);
+      expect(tip, code).not.toContain('{n}');
+    }
+  });
+});
+
+describe('proCaller', () => {
+  it('is Pro only with v2 on and a Pro /meta, so 1.0 never hides a Free nudge', () => {
+    expect(proCaller({ tier: 'pro' }, true)).toBe(true);
+    expect(proCaller({ tier: 'pro' }, false)).toBe(false);
+    expect(proCaller({ tier: 'free' }, true)).toBe(false);
+    expect(proCaller(undefined, true)).toBe(false);
   });
 });
 

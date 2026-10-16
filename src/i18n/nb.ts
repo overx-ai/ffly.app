@@ -104,10 +104,12 @@ const nb = {
       free: {
         question: `Er ${APP.name} gratis?`,
         answer: {
-          one: `Ditt første søk i appen er gratis og i sin helhet, og du kan prøve et søk på nettet {perDay}. ${APP.proName} er for hver reise etterpå.`,
-          other: `Dine første {n} søk i appen er gratis og i sin helhet, og du kan prøve et søk på nettet {perDay}. ${APP.proName} er for hver reise etterpå.`,
+          one: `Ditt første søk i appen er gratis og i sin helhet. {web} ${APP.proName} er for hver reise etterpå.`,
+          other: `Dine første {n} søk i appen er gratis og i sin helhet. {web} ${APP.proName} er for hver reise etterpå.`,
         },
-        perDay: { one: 'én gang om dagen', other: '{n} ganger om dagen' },
+        web: { one: 'På nettet kan du søke én gang {every}.', other: 'På nettet kan du søke {n} ganger {every}.' },
+        every: { one: 'hver time', other: 'hver {n}. time' },
+        webFree: 'Du kan også prøve et søk gratis på nettet.',
       },
       tickets: {
         question: `Selger ${APP.name} billetter?`,
@@ -312,8 +314,12 @@ const nb = {
         cityLimit: { one: 'Det gratis nettsøket tar opptil {n} by.', other: 'Det gratis nettsøket tar opptil {n} byer.' },
         cityCount: '{n} av {max}',
         pickCity: 'Velg hver by fra listen.',
-        quota: 'Du har brukt dagens gratis nettsøk. Appen har flere.',
-        left: { one: '{n} gratis nettsøk igjen i dag.', other: '{n} gratis nettsøk igjen i dag.' },
+        quota: 'Du har brukt opp de gratis nettsøkene dine for nå. Prøv igjen senere.',
+        quotaWindow: {
+          one: 'Du har brukt opp de gratis nettsøkene dine for nå. Flere om høyst {n} time.',
+          other: 'Du har brukt opp de gratis nettsøkene dine for nå. Flere om høyst {n} timer.',
+        },
+        left: { one: '{n} gratis nettsøk igjen.', other: '{n} gratis nettsøk igjen.' },
         invalid: 'Noen av reisedetaljene ble ikke godtatt. Sjekk dem og prøv igjen.',
         appOnly: 'Det valget finnes ikke i nettsøket ennå.',
         to: 'Velg fra listen hvor du skal reise.',
@@ -400,7 +406,7 @@ const nb = {
         rotation: [
           'Velg tidene du liker å fly på, i appen.',
           'I appen hopper søket ditt over køen.',
-          `${APP.freeSearches} fullstendige søk gratis i appen.`,
+          { one: '{n} fullstendig søk gratis i appen.', other: '{n} fullstendige søk gratis i appen.' },
           'Del en reise som boardingkort fra appen.',
           'Legg til flere byer i en reise i appen.',
           'Reisene dine lagres i appen.',
@@ -434,6 +440,70 @@ const nb = {
       'Ruter rangert etter det som betyr noe for deg: tider, pris eller en balanse',
       'Bestill hvert fly på flyselskapets nettsted eller et bestillingsnettsted',
     ],
+  },
+
+  v2: {
+    home: {
+      plans: {
+        title: { other: `Gratis i appen og på nettet. ${APP.proName} for større reiser og de laveste prisene vi finner.` },
+        free: {
+          line: { other: 'Hver rute i sin helhet, med partnerpriser' },
+          body: 'Datoer, flytider, flyselskaper og bestillingslenker for hver rute, likt i appen og på nettet.',
+        },
+        pro: {
+          line: 'De laveste prisene vi finner, også direkte hos flyselskapene',
+          body: 'Flere byer og steder å avslutte, flere søk, og søket ditt går først når det er travelt. Bestill hvert fly direkte eller via en partner. Ukentlig, årlig eller «{lifetime}» som engangskjøp, med priser i appen.',
+        },
+        promise: 'Ingen reklame i appen, bortsett fra partnertilbud for reisen din. Vi selger ikke dataene dine.',
+      },
+      faq: {
+        free: {
+          answer: {
+            other: `Ja. Gratisversjonen av ${APP.name} viser hver rute i sin helhet, med partnerpriser. {web} ${APP.proName} gir deg flere byer, de laveste prisene vi finner, også direkte hos flyselskapene, og flere søk.`,
+          },
+          web: { one: 'Du kan søke én gang {every}, i appen og på nettet.', other: 'Du kan søke {n} ganger {every}, i appen og på nettet.' },
+          webFree: 'Gratisversjonen fungerer likt i appen og på nettet.',
+        },
+        android: {
+          answer: `${APP.name} er en iPhone-app. På andre enheter kan du søke på nettet, der gratisversjonen fungerer likt.`,
+        },
+      },
+    },
+    search: {
+      lead: `Fortell ${APP.name} hvilke byer du vil se. Du får rekkefølgen og datoene som gjør hele reisen billigst, med fly og bestillingslenker for hver rute.`,
+    },
+    widget: {
+      script: {
+        messages: {
+          cityLimit: {
+            one: `I gratisversjonen tar en reise opptil {n} by. ${APP.proName} tar flere.`,
+            other: `I gratisversjonen tar en reise opptil {n} byer. ${APP.proName} tar flere.`,
+          },
+          quota: 'Du har brukt opp søkene dine for nå. Prøv igjen senere.',
+          quotaWindow: {
+            one: 'Du har brukt opp søkene dine for nå. Flere om høyst {n} time.',
+            other: 'Du har brukt opp søkene dine for nå. Flere om høyst {n} timer.',
+          },
+          left: { one: '{n} gratis søk igjen.', other: '{n} gratis søk igjen.' },
+          more: { one: `{n} rute til med ${APP.proName}`, other: `{n} ruter til med ${APP.proName}` },
+          lockedRow: { one: `{n} by · datoer og fly med ${APP.proName}`, other: `{n} byer · datoer og fly med ${APP.proName}` },
+        },
+        nudges: {
+          priceLine: `${APP.proName}: de laveste prisene vi finner, også direkte hos flyselskapene.`,
+          queue: `Med ${APP.proName} går søket ditt først når det er travelt.`,
+          cityCap: `Flere byer med ${APP.proName}`,
+          appHint: `Samme reise med ${APP.proName}: fra {from}, {less} mindre.`,
+          rotation: [
+            'Hver rute i sin helhet, gratis i appen og på nettet.',
+            'Del en reise som boardingkort fra appen.',
+            'Reisene dine lagres i appen.',
+            `Flere byer og steder å avslutte med ${APP.proName}.`,
+            `Med ${APP.proName} bestiller du hvert fly direkte eller via en partner.`,
+            `Flere søk med ${APP.proName}.`,
+          ],
+        },
+      },
+    },
   },
 } satisfies Dict;
 

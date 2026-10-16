@@ -1,5 +1,6 @@
+import { APP } from '../app';
 import type { Dict } from '../i18n';
-import { fill } from '../i18n/text';
+import { fill, isPlural, plural } from '../i18n/text';
 
 // The app strip's first tip per page view: show the stored index, store the next.
 export function rotation(stored: string | undefined, count: number) {
@@ -18,12 +19,8 @@ export function appHintLine(
   return fill(template, { from: money(hint.price), less: money(best - hint.price) });
 }
 
-// Spec 015: the flight hours tip leaves the rotation once the web search has flight hours (CONTRACT_1_12).
-export const tipsOf = (rotation: readonly string[], hoursTip: string, hoursOnWeb: boolean) =>
-  rotation.filter((tip) => !(hoursOnWeb && tip === hoursTip));
-
-// The strip's strings as both the page and the bundle read them.
-export const webNudges = (widget: Pick<Dict['widget'], 'script' | 'appOnly'>, hoursOnWeb: boolean) => ({
-  ...widget.script.nudges,
-  rotation: tipsOf(widget.script.nudges.rotation, widget.appOnly.hours.nudge, hoursOnWeb),
+// The strip's strings as both the page and the bundle read them; a counted tip counts the app's free searches.
+export const webNudges = (nudges: Dict['widget']['script']['nudges'], tag: string) => ({
+  ...nudges,
+  rotation: nudges.rotation.map((tip) => (isPlural(tip) ? plural(tag, tip, APP.freeSearches) : tip)),
 });

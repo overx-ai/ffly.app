@@ -1,7 +1,9 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import en from '../src/i18n/en';
-import { LANGS, useLang } from '../src/i18n';
-import { fill, plural } from '../src/i18n/text';
+import { DICTIONARIES, LANGS, editionOf, useLang, type Dict } from '../src/i18n';
+import { overlay } from '../src/i18n/edition';
+import { fill, plural, type Plural } from '../src/i18n/text';
+import { APP_CLAIM, stringsOf } from '../scripts/copy-rules.mjs';
 
 const ORIGIN = 'https://ffly.app';
 
@@ -80,8 +82,10 @@ describe('dictionaries', () => {
         ? Object.fromEntries(Object.entries(value).filter(([k]) => !['one', 'two', 'few', 'many', 'zero'].includes(k)).map(([k, v]) => [k, shape(v)]))
         : typeof value;
 
+  // Against English's served edition: v2 swaps the rotation's plural tip for a plain one.
   it('give every language the keys of English', () => {
-    for (const { code } of LANGS) expect(shape(useLang(code).t), code).toEqual(shape(en));
+    const english = shape(useLang('en').t);
+    for (const { code } of LANGS) expect(shape(useLang(code).t), code).toEqual(english);
   });
 
   it('label a city with several airports in every language', () => {
@@ -98,5 +102,44 @@ describe('fill and abbreviations', () => {
   it('does not double a full stop after a value that already ends in one', () => {
     expect(fill('{from} bis {to}.', { from: 'So., 15. Nov.', to: 'So., 22. Nov.' })).toBe('So., 15. Nov. bis So., 22. Nov.');
     expect(fill('{to}.', { to: '22 Nov' })).toBe('22 Nov.');
+  });
+});
+
+describe('editions (spec 016)', () => {
+  // The 1.0 lines v2 must rewrite: each says the app is cheaper, goes first or has more.
+  const claims = (d: Dict) => {
+    const { nudges, messages } = d.widget.script;
+    return [nudges.priceLine, nudges.queue, nudges.cityCap, nudges.appHint, nudges.rotation, messages.more, messages.lockedRow, d.search.lead, d.home.plans.title];
+  };
+
+  it('replace a plural or a list whole, never form by form', () => {
+    const forms: Plural = { one: '{n} city', few: '{n} cities (few)', other: '{n} cities' };
+    const base = { n: forms, list: ['a', 'b'], keep: { a: 'old', b: 'kept' } };
+    expect(overlay(base, { n: { other: 'any' }, list: ['c'], keep: { a: 'new' } })).toEqual({ n: { other: 'any' }, list: ['c'], keep: { a: 'new', b: 'kept' } });
+  });
+
+  it('give every language v2 copy for each 1.0 app claim', () => {
+    for (const { code } of LANGS) {
+      const dict = DICTIONARIES[code];
+      const v2 = claims(editionOf(dict, true));
+      claims(dict).forEach((line, i) => expect(JSON.stringify(v2[i]), `${code} claim ${i}`).not.toBe(JSON.stringify(line)));
+    }
+  });
+
+  it('make no app-cheaper or app-queue claim in English v2', () => {
+    const { v2: _, ...copy } = editionOf(en, true);
+    const claim = stringsOf(copy).find((text: string) => APP_CLAIM.test(text));
+    expect(claim).toBeUndefined();
+  });
+
+  it('give Russian and Polish every plural form of the window in both editions, counted wherever more than one number takes it', () => {
+    for (const code of ['ru', 'pl'] as const) for (const { home, widget } of [DICTIONARIES[code], editionOf(DICTIONARIES[code], true)]) {
+      for (const forms of [widget.script.messages.quotaWindow, home.faq.free.web, home.faq.free.every]) {
+        expect(Object.keys(forms).sort(), code).toEqual(['few', 'many', 'one', 'other']);
+        // Russian "one" is 1, 21, 31...; Polish "one" is 1 alone.
+        const counted = Object.entries(forms).filter(([form]) => code === 'ru' || form !== 'one');
+        for (const [form, text] of counted) expect(text, `${code} ${form}`).toContain('{n}');
+      }
+    }
   });
 });

@@ -3,7 +3,7 @@ title: The cheapest order to visit cities on a multi-city trip
 slug: cheapest-order-to-visit-cities
 keyword: cheapest order to visit cities
 published: 2026-10-05
-updated: 2026-10-09
+updated: 2026-10-16
 cluster: A. Route order and dates
 intent: how-to
 serp_format: 1,500-2,000 word how-to with a direct answer, steps, one worked example and an FAQ. Current top results answer "cheapest cities to fly into", a different question.
@@ -102,7 +102,7 @@ If you book separate flights, leave a buffer between them. On separate bookings,
 
 I built ffly, a [multi-city trip planner](/), for exactly this. You pick the cities you want to see, your travel window and a range of nights for each city. ffly compares orders and dates for the whole trip and ranks the routes by what matters most to you: Best schedule, Balanced or Cheapest. It favours sensible flight times over pre-dawn starts, and counts a midnight landing as the hotel night it costs you. You then book each flight on the airline's site or a booking site.
 
-Fares come from Ryanair, Wizz Air, airBaltic, Volotea and more. To see how your own cities line up, [try a search free on the web](/search). The iPhone app gives you 3 searches free.
+Fares come from Ryanair, Wizz Air, airBaltic, Volotea and more. To see how your own cities line up, [try a search free on the web](/search) or in the iPhone app.
 
 ## FAQ
 

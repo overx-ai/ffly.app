@@ -1,6 +1,7 @@
 // Every fact about the app lives here. Pages must not hardcode any of it.
 // Source of truth: ../../0E-extensions/ios-ffly (fastlane/metadata/en-US, PrivacyInfo.xcprivacy,
 // docs/compliance/data-inventory.yaml) and the ffly API in 1B-bots apps/ffly-api.
+import type { Provider } from './server/auth-session';
 
 export const APP = {
   name: 'ffly',
@@ -68,12 +69,14 @@ export const CONTRACT_1_12: boolean = false;
 
 // Sign in with Apple or Google on the web search (spec 014). The page hands the provider's token to this site's own
 // /api/auth routes, which trade it at overx-auth and keep only its refresh token, in an HttpOnly cookie; the access
-// token lives in page memory. Public ids only, no secret. TODO(owner): set googleClientId (the "ffly web" OAuth client,
-// 1B-bots spec 573 T2) once the Services ID is set up too (573 T1); sign-in stays hidden until then.
+// token lives in page memory. Public ids only, no secret. Each provider goes live on its own (spec 016). TODO(owner):
+// set appleRegistered once the Services ID and its return URL are registered (1B-bots spec 573 T1), and googleClientId
+// to the "ffly web" OAuth client (573 T2), each with its CSP hosts in vercel.json (npm test names them).
 export const AUTH = {
   base: `https://${SERVICE.authHost}`,
   routes: '/api/auth',
   appleServiceId: 'ai.overx.ffly.web',
+  appleRegistered: false as boolean,
   appleReturnUrl: `https://${SITE_HOST}/auth/apple`,
   googleClientId: undefined as string | undefined,
   cookie: 'ffly_session',
@@ -82,7 +85,13 @@ export const AUTH = {
   timeoutMs: 8000,
   hintKey: 'ffly.account',
 } as const;
-export const SIGN_IN = CONTRACT_1_12 && AUTH.googleClientId !== undefined;
+export function signInProviders(contract: boolean, auth: Pick<typeof AUTH, 'appleServiceId' | 'appleRegistered' | 'googleClientId'>): Provider[] {
+  if (!contract) return [];
+  const ready: Record<Provider, boolean> = { apple: Boolean(auth.appleServiceId) && auth.appleRegistered, google: Boolean(auth.googleClientId) };
+  return (['apple', 'google'] as const).filter((provider) => ready[provider]);
+}
+export const SIGN_IN_PROVIDERS = signInProviders(CONTRACT_1_12, AUTH);
+export const SIGN_IN = SIGN_IN_PROVIDERS.length > 0;
 export const APPLE_JS = 'https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js';
 export const GOOGLE_JS = 'https://accounts.google.com/gsi/client';
 
@@ -133,7 +142,6 @@ export const FEEDBACK = {
 
 // The web search on / (#search) and /search (src/scripts/search.ts), an anonymous Free caller of FFLY_API_BASE.
 export const WEB_SEARCH = {
-  freeSearchesPerDay: 5,
   pollMs: 2000,
   requestTimeoutMs: 15000,
   pollRetries: 3,

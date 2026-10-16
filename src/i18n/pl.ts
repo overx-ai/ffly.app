@@ -116,12 +116,19 @@ const pl = {
       free: {
         question: `Czy ${APP.name} jest darmowy?`,
         answer: {
-          one: `Pierwsze wyszukiwanie w aplikacji jest darmowe i pełne, a w przeglądarce możesz wypróbować wyszukiwanie {perDay}. Na każdą kolejną podróż jest ${APP.proName}.`,
-          few: `Pierwsze {n} wyszukiwania w aplikacji są darmowe i pełne, a w przeglądarce możesz wypróbować wyszukiwanie {perDay}. Na każdą kolejną podróż jest ${APP.proName}.`,
-          many: `Pierwszych {n} wyszukiwań w aplikacji jest darmowych i pełnych, a w przeglądarce możesz wypróbować wyszukiwanie {perDay}. Na każdą kolejną podróż jest ${APP.proName}.`,
-          other: `Pierwsze {n} wyszukiwania w aplikacji są darmowe i pełne, a w przeglądarce możesz wypróbować wyszukiwanie {perDay}. Na każdą kolejną podróż jest ${APP.proName}.`,
+          one: `Pierwsze wyszukiwanie w aplikacji jest darmowe i pełne. {web} Na każdą kolejną podróż jest ${APP.proName}.`,
+          few: `Pierwsze {n} wyszukiwania w aplikacji są darmowe i pełne. {web} Na każdą kolejną podróż jest ${APP.proName}.`,
+          many: `Pierwszych {n} wyszukiwań w aplikacji jest darmowych i pełnych. {web} Na każdą kolejną podróż jest ${APP.proName}.`,
+          other: `Pierwsze {n} wyszukiwania w aplikacji są darmowe i pełne. {web} Na każdą kolejną podróż jest ${APP.proName}.`,
         },
-        perDay: { one: 'raz dziennie', few: '{n} razy dziennie', many: '{n} razy dziennie', other: '{n} razy dziennie' },
+        web: {
+          one: 'W przeglądarce możesz szukać raz {every}.',
+          few: 'W przeglądarce możesz szukać {n} razy {every}.',
+          many: 'W przeglądarce możesz szukać {n} razy {every}.',
+          other: 'W przeglądarce możesz szukać {n} razy {every}.',
+        },
+        every: { one: 'co godzinę', few: 'co {n} godziny', many: 'co {n} godzin', other: 'co {n} godziny' },
+        webFree: 'W przeglądarce możesz też za darmo wypróbować wyszukiwanie.',
       },
       tickets: {
         question: `Czy ${APP.name} sprzedaje bilety?`,
@@ -331,12 +338,18 @@ const pl = {
         },
         cityCount: '{n} z {max}',
         pickCity: 'Wybierz każde miasto z listy.',
-        quota: 'Dzisiejsze darmowe wyszukiwania w przeglądarce się skończyły. W aplikacji jest ich więcej.',
+        quota: 'Darmowe wyszukiwania w przeglądarce na razie się skończyły. Spróbuj później.',
+        quotaWindow: {
+          one: 'Darmowe wyszukiwania w przeglądarce na razie się skończyły. Kolejne pojawią się najpóźniej za godzinę.',
+          few: 'Darmowe wyszukiwania w przeglądarce na razie się skończyły. Kolejne pojawią się najpóźniej za {n} godziny.',
+          many: 'Darmowe wyszukiwania w przeglądarce na razie się skończyły. Kolejne pojawią się najpóźniej za {n} godzin.',
+          other: 'Darmowe wyszukiwania w przeglądarce na razie się skończyły. Kolejne pojawią się najpóźniej za {n} godziny.',
+        },
         left: {
-          one: 'Dziś zostało ci {n} darmowe wyszukiwanie w przeglądarce.',
-          few: 'Dziś zostały ci {n} darmowe wyszukiwania w przeglądarce.',
-          many: 'Dziś zostało ci {n} darmowych wyszukiwań w przeglądarce.',
-          other: 'Dziś zostało ci {n} darmowego wyszukiwania w przeglądarce.',
+          one: 'Zostało ci {n} darmowe wyszukiwanie w przeglądarce.',
+          few: 'Zostały ci {n} darmowe wyszukiwania w przeglądarce.',
+          many: 'Zostało ci {n} darmowych wyszukiwań w przeglądarce.',
+          other: 'Zostało ci {n} darmowego wyszukiwania w przeglądarce.',
         },
         invalid: 'Część danych podróży nie została przyjęta. Sprawdź je i spróbuj ponownie.',
         appOnly: 'Tej opcji nie ma jeszcze w przeglądarce.',
@@ -449,7 +462,12 @@ const pl = {
         rotation: [
           'W aplikacji wybierzesz godziny, w których lubisz latać.',
           'W aplikacji twoje wyszukiwanie omija kolejkę.',
-          `${APP.freeSearches} pełne wyszukiwania za darmo w aplikacji.`,
+          {
+            one: '{n} pełne wyszukiwanie za darmo w aplikacji.',
+            few: '{n} pełne wyszukiwania za darmo w aplikacji.',
+            many: '{n} pełnych wyszukiwań za darmo w aplikacji.',
+            other: '{n} pełnego wyszukiwania za darmo w aplikacji.',
+          },
           'W aplikacji udostępnisz podróż jako kartę pokładową.',
           'W aplikacji dodasz do podróży więcej miast.',
           'Twoje podróże zapisują się w aplikacji.',
@@ -483,6 +501,94 @@ const pl = {
       'Trasy uszeregowane według tego, co jest dla ciebie ważne: godziny, cena lub równowaga',
       'Każdy lot rezerwujesz na stronie linii lotniczej lub w serwisie rezerwacyjnym',
     ],
+  },
+
+  v2: {
+    home: {
+      plans: {
+        title: { other: `Za darmo w aplikacji i w przeglądarce. ${APP.proName} na większe podróże i najniższe ceny, jakie znajdujemy.` },
+        free: {
+          line: { other: 'Każda trasa w całości, z cenami partnerów' },
+          body: 'Daty, godziny lotów, linie lotnicze i linki do rezerwacji każdej trasy, tak samo w aplikacji i w przeglądarce.',
+        },
+        pro: {
+          line: 'Najniższe ceny, jakie znajdujemy, także bezpośrednio u linii lotniczych',
+          body: 'Więcej miast i miejsc końcowych, więcej wyszukiwań, a przy dużym ruchu twoje wyszukiwanie idzie pierwsze. Każdy lot zarezerwujesz bezpośrednio lub przez partnera. Subskrypcja tygodniowa lub roczna albo plan „{lifetime}” kupowany jednorazowo; ceny znajdziesz w aplikacji.',
+        },
+        promise: 'W aplikacji nie ma reklam, poza ofertami partnerów dla twojej podróży. Nie sprzedajemy twoich danych.',
+      },
+      faq: {
+        free: {
+          answer: {
+            other: `Tak. W planie Darmowym ${APP.name} pokazuje każdą trasę w całości, z cenami partnerów. {web} ${APP.proName} dodaje więcej miast, najniższe ceny, jakie znajdujemy, także bezpośrednio u linii lotniczych, i więcej wyszukiwań.`,
+          },
+          web: {
+            one: 'Możesz szukać raz {every}, w aplikacji i w przeglądarce.',
+            few: 'Możesz szukać {n} razy {every}, w aplikacji i w przeglądarce.',
+            many: 'Możesz szukać {n} razy {every}, w aplikacji i w przeglądarce.',
+            other: 'Możesz szukać {n} razy {every}, w aplikacji i w przeglądarce.',
+          },
+          webFree: 'Plan Darmowy działa tak samo w aplikacji i w przeglądarce.',
+        },
+        android: {
+          answer: `${APP.name} to aplikacja na iPhone’a. Na każdym innym urządzeniu szukaj w przeglądarce, gdzie plan Darmowy działa tak samo.`,
+        },
+      },
+    },
+    search: {
+      lead: `Dodaj miasta, które chcesz zobaczyć. ${APP.name} znajdzie kolejność i daty, przy których cała podróż kosztuje najmniej, z lotami i linkami do rezerwacji każdej trasy.`,
+    },
+    widget: {
+      script: {
+        messages: {
+          cityLimit: {
+            one: `W planie Darmowym podróż obejmuje najwyżej {n} miasto. ${APP.proName} obejmuje więcej.`,
+            few: `W planie Darmowym podróż obejmuje najwyżej {n} miasta. ${APP.proName} obejmuje więcej.`,
+            many: `W planie Darmowym podróż obejmuje najwyżej {n} miast. ${APP.proName} obejmuje więcej.`,
+            other: `W planie Darmowym podróż obejmuje najwyżej {n} miasta. ${APP.proName} obejmuje więcej.`,
+          },
+          quota: 'Twoje wyszukiwania na razie się skończyły. Spróbuj później.',
+          quotaWindow: {
+            one: 'Twoje wyszukiwania na razie się skończyły. Kolejne pojawią się najpóźniej za godzinę.',
+            few: 'Twoje wyszukiwania na razie się skończyły. Kolejne pojawią się najpóźniej za {n} godziny.',
+            many: 'Twoje wyszukiwania na razie się skończyły. Kolejne pojawią się najpóźniej za {n} godzin.',
+            other: 'Twoje wyszukiwania na razie się skończyły. Kolejne pojawią się najpóźniej za {n} godziny.',
+          },
+          left: {
+            one: 'Zostało ci {n} darmowe wyszukiwanie.',
+            few: 'Zostały ci {n} darmowe wyszukiwania.',
+            many: 'Zostało ci {n} darmowych wyszukiwań.',
+            other: 'Zostało ci {n} darmowego wyszukiwania.',
+          },
+          more: {
+            one: `{n} kolejna trasa w ${APP.proName}`,
+            few: `{n} kolejne trasy w ${APP.proName}`,
+            many: `{n} kolejnych tras w ${APP.proName}`,
+            other: `{n} kolejnej trasy w ${APP.proName}`,
+          },
+          lockedRow: {
+            one: `{n} miasto · daty i loty w ${APP.proName}`,
+            few: `{n} miasta · daty i loty w ${APP.proName}`,
+            many: `{n} miast · daty i loty w ${APP.proName}`,
+            other: `{n} miasta · daty i loty w ${APP.proName}`,
+          },
+        },
+        nudges: {
+          priceLine: `${APP.proName}: najniższe ceny, jakie znajdujemy, także bezpośrednio u linii lotniczych.`,
+          queue: `W ${APP.proName} przy dużym ruchu twoje wyszukiwanie idzie pierwsze.`,
+          cityCap: `Więcej miast w ${APP.proName}`,
+          appHint: `Ta sama podróż w ${APP.proName}: od {from}, o {less} taniej.`,
+          rotation: [
+            'Każda trasa w całości, za darmo w aplikacji i w przeglądarce.',
+            'W aplikacji udostępnisz podróż jako kartę pokładową.',
+            'Twoje podróże zapisują się w aplikacji.',
+            `Więcej miast i miejsc końcowych w ${APP.proName}.`,
+            `W ${APP.proName} każdy lot zarezerwujesz bezpośrednio lub przez partnera.`,
+            `Więcej wyszukiwań w ${APP.proName}.`,
+          ],
+        },
+      },
+    },
   },
 } satisfies Dict;
 

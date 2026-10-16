@@ -104,10 +104,12 @@ const fi = {
       free: {
         question: `Onko ${APP.name} ilmainen?`,
         answer: {
-          one: `Ensimmäinen hakusi sovelluksessa on ilmainen ja täysi, ja verkossa voit kokeilla hakua {perDay}. ${APP.proName} on jokaista sen jälkeistä matkaa varten.`,
-          other: `Ensimmäiset {n} hakuasi sovelluksessa ovat ilmaisia ja täysiä, ja verkossa voit kokeilla hakua {perDay}. ${APP.proName} on jokaista sen jälkeistä matkaa varten.`,
+          one: `Ensimmäinen hakusi sovelluksessa on ilmainen ja täysi. {web} ${APP.proName} on jokaista sen jälkeistä matkaa varten.`,
+          other: `Ensimmäiset {n} hakuasi sovelluksessa ovat ilmaisia ja täysiä. {web} ${APP.proName} on jokaista sen jälkeistä matkaa varten.`,
         },
-        perDay: { one: 'kerran päivässä', other: '{n} kertaa päivässä' },
+        web: { one: 'Verkossa voit hakea kerran {every}.', other: 'Verkossa voit hakea {n} kertaa {every}.' },
+        every: { one: 'tunnissa', other: '{n} tunnissa' },
+        webFree: 'Voit myös kokeilla hakua verkossa ilmaiseksi.',
       },
       tickets: {
         question: `Myykö ${APP.name} lippuja?`,
@@ -312,8 +314,12 @@ const fi = {
         cityLimit: { one: 'Ilmaisessa verkkohaussa voi olla enintään {n} kaupunki.', other: 'Ilmaisessa verkkohaussa voi olla enintään {n} kaupunkia.' },
         cityCount: '{n}/{max}',
         pickCity: 'Valitse jokainen kaupunki listasta.',
-        quota: 'Olet käyttänyt tämän päivän ilmaiset verkkohaut. Sovelluksessa on enemmän.',
-        left: { one: 'Tänään jäljellä {n} ilmainen verkkohaku.', other: 'Tänään jäljellä {n} ilmaista verkkohakua.' },
+        quota: 'Olet käyttänyt ilmaiset verkkohakusi tältä erää. Yritä myöhemmin uudelleen.',
+        quotaWindow: {
+          one: 'Olet käyttänyt ilmaiset verkkohakusi tältä erää. Uusia hakuja viimeistään tunnin päästä.',
+          other: 'Olet käyttänyt ilmaiset verkkohakusi tältä erää. Uusia hakuja viimeistään {n} tunnin päästä.',
+        },
+        left: { one: 'Jäljellä {n} ilmainen verkkohaku.', other: 'Jäljellä {n} ilmaista verkkohakua.' },
         invalid: 'Joitakin matkan tietoja ei hyväksytty. Tarkista ne ja yritä uudelleen.',
         appOnly: 'Tämä valinta ei ole vielä verkkohaussa.',
         to: 'Valitse listasta, minne matkustat.',
@@ -400,7 +406,7 @@ const fi = {
         rotation: [
           'Valitse sovelluksessa kellonajat, joina haluat lentää.',
           'Sovelluksessa hakusi ohittaa jonon.',
-          `${APP.freeSearches} täyttä hakua ilmaiseksi sovelluksessa.`,
+          { one: '{n} täysi haku ilmaiseksi sovelluksessa.', other: '{n} täyttä hakua ilmaiseksi sovelluksessa.' },
           'Jaa matka sovelluksesta tarkastuskorttina.',
           'Lisää matkaan kaupunkeja sovelluksessa.',
           'Matkasi tallentuvat sovellukseen.',
@@ -434,6 +440,73 @@ const fi = {
       'Reitit järjestettynä sen mukaan, mikä on sinulle tärkeää: aikataulu, hinta tai tasapaino',
       'Varaa jokainen lento lentoyhtiön sivustolta tai varaussivustolta',
     ],
+  },
+
+  v2: {
+    home: {
+      plans: {
+        title: { other: `Ilmainen sovelluksessa ja verkossa. ${APP.proName}: isommat matkat ja halvimmat löytämämme hinnat.` },
+        free: {
+          line: { other: 'Jokainen reitti kokonaan, kumppanien hinnoilla' },
+          body: 'Jokaisen reitin päivät, lentoajat, lentoyhtiöt ja varauslinkit, samat sovelluksessa ja verkossa.',
+        },
+        pro: {
+          line: 'Halvimmat löytämämme hinnat, myös suoraan lentoyhtiöiltä',
+          body: 'Lisää kaupunkeja, paluupaikkoja ja hakuja, ja hakusi menee ensin ruuhka-aikoina. Varaa jokainen lento suoraan tai kumppanin kautta. Viikoittainen, vuosittainen tai kertaostos ”{lifetime}”, hinnat sovelluksessa.',
+        },
+        promise: 'Sovelluksessa ei ole mainoksia, paitsi kumppanien tarjouksia matkaasi varten. Emme myy tietojasi.',
+      },
+      faq: {
+        free: {
+          answer: {
+            other: `Kyllä. Ilmaisversio näyttää jokaisen reitin kokonaan, kumppanien hinnoilla. {web} ${APP.proName} tuo lisää kaupunkeja, halvimmat löytämämme hinnat, myös suoraan lentoyhtiöiltä, ja lisää hakuja.`,
+          },
+          web: { one: 'Voit hakea kerran {every} sekä sovelluksessa että verkossa.', other: 'Voit hakea {n} kertaa {every} sekä sovelluksessa että verkossa.' },
+          webFree: 'Ilmaisversio toimii samoin sovelluksessa ja verkossa.',
+        },
+        android: {
+          answer: `${APP.name} on iPhone-sovellus. Muilla laitteilla voit hakea verkossa, jossa ilmaisversio toimii samoin.`,
+        },
+      },
+    },
+    search: {
+      lead: `Kerro, mitkä kaupungit haluat nähdä. ${APP.name} löytää järjestyksen ja päivät, joilla koko matka maksaa vähiten, sekä jokaisen reitin lennot ja varauslinkit.`,
+    },
+    widget: {
+      script: {
+        messages: {
+          cityLimit: {
+            one: `Ilmaisversiossa matkalla voi olla enintään {n} kaupunki. ${APP.proName} sallii enemmän.`,
+            other: `Ilmaisversiossa matkalla voi olla enintään {n} kaupunkia. ${APP.proName} sallii enemmän.`,
+          },
+          quota: 'Olet käyttänyt hakusi tältä erää. Yritä myöhemmin uudelleen.',
+          quotaWindow: {
+            one: 'Olet käyttänyt hakusi tältä erää. Uusia hakuja viimeistään tunnin päästä.',
+            other: 'Olet käyttänyt hakusi tältä erää. Uusia hakuja viimeistään {n} tunnin päästä.',
+          },
+          left: { one: 'Jäljellä {n} ilmainen haku.', other: 'Jäljellä {n} ilmaista hakua.' },
+          more: { one: `${APP.proName} näyttää {n} reitin lisää`, other: `${APP.proName} näyttää {n} reittiä lisää` },
+          lockedRow: {
+            one: `{n} kaupunki · ${APP.proName} näyttää päivät ja lennot`,
+            other: `{n} kaupunkia · ${APP.proName} näyttää päivät ja lennot`,
+          },
+        },
+        nudges: {
+          priceLine: `${APP.proName}: halvimmat löytämämme hinnat, myös suoraan lentoyhtiöiltä.`,
+          queue: `${APP.proName}: hakusi menee ensin ruuhka-aikoina.`,
+          cityCap: `Enemmän kaupunkeja: ${APP.proName}`,
+          appHint: `${APP.proName} löytää saman matkan alkaen {from}, {less} vähemmän.`,
+          rotation: [
+            'Jokainen reitti kokonaan, ilmaiseksi sovelluksessa ja verkossa.',
+            'Jaa matka sovelluksesta tarkastuskorttina.',
+            'Matkasi tallentuvat sovellukseen.',
+            `${APP.proName} tuo lisää kaupunkeja ja paluupaikkoja.`,
+            `${APP.proName}: varaa jokainen lento suoraan tai kumppanin kautta.`,
+            `${APP.proName} tuo lisää hakuja.`,
+          ],
+        },
+      },
+    },
   },
 } satisfies Dict;
 

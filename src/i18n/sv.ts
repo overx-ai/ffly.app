@@ -104,10 +104,12 @@ const sv = {
       free: {
         question: `Är ${APP.name} gratis?`,
         answer: {
-          one: `Din första sökning i appen är gratis och fullständig, och på webben kan du testa en sökning {perDay}. ${APP.proName} är för varje resa därefter.`,
-          other: `Dina första {n} sökningar i appen är gratis och fullständiga, och på webben kan du testa en sökning {perDay}. ${APP.proName} är för varje resa därefter.`,
+          one: `Din första sökning i appen är gratis och fullständig. {web} ${APP.proName} är för varje resa därefter.`,
+          other: `Dina första {n} sökningar i appen är gratis och fullständiga. {web} ${APP.proName} är för varje resa därefter.`,
         },
-        perDay: { one: 'en gång om dagen', other: '{n} gånger om dagen' },
+        web: { one: 'På webben kan du söka en gång {every}.', other: 'På webben kan du söka {n} gånger {every}.' },
+        every: { one: 'per timme', other: 'per {n} timmar' },
+        webFree: 'Du kan också testa en sökning på webben, gratis.',
       },
       tickets: {
         question: `Säljer ${APP.name} biljetter?`,
@@ -312,8 +314,12 @@ const sv = {
         cityLimit: { one: 'Den kostnadsfria webbsökningen tar upp till {n} stad.', other: 'Den kostnadsfria webbsökningen tar upp till {n} städer.' },
         cityCount: '{n} av {max}',
         pickCity: 'Välj varje stad i listan.',
-        quota: 'Du har använt dagens gratis webbsökningar. Appen har fler.',
-        left: { one: '{n} gratis webbsökning kvar i dag.', other: '{n} gratis webbsökningar kvar i dag.' },
+        quota: 'Du har använt dina gratis webbsökningar för tillfället. Försök igen senare.',
+        quotaWindow: {
+          one: 'Du har använt dina gratis webbsökningar för tillfället. Fler inom {n} timme.',
+          other: 'Du har använt dina gratis webbsökningar för tillfället. Fler inom {n} timmar.',
+        },
+        left: { one: '{n} gratis webbsökning kvar.', other: '{n} gratis webbsökningar kvar.' },
         invalid: 'Vissa uppgifter om resan godtogs inte. Kontrollera dem och försök igen.',
         appOnly: 'Det alternativet finns inte på webben än.',
         to: 'Välj i listan vart du ska.',
@@ -400,7 +406,7 @@ const sv = {
         rotation: [
           'Välj tiderna du helst flyger på, i appen.',
           'I appen slipper din sökning kön.',
-          `${APP.freeSearches} fullständiga sökningar gratis i appen.`,
+          { one: '{n} fullständig sökning gratis i appen.', other: '{n} fullständiga sökningar gratis i appen.' },
           'Dela en resa som boardingkort från appen.',
           'Lägg till fler städer i en resa i appen.',
           'I appen hittar du alltid dina resor igen.',
@@ -434,6 +440,70 @@ const sv = {
       'Rutter rangordnade efter vad som är viktigt för dig: tider, pris eller en balans',
       'Boka varje flyg på flygbolagets sajt eller på en bokningssajt',
     ],
+  },
+
+  v2: {
+    home: {
+      plans: {
+        title: { other: `Gratis i appen och på webben. ${APP.proName} för större resor och de lägsta priserna vi hittar.` },
+        free: {
+          line: { other: 'Varje rutt i sin helhet, med partnerpriser' },
+          body: 'Datum, flygtider, flygbolag och bokningslänkar för varje rutt, likadant i appen och på webben.',
+        },
+        pro: {
+          line: 'De lägsta priserna vi hittar, även direkt hos flygbolagen',
+          body: 'Fler städer och platser att sluta på, fler sökningar, och din sökning går först när många söker samtidigt. Boka varje flyg direkt eller via en partner. Veckovis, årsvis eller ”{lifetime}” som engångsköp. Priserna finns i appen.',
+        },
+        promise: 'Ingen reklam i appen, förutom partnererbjudanden för din resa. Vi säljer inte dina uppgifter.',
+      },
+      faq: {
+        free: {
+          answer: {
+            other: `Ja. Gratisversionen av ${APP.name} visar varje rutt i sin helhet, med partnerpriser. {web} ${APP.proName} ger dig dessutom fler städer, de lägsta priserna vi hittar, även direkt hos flygbolagen, och fler sökningar.`,
+          },
+          web: { one: 'Du kan söka en gång {every}, i appen och på webben.', other: 'Du kan söka {n} gånger {every}, i appen och på webben.' },
+          webFree: 'Gratisversionen fungerar likadant i appen och på webben.',
+        },
+        android: {
+          answer: `${APP.name} är en iPhone-app. På andra enheter söker du på webben, där gratisversionen fungerar likadant.`,
+        },
+      },
+    },
+    search: {
+      lead: `Berätta för ${APP.name} vilka städer du vill se. Du får ordningen och datumen där hela resan kostar minst, med flyg och bokningslänkar för varje rutt.`,
+    },
+    widget: {
+      script: {
+        messages: {
+          cityLimit: {
+            one: `I gratisversionen tar en resa upp till {n} stad. ${APP.proName} tar fler.`,
+            other: `I gratisversionen tar en resa upp till {n} städer. ${APP.proName} tar fler.`,
+          },
+          quota: 'Du har använt dina sökningar för tillfället. Försök igen senare.',
+          quotaWindow: {
+            one: 'Du har använt dina sökningar för tillfället. Fler inom {n} timme.',
+            other: 'Du har använt dina sökningar för tillfället. Fler inom {n} timmar.',
+          },
+          left: { one: '{n} gratis sökning kvar.', other: '{n} gratis sökningar kvar.' },
+          more: { one: `{n} rutt till med ${APP.proName}`, other: `{n} rutter till med ${APP.proName}` },
+          lockedRow: { one: `{n} stad · datum och flyg med ${APP.proName}`, other: `{n} städer · datum och flyg med ${APP.proName}` },
+        },
+        nudges: {
+          priceLine: `${APP.proName}: de lägsta priserna vi hittar, även direkt hos flygbolagen.`,
+          queue: `Med ${APP.proName} går din sökning först när många söker samtidigt.`,
+          cityCap: `Fler städer med ${APP.proName}`,
+          appHint: `Samma resa med ${APP.proName}: från {from}, {less} mindre.`,
+          rotation: [
+            'Varje rutt i sin helhet, gratis i appen och på webben.',
+            'Dela en resa som boardingkort från appen.',
+            'I appen hittar du alltid dina resor igen.',
+            `Fler städer och platser att sluta på med ${APP.proName}.`,
+            `Med ${APP.proName} bokar du varje flyg direkt eller via en partner.`,
+            `Fler sökningar med ${APP.proName}.`,
+          ],
+        },
+      },
+    },
   },
 } satisfies Dict;
 

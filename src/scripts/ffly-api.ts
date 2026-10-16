@@ -21,7 +21,14 @@ export interface Meta {
   places_version?: string | null;
   currency: string;
   limits: { max_cities: number; max_ends: number; max_nights: number; max_window_days: number };
-  tier_limits: { max_cities: number; max_ends?: number; searches_per_day: number | null; app_only_fields?: string[] };
+  tier_limits: {
+    max_cities: number;
+    max_ends?: number;
+    searches_per_day: number | null;
+    searches_per_window?: number | null;
+    window_hours?: number | null;
+    app_only_fields?: string[];
+  };
   free_searches_left: number | null;
   tier?: Tier;
   priorities?: Record<string, { label: string; hint?: string }>;
@@ -30,7 +37,18 @@ export interface Meta {
 
 export type Tier = 'free' | 'pro';
 
+// Spec 016: Pro on the web needs v2 (CONTRACT_1_12); such a caller sees none of Free's nudges.
+export const proCaller = (meta: Pick<Meta, 'tier'> | undefined, v12: boolean) => v12 && meta?.tier === 'pro';
+
 export const endLimit = (meta: Pick<Meta, 'limits' | 'tier_limits'>) => Math.min(meta.tier_limits.max_ends ?? 1, meta.limits.max_ends);
+
+const positive = (n: unknown): n is number => typeof n === 'number' && n > 0;
+
+// ffly API 1.13.0 (spec 016): the searches a caller gets per window. Before 1.13.0 there is none, and copy names no count.
+export function searchWindow(limits: Meta['tier_limits']): { searches: number; hours: number } | undefined {
+  const { searches_per_window: searches, window_hours: hours } = limits;
+  return positive(searches) && positive(hours) ? { searches, hours } : undefined;
+}
 
 export interface Travellers {
   adults: number;

@@ -1,0 +1,295 @@
+{
+  "_source": "1B-bots apps/ffly-api/contract/openapi.json 1.13.0 (origin/master 2c1201318, spec 575, 2026-10-16): MetaResponse and the schemas it refers to, verbatim",
+  "schemas": {
+    "Channel": {
+      "type": "string",
+      "enum": [
+        "app",
+        "web"
+      ],
+      "title": "Channel"
+    },
+    "Limits": {
+      "properties": {
+        "max_cities": {
+          "type": "integer",
+          "title": "Max Cities"
+        },
+        "max_ends": {
+          "type": "integer",
+          "title": "Max Ends"
+        },
+        "max_nights": {
+          "type": "integer",
+          "title": "Max Nights"
+        },
+        "max_window_days": {
+          "type": "integer",
+          "title": "Max Window Days"
+        }
+      },
+      "type": "object",
+      "required": [
+        "max_cities",
+        "max_ends",
+        "max_nights",
+        "max_window_days"
+      ],
+      "title": "Limits"
+    },
+    "MetaResponse": {
+      "properties": {
+        "places": {
+          "items": {
+            "$ref": "#/components/schemas/Place"
+          },
+          "type": "array",
+          "title": "Places"
+        },
+        "places_version": {
+          "type": "string",
+          "title": "Places Version",
+          "description": "GET /places' ETag without its quotes: a client holding this version has the current list"
+        },
+        "currency": {
+          "type": "string",
+          "title": "Currency"
+        },
+        "limits": {
+          "$ref": "#/components/schemas/Limits"
+        },
+        "priorities": {
+          "additionalProperties": {
+            "$ref": "#/components/schemas/Priority"
+          },
+          "type": "object",
+          "title": "Priorities"
+        },
+        "default_priority": {
+          "type": "string",
+          "title": "Default Priority"
+        },
+        "channel": {
+          "$ref": "#/components/schemas/Channel"
+        },
+        "tier": {
+          "$ref": "#/components/schemas/Tier"
+        },
+        "tier_limits": {
+          "$ref": "#/components/schemas/TierLimitsView"
+        },
+        "free_searches_left": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Free Searches Left",
+          "description": "Left in the current window, or ever where searches_lifetime applies; null when unmetered (Pro, except on the flag-off web)"
+        }
+      },
+      "type": "object",
+      "required": [
+        "places",
+        "places_version",
+        "currency",
+        "limits",
+        "priorities",
+        "default_priority",
+        "channel",
+        "tier",
+        "tier_limits",
+        "free_searches_left"
+      ],
+      "title": "MetaResponse"
+    },
+    "Place": {
+      "properties": {
+        "code": {
+          "type": "string",
+          "title": "Code"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name"
+        },
+        "top": {
+          "type": "boolean",
+          "title": "Top"
+        },
+        "airports": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Airports"
+        },
+        "country": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Country",
+          "description": "ISO 3166-1 alpha-2 country (PL, RU, US), so two places of one name (London GB, London CA) tell apart; null when unknown"
+        },
+        "names": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Names",
+          "description": "Language (de, zh-Hans, pt-BR) to the place's name in it, from GET /places; null in /meta. Look up the full language, then its base (pt-BR, then pt), else show `name`: a language absent reads as in English"
+        }
+      },
+      "type": "object",
+      "required": [
+        "code",
+        "name",
+        "top"
+      ],
+      "title": "Place"
+    },
+    "Priority": {
+      "properties": {
+        "label": {
+          "type": "string",
+          "title": "Label"
+        },
+        "hint": {
+          "type": "string",
+          "title": "Hint"
+        }
+      },
+      "type": "object",
+      "required": [
+        "label",
+        "hint"
+      ],
+      "title": "Priority"
+    },
+    "Tier": {
+      "type": "string",
+      "enum": [
+        "free",
+        "pro"
+      ],
+      "title": "Tier"
+    },
+    "TierLimitsView": {
+      "properties": {
+        "max_cities": {
+          "type": "integer",
+          "title": "Max Cities"
+        },
+        "max_ends": {
+          "type": "integer",
+          "title": "Max Ends"
+        },
+        "locked": {
+          "type": "boolean",
+          "title": "Locked"
+        },
+        "full_routes": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Full Routes"
+        },
+        "searches_per_window": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Searches Per Window",
+          "description": "Searches per window; null where searches_lifetime applies"
+        },
+        "window_hours": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Window Hours",
+          "description": "The window's length; windows start at 00:00 UTC. Null where searches_lifetime applies"
+        },
+        "searches_per_day": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Searches Per Day",
+          "description": "The daily total, searches_per_window * 24 / window_hours; null where searches_lifetime applies"
+        },
+        "searches_lifetime": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Searches Lifetime"
+        },
+        "app_only_fields": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "App Only Fields"
+        }
+      },
+      "type": "object",
+      "required": [
+        "max_cities",
+        "max_ends",
+        "locked",
+        "full_routes",
+        "searches_per_window",
+        "window_hours",
+        "searches_per_day",
+        "searches_lifetime",
+        "app_only_fields"
+      ],
+      "title": "TierLimitsView",
+      "description": "The caller's limits on its channel. `full_routes` null means every route comes back in full."
+    }
+  }
+}

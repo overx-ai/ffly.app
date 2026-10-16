@@ -106,15 +106,17 @@ curl -si -X POST localhost:4329/api/auth/token -H 'Origin: https://evil.example'
 curl -si localhost:4329/api/auth/token | head -1                                             # 404
 ```
 
-Accounts, Pro and the Trip kit (spec 014), once `CONTRACT_1_12` and `AUTH.googleClientId` are set, on ffly.app (Apple and
-Google accept no other origin) with DevTools open:
+Accounts, Pro and the Trip kit (specs 014, 016), once `CONTRACT_1_12` and a provider (`AUTH.appleRegistered`,
+`AUTH.googleClientId`) are set, on ffly.app (Apple and Google accept no other origin) with DevTools open:
 1. Signed out: `/search` sends nothing to `appleid.cdn-apple.com` or `accounts.google.com`, no `/api/auth` request, and
    the API's GETs carry no `Authorization` and no preflight.
-2. Sign in with Apple (a popup) and with Google: the sheet closes, the row says "Signed in", `ffly_session` is
-   `HttpOnly; Secure; SameSite=Strict; Path=/api/auth`, and no token is in `localStorage`, `sessionStorage`,
-   `document.cookie` or the URL (`ffly.account` holds only `1`). `/meta` is asked again with `Authorization`.
-3. A Pro account's caps and daily searches follow `/meta`; its legs offer Book direct and Book via partner. A Free
-   visitor sees Book via partner, the "Pro found this route about €X cheaper" line and the upsell.
+2. Sign in with each ready provider (Apple: a popup), and only its button is in the sheet: the sheet closes, the row
+   says "Signed in", `ffly_session` is `HttpOnly; Secure; SameSite=Strict; Path=/api/auth`, and no token is in
+   `localStorage`, `sessionStorage`, `document.cookie` or the URL (`ffly.account` holds only `1`). `/meta` is asked
+   again with `Authorization`.
+3. A Pro account's caps and searches follow `/meta`; its legs offer Book direct and Book via partner, the row says
+   "Signed in with ffly Pro", and the app strip, the queue line and the quota note are gone. A Free visitor sees Book
+   via partner, the "Pro found this route about €X cheaper" line and the upsell.
 4. During a search the progress card shows "Partner offers"; each route's details show its own.
 5. After Accept, Book and kit clicks send `book_click` and `kit_click` (`placement`, `kind`, `tier`); after Reject
    they send nothing and still open.

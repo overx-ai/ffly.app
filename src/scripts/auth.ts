@@ -1,4 +1,4 @@
-import { APPLE_JS, AUTH, GOOGLE_JS } from '../app';
+import { APPLE_JS, AUTH, GOOGLE_JS, SIGN_IN_PROVIDERS } from '../app';
 import { AuthState, type Change, type Hint, type Provider } from './auth-state';
 import { loadScript } from './load-script';
 
@@ -50,7 +50,8 @@ const storedHint: Hint = {
 
 export function setupAccount(text: AccountText, onChange: (change: Change) => void) {
   const sheet = byId<HTMLDialogElement>('sign-in-sheet');
-  const apple = byId<HTMLButtonElement>('apple-sign-in');
+  // Only a ready provider's button is on the page (spec 016).
+  const apple = document.getElementById('apple-sign-in') as HTMLButtonElement | null;
   const error = byId('sign-in-error');
   const status = byId('account-status');
   const signInButton = byId('sign-in');
@@ -69,8 +70,8 @@ export function setupAccount(text: AccountText, onChange: (change: Change) => vo
     if (!(await auth.signIn(provider, body))) error.textContent = text.failed;
   };
 
-  // Apple's and Google's scripts load only once the visitor asks to sign in, so a signed-out page sends them nothing.
-  // A script that failed to load is tried again at the next opening.
+  // A ready provider's script loads only once the visitor asks to sign in, so a signed-out page sends it nothing. A
+  // script that failed to load is tried again at the next opening.
   const loading = new Map<string, Promise<void>>();
   const loadOnce = (src: string, ready: () => void) => {
     let pending = loading.get(src);
@@ -83,7 +84,7 @@ export function setupAccount(text: AccountText, onChange: (change: Change) => vo
   };
   const initApple = () => {
     window.AppleID!.auth.init({ clientId: AUTH.appleServiceId, scope: 'email', redirectURI: AUTH.appleReturnUrl, usePopup: true });
-    apple.disabled = false;
+    apple!.disabled = false;
   };
   const initGoogle = () => {
     const id = window.google!.accounts.id;
@@ -93,11 +94,17 @@ export function setupAccount(text: AccountText, onChange: (change: Change) => vo
       itp_support: true,
       use_fedcm_for_prompt: true,
     });
-    id.renderButton(byId('gis-sign-in'), { type: 'standard', theme: 'outline', size: 'large', shape: 'pill', text: 'signin_with', locale: document.documentElement.lang });
+    const button = byId('gis-sign-in');
+    id.renderButton(button, { type: 'standard', theme: 'outline', size: 'large', shape: 'pill', text: 'signin_with', locale: document.documentElement.lang });
+    button.hidden = false;
+  };
+  const load: Record<Provider, () => Promise<unknown>> = {
+    apple: () => loadOnce(APPLE_JS, initApple),
+    google: () => loadOnce(GOOGLE_JS, initGoogle).then(() => window.google?.accounts.id.prompt()),
   };
 
   // signIn() runs inside the click, or the browser blocks Apple's popup.
-  apple.addEventListener('click', () => {
+  apple?.addEventListener('click', () => {
     error.textContent = '';
     window.AppleID?.auth.signIn().then(
       (answer) => {
@@ -117,10 +124,7 @@ export function setupAccount(text: AccountText, onChange: (change: Change) => vo
     opener.addEventListener('click', () => {
       error.textContent = '';
       sheet.showModal();
-      loadOnce(APPLE_JS, initApple).catch(() => undefined);
-      loadOnce(GOOGLE_JS, initGoogle)
-        .then(() => window.google?.accounts.id.prompt())
-        .catch(() => undefined);
+      for (const provider of SIGN_IN_PROVIDERS) load[provider]().catch(() => undefined);
     });
   }
   byId('sign-in-close').addEventListener('click', () => sheet.close());

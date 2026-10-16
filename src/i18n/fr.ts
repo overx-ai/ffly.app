@@ -104,10 +104,12 @@ const fr = {
       free: {
         question: `${APP.name} est-il gratuit ?`,
         answer: {
-          one: `Votre première recherche dans l’app est gratuite et complète, et vous pouvez essayer une recherche sur le web {perDay}. ${APP.proName} est fait pour tous les voyages suivants.`,
-          other: `Vos {n} premières recherches dans l’app sont gratuites et complètes, et vous pouvez essayer une recherche sur le web {perDay}. ${APP.proName} est fait pour tous les voyages suivants.`,
+          one: `Dans l’app, {n} recherche est gratuite et complète. {web} ${APP.proName} est fait pour tous les voyages suivants.`,
+          other: `Vos {n} premières recherches dans l’app sont gratuites et complètes. {web} ${APP.proName} est fait pour tous les voyages suivants.`,
         },
-        perDay: { one: 'une fois par jour', other: '{n} fois par jour' },
+        web: { one: 'Sur le web, vous pouvez lancer {n} recherche {every}.', other: 'Sur le web, vous pouvez lancer {n} recherches {every}.' },
+        every: { one: 'par période de {n} heure', other: 'toutes les {n} heures' },
+        webFree: 'Vous pouvez aussi essayer une recherche sur le web, gratuitement.',
       },
       tickets: {
         question: `${APP.name} vend-il des billets ?`,
@@ -312,8 +314,12 @@ const fr = {
         cityLimit: { one: 'La recherche web gratuite accepte jusqu’à {n} ville.', other: 'La recherche web gratuite accepte jusqu’à {n} villes.' },
         cityCount: '{n} sur {max}',
         pickCity: 'Choisissez chaque ville dans la liste.',
-        quota: 'Vous avez utilisé les recherches web gratuites du jour. L’app en propose davantage.',
-        left: { one: 'Il reste {n} recherche web gratuite aujourd’hui.', other: 'Il reste {n} recherches web gratuites aujourd’hui.' },
+        quota: 'Vous avez utilisé vos recherches web gratuites pour le moment. Réessayez plus tard.',
+        quotaWindow: {
+          one: 'Vous avez utilisé vos recherches web gratuites pour le moment. Vous en aurez d’autres d’ici {n} heure au plus.',
+          other: 'Vous avez utilisé vos recherches web gratuites pour le moment. Vous en aurez d’autres d’ici {n} heures au plus.',
+        },
+        left: { one: 'Il reste {n} recherche web gratuite.', other: 'Il reste {n} recherches web gratuites.' },
         invalid: 'Certains détails du voyage n’ont pas été acceptés. Vérifiez-les et réessayez.',
         appOnly: 'Cette option n’est pas encore disponible sur le web.',
         to: 'Choisissez votre destination dans la liste.',
@@ -400,7 +406,7 @@ const fr = {
         rotation: [
           'Choisissez vos heures de vol préférées dans l’app.',
           'Dans l’app, votre recherche passe en priorité.',
-          `${APP.freeSearches} recherches complètes gratuites dans l’app.`,
+          { one: '{n} recherche complète gratuite dans l’app.', other: '{n} recherches complètes gratuites dans l’app.' },
           'Partagez un voyage sous forme de carte d’embarquement depuis l’app.',
           'Ajoutez plus de villes à un voyage dans l’app.',
           'Vos voyages sont enregistrés dans l’app.',
@@ -434,6 +440,70 @@ const fr = {
       'Des itinéraires classés selon ce qui compte pour vous : horaires, prix ou équilibre',
       'Réservez chaque vol sur le site de la compagnie ou sur un site de réservation',
     ],
+  },
+
+  v2: {
+    home: {
+      plans: {
+        title: { other: `Gratuit dans l’app et sur le web. ${APP.proName} pour les grands voyages et les tarifs les plus bas que nous trouvons.` },
+        free: {
+          line: { other: 'Chaque itinéraire en entier, avec les tarifs partenaires' },
+          body: 'Les dates, les horaires de vol, les compagnies et les liens de réservation de chaque itinéraire, les mêmes dans l’app et sur le web.',
+        },
+        pro: {
+          line: 'Les tarifs les plus bas que nous trouvons, y compris en direct auprès des compagnies',
+          body: 'Plus de villes et de lieux d’arrivée, plus de recherches, et votre recherche passe en premier en cas d’affluence. Réservez chaque vol en direct ou via un partenaire. À la semaine, à l’année ou « {lifetime} » en achat unique, au prix indiqué dans l’app.',
+        },
+        promise: 'Pas de publicité dans l’app, hormis les offres partenaires pour votre voyage. Nous ne vendons pas vos données.',
+      },
+      faq: {
+        free: {
+          answer: {
+            other: `Oui. La formule Gratuit de ${APP.name} affiche chaque itinéraire en entier, avec les tarifs partenaires. {web} ${APP.proName} ajoute plus de villes, les tarifs les plus bas que nous trouvons, y compris en direct auprès des compagnies, et plus de recherches.`,
+          },
+          web: { one: 'Vous pouvez lancer {n} recherche {every}, dans l’app et sur le web.', other: 'Vous pouvez lancer {n} recherches {every}, dans l’app et sur le web.' },
+          webFree: 'La formule Gratuit fonctionne de la même façon dans l’app et sur le web.',
+        },
+        android: {
+          answer: `${APP.name} est une app iPhone. Sur tout autre appareil, lancez votre recherche sur le web, où la formule Gratuit fonctionne de la même façon.`,
+        },
+      },
+    },
+    search: {
+      lead: `Indiquez à ${APP.name} les villes que vous voulez voir. Il trouve l’ordre et les dates qui rendent le voyage complet le moins cher possible, avec les vols et les liens de réservation de chaque itinéraire.`,
+    },
+    widget: {
+      script: {
+        messages: {
+          cityLimit: {
+            one: `Avec la formule Gratuit, un voyage compte jusqu’à {n} ville. ${APP.proName} en permet davantage.`,
+            other: `Avec la formule Gratuit, un voyage compte jusqu’à {n} villes. ${APP.proName} en permet davantage.`,
+          },
+          quota: 'Vous avez utilisé vos recherches pour le moment. Réessayez plus tard.',
+          quotaWindow: {
+            one: 'Vous avez utilisé vos recherches pour le moment. Vous en aurez d’autres d’ici {n} heure au plus.',
+            other: 'Vous avez utilisé vos recherches pour le moment. Vous en aurez d’autres d’ici {n} heures au plus.',
+          },
+          left: { one: 'Il reste {n} recherche gratuite.', other: 'Il reste {n} recherches gratuites.' },
+          more: { one: `{n} autre itinéraire avec ${APP.proName}`, other: `{n} autres itinéraires avec ${APP.proName}` },
+          lockedRow: { one: `{n} ville · dates et vols avec ${APP.proName}`, other: `{n} villes · dates et vols avec ${APP.proName}` },
+        },
+        nudges: {
+          priceLine: `${APP.proName} : les tarifs les plus bas que nous trouvons, y compris en direct auprès des compagnies.`,
+          queue: `Avec ${APP.proName}, votre recherche passe en premier en cas d’affluence.`,
+          cityCap: `Plus de villes avec ${APP.proName}`,
+          appHint: `Même voyage avec ${APP.proName} : dès {from}, soit {less} de moins.`,
+          rotation: [
+            'Chaque itinéraire en entier, gratuit dans l’app et sur le web.',
+            'Partagez un voyage sous forme de carte d’embarquement depuis l’app.',
+            'Vos voyages sont enregistrés dans l’app.',
+            `Plus de villes et de lieux d’arrivée avec ${APP.proName}.`,
+            `Avec ${APP.proName}, réservez chaque vol en direct ou via un partenaire.`,
+            `Plus de recherches avec ${APP.proName}.`,
+          ],
+        },
+      },
+    },
   },
 } satisfies Dict;
 

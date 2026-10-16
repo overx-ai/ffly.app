@@ -3,7 +3,7 @@ title: Open jaw flights in Europe, built from budget one-ways
 slug: open-jaw-flights-europe
 keyword: open jaw flights Europe
 published: 2026-10-09
-updated: 2026-10-09
+updated: 2026-10-16
 cluster: B. Booking mechanics on low-cost carriers
 intent: definition / how-to
 serp_format: Glossary definitions of 300-800 words (Going, Navan, AirHelp's opener) plus 1,200-2,500 word guides (Thrifty Traveler, Dollar Flight Club, Going, AirHelp) with a definition, the three types, how to book and an FAQ. Every ranking page is written for long-haul flights on full-service airlines; none covers budget airlines.
@@ -130,7 +130,7 @@ ffly, a [multi-city trip planner](/), plans the one-way part of an open jaw. You
 
 If you're flying in from outside Europe, book the long-haul ticket yourself and give ffly the European part: start where you land, finish where your flight home leaves. Fares come from Ryanair, Wizz Air, airBaltic, Volotea and more.
 
-ffly covers flights only, so a train across the jaw is yours to plan. It's a search tool, not a travel agent: you book each flight on the airline's site or a booking site, and fares may not include bags. To see how your own cities line up, [try a search free on the web](/search). The iPhone app gives you 3 searches free.
+ffly covers flights only, so a train across the jaw is yours to plan. It's a search tool, not a travel agent: you book each flight on the airline's site or a booking site, and fares may not include bags. To see how your own cities line up, [try a search free on the web](/search) or in the iPhone app.
 
 ## FAQ
 

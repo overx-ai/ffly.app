@@ -11,6 +11,7 @@ Contracts this site codes against. Bump a row in the same change that adopts a n
 | ffly API meta without places | 1.9.0 | 1B-bots `docs/specs/540` (`GET /meta?places=false`: `places: []`, the rest unchanged) | `getMeta` in `src/scripts/ffly-api.ts` (spec 009) |
 | ffly API web end cap | 1.5.0 | 1B-bots `docs/specs/535` T8 (`/meta` `tier_limits.max_ends` = 2 for web) | `endLimit` in `src/scripts/ffly-api.ts` (spec 006) |
 | ffly API accounts, offers, Trip kit | 1.12.0 | 1B-bots `docs/specs/574` (`Authorization: Bearer`, `leg.offers[]`, `route.pro_preview`, `route.trip_kit[]`, `GET /trip-kit`, `/meta` `tier` and v2 `tier_limits`, CORS allowing `Authorization`) | `src/scripts/ffly-api.ts`, `results.ts` behind `CONTRACT_1_12`; fixtures `tests/fixtures/ffly-api-1.12/`, `tests/contract/ffly-api-1.12.test.ts` (spec 014) |
+| ffly API search window | 1.13.0 | 1B-bots `apps/ffly-api/contract/openapi.json` at `2c1201318` (spec 575): `/meta` `tier_limits.searches_per_window` and `window_hours`, required and nullable (10 every 12 hours for the web and v2 Free, 100 every 24 for Pro, null for 1.0's app Free, which keeps `searches_lifetime`); `searches_per_day` the daily total; `free_searches_left` what is left in the current window | `searchWindow` in `src/scripts/ffly-api.ts`, `src/scripts/quota.ts`, the home FAQ through `src/data/web-meta.json`; `tests/fixtures/ffly-api-1.13/meta.schema.json` (the published `MetaResponse`, verbatim), `tests/contract/ffly-api-1.13.test.ts` (spec 016) |
 | ffly API one-way trips | 1.10.0 | 1B-bots `docs/specs/568` (`cities: []` with `ends: [destination]`; ends in visited cities) | the trip type in `src/scripts/filters.ts` `tripLists`, `buildRequest` (spec 015) |
 | ffly API travellers | 1.11.0 | 1B-bots `docs/specs/570` (`travellers` `{adults, children, infants}`: adults + children at most 9, an infant per adult; prices per adult, the party carried into booking links; not in the web's `app_only_fields`) | `buildRequest`, `allowedFields`, `REQUEST_LIMITS` (spec 015) |
 | ffly API web search options | 1.12.0 | 1B-bots `docs/specs/574` (the web's `tier_limits.app_only_fields` empties: `optional`, `excluded`, `pinned`, `max_stops_per_leg`, `max_stops_total`, `schedule`, `airports`, `priority`; the request schema is 1.11.0's, pinned in `tests/fixtures/ffly-api-1.12/search-request.schema.json`) | `allowedFields` behind `CONTRACT_1_12`; `tests/contract/ffly-api-parity.test.ts` (spec 015) |
@@ -43,6 +44,13 @@ stay simple requests with no preflight; only a signed-in request carries `Author
 1.12.0's CORS allows it from `https://ffly.app`. `GET /places` and `GET /searches/shared` never carry it. A 401 on a
 signed-in call refreshes once through `/api/auth/token` and retries; a second 401 signs out and the call goes on as Free.
 The site reads no `seller` from an offer or the Trip kit, so no partner is ever named on the page.
+
+1.13.0's window is read whether or not `CONTRACT_1_12` is on (spec 016): the web limit is the API's, never the site's.
+1.13.0 deployed 2026-10-16 (windows turn at 00:00 and 12:00 UTC). Without a window (an older API, or a null one) the quota
+note still counts `free_searches_left`, but the spent line and the home FAQ name no number ("Try again later.", "You can
+also try a search on the web, free."). The home FAQ is prerendered from `src/data/web-meta.json`, which `npm run places`
+writes with the two fields; `check-legal` holds the FAQ to that file. The fixtures are the live web `/meta` of 2026-10-16
+(`meta-web.json`) and a Pro answer, both validated against the published `MetaResponse`.
 
 The browser never calls overx-auth (it has no CORS): `src/pages/api/auth/*` do, from this site's server, and keep only the
 refresh token, in `ffly_session` (`HttpOnly; Secure; SameSite=Strict; Path=/api/auth`). They send no `device_id`, so a

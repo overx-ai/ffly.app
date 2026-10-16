@@ -31,12 +31,11 @@ export const SUPPORT_FAQ: readonly FaqItem[] = [
   },
   {
     question: `What do Free and ${APP.proName} include?`,
-    answer: `<p><strong>Free:</strong> ${APP.freeSearches} searches in the app, each showing every route in full,
-      with dates, flight times and booking links.</p>
-      <p><strong>${APP.proName}:</strong> every route in full, with dates, flight times and booking links, and no
-      ${APP.freeSearches}-search limit. It comes as a weekly or yearly subscription, or a one-time
-      ${APP.lifetimeName} purchase that does not renew. Prices are shown in the app, in your currency, before you
-      buy.</p>`,
+    answer: `<p><strong>Free:</strong> free searches in the app and on the web. In the app, each one shows every route
+      in full, with dates, flight times and booking links. The current limits are shown in the app and on the site.</p>
+      <p><strong>${APP.proName}:</strong> every route in full, with dates, flight times and booking links, and more
+      searches than Free. It comes as a weekly or yearly subscription, or a one-time ${APP.lifetimeName} purchase
+      that does not renew. Prices are shown in the app, in your currency, before you buy.</p>`,
   },
   {
     question: 'Why are prices indicative?',
@@ -45,8 +44,8 @@ export const SUPPORT_FAQ: readonly FaqItem[] = [
       confirm the final price where you book: Book opens the airline's site or a booking site.</p>`,
   },
   {
-    question: `What happens after my ${APP.freeSearches} free searches?`,
-    answer: `<p>Your first ${APP.freeSearches} searches show every route in full. After that, <strong>Find
+    question: 'What happens when I have used my free searches?',
+    answer: `<p>Every free search in the app shows every route in full. Once you have used them, <strong>Find
       route</strong> offers ${APP.proName} before it searches. The trips you already searched stay in your Trips
       list, and deleting and reinstalling ffly does not reset the count.</p>`,
   },
@@ -57,9 +56,9 @@ export const SUPPORT_FAQ: readonly FaqItem[] = [
   },
   {
     question: 'How do I delete my data?',
-    answer: `<p>ffly has no account. Swipe a trip in the Trips list to delete it, and uninstall the app to clear
-      the rest of the data on your device, except the free-search counter, which stays on your iPhone after you
-      uninstall. Your searches in the app are deleted within ${SERVICE.searchRetentionHours} hours. Apple, and the service that
+    answer: `<p>ffly works without an account; if you have one, you can delete it in the app's Settings. Swipe a trip
+      in the Trips list to delete it, and uninstall the app to clear the rest of the data on your device, except the
+      free-search counter, which stays on your iPhone after you uninstall. Your searches in the app are deleted within ${SERVICE.searchRetentionHours} hours. Apple, and the service that
       manages ${APP.proName} purchases for us, keep purchase records as needed for refunds and accounting.</p>
       <p>To delete feedback you sent, and the email address if you added one, write to ${mailto(CONTACT_EMAIL)} from
       that address or tell us roughly when you sent it, as

@@ -32,12 +32,13 @@ const places = withLanguages(fresh?.body.places ?? meta.places, LANG_CODES);
 const version = fresh?.etag?.replace(/^W\//, '').replace(/^"|"$/g, '') || meta.places_version || fail('no places version: public/places.json is cached immutably under it');
 if (!Array.isArray(places) || !places.length) fail('no places');
 
-const { max_cities, max_ends, searches_per_day } = meta.tier_limits;
+// The window (ffly API 1.13.0) is what the home FAQ names; absent (before 1.13.0) or null, the FAQ names no count (spec 016).
+const { max_cities, max_ends, searches_per_day, searches_per_window, window_hours } = meta.tier_limits;
 const head = {
   places_version: version,
   currency: meta.currency,
   limits: meta.limits,
-  tier_limits: { max_cities, max_ends, searches_per_day },
+  tier_limits: { max_cities, max_ends, searches_per_day, searches_per_window, window_hours },
 };
 writeFileSync(HEAD_OUT, `${JSON.stringify(head, null, 2)}\n`);
 // One place per line keeps the diff of a refresh readable.

@@ -10,6 +10,8 @@
   "tier_limits": {
     "max_cities": 4,
     "max_ends": 2,
-    "searches_per_day": 5
+    "searches_per_day": 20,
+    "searches_per_window": 10,
+    "window_hours": 12
   }
 }

@@ -22,6 +22,7 @@ import {
   getTripKit,
   isCurrent,
   lookupShared,
+  proCaller,
   searchedAt,
   setCaller,
   type ExcludedFlight,
@@ -63,9 +64,10 @@ import {
 } from './filters';
 import { Library, canCompare, routeKey, searchKey, toggleCompare, type Finished, type HistoryEntry, type SavedRoute } from './library';
 import { ask, canAsk, routesReady } from './notify';
-import { appHintLine, rotation } from './nudges';
+import { appHintLine, rotation, type webNudges } from './nudges';
 import { addPlace, countryNamer, fold, optionParts, placeName, placeNames, removePlace } from './places';
 import { PlacesStore, provisionalMeta, type PlaceSet } from './places-store';
+import { quotaNote, quotaSpent } from './quota';
 import { cookieString, fillPrefs, finishOf, namesPlaces, parseCookies, sameSearch, savedCookies, sharedRequest, shareUrl, type Prefs } from './prefs';
 import { kitGroups, routeRows, type BookLink, type KitGroup, type LegRow, type RouteRow, type Warn } from './results';
 import { glideLinks } from './scroll';
@@ -88,7 +90,8 @@ const MINUTE_S = 60;
 
 // One bundle serves every language: SearchForm renders that page's strings into data-i18n (the CSP allows no
 // inline script), and <html lang> is the locale of every date, number and list.
-const TEXT = JSON.parse(document.querySelector<HTMLElement>('[data-i18n]')!.dataset.i18n!) as Dict['widget']['script'] & {
+const TEXT = JSON.parse(document.querySelector<HTMLElement>('[data-i18n]')!.dataset.i18n!) as Omit<Dict['widget']['script'], 'nudges'> & {
+  nudges: ReturnType<typeof webNudges>;
   nights: Plural;
   loading: string;
   columns: Dict['widget']['columns'];
@@ -136,6 +139,8 @@ const el = {
   formError: byId('form-error'),
   submit: byId<HTMLButtonElement>('submit'),
   quotaNote: byId('quota-note'),
+  inAppLabel: byId('in-app-label'),
+  lockedChips: part<HTMLUListElement>(document, '.locked-chips'),
   strip: byId('app-side'),
   nudge: byId('nudge'),
   nudgeDots: byId('nudge-dots'),
@@ -147,6 +152,7 @@ const el = {
   progressBar: byId('progress-bar'),
   progressFill: byId('progress-fill'),
   progressDetail: byId('progress-detail'),
+  queueNudge: byId('queue-nudge'),
   notifyAsk: byId('notify-ask'),
   notifyYes: byId<HTMLButtonElement>('notify-yes'),
   notifyNo: byId<HTMLButtonElement>('notify-no'),
@@ -246,6 +252,7 @@ const nameOf = (code: string) => {
   return place ? localName(place) : code;
 };
 const tier = (): Tier => meta?.tier ?? 'free';
+const isPro = () => proCaller(meta, CONTRACT_1_12);
 const maxCities = () => Math.min(meta.tier_limits.max_cities, meta.limits.max_cities);
 const maxEnds = () => endLimit(meta);
 const severalEnds = () => maxEnds() > 1;
@@ -436,6 +443,10 @@ const LISTS: Record<ListName, ChipList> = {
     max: maxCities,
     exclude: () => [pickedFrom, ...lists.ends],
     remembered: 'cities',
+    // Pro is never shown Free's cap notice, so a full list hides its input, as Back to does.
+    rendered: () => {
+      comboOf(el.city).hidden = isPro() && lists.cities.length >= maxCities();
+    },
   },
   ends: {
     chips: el.ends,
@@ -512,11 +523,18 @@ function renderNights() {
 }
 
 function renderQuota() {
-  const left = meta.free_searches_left;
-  if (left === null) el.quotaNote.textContent = '';
-  else if (left > 0) el.quotaNote.textContent = count(MESSAGES.left, left);
-  else el.quotaNote.textContent = MESSAGES.quota;
+  el.quotaNote.textContent = quotaNote(meta, isPro(), MESSAGES, LOCALE);
 }
+
+// Spec 016: a Pro account sees none of Free's nudges: no app strip, no queue line, no quota note.
+function renderPlan() {
+  const pro = isPro();
+  el.strip.hidden = pro;
+  el.queueNudge.hidden = pro;
+  renderQuota();
+}
+
+const cityLimitLine = () => (isPro() ? MESSAGES.invalid : count(MESSAGES.cityLimit, maxCities()));
 
 function defaultWindow() {
   const from = addDays(localToday(), WEB_SEARCH.startInDays);
@@ -557,7 +575,7 @@ function applyMeta(next: Meta) {
     if (!wasSeveral && severalEnds() && lists.ends.length) el.back.value = '';
   }
   renderNights();
-  renderQuota();
+  renderPlan();
   applyGate();
 }
 
@@ -629,7 +647,7 @@ function readPlaces(from: string): { ends: string[]; cities: string[] } | string
   if (!ends) return MESSAGES.end;
   const cities = lists.cities;
   if (!cities.length) return MESSAGES.noCities;
-  if (cities.length > maxCities()) return count(MESSAGES.cityLimit, maxCities());
+  if (cities.length > maxCities()) return cityLimitLine();
   if ([from, ...ends].some((code) => cities.includes(code))) return MESSAGES.overlap;
   return { ends, cities: [...cities] };
 }
@@ -717,7 +735,7 @@ function showProblem(message: string, retry?: () => void, upsell = false) {
   retryAction = retry;
   el.retry.hidden = !retry;
   el.problem.hidden = false;
-  el.upsell.hidden = !upsell || (CONTRACT_1_12 && tier() === 'pro');
+  el.upsell.hidden = !upsell || isPro();
 }
 
 function renderProgress(view: Pick<SearchView, 'status' | 'done' | 'total' | 'eta_s'>) {
@@ -970,7 +988,7 @@ function renderResults(view: SearchView, request: SearchRequest) {
   el.placeholder.hidden = true;
   setSearching(false);
   el.progress.hidden = true;
-  el.upsell.hidden = CONTRACT_1_12 ? tier() === 'pro' : !(more > 0 || rows.some((r) => r.kind !== 'full'));
+  el.upsell.hidden = CONTRACT_1_12 ? isPro() : !(more > 0 || rows.some((r) => r.kind !== 'full'));
   el.submit.disabled = false;
   writeUrl(request);
   pushAds();
@@ -1271,9 +1289,9 @@ async function submit(asked: SearchRequest, resubmitted = false): Promise<void> 
     case 'quota':
       meta.free_searches_left = 0;
       renderQuota();
-      return showProblem(MESSAGES.quota, undefined, true);
+      return showProblem(quotaSpent(meta, MESSAGES, LOCALE), undefined, true);
     case 'city_limit':
-      return showProblem(count(MESSAGES.cityLimit, maxCities()), undefined, true);
+      return showProblem(cityLimitLine(), undefined, true);
     case 'invalid':
       return showProblem(MESSAGES.invalid);
     case 'app_only':
@@ -1333,6 +1351,9 @@ function applyGate() {
   for (const node of el.options.querySelectorAll<HTMLElement>('[data-any]')) node.hidden = !on(node.dataset.any);
   for (const node of el.options.querySelectorAll<HTMLElement>('[data-field]')) node.hidden = !on(node.dataset.field);
   for (const node of el.form.querySelectorAll<HTMLElement>('[data-locked-field]')) node.hidden = on(node.dataset.lockedField);
+  const anyChip = [...el.lockedChips.children].some((chip) => !(chip as HTMLElement).hidden);
+  el.inAppLabel.hidden = !anyChip;
+  el.lockedChips.hidden = !anyChip;
   renderList('cities');
   renderOptions();
 }
@@ -1741,7 +1762,7 @@ const cityBox = placeBox(
   el.cityList,
   () => taken('cities'),
   (p) => addTo('cities', p.code),
-  () => (lists.cities.length >= maxCities() ? TEXT.nudges.cityCap : undefined),
+  () => (lists.cities.length >= maxCities() && !isPro() ? TEXT.nudges.cityCap : undefined),
 );
 placeBox(el.from, el.fromList, () => lists.cities, (p) => {
   setFrom(p.code);
@@ -1955,7 +1976,7 @@ async function init(prefs: Prefs, metaAnswer = getMeta()): Promise<void> {
 let metaLive = false;
 let signedOutLine = false;
 const account = SIGN_IN ? setupAccount(TEXT.account!, (change) => void accountChanged(change)) : undefined;
-const renderAccount = () => account?.render(tier() === 'pro', signedOutLine);
+const renderAccount = () => account?.render(isPro(), signedOutLine);
 
 async function accountChanged(change: Change) {
   signedOutLine = change === 'expired';
