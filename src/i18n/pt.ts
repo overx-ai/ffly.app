@@ -452,7 +452,7 @@ const pt = {
         },
         pro: {
           line: 'As tarifas mais baixas que encontramos, incluindo tarifas diretas das companhias aéreas',
-          body: 'Mais cidades e locais para terminar, mais pesquisas, e a sua pesquisa passa à frente quando há muita procura. Reserve cada voo diretamente ou através de parceiro. Semanal, anual ou {lifetime}, uma compra única, com preços indicados na app.',
+          body: 'Mais cidades e locais para terminar, mais pesquisas, e a sua pesquisa passa à frente quando há muita procura. Reserve cada voo diretamente ou, quando disponível, através de parceiro. Semanal, anual ou {lifetime}, uma compra única, com preços indicados na app.',
         },
         promise: 'Sem anúncios na app, exceto ofertas de parceiros para a sua viagem. Não vendemos os seus dados.',
       },
@@ -498,7 +498,7 @@ const pt = {
             'Partilhe uma viagem como cartão de embarque a partir da app.',
             'As suas viagens ficam guardadas na app.',
             `Mais cidades e locais para terminar com o ${APP.proName}.`,
-            `Com o ${APP.proName}, reserve cada voo diretamente ou através de parceiro.`,
+            `Com o ${APP.proName}, reserve cada voo diretamente ou, quando disponível, através de parceiro.`,
             `Mais pesquisas com o ${APP.proName}.`,
           ],
         },

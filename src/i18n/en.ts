@@ -468,7 +468,7 @@ const v2 = {
       },
       pro: {
         line: 'The lowest fares we find, including direct airline fares',
-        body: "More cities and places to finish, more searches, and your search goes first when it's busy. Book each flight direct or via a partner. Weekly, yearly or a one-time {lifetime} purchase, priced in the app.",
+        body: "More cities and places to finish, more searches, and your search goes first when it's busy. Book each flight direct, or via a partner where one is offered. Weekly, yearly or a one-time {lifetime} purchase, priced in the app.",
       },
       promise: "No ads in the app, apart from partner offers for your trip. We don't sell your data.",
     },
@@ -508,7 +508,7 @@ const v2 = {
           'Share a trip as a boarding pass from the app.',
           'Your trips are saved in the app.',
           `More cities and places to finish with ${APP.proName}.`,
-          `With ${APP.proName}, book each flight direct or via a partner.`,
+          `With ${APP.proName}, book each flight direct, or via a partner where offered.`,
           `More searches with ${APP.proName}.`,
         ],
       },

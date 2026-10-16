@@ -513,7 +513,7 @@ const pl = {
         },
         pro: {
           line: 'Najniższe ceny, jakie znajdujemy, także bezpośrednio u linii lotniczych',
-          body: 'Więcej miast i miejsc końcowych, więcej wyszukiwań, a przy dużym ruchu twoje wyszukiwanie idzie pierwsze. Każdy lot zarezerwujesz bezpośrednio lub przez partnera. Subskrypcja tygodniowa lub roczna albo plan „{lifetime}” kupowany jednorazowo; ceny znajdziesz w aplikacji.',
+          body: 'Więcej miast i miejsc końcowych, więcej wyszukiwań, a przy dużym ruchu twoje wyszukiwanie idzie pierwsze. Każdy lot zarezerwujesz bezpośrednio lub, jeśli jest taka opcja, przez partnera. Subskrypcja tygodniowa lub roczna albo plan „{lifetime}” kupowany jednorazowo; ceny znajdziesz w aplikacji.',
         },
         promise: 'W aplikacji nie ma reklam, poza ofertami partnerów dla twojej podróży. Nie sprzedajemy twoich danych.',
       },
@@ -583,7 +583,7 @@ const pl = {
             'W aplikacji udostępnisz podróż jako kartę pokładową.',
             'Twoje podróże zapisują się w aplikacji.',
             `Więcej miast i miejsc końcowych w ${APP.proName}.`,
-            `W ${APP.proName} każdy lot zarezerwujesz bezpośrednio lub przez partnera.`,
+            `W ${APP.proName} każdy lot zarezerwujesz bezpośrednio lub, jeśli jest taka opcja, przez partnera.`,
             `Więcej wyszukiwań w ${APP.proName}.`,
           ],
         },

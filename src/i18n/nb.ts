@@ -452,7 +452,7 @@ const nb = {
         },
         pro: {
           line: 'De laveste prisene vi finner, også direkte hos flyselskapene',
-          body: 'Flere byer og steder å avslutte, flere søk, og søket ditt går først når det er travelt. Bestill hvert fly direkte eller via en partner. Ukentlig, årlig eller «{lifetime}» som engangskjøp, med priser i appen.',
+          body: 'Flere byer og steder å avslutte, flere søk, og søket ditt går først når det er travelt. Bestill hvert fly direkte, eller via en partner der det tilbys. Ukentlig, årlig eller «{lifetime}» som engangskjøp, med priser i appen.',
         },
         promise: 'Ingen reklame i appen, bortsett fra partnertilbud for reisen din. Vi selger ikke dataene dine.',
       },
@@ -498,7 +498,7 @@ const nb = {
             'Del en reise som boardingkort fra appen.',
             'Reisene dine lagres i appen.',
             `Flere byer og steder å avslutte med ${APP.proName}.`,
-            `Med ${APP.proName} bestiller du hvert fly direkte eller via en partner.`,
+            `Med ${APP.proName} bestiller du hvert fly direkte, eller via en partner der det tilbys.`,
             `Flere søk med ${APP.proName}.`,
           ],
         },

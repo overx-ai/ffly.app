@@ -452,7 +452,7 @@ const nl = {
         },
         pro: {
           line: 'De laagste prijzen die we vinden, ook rechtstreeks bij airlines',
-          body: 'Meer steden en eindbestemmingen, meer zoekopdrachten, en jouw zoekopdracht gaat voor als het druk is. Boek elke vlucht direct of via een partner. Wekelijks, jaarlijks of {lifetime} (eenmalige aankoop), met de prijzen in de app.',
+          body: 'Meer steden en eindbestemmingen, meer zoekopdrachten, en jouw zoekopdracht gaat voor als het druk is. Boek elke vlucht direct, of via een partner als er een wordt aangeboden. Wekelijks, jaarlijks of {lifetime} (eenmalige aankoop), met de prijzen in de app.',
         },
         promise: 'Geen advertenties in de app, behalve partneraanbiedingen voor je reis. We verkopen je gegevens niet.',
       },
@@ -498,7 +498,7 @@ const nl = {
             'Deel een reis als instapkaart vanuit de app.',
             'Je reizen worden bewaard in de app.',
             `Meer steden en eindbestemmingen met ${APP.proName}.`,
-            `Met ${APP.proName} boek je elke vlucht direct of via een partner.`,
+            `Met ${APP.proName} boek je elke vlucht direct, of via een partner als die er is.`,
             `Meer zoekopdrachten met ${APP.proName}.`,
           ],
         },

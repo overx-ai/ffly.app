@@ -37,7 +37,7 @@ Facts the copy must match:
 |---|---|---|
 | App Free | 3 searches per install, ever | 10 searches every 12 hours, every route in full, partner fares, Trip kit on |
 | Web | 5 per IP per day, 10 per 12 hours once 1B-bots spec 575 deploys; first routes in full | same as app Free |
-| Pro | every route in full, daily fair-use cap | more cities and places to finish, the lowest fares we find including direct airline fares, Book direct or via a partner per flight, priority when busy, Trip kit can be switched off; Pro bought in the app applies on ffly.app after signing in with the same Apple or Google account |
+| Pro | every route in full, daily fair-use cap | more cities and places to finish, the lowest fares we find including direct airline fares, Book direct, or via a partner where one is offered, per flight, priority when busy, Trip kit can be switched off; Pro bought in the app applies on ffly.app after signing in with the same Apple or Google account |
 
 Copy rules (CLAUDE.md, check-legal): never "unlimited", never "cheapest guaranteed", no em dashes, no source or vendor
 names, no city or place counts ("up to 8"). Free copy says "partner fares"; Pro copy says "the lowest fares we find,

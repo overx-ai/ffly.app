@@ -452,7 +452,7 @@ const it = {
         },
         pro: {
           line: 'Le tariffe più basse che troviamo, anche quelle dirette delle compagnie aeree',
-          body: 'Più città e luoghi d’arrivo, più ricerche, e la tua ricerca passa per prima quando c’è molta richiesta. Prenota ogni volo direttamente o tramite partner. Settimanale, annuale o {lifetime} (acquisto singolo), con i prezzi indicati nell’app.',
+          body: 'Più città e luoghi d’arrivo, più ricerche, e la tua ricerca passa per prima quando c’è molta richiesta. Prenota ogni volo direttamente o tramite partner, dove disponibile. Settimanale, annuale o {lifetime} (acquisto singolo), con i prezzi indicati nell’app.',
         },
         promise: 'Nessuna pubblicità nell’app, a parte le offerte dei partner per il tuo viaggio. Non vendiamo i tuoi dati.',
       },
@@ -498,7 +498,7 @@ const it = {
             'Condividi un viaggio come carta d’imbarco dall’app.',
             'I tuoi viaggi restano salvati nell’app.',
             `Più città e luoghi d’arrivo con ${APP.proName}.`,
-            `Con ${APP.proName}, prenota ogni volo direttamente o tramite partner.`,
+            `Con ${APP.proName}, prenota ogni volo direttamente o tramite partner, dove disponibile.`,
             `Più ricerche con ${APP.proName}.`,
           ],
         },

@@ -452,7 +452,7 @@ const fi = {
         },
         pro: {
           line: 'Halvimmat löytämämme hinnat, myös suoraan lentoyhtiöiltä',
-          body: 'Lisää kaupunkeja, paluupaikkoja ja hakuja, ja hakusi menee ensin ruuhka-aikoina. Varaa jokainen lento suoraan tai kumppanin kautta. Viikoittainen, vuosittainen tai kertaostos ”{lifetime}”, hinnat sovelluksessa.',
+          body: 'Lisää kaupunkeja, paluupaikkoja ja hakuja, ja hakusi menee ensin ruuhka-aikoina. Varaa jokainen lento suoraan tai kumppanin kautta, jos sellainen on tarjolla. Viikoittainen, vuosittainen tai kertaostos ”{lifetime}”, hinnat sovelluksessa.',
         },
         promise: 'Sovelluksessa ei ole mainoksia, paitsi kumppanien tarjouksia matkaasi varten. Emme myy tietojasi.',
       },
@@ -501,7 +501,7 @@ const fi = {
             'Jaa matka sovelluksesta tarkastuskorttina.',
             'Matkasi tallentuvat sovellukseen.',
             `${APP.proName} tuo lisää kaupunkeja ja paluupaikkoja.`,
-            `${APP.proName}: varaa jokainen lento suoraan tai kumppanin kautta.`,
+            `${APP.proName}: varaa jokainen lento suoraan tai kumppanin kautta, jos sellainen on tarjolla.`,
             `${APP.proName} tuo lisää hakuja.`,
           ],
         },

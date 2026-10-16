@@ -452,7 +452,7 @@ const fr = {
         },
         pro: {
           line: 'Les tarifs les plus bas que nous trouvons, y compris en direct auprès des compagnies',
-          body: 'Plus de villes et de lieux d’arrivée, plus de recherches, et votre recherche passe en premier en cas d’affluence. Réservez chaque vol en direct ou via un partenaire. À la semaine, à l’année ou « {lifetime} » en achat unique, au prix indiqué dans l’app.',
+          body: 'Plus de villes et de lieux d’arrivée, plus de recherches, et votre recherche passe en premier en cas d’affluence. Réservez chaque vol en direct, ou via un partenaire lorsqu’il y en a un. À la semaine, à l’année ou « {lifetime} » en achat unique, au prix indiqué dans l’app.',
         },
         promise: 'Pas de publicité dans l’app, hormis les offres partenaires pour votre voyage. Nous ne vendons pas vos données.',
       },
@@ -498,7 +498,7 @@ const fr = {
             'Partagez un voyage sous forme de carte d’embarquement depuis l’app.',
             'Vos voyages sont enregistrés dans l’app.',
             `Plus de villes et de lieux d’arrivée avec ${APP.proName}.`,
-            `Avec ${APP.proName}, réservez chaque vol en direct ou via un partenaire.`,
+            `Avec ${APP.proName}, réservez chaque vol en direct, ou via un partenaire s’il y en a un.`,
             `Plus de recherches avec ${APP.proName}.`,
           ],
         },

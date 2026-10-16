@@ -452,7 +452,7 @@ const de = {
         },
         pro: {
           line: 'Die niedrigsten Preise, die wir finden, auch direkt bei Airlines',
-          body: 'Mehr Städte und Zielorte, mehr Suchen, und deine Suche kommt zuerst dran, wenn viel los ist. Buche jeden Flug direkt oder über einen Partner. Wöchentlich, jährlich oder „{lifetime}“ als Einmalkauf, Preise in der App.',
+          body: 'Mehr Städte und Zielorte, mehr Suchen, und deine Suche kommt zuerst dran, wenn viel los ist. Buche jeden Flug direkt oder über einen Partner, sofern einer angeboten wird. Wöchentlich, jährlich oder „{lifetime}“ als Einmalkauf, Preise in der App.',
         },
         promise: 'Keine Werbung in der App, abgesehen von Partnerangeboten für deine Reise. Wir verkaufen deine Daten nicht.',
       },
@@ -498,7 +498,7 @@ const de = {
             'Teile eine Reise aus der App als Bordkarte.',
             'In der App findest du deine Reisen jederzeit wieder.',
             `Mehr Städte und Zielorte mit ${APP.proName}.`,
-            `Mit ${APP.proName} buchst du jeden Flug direkt oder über einen Partner.`,
+            `Mit ${APP.proName} buchst du jeden Flug direkt oder, wo angeboten, über einen Partner.`,
             `Mehr Suchen mit ${APP.proName}.`,
           ],
         },
