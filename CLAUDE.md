@@ -49,7 +49,7 @@ Those repos are the source of truth for copy, colours and claims.
     **no limit is ever a literal in the site**. The web's searches per window (ffly API 1.13.0, `searchWindow`) word the
     quota note and spent line (`quota.ts`) and, through `web-meta.json`, the home FAQ; without them no count is named.
     A Pro account (`proCaller`) sees no app strip, queue line, quota note or city-cap notice (spec 016).
-  - **Results** (`results.ts`): Book direct or Book via partner per `leg.offers[]` (`rel="sponsored noopener"`, the URL as
+  - **Results** (`results.ts`): Book direct (Pro direct-airline offer) or plain Book (partner) per `leg.offers[]` (`rel="sponsored noopener"`, the URL as
     the API sends it, https only), no commission line beside them (founder, 2026-10-15); `route.pro_preview` becomes one
     "Pro found this route about €X cheaper" line under the first route that has one, replacing the app hint; the upsell
     compares Free and Pro with no number and leads with "Already have Pro? Sign in with the same account".

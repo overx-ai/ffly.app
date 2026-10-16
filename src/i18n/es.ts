@@ -300,9 +300,7 @@ const es = {
     },
     offers: {
       bookDirect: 'Reservar directo',
-      bookPartner: 'Reservar con un socio',
       bookDirectFor: 'Reservar de {from} a {to} directamente',
-      bookPartnerFor: 'Reservar de {from} a {to} con un socio',
       proTeaser: 'Pro encontró esta ruta unos {amount} más barata.',
       partnerOffers: 'Ofertas de socios',
       kit: { hotel: 'Hoteles', esim: 'eSIM', insurance: 'Seguro de viaje', transfer: 'Traslados al aeropuerto' },

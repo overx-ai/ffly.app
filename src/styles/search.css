@@ -510,7 +510,7 @@
   .results-table .skeleton :is(.rank, .dates, .nights, .flights, .warn, .details) { display: none; }
 }
 
-/* Spec 014: sign-in, Book direct or via partner, the Pro teaser and the Trip kit, all behind CONTRACT_1_12. */
+/* Spec 014: sign-in, the direct and partner Book buttons, the Pro teaser and the Trip kit, all behind CONTRACT_1_12. */
 .search-form .account-row {
   display: flex;
   flex-wrap: wrap;

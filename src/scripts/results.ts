@@ -76,7 +76,7 @@ export function safeLink(url: string | null | undefined): string | undefined {
   }
 }
 
-// 1.12.0 offers in the API's order (Book direct, Book via partner); else the leg's one link, as on 1.11.
+// 1.12.0 offers in the API's order (direct, then partner); else the leg's one link, as on 1.11.
 export function bookLinks(leg: Leg, v12: boolean): BookLink[] {
   const offers = v12 ? (leg.offers ?? []) : [];
   const fromOffers = offers.flatMap((offer): BookLink[] => {

@@ -290,9 +290,7 @@ const fi = {
     },
     offers: {
       bookDirect: 'Varaa suoraan',
-      bookPartner: 'Varaa kumppanin kautta',
       bookDirectFor: 'Varaa suoraan: {from} – {to}',
-      bookPartnerFor: 'Varaa kumppanin kautta: {from} – {to}',
       proTeaser: 'Pro löysi tämän reitin noin {amount} halvemmalla.',
       partnerOffers: 'Kumppanien tarjoukset',
       kit: { hotel: 'Hotellit', esim: 'eSIM', insurance: 'Matkavakuutus', transfer: 'Lentokenttäkuljetukset' },

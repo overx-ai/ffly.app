@@ -290,9 +290,7 @@ const da = {
     },
     offers: {
       bookDirect: 'Book direkte',
-      bookPartner: 'Book via partner',
       bookDirectFor: 'Book {from} til {to} direkte',
-      bookPartnerFor: 'Book {from} til {to} via partner',
       proTeaser: 'Pro fandt denne rute cirka {amount} billigere.',
       partnerOffers: 'Partnertilbud',
       kit: { hotel: 'Hoteller', esim: 'eSIM', insurance: 'Rejseforsikring', transfer: 'Lufthavnstransfer' },

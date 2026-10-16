@@ -290,9 +290,7 @@ const nb = {
     },
     offers: {
       bookDirect: 'Bestill direkte',
-      bookPartner: 'Bestill via partner',
       bookDirectFor: 'Bestill fly fra {from} til {to} direkte',
-      bookPartnerFor: 'Bestill fly fra {from} til {to} via partner',
       proTeaser: 'Pro fant denne ruten omtrent {amount} billigere.',
       partnerOffers: 'Partnertilbud',
       kit: { hotel: 'Hotell', esim: 'eSIM', insurance: 'Reiseforsikring', transfer: 'Flyplasstransfer' },

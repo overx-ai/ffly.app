@@ -290,9 +290,7 @@ const sv = {
     },
     offers: {
       bookDirect: 'Boka direkt',
-      bookPartner: 'Boka via partner',
       bookDirectFor: 'Boka {from} till {to} direkt',
-      bookPartnerFor: 'Boka {from} till {to} via partner',
       proTeaser: 'Pro hittade den här rutten cirka {amount} billigare.',
       partnerOffers: 'Partnererbjudanden',
       kit: { hotel: 'Hotell', esim: 'eSIM', insurance: 'Reseförsäkring', transfer: 'Flygplatstransfer' },

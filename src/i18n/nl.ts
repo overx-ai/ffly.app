@@ -290,9 +290,7 @@ const nl = {
     },
     offers: {
       bookDirect: 'Boek direct',
-      bookPartner: 'Boek via partner',
       bookDirectFor: 'Boek {from} naar {to} direct',
-      bookPartnerFor: 'Boek {from} naar {to} via partner',
       proTeaser: 'Pro vond deze route zo’n {amount} goedkoper.',
       partnerOffers: 'Partneraanbiedingen',
       kit: { hotel: 'Hotels', esim: 'eSIM', insurance: 'Reisverzekering', transfer: 'Luchthaventransfers' },

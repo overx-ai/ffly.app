@@ -301,9 +301,7 @@ const base = {
     },
     offers: {
       bookDirect: 'Book direct',
-      bookPartner: 'Book via partner',
       bookDirectFor: 'Book {from} to {to} direct',
-      bookPartnerFor: 'Book {from} to {to} via partner',
       proTeaser: 'Pro found this route about {amount} cheaper.',
       partnerOffers: 'Partner offers',
       kit: { hotel: 'Hotels', esim: 'eSIM', insurance: 'Travel insurance', transfer: 'Airport transfers' },

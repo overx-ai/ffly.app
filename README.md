@@ -114,9 +114,9 @@ Accounts, Pro and the Trip kit (specs 014, 016), once `CONTRACT_1_12` and a prov
    says "Signed in", `ffly_session` is `HttpOnly; Secure; SameSite=Strict; Path=/api/auth`, and no token is in
    `localStorage`, `sessionStorage`, `document.cookie` or the URL (`ffly.account` holds only `1`). `/meta` is asked
    again with `Authorization`.
-3. A Pro account's caps and searches follow `/meta`; its legs offer Book direct and Book via partner, the row says
-   "Signed in with ffly Pro", and the app strip, the queue line and the quota note are gone. A Free visitor sees Book
-   via partner, the "Pro found this route about €X cheaper" line and the upsell.
+3. A Pro account's caps and searches follow `/meta`; its legs offer Book direct and Book (the partner fare), the row
+   says "Signed in with ffly Pro", and the app strip, the queue line and the quota note are gone. A Free visitor sees
+   Book, the "Pro found this route about €X cheaper" line and the upsell.
 4. During a search the progress card shows "Partner offers"; each route's details show its own.
 5. After Accept, Book and kit clicks send `book_click` and `kit_click` (`placement`, `kind`, `tier`); after Reject
    they send nothing and still open.

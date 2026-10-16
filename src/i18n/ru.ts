@@ -309,9 +309,7 @@ const ru = {
     },
     offers: {
       bookDirect: 'Купить напрямую',
-      bookPartner: 'Купить через партнёра',
       bookDirectFor: 'Купить напрямую: {from} → {to}',
-      bookPartnerFor: 'Купить через партнёра: {from} → {to}',
       proTeaser: 'Pro нашёл этот маршрут примерно на {amount} дешевле.',
       partnerOffers: 'Предложения партнёров',
       kit: { hotel: 'Отели', esim: 'eSIM', insurance: 'Страховка в поездку', transfer: 'Трансферы из аэропорта' },

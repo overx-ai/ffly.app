@@ -839,9 +839,6 @@ function bookButton(template: HTMLAnchorElement, link: BookLink, leg: LegRow): H
   if (link.kind === 'direct') {
     book.textContent = OFFERS.bookDirect;
     label = OFFERS.bookDirectFor;
-  } else if (link.kind === 'partner') {
-    book.textContent = OFFERS.bookPartner;
-    label = OFFERS.bookPartnerFor;
   }
   book.setAttribute('aria-label', fill(label, { from: leg.from, to: leg.to }));
   return CONTRACT_1_12 ? tracked(book, EVENTS.book, { placement: 'results', kind: link.kind }) : book;
