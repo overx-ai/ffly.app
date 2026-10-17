@@ -175,6 +175,7 @@ export function setupAccount(text: AccountText, onChange: (change: Change) => vo
     const state = auth.signedIn ? navSignedIn : navSignedOut;
     navLink.setAttribute('href', state.href);
     navLabel.textContent = state.label;
+    navLink.toggleAttribute('data-signed-in', auth.signedIn);
   };
 
   const render = (pro: boolean, expired = false) => {

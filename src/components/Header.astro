@@ -96,7 +96,19 @@ const code = shortCode(localeOf(lang));
     text-decoration: none;
   }
   nav a:hover { color: var(--ink); }
-  .nav-sign-in { white-space: nowrap; }
+  /* Signed out, the search form's gold Sign in; signed in (Account), a quiet nav link. The nav prefix outranks the scoped nav a. */
+  nav .nav-sign-in {
+    justify-content: center;
+    padding-inline: 16px;
+    border-radius: var(--radius-pill);
+    background: var(--gold);
+    color: var(--on-gold);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  nav .nav-sign-in:hover { color: var(--on-gold); filter: brightness(1.05); }
+  nav .nav-sign-in[data-signed-in] { padding-inline: 0; border-radius: var(--radius-sm); background: none; color: var(--ink-2); font-weight: 400; }
+  nav .nav-sign-in[data-signed-in]:hover { color: var(--ink); filter: none; }
   .nav-sign-in svg { display: none; }
   .lang-menu { position: relative; }
   .lang-menu summary {
@@ -145,13 +157,9 @@ const code = shortCode(localeOf(lang));
   .lang-panel :global([aria-current]) { background: var(--fill); font-weight: 700; }
   /* Below this the sign-in link is an icon the size of the language button, its label kept for screen readers. */
   @media (max-width: 900px) {
-    .nav-sign-in {
-      justify-content: center;
-      min-width: 44px;
-      border: 1px solid var(--rule);
-      border-radius: var(--radius-pill);
-    }
-    .nav-sign-in:hover { border-color: var(--ink-2); }
+    nav .nav-sign-in { min-width: 44px; padding-inline: 0; }
+    nav .nav-sign-in[data-signed-in] { border: 1px solid var(--rule); border-radius: var(--radius-pill); }
+    nav .nav-sign-in[data-signed-in]:hover { border-color: var(--ink-2); }
     .nav-sign-in svg { display: block; }
     .nav-sign-in span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   }
