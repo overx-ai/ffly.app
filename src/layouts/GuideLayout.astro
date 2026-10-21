@@ -4,22 +4,25 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import NoBreak from '../components/NoBreak.astro';
 import StoreCtas from '../components/StoreCtas.astro';
-import { APP, DEVELOPER } from '../app';
+import { DEVELOPER } from '../app';
+import { useLang } from '../i18n';
 import { formatDate, isoDate, pathFor } from '../site-pages';
 import { articleSchema, faqSchema, howToSchema, type Crumb } from '../schema';
 import { parseGuide } from '../guide-markdown';
-import { GUIDES_INDEX, guidePageSlug, type Guide } from '../guides';
+import { GUIDES_INDEX, guideLang, guidePageSlug, type Guide } from '../guides';
 
 interface Props { guide: Guide; }
 
 const { guide } = Astro.props;
 const { title, description, published, updated } = guide.data;
+const lang = guideLang(guide);
+const { t, fmt } = useLang(lang);
 const slug = guidePageSlug(guide);
 const { h1, faq, howTo, minutes } = parseGuide(guide.body);
-const parent: Crumb = { name: 'Guides', slug: GUIDES_INDEX };
+const parent: Crumb = { name: t.common.footer.guides, slug: GUIDES_INDEX };
 const structuredData = [
   articleSchema({ headline: h1, description, slug, published, updated }),
-  ...(faq.length ? [faqSchema(faq)] : []),
+  ...(faq.length ? [faqSchema(faq, lang)] : []),
   ...(howTo ? [howToSchema(howTo)] : []),
 ];
 ---
@@ -30,33 +33,34 @@ const structuredData = [
   ogType="article"
   parent={parent}
   structuredData={structuredData}
+  lang={lang}
 >
-  <Header slug={slug} />
+  <Header lang={lang} slug={slug} />
   <main id="main" class="container page guide">
-    <nav class="crumbs" aria-label="Breadcrumb">
+    <nav class="crumbs" aria-label={t.guides.breadcrumb}>
       <ol>
-        <li><a href={pathFor('')}>Home</a></li>
-        <li><a href={pathFor(parent.slug)}>{parent.name}</a></li>
+        <li><a href={pathFor('', lang)}>{t.schema.home}</a></li>
+        <li><a href={pathFor(parent.slug, lang)}>{parent.name}</a></li>
       </ol>
     </nav>
 
     <article>
       <h1><NoBreak text={h1} /></h1>
       <p class="byline">
-        <span>By {DEVELOPER} ·</span>
-        <span><time datetime={isoDate(published)}>{formatDate(published)}</time> ·</span>
-        <span>{minutes} min read</span>
+        <span>{fmt.text(t.guides.by, { name: DEVELOPER })} ·</span>
+        <span><time datetime={isoDate(published)}>{formatDate(published, lang)}</time> ·</span>
+        <span>{fmt.text(t.guides.minRead, { n: minutes })}</span>
       </p>
       <div class="prose"><slot /></div>
     </article>
 
-    <aside class="card cta" aria-label={`${APP.name} for iPhone`}>
-      <p class="lbl">{APP.name} for iPhone</p>
-      <p>Pick the cities. {APP.name} finds the order and dates where the whole trip costs least.</p>
-      <StoreCtas />
+    <aside class="card cta" aria-label={t.common.appForIphone}>
+      <p class="lbl">{t.common.appForIphone}</p>
+      <p>{t.guides.cta}</p>
+      <StoreCtas lang={lang} />
     </aside>
   </main>
-  <Footer />
+  <Footer lang={lang} />
 </BaseLayout>
 
 <style>

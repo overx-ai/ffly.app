@@ -159,6 +159,9 @@ const pl = {
     h1: 'Poradniki',
     lead: 'Jak zaplanować tanią podróż do kilku miast: kolejność, daty i rezerwacja lotów.',
     minRead: '{n} min czytania',
+    by: 'Autor: {name}',
+    breadcrumb: 'Ścieżka nawigacji',
+    cta: `Wybierz miasta. ${APP.name} znajdzie kolejność i daty, przy których cała podróż kosztuje najmniej.`,
   },
 
   pass: {

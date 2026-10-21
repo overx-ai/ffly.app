@@ -150,6 +150,9 @@ const es = {
     h1: 'Guías',
     lead: 'Cómo planificar un viaje barato a varias ciudades: el orden, las fechas y cómo reservar los vuelos.',
     minRead: '{n} min de lectura',
+    by: 'Por {name}',
+    breadcrumb: 'Ruta de navegación',
+    cta: `Elige las ciudades. ${APP.name} encuentra el orden y las fechas en que el viaje completo cuesta menos.`,
   },
 
   pass: {

@@ -140,6 +140,9 @@ const da = {
     h1: 'Guides',
     lead: 'Sådan planlægger du en billig rejse til flere byer: rækkefølgen, datoerne og hvordan du booker flyene.',
     minRead: '{n} min. læsning',
+    by: 'Af {name}',
+    breadcrumb: 'Brødkrummesti',
+    cta: `Vælg byerne. ${APP.name} finder rækkefølgen og datoerne, hvor hele rejsen koster mindst.`,
   },
 
   pass: {

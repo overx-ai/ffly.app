@@ -148,6 +148,9 @@ const base = {
     h1: 'Guides',
     lead: 'How to plan a cheap trip to several cities: the order, the dates and how to book the flights.',
     minRead: '{n} min read',
+    by: 'By {name}',
+    breadcrumb: 'Breadcrumb',
+    cta: `Pick the cities. ${APP.name} finds the order and dates where the whole trip costs least.`,
   },
 
   pass: {

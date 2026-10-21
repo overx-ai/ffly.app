@@ -140,6 +140,9 @@ const fr = {
     h1: 'Guides',
     lead: 'Comment organiser un voyage pas cher dans plusieurs villes : l’ordre, les dates et la réservation des vols.',
     minRead: '{n} min de lecture',
+    by: 'Par {name}',
+    breadcrumb: 'Fil d’Ariane',
+    cta: `Choisissez les villes. ${APP.name} trouve l'ordre et les dates où le voyage complet coûte le moins.`,
   },
 
   pass: {

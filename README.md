@@ -30,7 +30,7 @@ npm run preview  # serves .vercel/output as Vercel does; `astro preview` does no
 | `/search` | `src/pages/search.astro` + `src/views/Search.astro` + `src/components/SearchForm.astro` + `src/scripts/*.ts`, the free web search |
 | `/guides` | `src/pages/guides/index.astro` + `src/views/GuidesIndex.astro` |
 | `/{lang}`, `/{lang}/search`, `/{lang}/guides` | `src/pages/[lang]/*.astro`, the same views with `src/i18n/{lang}.ts` |
-| `/guides/{slug}` | `src/content/guides/{slug}.md` via `src/pages/guides/[slug].astro` + `src/layouts/GuideLayout.astro` |
+| `/guides/{slug}`, `/{lang}/guides/{slug}` | `src/content/guides/{lang}/{slug}.md` via `src/pages/guides/[slug].astro` or `src/pages/[lang]/guides/[slug].astro` + `src/layouts/GuideLayout.astro` |
 | `/404` | `src/pages/404.astro`, noindex |
 | `/sitemap.xml` | `src/pages/sitemap.xml.ts`, from `src/site-pages.ts` |
 | `/robots.txt`, `/llms.txt` | `public/` |

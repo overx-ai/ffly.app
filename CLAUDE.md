@@ -147,11 +147,12 @@ Those repos are the source of truth for copy, colours and claims.
   "Last updated" line, so a page's date lives only there. Bump a page's `lastmod` only when its copy
   actually changed, never from the build clock.
 - **Canonical URLs are non-trailing** (`/support`, not `/support/`). Never link one.
-- **Guides are markdown in `src/content/guides/`** (schema `src/content/config.ts`), rendered by
+- **Guides are markdown in `src/content/guides/{lang}/`** (schema `src/content/config.ts`; the folder is the locale,
+  `GUIDE_LANGS` in `src/guides.ts`: en, de, fr, es), rendered by
   `GuideLayout.astro`. The markdown `# ` heading is the H1. `src/guide-markdown.ts` builds FAQPage from the
   `## FAQ` section's `### question`s and HowTo from `### 1.`...`### N.` headings; `npm test` asserts both.
-  A new guide needs its `guides/{slug}` entry in `SITE_PAGES` (the build fails without it), with `lastmod`
-  equal to its frontmatter `updated`.
+  A new guide needs its `guides/{slug}` entry in `SITE_PAGES` (`de/guides/{slug}` for a German one; the build fails
+  without it), with `lastmod` equal to its frontmatter `updated`.
 - **App facts live in `src/app.ts`**: limits, operator, publisher, API hosts,
   retention, external URLs. Do not hardcode any of them in a page.
 - **One contact address: `CONTACT_EMAIL` (`support@overx.ai`)** for support, contact and privacy
@@ -174,7 +175,9 @@ Those repos are the source of truth for copy, colours and claims.
   Rows in `src/i18n/locales.ts`, fields in the order `code, prefix, hreflang, tag, og` (two regexes read it). Norwegian
   is `nb` in code, tag and hreflang (the API's names and the app's strings), `/no` in the URL.
 - Localized: `/`, `/search`, `/guides` only (views in `src/views`, routes in `src/pages/[lang]`).
-  Support, privacy, terms, guide articles and the 404 stay English at the root.
+  Support, privacy, terms and the 404 stay English at the root. Guide articles (spec 018) are English at
+  `/guides/{slug}`, or written natively at `/{prefix}/guides/{slug}`: self-canonical, no alternates, never translations.
+  `/{prefix}/guides` lists that language's guides first, then the English ones marked "In English".
 - Every page self-canonical. Localized pages: reciprocal hreflang for all 13 plus `x-default` → root, same
   set in the sitemap (`alternates()` in `src/site-pages.ts`). English-only pages: no alternates.
 - Never redirect by browser language or IP. Instead (spec 012): the header carries the footer's switcher

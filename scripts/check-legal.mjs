@@ -345,8 +345,14 @@ for (const text of answers) {
 // Guides: FAQPage and HowTo are parsed from the markdown (src/guide-markdown.ts), so a heading edit can drop them.
 const GUIDE_FAQ_QUESTIONS = 5;
 const HOWTO_GUIDES = ['cheapest-order-to-visit-cities', 'open-jaw-flights-europe'];
-const guideNames = readdirSync(`${DIST}guides`, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
+const subdirs = (dir) => readdirSync(dir, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
+const guideNames = subdirs(`${DIST}guides`);
 const sitemap = readFileSync(`${DIST}sitemap.xml`, 'utf8');
+function checkGuideListed(page, schemas, index) {
+  const lastmod = sitemap.match(new RegExp(`/${page}</loc>\\s*<lastmod>([^<]+)<`))?.[1];
+  check(lastmod !== undefined && ofType(schemas, 'Article')[0]?.dateModified === lastmod, `${page}: Article dateModified must equal its SITE_PAGES lastmod`);
+  check(readHtml(index).includes(`href="/${page}"`), `/${index} must list ${page}`);
+}
 const isFile = (path) => existsSync(path) && statSync(path).isFile();
 const resolves = (path) => isFile(`${DIST}${path}`) || isFile(`${DIST}${path}/index.html`);
 check(guideNames.length > 0, 'Guides: no guide pages in the build');
@@ -358,9 +364,7 @@ for (const name of guideNames) {
   const faq = ofType(schemas, 'FAQPage');
   check(faq.length === 1 && faq[0].mainEntity.length === GUIDE_FAQ_QUESTIONS, `${page}: FAQPage must have ${GUIDE_FAQ_QUESTIONS} questions`);
   check((ofType(schemas, 'HowTo').length === 1) === HOWTO_GUIDES.includes(name), `${page}: HowTo only on ${HOWTO_GUIDES.join(', ')}`);
-  const lastmod = sitemap.match(new RegExp(`/${page}</loc>\\s*<lastmod>([^<]+)<`))?.[1];
-  check(lastmod !== undefined && ofType(schemas, 'Article')[0]?.dateModified === lastmod, `${page}: Article dateModified must equal its SITE_PAGES lastmod`);
-  check(readHtml('guides').includes(`href="/${page}"`), `/guides must list ${page}`);
+  checkGuideListed(page, schemas, 'guides');
 }
 
 const vercel = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
@@ -605,12 +609,28 @@ for (const slug of LOCALIZED_SLUGS) {
     }
   }
 }
+// Spec 018: a guide written in another language is self-canonical in that language, with no hreflang alternates.
+const localizedGuides = new Set();
+for (const lang of LANGS.filter((l) => l.prefix)) {
+  for (const name of subdirs(`${DIST}${lang.prefix}/guides`)) {
+    const page = `${lang.prefix}/guides/${name}`;
+    const url = `${origin}/${page}`;
+    const html = readHtml(page);
+    localizedGuides.add(`${page}/index.html`);
+    check(html.includes(`<html lang="${lang.tag}">`), `${page}: <html lang> must be ${lang.tag}`);
+    check(canonicalOf(html) === url, `${page}: must be self-canonical`);
+    check(headAlternates(html).length === 0 && !html.includes('og:locale:alternate'), `${page}: must carry no hreflang alternates`);
+    check(html.includes(`<meta property="og:locale" content="${lang.og}">`), `${page}: og:locale must be ${lang.og}`);
+    check(sitemapAlternates.get(url)?.length === 0, `${page}: must be in the sitemap with no alternates`);
+    checkGuideListed(page, jsonLd(html), `${lang.prefix}/guides`);
+  }
+}
 for (const [file, html] of htmlPages) {
   const lang = LANGS.find((l) => l.prefix && file.startsWith(`${l.prefix}/`)) ?? LANGS[0];
   const searchLink = `${pagePath('', lang)}#search`;
   if (html.includes('<header')) check(html.includes(`href="${searchLink}"`), `${file}: the header must link ${searchLink}`);
   check(!/\bundefined\b|\[object Object\]/.test(withoutCss(html)), `${file}: a literal "undefined" or "[object Object]" leaked into the page`);
-  if (!localizedFiles.has(file)) {
+  if (!localizedFiles.has(file) && !localizedGuides.has(file)) {
     check(!/<link rel="alternate" hreflang=|og:locale/.test(html), `${file}: an English-only page must carry no hreflang alternates or og:locale`);
   }
 }

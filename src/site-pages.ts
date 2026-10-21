@@ -10,6 +10,9 @@ import { DEFAULT_LANG, LANGS, X_DEFAULT, localeOf, type Lang } from './i18n/loca
 //
 // One lastmod per slug, shared by every language of a localized page.
 //
+// A guide written in another language (spec 018) is its own page under that language's prefix,
+// e.g. { slug: 'de/guides/{slug}', lastmod }: self-canonical, with no alternates.
+//
 // /, /support, /privacy and /terms are fixed: the iOS app (LegalLinks.swift) and the App Store
 // listing (fastlane/metadata/*/{marketing,support,privacy}_url.txt) point at them.
 export const SITE_PAGES = [

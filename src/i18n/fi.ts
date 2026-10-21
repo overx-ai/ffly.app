@@ -140,6 +140,9 @@ const fi = {
     h1: 'Oppaat',
     lead: 'Näin suunnittelet edullisen matkan useaan kaupunkiin: järjestys, päivät ja lentojen varaaminen.',
     minRead: '{n} min lukuaika',
+    by: 'Kirjoittanut {name}',
+    breadcrumb: 'Murupolku',
+    cta: `Valitse kaupungit. ${APP.name} löytää järjestyksen ja päivät, joilla koko matka maksaa vähiten.`,
   },
 
   pass: {

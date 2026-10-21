@@ -140,6 +140,9 @@ const it = {
     h1: 'Guide',
     lead: 'Come pianificare un viaggio economico in più città: l’ordine, le date e come prenotare i voli.',
     minRead: '{n} min di lettura',
+    by: 'Di {name}',
+    breadcrumb: 'Percorso di navigazione',
+    cta: `Scegli le città. ${APP.name} trova l'ordine e le date in cui l'intero viaggio costa meno.`,
   },
 
   pass: {

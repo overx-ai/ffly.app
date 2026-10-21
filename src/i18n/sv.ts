@@ -140,6 +140,9 @@ const sv = {
     h1: 'Guider',
     lead: 'Så planerar du en billig resa till flera städer: ordningen, datumen och hur du bokar flygen.',
     minRead: '{n} min läsning',
+    by: 'Av {name}',
+    breadcrumb: 'Brödsmulor',
+    cta: `Välj städerna. ${APP.name} hittar ordningen och datumen där hela resan kostar minst.`,
   },
 
   pass: {

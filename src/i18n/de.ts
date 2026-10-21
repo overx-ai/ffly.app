@@ -140,6 +140,9 @@ const de = {
     h1: 'Ratgeber',
     lead: 'So planst du eine günstige Reise durch mehrere Städte: die Reihenfolge, die Daten und wie du die Flüge buchst.',
     minRead: '{n} Min. Lesezeit',
+    by: 'Von {name}',
+    breadcrumb: 'Brotkrümelnavigation',
+    cta: `Wähle die Städte. ${APP.name} findet die Reihenfolge und die Daten, bei denen die ganze Reise am wenigsten kostet.`,
   },
 
   pass: {

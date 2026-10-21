@@ -6,18 +6,25 @@ import NoBreak from '../components/NoBreak.astro';
 import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
 import { formatDate, hreflangOf, isoDate, pathFor } from '../site-pages';
 import { parseGuide } from '../guide-markdown';
-import { GUIDES_INDEX, getGuides, guidePageSlug } from '../guides';
+import { GUIDES_INDEX, getGuides, guideLang, guidePageSlug } from '../guides';
 
 interface Props { lang: Lang; }
 
 const { lang } = Astro.props;
 const { t, fmt } = useLang(lang);
 const { guides: copy } = t;
-// The articles are English-only, so a translated index marks each one as English.
-const english = lang !== DEFAULT_LANG;
-const guides = (await getGuides()).map((guide) => {
+// This language's own guides first, then the English ones, each marked as English.
+const own = lang === DEFAULT_LANG ? [] : await getGuides(lang);
+const guides = [...own, ...(await getGuides())].map((guide) => {
   const slug = guidePageSlug(guide);
-  return { ...guide.data, href: pathFor(slug), hreflang: hreflangOf(slug, lang), minutes: parseGuide(guide.body).minutes };
+  const english = guideLang(guide) !== lang;
+  return {
+    ...guide.data,
+    href: pathFor(slug),
+    hreflang: english ? hreflangOf(slug, lang) : undefined,
+    english,
+    minutes: parseGuide(guide.body).minutes,
+  };
 });
 ---
 <BaseLayout title={copy.title} description={copy.description} slug={GUIDES_INDEX} lang={lang}>
@@ -33,7 +40,7 @@ const guides = (await getGuides()).map((guide) => {
           <p lang={g.hreflang}>{g.description}</p>
           <p class="meta">
             <time datetime={isoDate(g.published)}>{formatDate(g.published, lang)}</time> · {fmt.text(copy.minRead, { n: g.minutes })}
-            {english && <span class="lang">{t.common.inEnglish}</span>}
+            {g.english && <span class="lang">{t.common.inEnglish}</span>}
           </p>
         </li>
       ))}

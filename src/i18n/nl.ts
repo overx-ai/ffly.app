@@ -140,6 +140,9 @@ const nl = {
     h1: 'Gidsen',
     lead: 'Zo plan je een goedkope reis naar meerdere steden: de volgorde, de datums en hoe je de vluchten boekt.',
     minRead: '{n} min lezen',
+    by: 'Door {name}',
+    breadcrumb: 'Kruimelpad',
+    cta: `Kies de steden. ${APP.name} vindt de volgorde en de data waarop de hele reis het minst kost.`,
   },
 
   pass: {

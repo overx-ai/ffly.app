@@ -1,0 +1,23 @@
+---
+import GuideLayout from '../../../layouts/GuideLayout.astro';
+import { DEFAULT_LANG, localeOf } from '../../../i18n/locales';
+import { GUIDE_LANGS, getGuides, guideName, type Guide } from '../../../guides';
+
+export async function getStaticPaths() {
+  const langs = GUIDE_LANGS.filter((lang) => lang !== DEFAULT_LANG);
+  const paths = await Promise.all(
+    langs.map(async (lang) =>
+      (await getGuides(lang)).map((guide) => ({ params: { lang: localeOf(lang).prefix, slug: guideName(guide) }, props: { guide } })),
+    ),
+  );
+  return paths.flat();
+}
+
+interface Props { guide: Guide; }
+
+const { guide } = Astro.props;
+const { Content } = await guide.render();
+---
+<GuideLayout guide={guide}>
+  <Content />
+</GuideLayout>

@@ -140,6 +140,9 @@ const pt = {
     h1: 'Guias',
     lead: 'Como planear uma viagem barata a várias cidades: a ordem, as datas e como reservar os voos.',
     minRead: '{n} min de leitura',
+    by: 'Por {name}',
+    breadcrumb: 'Trilho de navegação',
+    cta: `Escolha as cidades. ${APP.name} encontra a ordem e as datas em que a viagem inteira custa menos.`,
   },
 
   pass: {

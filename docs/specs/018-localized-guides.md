@@ -1,7 +1,7 @@
 ---
 id: 018
 title: "Guides written natively in German, French and Spanish"
-status: approved
+status: done
 priority: p1
 created: 2026-10-21
 updated: 2026-10-21
@@ -49,3 +49,6 @@ source: owner, 2026-10-21: "creating articles in popular european languages so t
 - `npm run build` passes. `dist/de/guides/<slug>/index.html` (or `.html`) exists, has its own canonical and contains no
   `hreflang`. The English guide URLs are unchanged.
 - `dist/sitemap.xml` lists the localized guides without `xhtml:link` alternates.
+
+## Writer flow (as built)
+`src/content/guides/<lang>/<native-slug>.md` (same frontmatter; never reuse an English slug, which fails the build), plus a `SITE_PAGES` entry `{ slug: '<prefix>/guides/<native-slug>', lastmod: <updated> }`. check-legal asserts lang, self-canonical, no alternates, sitemap entry and the `/<prefix>/guides` link once the first localized guide exists.
