@@ -2,39 +2,48 @@
 
 All volumes are **estimated** tiers inferred from SERP shape. No keyword-tool data was used. Competition notes come from the live SERPs and pages fetched during this research.
 
-| keyword | cluster | intent | volume (estimated) | status | notes |
-|---|---|---|---|---|---|
-| cheapest order to visit cities | A (pillar) | how-to | low-med (est.) | published | SERP intent mismatch: top results are "cheapest cities to fly into Europe" lists (NerdWallet, Going, Booking.com, myglobalviewpoint), 1.5-3k words, long-haul gateway focus. Nobody answers "which order of my cities is cheapest". Order-focused content exists only as Kiwi Nomad blog posts (Hippie in Heels, about 1.5k words, US-city example, old screenshots). **Gap: a worked intra-Europe example comparing orders.** |
-| best order to visit European cities | A | list / how-to | med (est.) | idea | Earth Trekkers, Julia Something, Finding the Universe, europeantourism.org, Rick Steves forum. 2-4k-word itinerary posts; logic is geographic ("no zig-zag, fly in one city, out another"). None compare prices across orders. |
-| does the order of cities change flight price | A | how-to | low (est.) | idea | Thrillophilia, Rick Steves pages on gateway airports; nothing tests the same city set in different orders. Strong FAQ candidate. |
-| how to find the cheapest route between multiple cities | A | how-to | low-med (est.) | idea | Trip.com guides, Dollar Flight Club, Thrifty Traveler, PanFlights home page, Kiwi Nomad posts. Tips lists ("test the direction both ways"), no method. |
-| flexible dates multi-city flights | A | how-to | low-med (est.) | idea | Google Flights guides (Going, Thrifty Traveler), PanFlights. Covers flexible dates for one route, not date windows across a multi-leg trip. |
-| how many nights in each city Europe | A | how-to | med (est.) | idea | Thrillophilia "2-night rule", Guidester, Rick Steves / Fodor's forums, about 1.5-2.5k words. Rules of thumb only. Light ffly fit (nights per city is an input); good supporting post. |
-| traveling salesman problem flights | A | definition | low (est.) | idea | Only CS and academic pages rank (GeeksforGeeks, W3Schools, Princeton PDF). No travel explainer. Low volume but a clean niche and good GEO citation bait. |
-| avoid early morning flights budget airlines | A | troubleshooting | low (est.) | idea | Simple Flying explains why low-cost carriers fly at dawn; Kiwi stories pushes morning flights. Ties to ffly favouring sensible flight times. Must not claim more than "favours". |
-| multi-city vs one-way tickets | B (pillar) | comparison | med (est.) | published | Skyscanner advice page, Going glossary, Dollar Flight Club, Mighty Travels, Flying Getaway, plus Rick Steves / Tripadvisor / Bogleheads threads. 1-2.5k words, long-haul and legacy focus. Forums agree that mixing budget carriers favours separate one-ways. **Gap: no worked low-cost Europe example.** |
-| is it cheaper to book multi-city or one way | B | comparison | med (est.) | idea | Same SERP as the pillar; merge into it as an H2 or FAQ, not a separate page. |
-| open jaw flights Europe | B | definition / how-to | med (est.) | published | 2026-10-09: live at /guides/open-jaw-flights-europe (brief in its frontmatter). Wikipedia, Thrifty Traveler (about 2.5k words, long-haul, legacy carriers, no budget carriers), Dollar Flight Club, McCool Travel, Thrillophilia. Gap: open-jaw built from low-cost one-ways. |
-| what is an open jaw flight | B | definition | med (est.) | published | 2026-10-09: folded into /guides/open-jaw-flights-europe as its first H2 and first FAQ, not a separate page. Glossary pages (Navan, Going, Paylater). Short. Better as an H2 inside the B-pillar than as its own page. |
-| Ryanair multi city | B | product / how-to | low-med (est.) | idea | One solid page (Irish Travel Addict, about 2-2.5k words, tested, says no discount) plus spammy Google Sites / Smartwaiver pages and a FlyerTalk thread. Gap: what to do when your route needs more than Ryanair. |
-| Wizz Air multi city | B | product / how-to | low-med (est.) | idea | Official WIZZ Link site, GB News and trade news on the Dohop launch, spam pages. Gap: plain explanation of WIZZ Link's limits (Wizz network only, self-transfer). |
-| self-transfer flights Europe risks | B | troubleshooting | med (est.) | idea | AirHelp, Going, Kiwi stories, TripBuffer, travelingsguide. About 1.5-2.5k words. Well covered. Write only as a supporting post because ffly trips are separate bookings. |
-| how to book multi-city flights on low cost airlines | B | how-to | low (est.) | idea | Trip.com, CheapOair, Engine blog. Generic. Good sub-article of the B-pillar. |
-| low cost airline multi city Europe | B | how-to | low (est.) | idea | Fragmented: Going budget-airline list, Volotea / airBaltic pages. No single strong answer. |
-| best multi-city flight search tools | C (pillar) | list / comparison | med (est.) | idea | Travellolo, Flightsfinder, Going "best apps", Locals Insider, Mighty Travels. Listicles of 5-17 tools, rarely tested on the same trip. Closest to the home page; keep it an honest comparison. |
-| Kiwi Nomad alternative | C | alternative | low (est.) | idea | RatePunk (self-promo), AlternativeTo, Kiwi reviews. Thin. Natural fit, but needs careful, factual competitor claims. |
-| Kiwi Nomad review | C | comparison | low (est.) | idea | Travel-Dealz, Hostel Geeks, NerdWallet, nomadstoolslab, davidwilliamrosales. Mixed; recurring caveat is support when connections break. |
-| Google Flights multi-city limitations | C | how-to / troubleshooting | med (est.) | idea | Going, Thrifty Traveler, Point Hacks, Upgraded Points. Facts: up to five legs (Going); "main weak spot is budget carriers" (Going). Order is fixed by the user. High-authority SERP, so a hard ranking target. |
-| Skyscanner multi-city | C | how-to | med (est.) | idea | Skyscanner's own advice pages dominate (could not be fetched; the search snippet says up to six legs). Hard to outrank; use only as a citation. |
-| Kayak Trip Builder | C | product | low (est.) | idea | KAYAK launch post dated 21 Jan 2020, "powered by Kiwi.com". Whether it is still live is unknown. Low priority. |
-| Ryanair vs Wizz Air | C | comparison | med (est.) | idea | Many 2026 comparison pages (aifly, travelvient, decodingairtravel, versusguy, RatePunk). Crowded; adjacent to ffly; later. |
-| cheapest way to visit multiple cities in Europe | D (pillar) | how-to | med (est.) | idea | Going Awesome Places, Happy to Wander, Europe Travel Companion, Driftwood Journals (2015). Transport-mode comparisons (bus / train / flight, Interrail). ffly is flights only, so the article must say so; gap is a flight-only worked example. |
-| how to plan a multi-city trip in Europe | D | how-to | med (est.) | idea | tripprof, A Single Woman Traveling, Skyscanner, multicitytrips.com, tripzip. Generic step lists. |
-| how to plan a Europe trip multiple cities cheap | D | how-to | low-med (est.) | idea | Overlaps the D pillar; merge. |
-| cheapest European cities to fly into | D | list | high (est.) | idea | NerdWallet, Going, Booking.com, The Knot. Long-haul gateway intent, high authority. Off-fit; deprioritise. |
-| 2 week Europe itinerary multiple cities | D | list | high (est.) | idea | Earth Trekkers, Finding the Universe, Julia Something. High-authority itinerary blogs; off-fit; deprioritise. |
-| cheap multi-city flights | HOME | product-page | med-high (est.) | idea | **Reserved for the home page.** Do not target in articles. |
-| multi-city trip planner | HOME | product-page | med (est.) | idea | **Reserved for the home page.** SERP: KAYAK, Skyscanner, Stardrift, iMean, PanFlights, Wanderlog. |
+| keyword | Locale | cluster | intent | volume (estimated) | status | notes |
+|---|---|---|---|---|---|---|
+| cheapest order to visit cities | | A (pillar) | how-to | low-med (est.) | published | SERP intent mismatch: top results are "cheapest cities to fly into Europe" lists (NerdWallet, Going, Booking.com, myglobalviewpoint), 1.5-3k words, long-haul gateway focus. Nobody answers "which order of my cities is cheapest". Order-focused content exists only as Kiwi Nomad blog posts (Hippie in Heels, about 1.5k words, US-city example, old screenshots). **Gap: a worked intra-Europe example comparing orders.** |
+| best order to visit European cities | | A | list / how-to | med (est.) | idea | Earth Trekkers, Julia Something, Finding the Universe, europeantourism.org, Rick Steves forum. 2-4k-word itinerary posts; logic is geographic ("no zig-zag, fly in one city, out another"). None compare prices across orders. |
+| does the order of cities change flight price | | A | how-to | low (est.) | idea | Thrillophilia, Rick Steves pages on gateway airports; nothing tests the same city set in different orders. Strong FAQ candidate. |
+| how to find the cheapest route between multiple cities | | A | how-to | low-med (est.) | idea | Trip.com guides, Dollar Flight Club, Thrifty Traveler, PanFlights home page, Kiwi Nomad posts. Tips lists ("test the direction both ways"), no method. |
+| flexible dates multi-city flights | | A | how-to | low-med (est.) | idea | Google Flights guides (Going, Thrifty Traveler), PanFlights. Covers flexible dates for one route, not date windows across a multi-leg trip. |
+| how many nights in each city Europe | | A | how-to | med (est.) | idea | Thrillophilia "2-night rule", Guidester, Rick Steves / Fodor's forums, about 1.5-2.5k words. Rules of thumb only. Light ffly fit (nights per city is an input); good supporting post. |
+| traveling salesman problem flights | | A | definition | low (est.) | idea | Only CS and academic pages rank (GeeksforGeeks, W3Schools, Princeton PDF). No travel explainer. Low volume but a clean niche and good GEO citation bait. |
+| avoid early morning flights budget airlines | | A | troubleshooting | low (est.) | idea | Simple Flying explains why low-cost carriers fly at dawn; Kiwi stories pushes morning flights. Ties to ffly favouring sensible flight times. Must not claim more than "favours". |
+| multi-city vs one-way tickets | | B (pillar) | comparison | med (est.) | published | Skyscanner advice page, Going glossary, Dollar Flight Club, Mighty Travels, Flying Getaway, plus Rick Steves / Tripadvisor / Bogleheads threads. 1-2.5k words, long-haul and legacy focus. Forums agree that mixing budget carriers favours separate one-ways. **Gap: no worked low-cost Europe example.** |
+| is it cheaper to book multi-city or one way | | B | comparison | med (est.) | idea | Same SERP as the pillar; merge into it as an H2 or FAQ, not a separate page. |
+| open jaw flights Europe | | B | definition / how-to | med (est.) | published | 2026-10-09: live at /guides/open-jaw-flights-europe (brief in its frontmatter). Wikipedia, Thrifty Traveler (about 2.5k words, long-haul, legacy carriers, no budget carriers), Dollar Flight Club, McCool Travel, Thrillophilia. Gap: open-jaw built from low-cost one-ways. |
+| what is an open jaw flight | | B | definition | med (est.) | published | 2026-10-09: folded into /guides/open-jaw-flights-europe as its first H2 and first FAQ, not a separate page. Glossary pages (Navan, Going, Paylater). Short. Better as an H2 inside the B-pillar than as its own page. |
+| Ryanair multi city | | B | product / how-to | low-med (est.) | idea | One solid page (Irish Travel Addict, about 2-2.5k words, tested, says no discount) plus spammy Google Sites / Smartwaiver pages and a FlyerTalk thread. Gap: what to do when your route needs more than Ryanair. |
+| Wizz Air multi city | | B | product / how-to | low-med (est.) | idea | Official WIZZ Link site, GB News and trade news on the Dohop launch, spam pages. Gap: plain explanation of WIZZ Link's limits (Wizz network only, self-transfer). |
+| self-transfer flights Europe risks | | B | troubleshooting | med (est.) | idea | AirHelp, Going, Kiwi stories, TripBuffer, travelingsguide. About 1.5-2.5k words. Well covered. Write only as a supporting post because ffly trips are separate bookings. |
+| how to book multi-city flights on low cost airlines | | B | how-to | low (est.) | idea | Trip.com, CheapOair, Engine blog. Generic. Good sub-article of the B-pillar. |
+| low cost airline multi city Europe | | B | how-to | low (est.) | idea | Fragmented: Going budget-airline list, Volotea / airBaltic pages. No single strong answer. |
+| best multi-city flight search tools | | C (pillar) | list / comparison | med (est.) | idea | Travellolo, Flightsfinder, Going "best apps", Locals Insider, Mighty Travels. Listicles of 5-17 tools, rarely tested on the same trip. Closest to the home page; keep it an honest comparison. |
+| Kiwi Nomad alternative | | C | alternative | low (est.) | idea | RatePunk (self-promo), AlternativeTo, Kiwi reviews. Thin. Natural fit, but needs careful, factual competitor claims. |
+| Kiwi Nomad review | | C | comparison | low (est.) | idea | Travel-Dealz, Hostel Geeks, NerdWallet, nomadstoolslab, davidwilliamrosales. Mixed; recurring caveat is support when connections break. |
+| Google Flights multi-city limitations | | C | how-to / troubleshooting | med (est.) | idea | Going, Thrifty Traveler, Point Hacks, Upgraded Points. Facts: up to five legs (Going); "main weak spot is budget carriers" (Going). Order is fixed by the user. High-authority SERP, so a hard ranking target. |
+| Skyscanner multi-city | | C | how-to | med (est.) | idea | Skyscanner's own advice pages dominate (could not be fetched; the search snippet says up to six legs). Hard to outrank; use only as a citation. |
+| Kayak Trip Builder | | C | product | low (est.) | idea | KAYAK launch post dated 21 Jan 2020, "powered by Kiwi.com". Whether it is still live is unknown. Low priority. |
+| Ryanair vs Wizz Air | | C | comparison | med (est.) | idea | Many 2026 comparison pages (aifly, travelvient, decodingairtravel, versusguy, RatePunk). Crowded; adjacent to ffly; later. |
+| cheapest way to visit multiple cities in Europe | | D (pillar) | how-to | med (est.) | idea | Going Awesome Places, Happy to Wander, Europe Travel Companion, Driftwood Journals (2015). Transport-mode comparisons (bus / train / flight, Interrail). ffly is flights only, so the article must say so; gap is a flight-only worked example. |
+| how to plan a multi-city trip in Europe | | D | how-to | med (est.) | idea | tripprof, A Single Woman Traveling, Skyscanner, multicitytrips.com, tripzip. Generic step lists. |
+| how to plan a Europe trip multiple cities cheap | | D | how-to | low-med (est.) | idea | Overlaps the D pillar; merge. |
+| cheapest European cities to fly into | | D | list | high (est.) | idea | NerdWallet, Going, Booking.com, The Knot. Long-haul gateway intent, high authority. Off-fit; deprioritise. |
+| 2 week Europe itinerary multiple cities | | D | list | high (est.) | idea | Earth Trekkers, Finding the Universe, Julia Something. High-authority itinerary blogs; off-fit; deprioritise. |
+| cheap multi-city flights | | HOME | product-page | med-high (est.) | idea | **Reserved for the home page.** Do not target in articles. |
+| multi-city trip planner | | HOME | product-page | med (est.) | idea | **Reserved for the home page.** SERP: KAYAK, Skyscanner, Stardrift, iMean, PanFlights, Wanderlog. |
+| günstigste Reihenfolge Städte Flug | de | A (pillar) | how-to | low (est.) | idea | 2026-10-23. Nobody answers it: the SERP returns Multi-City glossary FAQs (wandernundmehr.at "Was bedeutet Multi-City?"), the British Airways multi-city page and a mydealz miles thread. **Gap: a worked intra-Europe example comparing orders** (experience: example search 2, 8 routes for one city set). Native slug idea: guenstigste-reihenfolge-staedte. |
+| Gabelflug Europa Billigflieger | de | B | definition / how-to | med (est.) | idea | 2026-10-23. "Gabelflug" is the German word searchers use for open jaw. SERP: a wandernundmehr.at FAQ farm (dozens of thin near-duplicate pages), skyscanner.de Nachrichten, airhelp.de blog, navan.com/de glossary, schnaeppchenfuchs.com Ratgeber (about 2,000 words, 2019, says the Gabelflug search "lohnt sich in der Regel nicht" inside the EU). All long-haul or legacy framing. **Gap: inside Europe, budget one-ways make any chain a Gabelflug at no extra cost; order and dates move the price.** Slug idea: gabelflug-europa-billigflieger. |
+| Gabelflug oder zwei Einzelflüge | de | B | comparison | low-med (est.) | idea | 2026-10-23. Same SERP as the row above; snippets quote idealo and wandernundmehr saying a Gabelflug is "oft günstiger" (long-haul logic) and contradict each other. Merge into the Gabelflug article as an H2 or FAQ, not a separate page. |
+| Multi-Stopp-Flug günstig buchen | de | B (pillar) | how-to | med (est.) | idea | 2026-10-23. "Multi-Stopp" is the KAYAK/momondo German label. SERP: at.kayak.com and momondo.de product pages, de.trip.com Q&A, wandernundmehr FAQs. momondo itself says Billigflieger usually sell no multi-stop booking and one-ways can be cheaper after the first stop; nobody shows a low-cost example. Slug idea: multi-stopp-flug-billigflieger. |
+| Selbsttransfer Flug Risiko | de | B | troubleshooting | med (est.) | idea | 2026-10-23. SERP is almost all wandernundmehr.at FAQ pages ("Was ist Selbsttransfer bei Anschlussflügen?"), plus aerotelegraph on WIZZ Link being self-transfer. Thin but crowded by one farm. Supporting post only (ffly trips are separate bookings). |
+| wie viele Nächte pro Stadt Rundreise | de | A | how-to | low-med (est.) | idea | 2026-10-23. ERGO Ratgeber (Städtetrip, at least 3 days per city), tripprof.com/de 2026 (4-5 cities per two weeks, 3-4 nights each). Rules of thumb only. Light ffly fit (nights per city is an input). |
+| Städtehopping Europa Flugzeug | de | D | how-to | low-med (est.) | idea | 2026-10-23. Weak SERP: verwoehnwochenende.de blog, rheinpfalz.de Ratgeber, a 2010 vielfliegertreff thread, a 2004 test.de piece. Must say up front that ffly is flights only. |
+| frühe Flüge Billigflieger vermeiden | de | A | troubleshooting | low (est.) | idea | 2026-10-23. SERP argues for early flights (cheaper, more punctual): wandernundmehr "Ist es besser, einen frühen Flug zu nehmen?", leinetal24 tips, vielfliegertreff thread. Gap: the hidden cost of a 6 a.m. leg (an extra hotel night, no sleep). Experience: sleep and hotel-night decisions. Claim only "favours". |
+| WIZZ Link Erfahrungen | de | B | product | low (est.) | idea | 2026-10-23. Only news (aerotelegraph ticker, euronews 2026-02-12 "still self-transfer"); no German user reports. Low priority. |
 
 ---
 
@@ -145,3 +154,33 @@ All volumes are **estimated** tiers inferred from SERP shape. No keyword-tool da
 - https://tripprof.com/en/blog/multi-city-europe-trip-planning-guide/
 - https://travelvient.com/tools/compare/ryanair-vs-wizzair/
 - https://www.alternativeto.net/software/flightics/about/
+
+---
+
+## de research (2026-10-23, `/seo research --lang de`)
+
+Native seed terms, searched in German: Gabelflug, Multi-Stopp-Flug, Selbsttransfer, Städtehopping, Rundreise mehrere Städte, Reihenfolge der Städte, Nächte pro Stadt, frühe Flüge Billigflieger, WIZZ Link Erfahrungen. Not seeded from the English backlog. Volumes are estimated from SERP shape only.
+
+What the German SERP looks like: one FAQ farm (wandernundmehr.at) holds most positions with short near-duplicate answers; the rest are meta-search product pages (KAYAK, momondo, Skyscanner) and dated Ratgeber pieces. Everything frames Gabelflug as long-haul on one ticket. Nobody works an intra-Europe budget example.
+
+Suggested first pick for a de write slot: `günstigste Reihenfolge Städte Flug` (clean gap, strongest experience fit), then `Gabelflug Europa Billigflieger` (more volume, needs a Gabelflug-on-budget-airlines angle).
+
+Sources (de):
+- https://schnaeppchenfuchs.com/ratgeber/gabelfluege-buchen (fetched: about 2,000 words, 26 Sept 2019; "Die Gabelflug-Suche für Flüge innerhalb der EU lohnen sich dafür in der Regel nicht")
+- https://www.wandernundmehr.at/faq/warum-gabelflug
+- https://www.wandernundmehr.at/faq/was-ist-selbsttransfer-bei-anschlussflugen
+- https://www.wandernundmehr.at/faq/was-bedeutet-multi-city
+- https://www.wandernundmehr.at/faq/ist-es-besser-einen-fruhen-flug-zu-nehmen
+- https://www.skyscanner.de/nachrichten/was-ist-ein-gabelflug-und-wie-bucht-man-einen (did not render when fetched)
+- https://www.airhelp.de/blog/gabelflug/
+- https://navan.com/de/ressourcen/glossar/was-ist-ein-gabelflug
+- https://www.at.kayak.com/Multi-Stopp-Fluege.mc-fd.ksp
+- https://momondo.de/Tickets-fuer-Multi-Stopp-Fluege.mc-fd.ksp
+- https://de.trip.com/ask/questions/flug-mit-zwischenstopp-buchen.html
+- https://www.ergo.de/de/Ratgeber/reise_und_freizeit/staedtetrip
+- https://tripprof.com/de/blog/how-many-cities-too-many-trip-2026/
+- https://tripprof.com/de/blog/multi-city-europe-trip-planning-guide/
+- https://www.verwoehnwochenende.de/service/blog/staedtehopping-eine-aufregende-reise-durch-europas-metropolen
+- https://www.aerotelegraph.com/ticker/wizz-air-bietet-jetzt-umsteigefluege-an-mit-selbsttransfer/6dfkjl6
+- https://www.euronews.com/2026/02/12/wizz-air-just-made-it-easier-to-book-connecting-flights-but-its-still-self-transfer
+- https://www.vielfliegertreff.de/forum/threads/gabelflug-mit-mehr-als-6-legs.137426/post-3078185
