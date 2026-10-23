@@ -44,6 +44,14 @@ All volumes are **estimated** tiers inferred from SERP shape. No keyword-tool da
 | Städtehopping Europa Flugzeug | de | D | how-to | low-med (est.) | idea | 2026-10-23. Weak SERP: verwoehnwochenende.de blog, rheinpfalz.de Ratgeber, a 2010 vielfliegertreff thread, a 2004 test.de piece. Must say up front that ffly is flights only. |
 | frühe Flüge Billigflieger vermeiden | de | A | troubleshooting | low (est.) | idea | 2026-10-23. SERP argues for early flights (cheaper, more punctual): wandernundmehr "Ist es besser, einen frühen Flug zu nehmen?", leinetal24 tips, vielfliegertreff thread. Gap: the hidden cost of a 6 a.m. leg (an extra hotel night, no sleep). Experience: sleep and hotel-night decisions. Claim only "favours". |
 | WIZZ Link Erfahrungen | de | B | product | low (est.) | idea | 2026-10-23. Only news (aerotelegraph ticker, euronews 2026-02-12 "still self-transfer"); no German user reports. Low priority. |
+| dans quel ordre visiter plusieurs villes (moins cher) | fr | A (pillar) | how-to | low (est.) | idea | 2026-10-23. No page answers it: the SERP returns flytrippers.com/fr deal lists ("300+ destinations en Europe à moins de 500$"), guias-viajar.com comment pages and a luxuryescapes listing. **Gap: a worked intra-Europe example comparing orders** (experience: example search 2). Slug idea: ordre-villes-vols-moins-cher. |
+| vol multi-destinations pas cher | fr | B (pillar) | how-to | med (est.) | idea | 2026-10-23. "Multi-destinations" is the French term (kayak.fr, airlines). SERP: milesopedia.fr (how to visit several cities; says it isn't always cheaper and separate tickets are separate contracts), airhelp.fr blog, kayak.fr, Finnair and ITA Airways booking pages, flytrippers.com/fr (Canada to Europe). All one-ticket or long-haul framing; no low-cost intra-Europe example. Slug idea: vol-multi-destinations-pas-cher. |
+| vol multi-destinations ou allers simples | fr | B | comparison | low-med (est.) | idea | 2026-10-23. kayak.fr news ("parfois, les billets aller simple séparés sont moins chers"), routard.com forum, milesopedia. Merge into the multi-destinations article as an H2 or FAQ. |
+| correspondance autonome risques | fr | B | troubleshooting | med (est.) | idea | 2026-10-23. French for self-transfer. SERP: milesopedia.fr/aerien/correspondance-autonome, kayak.fr, routard.com threads ("Correspondance autonome bon délai?"), businessclass.com help, airadvisor.com/fr. Well covered; supporting post only. |
+| tour d'Europe en avion pas cher | fr | D (pillar) | how-to | med (est.) | idea | 2026-10-23. kayak.fr/magazine/tour-europe-avion (pick the places, then the order; uses its Explore map), flytrippers.com/fr "12 vols en 14 jours" (Montreal-based, CAD/USD). Good D-pillar fit; must say ffly is flights only. Slug idea: tour-europe-avion-pas-cher. |
+| vol open jaw | fr | B | definition | low (est.) | idea | 2026-10-23. French uses the English term; few pages: flytrippers.com/fr ("Économiser avec les vols open-jaw"), milesopedia. Better as an H2 inside the multi-destinations article. |
+| vol tôt le matin low cost | fr | A | troubleshooting | low (est.) | idea | 2026-10-23. SERP argues for early flights: theflightclub.it/fr (March 2026, more punctual), equinoxmagazine.fr (cheaper), airadvisor.com/fr. Gap: the hidden cost of a 6 a.m. leg (an extra hotel night, no sleep). Experience: sleep and hotel-night decisions. Claim only "favours". |
+| WIZZ Link avis | fr | B | product | low (est.) | idea | 2026-10-23. Only English press releases (traveldailynews, travelmole) and a routard "Ryanair ou Wizz air?" thread; no French review. Low priority. |
 
 ---
 
@@ -184,3 +192,32 @@ Sources (de):
 - https://www.aerotelegraph.com/ticker/wizz-air-bietet-jetzt-umsteigefluege-an-mit-selbsttransfer/6dfkjl6
 - https://www.euronews.com/2026/02/12/wizz-air-just-made-it-easier-to-book-connecting-flights-but-its-still-self-transfer
 - https://www.vielfliegertreff.de/forum/threads/gabelflug-mit-mehr-als-6-legs.137426/post-3078185
+
+---
+
+## fr research (2026-10-23, `/seo research --lang fr`)
+
+Native seed terms, searched in French: vol multi-destinations, allers simples, open jaw, correspondance autonome, ordre des villes, tour d'Europe en avion, nuits par ville, vol tôt le matin low cost, WIZZ Link avis. Not seeded from the English backlog. Volumes are estimated from SERP shape only.
+
+What the French SERP looks like: Québec deal sites (flytrippers.com/fr, prices in CAD/USD), milesopedia.fr explainers, kayak.fr pages and routard.com forum threads. Everything is one-ticket or transatlantic. "Combien de nuits par ville" returned only English road-trip pages, so no row for it yet. Nobody shows the same French or European city set priced in different orders.
+
+Suggested first pick for a fr write slot: `dans quel ordre visiter plusieurs villes (moins cher)` (clean gap), then `vol multi-destinations pas cher` (more volume, stronger competitors).
+
+Sources (fr):
+- https://milesopedia.fr/aerien/vol-multi-destinations/
+- https://milesopedia.fr/aerien/correspondance-autonome/
+- https://www.airhelp.fr/blog/billet-multidestination/
+- https://www.kayak.fr/news/vols-multidestinations/
+- https://kayak.fr/magazine/tour-europe-avion/
+- https://flytrippers.com/fr/economiser-avec-les-vols-open-jaw-et-les-vols-multi-destinations/
+- https://flytrippers.com/fr/14-vols-en-14-jours-notre-voyage-aujourdhui-en-europe-de-lest/
+- https://flytrippers.com/fr/300-destinations-en-europe-moins-de-500-aller-retour/
+- https://www.routard.com/forums/t/billets-multi-destinations/15837
+- https://www.routard.com/forums/t/correspondance-autonome-bon-delai/414846
+- https://www.routard.com/forums/t/ryanair-ou-wizz-air/428237
+- https://www.businessclass.com/fr-ca/help/self-transfer-flights
+- https://www.finnair.com/fr-fr/r%C3%A9servations-multi-destinations
+- https://www.theflightclub.it/fr/2026/03/parce-que-les-vols-tot-le-matin-sont-plus-ponctuels/
+- https://www.equinoxmagazine.fr/2022/12/08/quel-est-le-meilleur-moment-pour-prendre-un-vol
+- https://airadvisor.com/fr/blog/meilleurs-jours-et-horaires-pour-voler-pas-cher
+- https://www.traveldailynews.com/aviation/wizz-air-launches-wizz-link-with-dohop/
