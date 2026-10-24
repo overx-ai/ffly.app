@@ -104,6 +104,8 @@ I built ffly, a [multi-city trip planner](/), for exactly this. You pick the cit
 
 Fares come from Ryanair, Wizz Air, airBaltic, Volotea and more. To see how your own cities line up, [try a search free on the web](/search) or in the iPhone app.
 
+I've also written about choosing the order of your cities natively, with the same example search, in German ([günstigste Reihenfolge der Städte](/de/guides/guenstigste-reihenfolge-staedte)) and in French ([dans quel ordre visiter plusieurs villes](/fr/guides/ordre-visiter-plusieurs-villes-moins-cher)).
+
 ## FAQ
 
 ### Does the order you visit cities change the price of flights?

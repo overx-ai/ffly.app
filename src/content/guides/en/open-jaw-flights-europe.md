@@ -132,6 +132,8 @@ If you're flying in from outside Europe, book the long-haul ticket yourself and 
 
 ffly covers flights only, so a train across the jaw is yours to plan. It's a search tool, not a travel agent: you book each flight on the airline's site or a booking site, and fares may not include bags. To see how your own cities line up, [try a search free on the web](/search) or in the iPhone app.
 
+Once the finish is open, the next question is the order of the cities in between. I've covered it in German ([günstigste Reihenfolge der Städte](/de/guides/guenstigste-reihenfolge-staedte)) and in French ([dans quel ordre visiter plusieurs villes](/fr/guides/ordre-visiter-plusieurs-villes-moins-cher)).
+
 ## FAQ
 
 ### What is an open jaw flight?
