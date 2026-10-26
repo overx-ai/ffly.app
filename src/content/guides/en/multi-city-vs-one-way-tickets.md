@@ -113,7 +113,7 @@ Each flight is then yours to book with the airline or a booking site, under thei
 
 You can try it free, in the iPhone app or with the [web search](/search).
 
-If you read German or French, the order question has its own guides there: [günstigste Reihenfolge der Städte](/de/guides/guenstigste-reihenfolge-staedte) and [dans quel ordre visiter plusieurs villes](/fr/guides/ordre-visiter-plusieurs-villes-moins-cher).
+If you read German or French, the order question has its own guides there: [günstigste Reihenfolge der Städte](/de/guides/guenstigste-reihenfolge-staedte) and [dans quel ordre visiter plusieurs villes](/fr/guides/ordre-visiter-plusieurs-villes-moins-cher). In German, the open jaw built from budget one-ways is covered in [Gabelflug in Europa mit Billigfliegern](/de/guides/gabelflug-europa-billigflieger).
 
 ## FAQ
 

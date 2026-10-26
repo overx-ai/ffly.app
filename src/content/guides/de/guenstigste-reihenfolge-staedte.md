@@ -123,7 +123,7 @@ Mit festem Start und Ziel ist es die Fakultät der Zahl der Städte: 24 bei vier
 Bei klassischen Airlines auf der Langstrecke manchmal. Innerhalb Europas mit Billigfliegern buchst du fast immer einzelne Flüge, und dann entscheiden vor allem Reihenfolge und Daten über den Preis.
 
 ### Lohnt sich ein Gabelflug innerhalb Europas?
-Mit Billigfliegern oft, wenn deine Pläne es erlauben. Das Ticket kostet keinen Aufschlag dafür, in einer anderen Stadt zu enden, und die günstigste letzte Strecke führt nicht unbedingt zurück zum Start.
+Mit Billigfliegern oft, wenn deine Pläne es erlauben. Das Ticket kostet keinen Aufschlag dafür, in einer anderen Stadt zu enden, und die günstigste letzte Strecke führt nicht unbedingt zurück zum Start. Wie du ihn aus Einzelflügen baust, steht im Ratgeber [Gabelflug in Europa mit Billigfliegern](/de/guides/gabelflug-europa-billigflieger).
 
 ### Wie viele Nächte sollte ich pro Stadt einplanen?
 Plane statt einer festen Zahl lieber zwischen drei und fünf Nächten. So kommen die günstigen Tage zum Zug, ohne dass sich deine Reise stark verändert.

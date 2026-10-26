@@ -27,6 +27,8 @@ Supporting:
 
 **Pillar: `multi-city vs one-way tickets`** (comparison, estimated med)
 
+Localized (spec 018, written natively, self-canonical): de `Gabelflug Europa Billigflieger` at /de/guides/gabelflug-europa-billigflieger (2026-10-26, covers "Gabelflug oder zwei Einzelflüge" as an H2). Inbound links from /guides/open-jaw-flights-europe, /guides/multi-city-vs-one-way-tickets and /de/guides/guenstigste-reihenfolge-staedte.
+
 Variants: "multi-city vs separate one-way tickets", "is it cheaper to book multi-city or one way". The SERP leans long-haul and legacy carriers. Forum consensus is that low-cost carriers price point to point, so mixing budget carriers favours separate one-ways. No ranking page shows a worked intra-Europe low-cost example.
 
 Supporting:

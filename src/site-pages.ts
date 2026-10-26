@@ -26,6 +26,7 @@ export const SITE_PAGES = [
   { slug: 'guides/multi-city-vs-one-way-tickets',  lastmod: '2026-10-16' },
   { slug: 'guides/open-jaw-flights-europe',        lastmod: '2026-10-16' },
   { slug: 'de/guides/guenstigste-reihenfolge-staedte', lastmod: '2026-10-24' },
+  { slug: 'de/guides/gabelflug-europa-billigflieger', lastmod: '2026-10-26' },
   { slug: 'fr/guides/ordre-visiter-plusieurs-villes-moins-cher', lastmod: '2026-10-24' },
 ] as const;
 
