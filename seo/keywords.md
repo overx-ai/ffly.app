@@ -52,6 +52,15 @@ All volumes are **estimated** tiers inferred from SERP shape. No keyword-tool da
 | vol open jaw | fr | B | definition | low (est.) | idea | 2026-10-23. French uses the English term; few pages: flytrippers.com/fr ("Économiser avec les vols open-jaw"), milesopedia. Better as an H2 inside the multi-destinations article. |
 | vol tôt le matin low cost | fr | A | troubleshooting | low (est.) | idea | 2026-10-23. SERP argues for early flights: theflightclub.it/fr (March 2026, more punctual), equinoxmagazine.fr (cheaper), airadvisor.com/fr. Gap: the hidden cost of a 6 a.m. leg (an extra hotel night, no sleep). Experience: sleep and hotel-night decisions. Claim only "favours". |
 | WIZZ Link avis | fr | B | product | low (est.) | idea | 2026-10-23. Only English press releases (traveldailynews, travelmole) and a routard "Ryanair ou Wizz air?" thread; no French review. Low priority. |
+| en qué orden visitar varias ciudades (más barato) | es | A (pillar) | how-to | low (est.) | idea | 2026-10-26. Nobody answers it: the SERP returns ryanair.com/es, a FareCompare tips page, Argentine promo aggregators (turismocity "multidestinos a Europa", prices in pesos) and eurovistatrips "ciudad más barata para volar a Europa" (gateway intent). **Gap: a worked intra-Europe example comparing orders** (experience: example search 2, 8 routes for one city set). Slug idea: orden-visitar-varias-ciudades-mas-barato. |
+| vuelos multidestino baratos Europa | es | B (pillar) | how-to | med (est.) | idea | 2026-10-26. SERP: infoviajera.com and turismocity.com.ar deal posts (2017-2020, long-haul from Argentina, Turkish Airlines/Alitalia), guialowcost.es (Air Europa), kayak/momondo product pages. All transatlantic or one-ticket; none builds a multi-city trip from low-cost one-ways inside Europe. Slug idea: vuelos-multidestino-baratos-europa. |
+| multidestino o vuelos solo ida | es | B | comparison | low-med (est.) | idea | 2026-10-26. es.kayak.com and es.momondo.com product pages (round trips priced to favour full itineraries; low-cost one-ways better inside a country), cestee.es explainer ("multidestino" not automatically cheaper), felicesvacaciones, trip.com Q&A, British Airways pages, trome.com. Merge into the B pillar as an H2/FAQ unless the pillar runs long. |
+| vuelo open jaw | es | B | definition / how-to | low-med (est.) | idea | 2026-10-26. Spanish searchers use the English term. SERP: en.wikipedia, cestee.es, nomadesim.com/es (translated), altexsoft glossary, milevalue, a proz.com translation thread. Long-haul framing (Chicago-París-Múnich). Gap: open jaw built from low-cost one-ways at no surcharge. |
+| escala autogestionada riesgos | es | B | troubleshooting | low (est.) | idea | 2026-10-26. Native terms split: "escala autogestionada", "auto-transferencia" (businessclass.com/es-mx). SERP is mostly spammy English listicles on parked domains; one real Spanish page. Supporting post only: ffly trips are separate bookings, so it must say so plainly. |
+| cuántas noches en cada ciudad | es | A | how-to | low-med (est.) | idea | 2026-10-26. guias-viajar.com Europe guide (12 cities, 25-30 days) and its comment pages, a losviajeros.com forum thread, Business Insider (EN, "regret 6 places in 2 weeks"). Rules of thumb only. ffly takes nights per city as a min-max input: light product fit. |
+| recorrer Europa en avión barato | es | D (pillar) | how-to | med (est.) | idea | 2026-10-26. hola.com and wwwhatsnew on Airhopping ("interrail en avión", 2019, cannot choose the order), a kayak.es sample route (10 cities, legs €30-100), skyscanner.es "por qué avión y no tren", bluradio, felicesvacaciones. Flights-only honesty constraint from clusters.md D applies. |
+| vuelos de madrugada low cost | es | A | troubleshooting | low (est.) | idea | 2026-10-26. SERP is mostly "is it cheaper to BUY at dawn" (eltiempo, elpais.com.co, noticiasrcn): a different intent. directoalpaladar argues early flights are worth it (fewer delays). Nobody covers the hotel night a midnight landing costs. Experience fit: sleep and hotel-night decisions. Must not claim more than "favours". |
+| WIZZ Link opiniones | es | B | product | low (est.) | idea | 2026-10-26. cestee.es/blog/enlace-wizz and wizz-link (critical: bags re-checked, separate check-in, no refund of the second flight on a delay), airadvisor complaints page, kayak.es airline pages. Low priority. |
 
 ---
 
@@ -221,3 +230,34 @@ Sources (fr):
 - https://www.equinoxmagazine.fr/2022/12/08/quel-est-le-meilleur-moment-pour-prendre-un-vol
 - https://airadvisor.com/fr/blog/meilleurs-jours-et-horaires-pour-voler-pas-cher
 - https://www.traveldailynews.com/aviation/wizz-air-launches-wizz-link-with-dohop/
+
+---
+
+## es research (2026-10-26, `/seo research --lang es`)
+
+Native seed terms, searched in Spanish: vuelos multidestino, solo ida, orden de las ciudades, open jaw, escala autogestionada / auto-transferencia, noches en cada ciudad, recorrer Europa en avión, vuelos de madrugada low cost, WIZZ Link opiniones. Not seeded from the English backlog. Volumes are estimated from SERP shape only.
+
+What the Spanish SERP looks like: Latin American deal aggregators (turismocity.com.ar, infoviajera.com) with dated long-haul promos in local currency, meta-search product pages (es.kayak.com, es.momondo.com), one Spanish explainer site that covers most mechanics (cestee.es), and Spanish-from-Spain travel media (hola.com, guias-viajar.com). Nobody prices the same European city set in different orders. Mixed audience: Spain plus Latin Americans planning a Europe trip after a long-haul arrival, so copy should avoid Spain-only words where a neutral one exists.
+
+Suggested first pick for an es write slot: `en qué orden visitar varias ciudades (más barato)` (clean gap, strongest experience fit, mirrors the de and fr pilots), then `vuelos multidestino baratos Europa` (more volume, needs the low-cost one-ways angle).
+
+Sources (es):
+- https://www.ryanair.com/flights/es/es
+- https://www.farecompare.com/es/consejos-de-viajes/5-consejos-para-conseguir-pasajes-muy-baratos-a-europa/
+- https://www.turismocity.com.ar/promociones_aereas/p-Multidestinos_para_viajar_a_Europa_desde_dollar36600-3403.html
+- https://eurovistatrips.com/es/ciudad-mas-barata-para-volar-a-europa/
+- https://www.infoviajera.com/?p=39471
+- https://www.guialowcost.es/compra-varios-vuelos-y-ahorra-con-air-europa/
+- https://www.es.kayak.com/Vuelos-multi-destino.mc-fd.ksp
+- https://www.es.momondo.com/Boletos-de-avion-multidestino.mc-fd.ksp
+- https://www.cestee.es/blog/vuelos-con-varias-ciudades-de-ida-y-vuelta-y-con-escala
+- https://www.nomadesim.com/es/blog/are-open-jaw-tickets-more-expensive
+- https://www.businessclass.com/es-mx/help/self-transfer-flights
+- https://guias-viajar.com/viajar-por-tu-cuenta/guia-viajar-europa/
+- https://www.losviajeros.com/foros.php?p=515189
+- https://www.hola.com/viajes/20190708145425/interrail-en-avion-como-funciona/
+- https://www.espanol.skyscanner.com/noticias/por-que-viajar-por-avion-y-no-en-tren-por-europa
+- https://www.directoalpaladar.com/viajes/que-merece-pena-madrugon-tienes-que-coger-avion-volar-muy-temprano-compensa
+- https://www.eltiempo.com/cultura/gente/es-cierto-que-si-compra-tiquetes-en-la-madrugada-son-mas-baratos-aerolineas-responden-854074
+- https://www.cestee.es/blog/enlace-wizz
+- https://airadvisor.com/es/opiniones-de-aerolineas/wizz-air
