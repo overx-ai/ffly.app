@@ -9,5 +9,6 @@
 | https://ffly.app/fr/guides/ordre-visiter-plusieurs-villes-moins-cher | fr | dans quel ordre visiter plusieurs villes (moins cher) | A | 2026-10-24 | — (new; judge 86) |
 | https://ffly.app/de/guides/gabelflug-europa-billigflieger | de | Gabelflug Europa Billigflieger | B | 2026-10-26 | — (new; judge 84) |
 | https://ffly.app/es/guides/orden-visitar-varias-ciudades-mas-barato | es | en qué orden visitar varias ciudades (más barato) | A | 2026-11-02 | new; judge 84 |
+| https://ffly.app/es/guides/vuelos-multidestino-baratos-europa | es | vuelos multidestino baratos Europa | B | 2026-11-02 | new; judge 85 |
 
 Briefs, sources and judge scores (94, 92, 84; de 81, 84; fr 86) live in the article frontmatter in `src/content/guides/`.
