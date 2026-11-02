@@ -43,8 +43,8 @@ const fr = {
   },
 
   home: {
-    title: `${APP.name} : vols multi-destinations pas chers et planificateur de voyage`,
-    description: `Choisissez vos villes. ${APP.name} trouve l’ordre et les dates les moins chers pour tout le voyage, avec des horaires de vol raisonnables.`,
+    title: `${APP.name} : vols multi-destinations dans l’ordre le moins cher`,
+    description: `Donnez vos villes et vos dates : ${APP.name} trouve l’ordre et les jours qui coûtent le moins, avec moins de réveils à 3 h. Gratuit sur iPhone et en ligne.`,
     h1: 'Le moyen le moins cher de toutes les voir.',
     sub: `Indiquez à ${APP.name} les villes que vous voulez voir. Il trouve l’ordre et les dates qui rendent le voyage complet le moins cher possible, et privilégie des horaires de vol qui vous conviennent.`,
     legend: { one: 'Exemple de recherche · le meilleur sur {n} itinéraire, total des vols', other: 'Exemple de recherche · le meilleur sur {n} itinéraires, total des vols' },

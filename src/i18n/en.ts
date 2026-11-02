@@ -50,8 +50,8 @@ const base = {
   },
 
   home: {
-    title: `${APP.name}: Cheap Multi-City Flights and Trip Planner`,
-    description: `Pick your cities. ${APP.name} finds the cheapest order and dates for the whole trip, with sensible flight times.`,
+    title: `${APP.name} app: Free Search for the Cheapest Multi-City Trip`,
+    description: `Pick your cities and a travel window. ${APP.name} finds the order and dates that cost the least, with fewer 3 a.m. alarms. Free on iPhone and on the web.`,
     h1: 'The cheapest way to see them all.',
     sub: `Tell ${APP.name} the cities you want to see. It finds the order and the dates that make the whole trip cost the least, and favours flight times you can live with.`,
     legend: p({ one: 'Example search · best of {n} route, flights total', other: 'Example search · best of {n} routes, flights total' }),

@@ -10,5 +10,7 @@
 | https://ffly.app/de/guides/gabelflug-europa-billigflieger | de | Gabelflug Europa Billigflieger | B | 2026-10-26 | — (new; judge 84) |
 | https://ffly.app/es/guides/orden-visitar-varias-ciudades-mas-barato | es | en qué orden visitar varias ciudades (más barato) | A | 2026-11-02 | new; judge 84 |
 | https://ffly.app/es/guides/vuelos-multidestino-baratos-europa | es | vuelos multidestino baratos Europa | B | 2026-11-02 | new; judge 85 |
+| https://ffly.app/ | | ffly (brand; 303 of 371 impressions) | home | — | retitle 2026-11-02 |
+| https://ffly.app/fr | fr | ffly (brand; 85 of 100 impressions) | home | — | retitle 2026-11-02 |
 
 Briefs, sources and judge scores (94, 92, 84; de 81, 84; fr 86) live in the article frontmatter in `src/content/guides/`.
