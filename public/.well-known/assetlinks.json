@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "ai.overx.ffly",
+    "sha256_cert_fingerprints": ["A6:83:12:5B:8A:F4:12:CE:AF:DC:3D:FA:A8:E2:5B:6E:A7:82:36:67:8B:AE:3D:FC:44:5B:0C:F4:0C:A0:10:28"]
+  }
+}]
