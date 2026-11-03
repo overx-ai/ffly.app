@@ -37,6 +37,7 @@ export const SITE_PAGES = [
   { slug: 'ru/guides/kak-sostavit-marshrut-po-evrope', lastmod: '2026-11-03' },
   { slug: 'sv/guides/flyga-mellan-flera-stader-europa', lastmod: '2026-11-03' },
   { slug: 'da/guides/flyve-mellem-flere-byer-europa', lastmod: '2026-11-03' },
+  { slug: 'no/guides/rundreise-i-europa-med-fly', lastmod: '2026-11-03' },
 ] as const;
 
 export type Slug = (typeof SITE_PAGES)[number]['slug'];

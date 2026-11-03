@@ -116,6 +116,14 @@ All volumes are **estimated** tiers inferred from SERP shape. No keyword-tool da
 | enkeltbillet eller returbillet | da | B | comparison | med (est.) | idea | 2026-11-03. Mostly Norwegian/Swedish/German pages (smartepenger.no, reisetopia); no good Danish page. |
 | open jaw billet | da | B | definition | low (est.) | idea | 2026-11-03. English glossaries only (Wikipedia, Going, NerdWallet). |
 | billigt at flyve rundt i Europa | da | D | planning | low-med (est.) | idea | 2026-11-03. TV2 Kosmopol, airadvisor.com/da, skagenonline. |
+| rundreise i Europa med fly | nb | A (pillar) | how-to | low (est.) | published | 2026-11-03: live at /no/guides/rundreise-i-europa-med-fly (brief in its frontmatter; judge 87). Google autocomplete hl=nb gl=NO (also "rundreise med fly", "rundreise fly"). SERP (WebSearch; the Google page sat behind a consent wall): Danish package and group tours (rejsespejder.dk, besttravel.dk, togrejsereuropa.dk, nillesgislev.dk), tourradar.com, an Expedia landing page, Wikipedia hits on "Air Europa". No Norwegian page. **Gap: putting the trip together yourself on low-cost one-ways from Gardermoen, Torp or Bergen, and choosing the order and dates.** |
+| flybilletter flere byer | nb | B (pillar) | transactional / how-to | low-med (est.) | idea | 2026-11-03. Autocomplete also "flybilletter flere destinasjoner". Finnair's own pages own it ("flerbybestilling"), plus finn.no and sas.dk. Gap: a "flerbybestilling" is one airline's network; low-cost legs are bought one by one. Slug idea: flybilletter-flere-byer. |
+| enveisbillett fly | nb | B | informational / commercial | med (est.) | idea | 2026-11-03. smartepenger.no (one-ways from two airlines can pay off; a through ticket can cost more than two singles), finn.no listings. |
+| multi city flybilletter | nb | B / C | tool | low-med (est.) | idea | 2026-11-03. Typed in English; "multi city sas", "flysas multi city". Finnair and SAS pages. |
+| fly mellom byer i Europa | nb | A / D | informational | low (est.) | idea | 2026-11-03. Only English budget-travel blogs. |
+| interrail med fly | nb | D | comparison | low (est.) | idea | 2026-11-03. Also "interrail eller fly". No Norwegian page; momondo.se, youth.europa.eu, bahn.de. |
+| open jaw | nb | B | definition | low (est.) | idea | 2026-11-03. Norwegians type it in English, mostly with SAS / EuroBonus. "åpen kjeve" has no suggestions: never use it. |
+| storbyferie Europa billig | nb | D | inspirational | med-high (est.) | idea | 2026-11-03. Deep autocomplete tree; norwegian.com, Ving/Apollo, dagbladet.no. Package intent, strong incumbents. |
 
 ---
 
@@ -451,3 +459,24 @@ Sources (pl):
 - https://corporate.ryanair.com/informacje/ryanair-oglasza-rekordowy-letni-rozklad-lotow-2026z-katowic/
 - https://www.podrozepoeuropie.pl/gdzie-i-jak-szukac-tanich-lotow/
 - https://turystyka.wp.pl/multicity-sprytny-sposob-na-tanie-bilety-6100963749786241a
+
+## nb research (2026-11-03, `/seo research --lang nb`)
+
+Native seed terms, in Bokmål: rundreise i Europa med fly, flybilletter flere byer, enveisbillett, multi city, open jaw, storbyferie Europa, interrail med fly, lavprisfly fra Oslo, separate billetter. Not seeded from the English backlog. Volumes are estimated.
+
+Search method: the local Google SERP (hl=no, gl=NO) redirected to a consent wall and Bing returned an empty page, so demand comes from Google autocomplete (suggestqueries, hl=nb, gl=NO) and SERP shape from WebSearch with native queries. No "Andre spør også" box could be captured; FAQ questions come from autocomplete and ranking pages.
+
+What the Norwegian SERP looks like: "rundreise" means a package or group tour, and the results are mostly Danish. Multi-city booking is Finnair's "flerbybestilling". Norwegians write "open jaw" in English; "åpen kjeve" and "egen overgang" are not used ("separate billetter", "gjennomgående billett", "rekker ikke flyet videre" are). Low-cost reality from Norway: Ryanair at Torp (over 100 weekly flights, 10 routes, winter 2026), Wizz Air from Bergen (Budapest), Norwegian across the country.
+
+Sources (nb):
+- https://www.smartepenger.no/reiseokonomi/546-slik-finner-du-best-pris-pa-flyreiser
+- https://www.smartepenger.no/pluss/1666-flyreise-mellomland-i-london
+- https://corporate.ryanair.com/?p=31482
+- https://www.thelocal.no/20251120/listed-all-the-new-flights-to-and-from-norway-in-2026
+- https://www.skatteetaten.no/satser/flypassasjeravgift/?year=2026
+- https://www.finnair.com/no-no/bestillinger-for-flere-byer
+- https://rejsespejder.dk/europa-rundrejse-flyv-4-europaeiske-storbyer-paa-10-dage-kun-604-kr/
+- https://www.tourradar.com/i/europe-intl-flights-included
+- https://www.norwegian.com/no/ferietyper/storbyferie-i-europa/
+- https://wizzlink.wizzair.com/
+- https://help.ryanair.com/hc/en-gb/articles/43063344708369-What-are-Multicity-Trips

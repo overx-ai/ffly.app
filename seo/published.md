@@ -17,6 +17,7 @@
 | https://ffly.app/ru/guides/kak-sostavit-marshrut-po-evrope | ru | как составить маршрут по Европе | A | 2026-11-03 | new; judge 86 |
 | https://ffly.app/sv/guides/flyga-mellan-flera-stader-europa | sv | flyga mellan flera städer i Europa | A | 2026-11-03 | new; judge 88 |
 | https://ffly.app/da/guides/flyve-mellem-flere-byer-europa | da | flyve mellem flere byer i Europa | A | 2026-11-03 | new; judge 90 |
+| https://ffly.app/no/guides/rundreise-i-europa-med-fly | nb | rundreise i Europa med fly | A | 2026-11-03 | new; judge 87 |
 | https://ffly.app/ | | ffly (brand; 303 of 371 impressions) | home | — | retitle 2026-11-02 |
 | https://ffly.app/fr | fr | ffly (brand; 85 of 100 impressions) | home | — | retitle 2026-11-02 |
 
