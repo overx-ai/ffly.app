@@ -30,6 +30,7 @@ export const SITE_PAGES = [
   { slug: 'fr/guides/ordre-visiter-plusieurs-villes-moins-cher', lastmod: '2026-10-24' },
   { slug: 'es/guides/orden-visitar-varias-ciudades-mas-barato', lastmod: '2026-11-02' },
   { slug: 'es/guides/vuelos-multidestino-baratos-europa', lastmod: '2026-11-02' },
+  { slug: 'fi/guides/lennot-useita-kohteita', lastmod: '2026-11-03' },
   { slug: 'it/guides/voli-multitratta-low-cost', lastmod: '2026-11-03' },
   { slug: 'pt/guides/viajar-varias-cidades-europa-aviao', lastmod: '2026-11-03' },
   { slug: 'pl/guides/jak-zaplanowac-podroz-po-kilku-miastach-europy', lastmod: '2026-11-03' },

@@ -124,6 +124,13 @@ All volumes are **estimated** tiers inferred from SERP shape. No keyword-tool da
 | interrail med fly | nb | D | comparison | low (est.) | idea | 2026-11-03. Also "interrail eller fly". No Norwegian page; momondo.se, youth.europa.eu, bahn.de. |
 | open jaw | nb | B | definition | low (est.) | idea | 2026-11-03. Norwegians type it in English, mostly with SAS / EuroBonus. "åpen kjeve" has no suggestions: never use it. |
 | storbyferie Europa billig | nb | D | inspirational | med-high (est.) | idea | 2026-11-03. Deep autocomplete tree; norwegian.com, Ving/Apollo, dagbladet.no. Package intent, strong incumbents. |
+| lennot useita kohteita | fi | A (pillar) | how-to | low-med (est.) | published | 2026-11-03: live at /fi/guides/lennot-useita-kohteita (brief in its frontmatter; judge 81). Google autocomplete hl=fi gl=fi (also "lennot useampi kohde", "useamman kohteen matka"; "useampi kohde" is the multi-city tab label). SERP (WebSearch; the Google page sat behind a consent wall): OTA and meta-search form pages (tjareborg.fi, fi.kayak.com, travellink.fi, omio.com/fi, a closed ebookers.fi), airBaltic home, Finnair's multi-city booking page and FAQ, Skyscanner help and stopover article. No Finnish guide. **Gap: which order and dates make the whole trip cheapest on low-cost one-ways from Helsinki, Turku or Oulu.** |
+| useamman kohteen matka | fi | A / B | navigational | low (est.) | idea | 2026-11-03. Finnair's own term; finnair.com dominates. |
+| omatoiminen vaihto | fi | B | informational | med (est.) | idea | 2026-11-03. Deepest autocomplete of any B term ("mitä omatoiminen vaihto tarkoittaa", "omatoiminen vaihto kokemuksia"). supersaver.fi FAQ, vauva.fi threads (2019), klm.fi, airbaltic.com. No authority explainer. Slug idea: omatoiminen-vaihto-lento. Next fi article. |
+| menolento vai meno-paluu | fi | B | informational | low (est.) | idea | 2026-11-03. fi.kayak.com route pages, loudavymkrokem.cz/fi blog, Finnair no-show FAQ. |
+| euroopan kiertomatka lentäen | fi | D | mixed | low (est.) | idea | 2026-11-03. Head term "euroopan kiertomatkat" means packaged bus tours; the "lentäen" form is thin. |
+| reppureissu Eurooppa | fi | D | planning | low-med (est.) | idea | 2026-11-03. Blogs only, nothing on flight order. |
+| interrail vai lentäen | fi | D | comparison | med (est.) | idea | 2026-11-03. interrail.eu, taloustaito.fi (2017), youth.europa.eu. |
 
 ---
 
@@ -480,3 +487,24 @@ Sources (nb):
 - https://www.norwegian.com/no/ferietyper/storbyferie-i-europa/
 - https://wizzlink.wizzair.com/
 - https://help.ryanair.com/hc/en-gb/articles/43063344708369-What-are-Multicity-Trips
+
+
+## fi research (2026-11-03, `/seo research --lang fi`)
+
+Native seed terms, in Finnish: lennot useita kohteita, useampi kohde, useamman kohteen matka, omatoiminen vaihto, menolento vai meno-paluu, kiertomatka lentäen, reppureissu, interrail. Not seeded from the English backlog. Volumes are estimated.
+
+Search method: the local Google SERP (hl=fi, gl=FI) redirected to a consent wall and Bing returned an empty page, so demand comes from Google autocomplete (suggestqueries, hl=fi, gl=fi) and SERP shape from WebSearch with native queries. No "Muut kysyivät myös" box could be captured; FAQ questions come from autocomplete and ranking FAQ titles.
+
+What the Finnish SERP looks like: calques such as "monen kaupungin matka" and "kaupunkikierros euroopassa" have no demand; Finns type the UI label "useampi kohde" / "useita kohteita". Results are booking forms and airline help pages with no guide. "open jaw" has no Finnish term (never "avoin lippu", which means open-dated). Low-cost reality from Finland: Ryanair at Helsinki and Rovaniemi (16 routes winter 2025-2026), Norwegian (23 routes summer 2026), Wizz Air from Turku, airBaltic Oulu-Riga (summer 2026).
+
+Sources (fi):
+- https://www.finnair.com/fi-fi/useamman-kohteen-varaus
+- https://europa.eu/youreurope/citizens/travel/passenger-rights/air/faq/index_fi.htm
+- https://www.supersaver.fi/c/faq/self-transfer/what-is-self-transfer
+- https://corporate.ryanair.com/news/ryanair-announces-biggest-ever-winter-schedule-in-finland-16-routes-4-new-30-capacity-growth-850000-passengers-p-a/
+- https://www.finavia.fi/en/newsroom/2025/new-route-helsinki-airport-tirana
+- https://www.finavia.fi/en/newsroom/2025/wizz-air-launch-direct-flights-turku-airport-bucharest
+- https://www.businessoulu.com/en/news/airbaltic-to-launch-five-direct-scheduled-flights-weekly-between-oulu-and-riga/
+- https://www.vauva.fi/keskustelu/3631643/vaihto-omalla-vastuulla-halpalennoissa-uskaltaako-tuollaista-ottaa-jos-1
+- https://www.lomalista.fi/suorat-lennot-helsingista
+- https://wizzlink.wizzair.com/
