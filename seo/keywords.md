@@ -78,6 +78,14 @@ All volumes are **estimated** tiers inferred from SERP shape. No keyword-tool da
 | open jaw vlucht | nl | B | definition | low (est.) | idea | 2026-11-03. Dutch searchers keep the English term; SERP almost entirely English (thepointsguy, going.com). travelvalley's "vertrek Amsterdam, terug op Rotterdam" tip is the only native take. |
 | rondreis Europa vliegen goedkoop | nl | D (pillar) | planning | med (est.) | idea | 2026-11-03. be.kayak.com Europe price pages, Eurowings and Air Europa deals, 27vakantiedagen.nl "goedkope stedentrip Europa" (about 4,000-word listicle). Price-led, no multi-leg planning page. |
 | losse tickets overstap gemist | nl | B | troubleshooting | low (est.) | idea | 2026-11-03. airadvisor.com/nl (claim agency). Your Europe NL FAQ: compensation only "als die aansluitende vlucht deel uitmaakt van dezelfde boeking". No Dutch consumer-authority page. |
+| как составить маршрут по Европе | ru | A (pillar) | how-to | med (est.) | published | 2026-11-03: live at /ru/guides/kak-sostavit-marshrut-po-evrope (brief in its frontmatter; judge 86). 2026-11-03. Google autocomplete hl=ru gl=de/lv (also "как спланировать путешествие по европе", "как составить маршрут путешествия"). SERP (WebSearch, the live Google page sat behind a consent wall): freedom-travel.kz (bus), style.rbc.ru and tonkosti.ru (Randal Olson "optimal road trip", driving distance), eksmo.ru book, kupibilet.ru road-trip listicle, howtrip.ru 2026 all-in-one guide (Moscow start, visas, cards), qna.habr.com, woman.ru. kupibilet (2026-09-21) says "first decide the cities and their order" and never says how. **Gap: how to pick the order and dates so the flights cost least, from an EU base city, on low-cost one-ways.** Slug: kak-sostavit-marshrut-po-evrope. |
+| в каком порядке посетить города Европы, чтобы дешевле | ru | A | how-to | low (est.) | idea | 2026-11-03. Covered as H2 «Почему маршрут по карте не самый выгодный» and FAQ in /ru/guides/kak-sostavit-marshrut-po-evrope. No autocomplete ("в каком порядке" is taken by "смотреть марвел"). Nothing answers it: t-j.ru, make-trip.ru, kupibilet hidden fees, freedom-travel.kz top-17, eurointegration.com.ua (2016). Fold into the pillar as an H2 and FAQ. |
+| сложный маршрут авиабилеты | ru | B (pillar) | transactional / how-to | high (est.) | idea | 2026-11-03. The native word for a multi-city ticket (the button on the big Russian-language flight searches). Tool-dominated SERP plus tonkosti.ru (2026-01-29) and kupibilet.ru (2026-09). Gap: low-cost one-ways in Europe rarely fit one "сложный маршрут" ticket. Slug idea: slozhnyj-marshrut-aviabilety. |
+| составной маршрут это | ru | B | definition | low-med (est.) | idea | 2026-11-03. kupibilet.ru uses it for open jaw ("прилёт в один город, а вылет обратно из другого"); ru.momondo.ua, samokatus.ru. "открытая челюсть" autocompletes to anatomy: never target it. |
+| самостоятельная пересадка это | ru | B | definition / troubleshooting | med-high (est.) | idea | 2026-11-03. Autocomplete: "чем отличается самостоятельная пересадка от пересадки", "как понять самостоятельная пересадка или нет". SERP skews to Istanbul transfers; big flight-search FAQs, tonkosti, kupibilet, onetwotrip. |
+| раздельные билеты что это | ru | B | definition | med (est.) | idea | 2026-11-03. Flight-search FAQs, nashaplaneta.net, freedom-travel.kz. Definition not verified on a page yet. |
+| маршрут по Европе на 2 недели | ru | D | list | med-high (est.) | idea | 2026-11-03. English blogs, ru.trip moments, rutube, howtrip.ru. Itinerary intent, off-fit for a flights-only tool. |
+| дешевые перелеты по Европе | ru | D (pillar) | how-to | med (est.) | idea | 2026-11-03. kupibilet budget-airline post (2012), make-trip.ru, freedom-travel.kz top-17 low-cost carriers, finance.ua. |
 
 ---
 
@@ -315,3 +323,28 @@ Sources (nl):
 - https://en.wikipedia.org/wiki/Brussels_South_Charleroi_Airport
 - https://www.27vakantiedagen.nl/?p=33708
 - https://airadvisor.com/nl/gemiste-aansluiting-vluchtcompensatie
+## ru research (2026-11-03, `/seo research --lang ru`)
+
+Native seed terms, in Russian: как составить маршрут по Европе, в каком порядке посетить города, сложный маршрут авиабилеты, составной маршрут, самостоятельная пересадка, раздельные билеты, лоукостеры Европы, маршрут по Европе на 2 недели. Not seeded from the English backlog. Audience: Russian speakers living in or travelling around the EU (Berlin, Warsaw, Riga, Limassol, Belgrade, Tbilisi); no routes from or to Russia.
+
+Search method: the local Google SERP (hl=ru, gl=DE) redirected to a consent wall and Bing returned an empty page, so demand comes from Google autocomplete (suggestqueries, hl=ru, gl=de and gl=lv) and the SERP shape from WebSearch with native queries. No People Also Ask box could be captured; FAQ questions come from autocomplete question forms. Volumes are estimated.
+
+What the Russian SERP looks like: almost every page assumes a start from Moscow (Schengen visa, Russian cards); route content is road-trip or bus listicles and the Randal Olson "optimal road trip" story (distance, not price); multi-city tickets are called «сложный маршрут», open jaw «составной маршрут» (kupibilet) and «открытая челюсть» only in anatomy. Nobody explains how to choose the order of cities and the dates so the flights cost least.
+
+Sources (ru):
+- https://www.kupibilet.ru/blog/kak-sekonomit-na-slozhnosostavnom-marshrute
+- https://www.kupibilet.ru/blog/ow-rt-open-jaw-i-circle-trip-aviabilety
+- https://www.kupibilet.ru/blog/kak-sostavit-perelyot-iz-tryoh-gorodov
+- https://tonkosti.ru/Журнал/Пересадка_не_враг:_как_сложные_маршруты_делают_авиабилеты_дешевле
+- https://howtrip.ru/samostoyatelnoe-puteshestvie-po-evrope/
+- https://style.rbc.ru/impressions/5716390d9a79472acdb34ff9
+- https://www.randalolson.com/2015/03/10/computing-the-optimal-road-trip-across-europe/
+- https://freedom-travel.kz/media/advice/kak-otpravitsia-v-puteshestvie-po-evrope-na-avtobuse/
+- https://samokatus.ru/travel-telegram-feed/loyaltyshmoyalty/4989
+- https://rail.ninja/ru/faq/how-plan-multi-city-trip-europe
+- https://make-trip.ru/sam-travel/lowcoster-avia
+- https://help.ryanair.com/hc/en-gb/articles/43063344708369-What-are-Multicity-Trips
+- https://help.ryanair.com/hc/en-gb/articles/47320825778705-What-happens-if-I-don-t-take-my-outbound-flight-Can-I-still-use-my-return
+- https://wizzlink.wizzair.com/
+- https://www.euronews.com/2026/02/12/wizz-air-just-made-it-easier-to-book-connecting-flights-but-its-still-self-transfer
+- https://www.airbaltic.com/en/flight-deals/flights-from-riga-to-amsterdam
