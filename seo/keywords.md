@@ -61,6 +61,16 @@ All volumes are **estimated** tiers inferred from SERP shape. No keyword-tool da
 | recorrer Europa en avión barato | es | D (pillar) | how-to | med (est.) | idea | 2026-10-26. hola.com and wwwhatsnew on Airhopping ("interrail en avión", 2019, cannot choose the order), a kayak.es sample route (10 cities, legs €30-100), skyscanner.es "por qué avión y no tren", bluradio, felicesvacaciones. Flights-only honesty constraint from clusters.md D applies. |
 | vuelos de madrugada low cost | es | A | troubleshooting | low (est.) | idea | 2026-10-26. SERP is mostly "is it cheaper to BUY at dawn" (eltiempo, elpais.com.co, noticiasrcn): a different intent. directoalpaladar argues early flights are worth it (fewer delays). Nobody covers the hotel night a midnight landing costs. Experience fit: sleep and hotel-night decisions. Must not claim more than "favours". |
 | WIZZ Link opiniones | es | B | product | low (est.) | idea | 2026-10-26. cestee.es/blog/enlace-wizz and wizz-link (critical: bags re-checked, separate check-in, no refund of the second flight on a delay), airadvisor complaints page, kayak.es airline pages. Low priority. |
+| voli multitratta low cost | it | B (pillar) | how-to | med (est.) | published | 2026-11-03: live at /it/guides/voli-multitratta-low-cost (brief in its frontmatter; judge 85). SERP (web search with Italian queries; google.it unreachable to the crawler): momondo.it and kayak.it multitratta landing pages (form + 6-question FAQ) both say low-cost carriers usually don't sell multitratta and point to legacy carriers; a booking-site Q&A; the rest off-topic. Gap: building the trip from low-cost one-ways, order and dates changing the total. |
+| volo multitratta | it | B | product / navigational | med-high (est.) | idea | 2026-11-03. kayak.it, momondo.it, volagratis, ITA Airways and Finnair it-it multi-city pages. Tool intent; hard for an article. |
+| multitratta o voli sola andata | it | B | comparison | low-med (est.) | idea | 2026-11-03. quifinanza.it "trucco del biglietto di sola andata" (11/10/2025), flightsmilesandpoints/it, nomadesim/it. Nobody quantifies a 3+ city low-cost trip. Covered as an FAQ in the pillar. |
+| volo open jaw | it | B | definition | low-med (est.) | idea | 2026-11-03. siviaggia.it owns the definition (07/05/2024, about 700 words) plus kayak/momondo FAQ blocks. Covered as a table row in the pillar. |
+| ryanair multitratta | it | B | navigational / how-to | low (est.) | idea | 2026-11-03. No Ryanair page surfaced for the Italian query; antitrust news, kayak, volagratis. Ryanair's help page (Multicity = open jaw only) returned 403; verify before writing. |
+| wizz link come funziona | it | B | product | low, rising (est.) | idea | 2026-11-03. Trade press only (italiavola.com 12/02/2026, airlinergs). No Italian consumer explainer. |
+| autotrasferimento voli rischi | it | B | troubleshooting | low (est.) | idea | 2026-11-03. Almost no Italian pages (kayak .com/.fr, milesopedia.fr, one theflightclub.it anecdote). "Self transfer" and "biglietti separati" are what people say. |
+| in che ordine visitare più città | it | A (pillar) | how-to | low (est.) | idea | 2026-11-03. No head term; kayak.it/news "Gira l'Europa a meno di 1500 €" (2017), interrail.com/it, cheap-city lists. No Italian page compares orders on price. Next it pick. |
+| quante notti per città | it | A | how-to | low (est.) | idea | 2026-11-03. No strong Italian page (pt/es/en results). |
+| voli all'alba low cost evitare | it | A | troubleshooting | low (est.) | idea | 2026-11-03. theflightclub.it (2022), fanpage.it, siviaggia: all say dawn flights are cheaper; nobody prices avoiding them. |
 
 ---
 
@@ -261,3 +271,22 @@ Sources (es):
 - https://www.eltiempo.com/cultura/gente/es-cierto-que-si-compra-tiquetes-en-la-madrugada-son-mas-baratos-aerolineas-responden-854074
 - https://www.cestee.es/blog/enlace-wizz
 - https://airadvisor.com/es/opiniones-de-aerolineas/wizz-air
+
+---
+
+## it research (2026-11-03, `/seo research --lang it`)
+
+Native seed terms, searched in Italian: voli multitratta, sola andata, open jaw, autotrasferimento, in che ordine visitare, WIZZ Link. google.it, Bing (cc=IT) and DuckDuckGo (kl=it-it) were bot-walled; observations come from web search with Italian queries plus fetched pages, so rank order is approximate and no real PAA was captured.
+
+What the Italian SERP looks like: OTA landing pages (kayak.it, momondo.it) own "multitratta" and tell the reader low-cost carriers don't do it; definitions on siviaggia.it; one-way tricks on quifinanza.it; WIZZ Link only in trade press. Cluster A queries have no head term, so the pilot went to the B pillar with order and dates as its core section.
+
+Vocabulary: "multitratta" (one word) is the term; "sola andata" editorial, "solo andata" also typed; "low cost" is native; self-transfer has no settled word ("biglietti separati", "self transfer").
+
+Sources (it):
+- https://www.kayak.it/Voli-multi-tratta.mc-fd.ksp
+- https://www.momondo.it/Biglietti-aerei-per-voli-multitratta.mc-fd.ksp
+- https://www.quifinanza.it/lifestyle/travel-economy/voli-low-cost-trucco-solo-andata/932148/
+- https://www.italiavola.com/2026/02/12/wizz-air-amplia-le-capacita-della-sua-rete-con-il-lancio-di-wizz-link-offerto-da-dohop/
+- https://tg24.sky.it/economia/2026/01/31/voli-wizzair-italia-spagna
+- https://www.siviaggia.it/informazioni-utili/significato-voli-open-jaw/221322/
+- https://www.kayak.it/news/?p=6212

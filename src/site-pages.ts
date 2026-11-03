@@ -30,6 +30,7 @@ export const SITE_PAGES = [
   { slug: 'fr/guides/ordre-visiter-plusieurs-villes-moins-cher', lastmod: '2026-10-24' },
   { slug: 'es/guides/orden-visitar-varias-ciudades-mas-barato', lastmod: '2026-11-02' },
   { slug: 'es/guides/vuelos-multidestino-baratos-europa', lastmod: '2026-11-02' },
+  { slug: 'it/guides/voli-multitratta-low-cost', lastmod: '2026-11-03' },
 ] as const;
 
 export type Slug = (typeof SITE_PAGES)[number]['slug'];

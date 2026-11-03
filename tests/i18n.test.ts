@@ -52,9 +52,11 @@ describe('alternates', () => {
   it('leaves out a guides hub whose language has no guide yet', () => {
     const langs = site.alternates('guides').map((l) => l.hreflang);
     expect(langs).toContain('de');
-    expect(langs).not.toContain('it');
-    expect(site.isIndexed('guides', 'it')).toBe(false);
-    expect(site.isIndexed('search', 'it')).toBe(true);
+    const without = LANGS.find((l) => !site.hasGuides(l.code));
+    if (!without) return;
+    expect(langs).not.toContain(without.hreflang);
+    expect(site.isIndexed('guides', without.code)).toBe(false);
+    expect(site.isIndexed('search', without.code)).toBe(true);
   });
 });
 
