@@ -86,6 +86,13 @@ All volumes are **estimated** tiers inferred from SERP shape. No keyword-tool da
 | раздельные билеты что это | ru | B | definition | med (est.) | idea | 2026-11-03. Flight-search FAQs, nashaplaneta.net, freedom-travel.kz. Definition not verified on a page yet. |
 | маршрут по Европе на 2 недели | ru | D | list | med-high (est.) | idea | 2026-11-03. English blogs, ru.trip moments, rutube, howtrip.ru. Itinerary intent, off-fit for a flights-only tool. |
 | дешевые перелеты по Европе | ru | D (pillar) | how-to | med (est.) | idea | 2026-11-03. kupibilet budget-airline post (2012), make-trip.ru, freedom-travel.kz top-17 low-cost carriers, finance.ua. |
+| flyga mellan flera städer i Europa | sv | A (pillar) | how-to | low-med (est.) | published | 2026-11-03: live at /sv/guides/flyga-mellan-flera-stader-europa (brief in its frontmatter). No Swedish guide: momondo.se (Europe price page, "Boka flyg med flera stopp"), Finnair "bokningar med flera destinationer", Flashback t2137851 ("stad till stad eller via Sthlm?"), BusinessClass forum, Dagens PS "Se fyra storstäder på en resa" (about 400 words, train/bus). **Gap: order and dates of low-cost one-ways, worked example.** |
+| billigaste ordningen att besöka städer | sv | A | how-to | low (est.) | idea | 2026-11-03. Also "i vilken ordning ska man resa". Nothing on target (Everyrail train blogs for "ordning"). Covered as the core of the sv pilot; refresh that page rather than a second article. |
+| se flera storstäder på en resa | sv | D | informational | low-med (est.) | idea | 2026-11-03. Also "storstadsresa flera städer". Dagens PS trend piece (29 Jul 2026, train/bus routes only), Norwegian cityresor, Realtid. |
+| flyg med flera stopp | sv | B (pillar) | commercial | med (est.) | idea | 2026-11-03. Also "boka flyg till flera destinationer". momondo.se (about 750 words plus FAQ: "lågprisflygbolag vanligtvis inte erbjuder alternativ för flyg med flera stopp"), Finnair se-sv. Strong commercial pages. |
+| enkelresa eller tur och retur | sv | B | comparison | med (est.) | idea | 2026-11-03. momondo.se Enkelbiljetter, BusinessClass threads ("Enkel vs tur och retur – hur tänker flygbolagen"). |
+| open jaw flyg | sv | B | definition | low (est.) | idea | 2026-11-03. English glossaries (ThePointsGuy, AltexSoft) and BusinessClass threads; Swedish searchers use the English term. |
+| missat anslutningsflyg separata biljetter | sv | B | troubleshooting | low-med (est.) | idea | 2026-11-03. Konsumentverket "Missat anslutningsflyg" ("Du kan inte kräva något av flygbolaget om du inte haft tillräckligt med tid mellan bytena"), ARN rulings on lagen.nu, airadvisor.com/sv, BusinessClass. |
 
 ---
 
@@ -348,3 +355,24 @@ Sources (ru):
 - https://wizzlink.wizzair.com/
 - https://www.euronews.com/2026/02/12/wizz-air-just-made-it-easier-to-book-connecting-flights-but-its-still-self-transfer
 - https://www.airbaltic.com/en/flight-deals/flights-from-riga-to-amsterdam
+
+---
+
+## sv research (2026-11-03, `/seo research --lang sv`)
+
+Native seed terms, searched in Swedish: billigaste ordningen att besöka städer, flyga mellan flera städer, storstadsresa flera städer, rundresa Europa flyg, flyg med flera stopp, enkelresa eller tur och retur, open jaw flyg, missat anslutningsflyg separata biljetter. Not seeded from the English backlog. Searched with the WebSearch tool in Swedish, not a literal google.se hl=sv&gl=se session; PAA candidates are inferred from momondo.se's FAQ, Flashback and BusinessClass threads. Volumes are estimated tiers.
+
+What the Swedish SERP looks like: momondo.se and Finnair product pages, BusinessClass.com's forum (the de facto Swedish ticket-mechanics forum), Flashback, a Dagens PS trend piece, and a strong train frame (Everyrail, "interrail eller flyg"). Swedish phrasing: "enkelresa" / "enkelbiljett", "delsträcka", "flyg med flera stopp", "flera destinationer", "storstadsresa"; "rundresa" suggests a packaged tour; "separata biljetter" (Konsumentverket) rather than "självtransfer". Local low-cost: Ryanair (Arlanda since 2020, Skavsta again from March 2027) and Wizz Air (Arlanda, Malmö).
+
+Sources (sv):
+- https://momondo.se/Flygbiljetter-med-flera-stopp.mc-fd.ksp
+- https://www.momondo.se/discover/flyg-med-flera-stopp
+- https://www.finnair.com/se-sv/bokningar-med-flera-destinationer
+- https://www.konsumentverket.se/varor-och-tjanster-process/missat-anslutningsflyg/
+- https://corporate.ryanair.com/news/ryanairs-new-summer-2026-stockholm-arlanda-trapani-marsala-route-takes-off/
+- https://www.dagensps.se/weekend/resor/ryanair-hittar-tillbaka-till-flygplatsen-som-gud-glomde/
+- https://www.swedavia.com/about-swedavia/swedaviasnewsroom/2025/wizz-air-continues-to-expand-at-stockholm-arlanda-airport/
+- https://www.swedavia.com/about-swedavia/swedaviasnewsroom/2026/wizz-air-continues-to-expand-at-malmo-airport---new-route-to-pristina-added/
+- https://www.flashback.org/t2137851
+- https://www.dagensps.se/weekend/resor/ny-trend-se-fyra-storstader-pa-en-resa-har-ar-europas-smartaste-rutter/
+- https://www.businessclass.com/forum/threads/enkel-vs-tur-och-retur-hur-t%C3%A4nker-flygbolagen.100035/post-903220

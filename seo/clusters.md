@@ -12,6 +12,7 @@ Home page (do not target in articles): **cheap multi-city flights**, **multi-cit
 
 Localized pillars (spec 018, written natively, self-canonical): de `günstigste Reihenfolge Städte Flug` at /de/guides/guenstigste-reihenfolge-staedte, fr `dans quel ordre visiter plusieurs villes (moins cher)` at /fr/guides/ordre-visiter-plusieurs-villes-moins-cher (both 2026-10-24), es `en qué orden visitar varias ciudades (más barato)` at /es/guides/orden-visitar-varias-ciudades-mas-barato (2026-11-02). Inbound links from the three English guides.
 - nl `in welke volgorde steden bezoeken (goedkoopst)` at /nl/guides/volgorde-steden-bezoeken-goedkoopst (2026-11-03, judge 83; same-cluster guides in other languages link it through the layout)
+- sv `flyga mellan flera städer i Europa` at /sv/guides/flyga-mellan-flera-stader-europa (2026-11-03, judge 88; same-cluster guides in other languages link it through the layout)
 
 Why this is the core: ffly's distinctive work is choosing the order and dates of a set of cities so the whole trip costs least. Low-cost carriers price each leg one-way, so the order and the day you fly each leg change the total. The SERP for this query is an intent mismatch: Google returns "cheapest cities to fly into Europe" lists (NerdWallet, Going, Booking.com) that answer a different question.
 
