@@ -11,6 +11,7 @@
 | https://ffly.app/es/guides/orden-visitar-varias-ciudades-mas-barato | es | en qué orden visitar varias ciudades (más barato) | A | 2026-11-02 | new; judge 84 |
 | https://ffly.app/es/guides/vuelos-multidestino-baratos-europa | es | vuelos multidestino baratos Europa | B | 2026-11-02 | new; judge 85 |
 | https://ffly.app/it/guides/voli-multitratta-low-cost | it | voli multitratta low cost | B | 2026-11-03 | new; judge 85 |
+| https://ffly.app/nl/guides/volgorde-steden-bezoeken-goedkoopst | nl | in welke volgorde steden bezoeken (goedkoopst) | A | 2026-11-03 | new; judge 83 |
 | https://ffly.app/ | | ffly (brand; 303 of 371 impressions) | home | — | retitle 2026-11-02 |
 | https://ffly.app/fr | fr | ffly (brand; 85 of 100 impressions) | home | — | retitle 2026-11-02 |
 

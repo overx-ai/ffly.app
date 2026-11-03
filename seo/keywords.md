@@ -71,6 +71,13 @@ All volumes are **estimated** tiers inferred from SERP shape. No keyword-tool da
 | in che ordine visitare più città | it | A (pillar) | how-to | low (est.) | idea | 2026-11-03. No head term; kayak.it/news "Gira l'Europa a meno di 1500 €" (2017), interrail.com/it, cheap-city lists. No Italian page compares orders on price. Next it pick. |
 | quante notti per città | it | A | how-to | low (est.) | idea | 2026-11-03. No strong Italian page (pt/es/en results). |
 | voli all'alba low cost evitare | it | A | troubleshooting | low (est.) | idea | 2026-11-03. theflightclub.it (2022), fanpage.it, siviaggia: all say dawn flights are cheaper; nobody prices avoiding them. |
+| in welke volgorde steden bezoeken (goedkoopst) | nl | A (pillar) | how-to | low (est.) | published | 2026-11-03: live at /nl/guides/volgorde-steden-bezoeken-goedkoopst (brief in its frontmatter). No Dutch page answers it: English pages (ratepunk, smartertravel), kayak.nl / be.kayak.com "vliegtickets meerdere bestemmingen" product pages, generic tips listicles (travelvalley.nl "tips & trucs" with "retour of twee enkeltjes?", reischeck.nl stedentrip). **Gap: order and dates of low-cost one-ways, worked example.** |
+| meerdere steden bezoeken vliegen | nl | A | how-to | low-med (est.) | idea | 2026-11-03. Variant "stedentrip meerdere steden combineren". reischeck.nl, travelvalley.nl, test-aankoop.be "goedkoper reizen", Air Transat NL "meervoudige bestemming". None covers flight order or dates. |
+| vliegtickets meerdere bestemmingen | nl | B (pillar) | transactional / definition | med (est.) | idea | 2026-11-03. Variant "multi-city vlucht". kayak.nl and be.kayak.com tool pages (about 1,000-1,300 words with FAQ), Finnair. Tool and OTA pages own the head term. |
+| twee enkele reizen of retour goedkoper | nl | B | comparison | med (est.) | idea | 2026-11-03. Colloquial "twee enkeltjes". travelvalley.nl (H2 "Een retour boeken of twee enkeltjes?"), id.nl, luggit.app/nl, Radar forum. Nobody covers it for 3+ legs. |
+| open jaw vlucht | nl | B | definition | low (est.) | idea | 2026-11-03. Dutch searchers keep the English term; SERP almost entirely English (thepointsguy, going.com). travelvalley's "vertrek Amsterdam, terug op Rotterdam" tip is the only native take. |
+| rondreis Europa vliegen goedkoop | nl | D (pillar) | planning | med (est.) | idea | 2026-11-03. be.kayak.com Europe price pages, Eurowings and Air Europa deals, 27vakantiedagen.nl "goedkope stedentrip Europa" (about 4,000-word listicle). Price-led, no multi-leg planning page. |
+| losse tickets overstap gemist | nl | B | troubleshooting | low (est.) | idea | 2026-11-03. airadvisor.com/nl (claim agency). Your Europe NL FAQ: compensation only "als die aansluitende vlucht deel uitmaakt van dezelfde boeking". No Dutch consumer-authority page. |
 
 ---
 
@@ -290,3 +297,21 @@ Sources (it):
 - https://tg24.sky.it/economia/2026/01/31/voli-wizzair-italia-spagna
 - https://www.siviaggia.it/informazioni-utili/significato-voli-open-jaw/221322/
 - https://www.kayak.it/news/?p=6212
+
+---
+
+## nl research (2026-11-03, `/seo research --lang nl`)
+
+Native seed terms, searched in Dutch: goedkoopste volgorde steden, in welke volgorde steden bezoeken, meerdere steden bezoeken vliegen, stedentrip meerdere steden, rondreis Europa vliegen, vliegtickets meerdere bestemmingen, twee enkeltjes of retour, open jaw vlucht, losse tickets overstap gemist. Not seeded from the English backlog. Searched with the WebSearch tool in Dutch, not a literal google.nl hl=nl&gl=nl session, so no real "Mensen vragen ook" box was seen; PAA candidates are inferred from forum and FAQ pages. Volumes are estimated tiers.
+
+What the Dutch SERP looks like: kayak.nl / be.kayak.com tool pages with FAQ, generic cheap-flight tips listicles (travelvalley.nl, reischeck.nl, 27vakantiedagen.nl), English pages filling the rest. Dutch phrasing: "stedentrip", "rondreis", "enkele reis" / "enkeltje", "losse tickets", "meerdere bestemmingen", "prijsvechter" / "budgetmaatschappij". Local low-cost: Ryanair, Transavia and Wizz Air from Eindhoven (Ryanair and Transavia to Barcelona); Belgians use Charleroi (Ryanair base, also Wizz Air, Volotea).
+
+Sources (nl):
+- https://www.kayak.nl/Meerdere-bestemmingen-vliegtickets.mc-fd.ksp
+- https://www.be.kayak.com/Vols-multidestinations.mc-fd.fr.ksp
+- https://www.travelvalley.nl/vliegen/goedkope-vliegtickets-tips-trucs
+- https://europa.eu/youreurope/citizens/travel/passenger-rights/air/faq/index_nl.htm
+- https://en.wikipedia.org/wiki/Eindhoven_Airport
+- https://en.wikipedia.org/wiki/Brussels_South_Charleroi_Airport
+- https://www.27vakantiedagen.nl/?p=33708
+- https://airadvisor.com/nl/gemiste-aansluiting-vluchtcompensatie
