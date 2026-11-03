@@ -1,26 +1,42 @@
 ---
-import { DEFAULT_LANG, LANGS, otherScript, type Lang } from '../i18n';
-import { isLocalized, pathFor, type Slug } from '../site-pages';
+import { DEFAULT_LANG, LANGS, otherScript, useLang, type Lang } from '../i18n';
+import { GUIDES_INDEX, hasGuides, isGuidePage, isLocalized, pathFor, type Slug } from '../site-pages';
 
 interface Props {
   lang?: Lang;
   slug?: Slug;
+  // The footer grid: each language also links its own guides hub, once it has a guide.
+  guides?: boolean;
 }
 
-const { lang = DEFAULT_LANG, slug } = Astro.props;
-// The same page in each language where it has one; otherwise each language's home.
-const switchTo: Slug = slug !== undefined && isLocalized(slug) ? slug : '';
+const { lang = DEFAULT_LANG, slug, guides = false } = Astro.props;
+// From a guide, each language's guides hub; otherwise the same page in each language where it has one; else its home.
+const switchTo = (code: Lang): Slug => {
+  if (slug === undefined) return '';
+  if (isGuidePage(slug)) return hasGuides(code) ? GUIDES_INDEX : '';
+  return isLocalized(slug) ? slug : '';
+};
+const links = LANGS.map((l) => {
+  const target = switchTo(l.code);
+  return {
+    locale: l,
+    href: pathFor(target, l.code),
+    current: l.code === lang ? (target === slug ? 'page' : 'true') : undefined,
+    script: otherScript(l, lang) ? 'other-script' : undefined,
+    guides: guides && hasGuides(l.code) ? { href: pathFor(GUIDES_INDEX, l.code), label: useLang(l.code).t.common.footer.guides } : undefined,
+  };
+});
 ---
-{LANGS.map((l) => (
-  <a
-    href={pathFor(switchTo, l.code)}
-    lang={l.tag}
-    hreflang={l.hreflang}
-    aria-current={l.code === lang && slug === switchTo ? 'page' : undefined}
-    class={otherScript(l, lang) ? 'other-script' : undefined}
-    data-lang-pick={l.code}
-  >{l.name}</a>
-))}
+{guides
+  ? links.map(({ locale: l, href, current, script, guides: hub }) => (
+      <div class="cell" lang={l.tag}>
+        <a href={href} hreflang={l.hreflang} aria-current={current} class:list={['name', script]} data-lang-pick={l.code}>{l.name}</a>
+        {hub && <a href={hub.href} hreflang={l.hreflang} class:list={['hub', script]} data-lang-pick={l.code}>{hub.label}</a>}
+      </div>
+    ))
+  : links.map(({ locale: l, href, current, script }) => (
+      <a href={href} lang={l.tag} hreflang={l.hreflang} aria-current={current} class={script} data-lang-pick={l.code}>{l.name}</a>
+    ))}
 
 <style>
   .other-script { font-family: var(--font-system); }

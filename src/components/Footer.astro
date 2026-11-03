@@ -31,8 +31,9 @@ const pageLinks = [
       <span>&copy; {year} {DEVELOPER}</span>
       <span>{footer.createdBy} <a href={PUBLISHER.url} rel="noopener">{PUBLISHER.label}</a></span>
     </nav>
-    <nav class="links langs" aria-label={footer.languages}>
-      <LanguageLinks lang={lang} slug={slug} />
+    <h2 class="langs-title" id="footer-languages">{footer.languages}</h2>
+    <nav class="langs" aria-labelledby="footer-languages">
+      <LanguageLinks lang={lang} slug={slug} guides />
     </nav>
     <p class="fine">{footer.disclaimer}</p>
   </div>
@@ -62,8 +63,35 @@ const pageLinks = [
   }
   .links :global(a:hover), .links button:hover { color: var(--ink); }
   .links span a { text-decoration: underline; }
-  .langs { font-size: 13px; }
-  .langs :global([aria-current]) { color: var(--ink); font-weight: 600; }
+  .langs-title {
+    font: 600 12px var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding-top: var(--space-md);
+  }
+  .langs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-sm) var(--space-lg);
+    padding-block: var(--space-sm);
+  }
+  .langs :global(.cell) { display: flex; flex-direction: column; min-width: 0; }
+  .langs :global(a) {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--ink-2);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  /* Name and hub text meet in the middle of the cell, so each keeps a full 44px target without looking detached. */
+  .langs :global(a.name) { align-items: flex-end; }
+  .langs :global(a.hub) { align-items: flex-start; padding-top: var(--space-xs); font-size: 12px; }
+  .langs :global(a:hover) { color: var(--ink); }
+  .langs :global([aria-current]) { color: var(--ink); font-weight: 700; }
+  @media (max-width: 599px) {
+    .langs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
   .fine {
     font-size: 13px;
     line-height: 1.55;

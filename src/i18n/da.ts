@@ -142,6 +142,7 @@ const da = {
     minRead: '{n} min. læsning',
     by: 'Af {name}',
     breadcrumb: 'Brødkrummesti',
+    otherLanguages: 'På andre sprog',
     cta: `Vælg byerne. ${APP.name} finder rækkefølgen og datoerne, hvor hele rejsen koster mindst.`,
   },
 

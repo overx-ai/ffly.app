@@ -142,6 +142,7 @@ const fi = {
     minRead: '{n} min lukuaika',
     by: 'Kirjoittanut {name}',
     breadcrumb: 'Murupolku',
+    otherLanguages: 'Muilla kielillä',
     cta: `Valitse kaupungit. ${APP.name} löytää järjestyksen ja päivät, joilla koko matka maksaa vähiten.`,
   },
 

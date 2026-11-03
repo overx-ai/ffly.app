@@ -46,10 +46,22 @@ export const LOCALIZED_SLUGS = ['', 'search', 'guides'] as const satisfies reado
 
 export const isLocalized = (slug: Slug) => (LOCALIZED_SLUGS as readonly Slug[]).includes(slug);
 
+export const GUIDES_INDEX = 'guides' satisfies Slug;
+
+export const isGuidePage = (slug: Slug) => slug.split('/').includes(GUIDES_INDEX);
+
 export function pathFor(slug: Slug, lang: Lang = DEFAULT_LANG): string {
   const prefix = isLocalized(slug) ? localeOf(lang).prefix : '';
   return `/${[prefix, slug].filter(Boolean).join('/')}`;
 }
+
+// A language has guides once one is registered above under its prefix. Until then its guides hub (which lists the
+// English ones) stays out of search: noindex, no hreflang, not in the sitemap.
+export const hasGuides = (lang: Lang) => SITE_PAGES.some((page) => page.slug.startsWith(`${pathFor(GUIDES_INDEX, lang).slice(1)}/`));
+
+export const isIndexed = (slug: Slug, lang: Lang = DEFAULT_LANG) => slug !== GUIDES_INDEX || hasGuides(lang);
+
+export const indexedLangs = (slug: Slug) => LANGS.filter((l) => isIndexed(slug, l.code));
 
 export const urlFor = (slug: Slug, lang: Lang = DEFAULT_LANG) => `${siteOrigin}${pathFor(slug, lang)}`;
 
@@ -61,7 +73,7 @@ export interface Alternate {
 // The head and the sitemap both read this, so the hreflang cluster cannot drift between them.
 export const alternates = (slug: Slug): Alternate[] =>
   isLocalized(slug)
-    ? [...LANGS.map((l) => ({ hreflang: l.hreflang, href: urlFor(slug, l.code) })), { hreflang: X_DEFAULT, href: urlFor(slug) }]
+    ? [...indexedLangs(slug).map((l) => ({ hreflang: l.hreflang, href: urlFor(slug, l.code) })), { hreflang: X_DEFAULT, href: urlFor(slug) }]
     : [];
 
 // A localized page linking an English-only one says so, for the reader and for crawlers.

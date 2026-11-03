@@ -48,6 +48,14 @@ describe('alternates', () => {
     expect(site.alternates('privacy')).toEqual([]);
     expect(site.alternates('guides/multi-city-vs-one-way-tickets')).toEqual([]);
   });
+
+  it('leaves out a guides hub whose language has no guide yet', () => {
+    const langs = site.alternates('guides').map((l) => l.hreflang);
+    expect(langs).toContain('de');
+    expect(langs).not.toContain('it');
+    expect(site.isIndexed('guides', 'it')).toBe(false);
+    expect(site.isIndexed('search', 'it')).toBe(true);
+  });
 });
 
 describe('plural', () => {

@@ -5,11 +5,11 @@ import Footer from '../components/Footer.astro';
 import NoBreak from '../components/NoBreak.astro';
 import StoreCtas from '../components/StoreCtas.astro';
 import { DEVELOPER } from '../app';
-import { useLang } from '../i18n';
+import { localeOf, otherScript, useLang } from '../i18n';
 import { formatDate, isoDate, pathFor } from '../site-pages';
 import { articleSchema, faqSchema, howToSchema, type Crumb } from '../schema';
 import { parseGuide } from '../guide-markdown';
-import { GUIDES_INDEX, guideLang, guidePageSlug, type Guide } from '../guides';
+import { GUIDES_INDEX, clusterSiblings, guideLang, guidePageSlug, type Guide } from '../guides';
 
 interface Props { guide: Guide; }
 
@@ -19,6 +19,10 @@ const lang = guideLang(guide);
 const { t, fmt } = useLang(lang);
 const slug = guidePageSlug(guide);
 const { h1, faq, howTo, minutes } = parseGuide(guide.body);
+const siblings = (await clusterSiblings(guide)).map((other) => {
+  const locale = localeOf(guideLang(other));
+  return { href: pathFor(guidePageSlug(other)), title: other.data.title, locale, system: otherScript(locale, lang) };
+});
 const parent: Crumb = { name: t.common.footer.guides, slug: GUIDES_INDEX };
 const structuredData = [
   articleSchema({ headline: h1, description, slug, published, updated }),
@@ -54,13 +58,24 @@ const structuredData = [
       <div class="prose"><slot /></div>
     </article>
 
+    {siblings.length > 0 && (
+      <nav class="other-langs" aria-labelledby="other-langs">
+        <h2 id="other-langs" class="lbl">{t.guides.otherLanguages}</h2>
+        <ul>
+          {siblings.map(({ href, title, locale, system }) => (
+            <li><a href={href} lang={locale.tag} hreflang={locale.hreflang} class:list={{ 'other-script': system }}>{title} ({locale.name})</a></li>
+          ))}
+        </ul>
+      </nav>
+    )}
+
     <aside class="card cta" aria-label={t.common.appForIphone}>
       <p class="lbl">{t.common.appForIphone}</p>
       <p>{t.guides.cta}</p>
       <StoreCtas lang={lang} />
     </aside>
   </main>
-  <Footer lang={lang} />
+  <Footer lang={lang} slug={slug} />
 </BaseLayout>
 
 <style>
@@ -157,6 +172,11 @@ const structuredData = [
     border-radius: var(--radius-md);
     padding: var(--space-lg) var(--space-lg) var(--space-lg) calc(var(--space-lg) + 1.1em);
   }
+
+  .other-langs { margin-top: var(--space-3xl); }
+  .other-langs ul { list-style: none; margin: var(--space-sm) 0 0; padding: 0; }
+  .other-langs a { display: inline-flex; align-items: center; min-height: 44px; }
+  .other-langs .other-script { font-family: var(--font-system); }
 
   .cta {
     margin-top: var(--space-3xl);

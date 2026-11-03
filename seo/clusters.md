@@ -74,3 +74,4 @@ Supporting:
 - Every article -> home page (anchor: "multi-city trip planner") and -> ffly.app/search for a reader's own try
 - B supporting (Ryanair / Wizz) -> B-pillar; A supporting -> A-pillar
 - C-pillar is the one place competitors get named side by side
+- Every new guide must set `cluster:` frontmatter (this file's letter, e.g. `cluster: A. Route order and dates`): the guide layout links same-cluster guides across languages from it

@@ -142,6 +142,7 @@ const nl = {
     minRead: '{n} min lezen',
     by: 'Door {name}',
     breadcrumb: 'Kruimelpad',
+    otherLanguages: 'In andere talen',
     cta: `Kies de steden. ${APP.name} vindt de volgorde en de data waarop de hele reis het minst kost.`,
   },
 

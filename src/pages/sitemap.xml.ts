@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro';
-import { LANGS } from '../i18n/locales';
-import { SITE_PAGES, alternates, isLocalized, urlFor } from '../site-pages';
+import { SITE_PAGES, alternates, indexedLangs, isLocalized, urlFor } from '../site-pages';
 
 // Hand-rolled rather than @astrojs/sitemap so the sitemap and the head tags read from the
 // same manifest. No <priority> or <changefreq>: Google ignores both. <lastmod> is the one
@@ -10,7 +9,7 @@ export const GET: APIRoute = () => {
     const links = alternates(slug)
       .map((a) => `\n    <xhtml:link rel="alternate" hreflang="${a.hreflang}" href="${a.href}"/>`)
       .join('');
-    const langs = isLocalized(slug) ? LANGS.map((l) => l.code) : [undefined];
+    const langs = isLocalized(slug) ? indexedLangs(slug).map((l) => l.code) : [undefined];
     return langs.map(
       (lang) => `  <url>\n    <loc>${urlFor(slug, lang)}</loc>\n    <lastmod>${lastmod}</lastmod>${links}\n  </url>`,
     );

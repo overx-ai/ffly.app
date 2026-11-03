@@ -142,6 +142,7 @@ const sv = {
     minRead: '{n} min läsning',
     by: 'Av {name}',
     breadcrumb: 'Brödsmulor',
+    otherLanguages: 'På andra språk',
     cta: `Välj städerna. ${APP.name} hittar ordningen och datumen där hela resan kostar minst.`,
   },
 

@@ -142,6 +142,7 @@ const fr = {
     minRead: '{n} min de lecture',
     by: 'Par {name}',
     breadcrumb: 'Fil d’Ariane',
+    otherLanguages: 'Dans d’autres langues',
     cta: `Choisissez les villes. ${APP.name} trouve l'ordre et les dates où le voyage complet coûte le moins.`,
   },
 

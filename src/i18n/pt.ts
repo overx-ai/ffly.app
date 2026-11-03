@@ -142,6 +142,7 @@ const pt = {
     minRead: '{n} min de leitura',
     by: 'Por {name}',
     breadcrumb: 'Trilho de navegação',
+    otherLanguages: 'Noutras línguas',
     cta: `Escolha as cidades. ${APP.name} encontra a ordem e as datas em que a viagem inteira custa menos.`,
   },
 

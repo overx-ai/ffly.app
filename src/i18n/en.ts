@@ -150,6 +150,7 @@ const base = {
     minRead: '{n} min read',
     by: 'By {name}',
     breadcrumb: 'Breadcrumb',
+    otherLanguages: 'In other languages',
     cta: `Pick the cities. ${APP.name} finds the order and dates where the whole trip costs least.`,
   },
 

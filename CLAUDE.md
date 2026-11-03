@@ -148,8 +148,11 @@ Those repos are the source of truth for copy, colours and claims.
   actually changed, never from the build clock.
 - **Canonical URLs are non-trailing** (`/support`, not `/support/`). Never link one.
 - **Guides are markdown in `src/content/guides/{lang}/`** (schema `src/content/config.ts`; the folder is the locale,
-  `GUIDE_LANGS` in `src/guides.ts`: en, de, fr, es), rendered by
-  `GuideLayout.astro`. The markdown `# ` heading is the H1. `src/guide-markdown.ts` builds FAQPage from the
+  `GUIDE_LANGS` in `src/guides.ts`: every language in `LANGS`, folder `nb` for `/no`), rendered by
+  `GuideLayout.astro`. Frontmatter `cluster:` (the `seo/clusters.md` letter) links a guide to the same-cluster guides in
+  the other languages. A language's `/{prefix}/guides` is noindex, without hreflang and out of the sitemap until it has a
+  guide of its own (`isIndexed` in `src/site-pages.ts`); the footer language grid links a language's guides hub once it has one.
+  The markdown `# ` heading is the H1. `src/guide-markdown.ts` builds FAQPage from the
   `## FAQ` section's `### question`s and HowTo from `### 1.`...`### N.` headings; `npm test` asserts both.
   A new guide needs its `guides/{slug}` entry in `SITE_PAGES` (`de/guides/{slug}` for a German one; the build fails
   without it), with `lastmod` equal to its frontmatter `updated`.

@@ -581,9 +581,13 @@ const sitemapAlternates = new Map(
   ]),
 );
 const localizedFiles = new Map();
+// A language's guides hub is indexed only once the language has a guide of its own (site-pages.ts isIndexed).
+const hasGuides = (lang) => subdirs(`${DIST}${pagePath('guides', lang).slice(1)}`).length > 0;
+const isIndexed = (slug, lang) => slug !== 'guides' || hasGuides(lang);
 for (const slug of LOCALIZED_SLUGS) {
   const urlOf = (lang) => `${origin}${pagePath(slug, lang)}`;
-  const cluster = [...LANGS.map((lang) => `${lang.hreflang} ${urlOf(lang)}`), `${X_DEFAULT} ${urlOf(LANGS[0])}`].sort();
+  const indexed = LANGS.filter((lang) => isIndexed(slug, lang));
+  const cluster = [...indexed.map((lang) => `${lang.hreflang} ${urlOf(lang)}`), `${X_DEFAULT} ${urlOf(LANGS[0])}`].sort();
   for (const lang of LANGS) {
     const where = pagePath(slug, lang);
     const file = fileOf(where);
@@ -594,6 +598,11 @@ for (const slug of LOCALIZED_SLUGS) {
     }
     const html = readFileSync(`${DIST}${file}`, 'utf8');
     check(html.includes(`<html lang="${lang.tag}">`), `${where}: <html lang> must be ${lang.tag}`);
+    if (!indexed.includes(lang)) {
+      check(html.includes('<meta name="robots" content="noindex') && canonicalOf(html) === undefined && headAlternates(html).length === 0, `${where}: a guides hub with no guide of its own must be noindex, with no canonical or hreflang`);
+      check(!sitemapAlternates.has(urlOf(lang)), `${where}: a noindex guides hub must stay out of the sitemap`);
+      continue;
+    }
     check(canonicalOf(html) === urlOf(lang), `${where}: must be self-canonical`);
     const head = headAlternates(html).sort();
     check(JSON.stringify(head) === JSON.stringify(cluster), `${where}: hreflang must be the full reciprocal set (${LANGS.length} + ${X_DEFAULT})`);
@@ -634,21 +643,27 @@ for (const [file, html] of htmlPages) {
     check(!/<link rel="alternate" hreflang=|og:locale/.test(html), `${file}: an English-only page must carry no hreflang alternates or og:locale`);
   }
 }
-const switcherLinks = (html) => [...html.matchAll(/<a href="([^"]+)"[^>]*\shreflang="([^"]+)"/g)].map(([, href, hreflang]) => `${hreflang} ${href}`);
-// The footer switcher links the same page in each language where it has one, else each language's home: each link is
-// that page's canonical URL, in the order of LANGS.
+const switcherLinks = (html) =>
+  [...html.matchAll(/<a href="([^"]+)"(?![^>]*class="hub\b)[^>]*\shreflang="([^"]+)"[^>]*\sdata-lang-pick=/g)].map(([, href, hreflang]) => `${hreflang} ${href}`);
+const hubLinks = (html) => [...html.matchAll(/<a href="([^"]+)" hreflang="[^"]+" class="hub\b/g)].map(([, href]) => href);
+// The footer switcher links, in the order of LANGS, each language's guides hub from a guide page (its home while it has
+// no guide), else the same page in each language where it has one, else its home: each link that page's canonical URL.
+// Under each language with a guide, the footer grid also links its guides hub.
 for (const [file, html] of htmlPages) {
-  const nav = html.match(/<nav class="links langs"[^>]*>([\s\S]*?)<\/nav>/)?.[1];
+  const nav = html.match(/<nav class="langs"[^>]*>([\s\S]*?)<\/nav>/)?.[1];
   if (nav === undefined) {
     check(!html.includes('<footer'), `${file}: the footer language switcher is missing`);
     continue;
   }
-  const slug = localizedFiles.get(file) ?? '';
+  const onGuide = file.split('/').includes('guides');
+  const slugFor = (lang) => (onGuide ? (hasGuides(lang) ? 'guides' : '') : localizedFiles.get(file) ?? '');
   const links = switcherLinks(nav);
-  const want = LANGS.map((lang) => `${lang.hreflang} ${pagePath(slug, lang)}`);
+  const want = LANGS.map((lang) => `${lang.hreflang} ${pagePath(slugFor(lang), lang)}`);
+  const hubs = LANGS.filter(hasGuides).map((lang) => pagePath('guides', lang));
+  check(JSON.stringify(hubLinks(nav)) === JSON.stringify(hubs), `${file}: the footer must link the guides hub of exactly ${hubs.join(', ')}`);
   check(JSON.stringify(links) === JSON.stringify(want), `${file}: the language switcher must link ${want.join(', ')}`);
   for (const lang of LANGS) {
-    const href = pagePath(slug, lang);
+    const href = pagePath(slugFor(lang), lang);
     const target = fileOf(href);
     check(isFile(`${DIST}${target}`) && canonicalOf(readFileSync(`${DIST}${target}`, 'utf8')) === `${origin}${href}`, `${file}: switcher link ${href} must be its page's canonical`);
   }
@@ -659,8 +674,10 @@ for (const [file, html] of htmlPages) {
   check(menu !== undefined, `${file}: the header language switcher is missing`);
   check(JSON.stringify(switcherLinks(menu ?? '')) === JSON.stringify(links), `${file}: the header language switcher must link what the footer's does`);
 }
+const hubUrls = new Set(LANGS.map((lang) => `${origin}${pagePath('guides', lang)}`));
 for (const [loc, links] of sitemapAlternates) {
-  check(links.length === 0 || links.length === LANGS.length + 1, `sitemap.xml: ${loc} must list ${LANGS.length} alternates + ${X_DEFAULT}`);
+  const want = hubUrls.has(loc) ? LANGS.filter(hasGuides).length : LANGS.length;
+  check(links.length === 0 || links.length === want + 1, `sitemap.xml: ${loc} must list ${want} alternates + ${X_DEFAULT}`);
 }
 
 const connectHosts = (csp.match(/connect-src ([^;]*)/)?.[1] ?? '')

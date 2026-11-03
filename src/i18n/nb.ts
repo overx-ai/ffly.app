@@ -142,6 +142,7 @@ const nb = {
     minRead: '{n} min lesing',
     by: 'Av {name}',
     breadcrumb: 'Brødsmulesti',
+    otherLanguages: 'På andre språk',
     cta: `Velg byene. ${APP.name} finner rekkefølgen og datoene der hele reisen koster minst.`,
   },
 

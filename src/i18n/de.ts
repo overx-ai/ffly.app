@@ -142,6 +142,7 @@ const de = {
     minRead: '{n} Min. Lesezeit',
     by: 'Von {name}',
     breadcrumb: 'Brotkrümelnavigation',
+    otherLanguages: 'In anderen Sprachen',
     cta: `Wähle die Städte. ${APP.name} findet die Reihenfolge und die Daten, bei denen die ganze Reise am wenigsten kostet.`,
   },
 

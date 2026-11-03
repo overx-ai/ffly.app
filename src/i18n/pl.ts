@@ -161,6 +161,7 @@ const pl = {
     minRead: '{n} min czytania',
     by: 'Autor: {name}',
     breadcrumb: 'Ścieżka nawigacji',
+    otherLanguages: 'W innych językach',
     cta: `Wybierz miasta. ${APP.name} znajdzie kolejność i daty, przy których cała podróż kosztuje najmniej.`,
   },
 
