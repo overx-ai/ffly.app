@@ -18,13 +18,13 @@ const es = {
       account: 'Cuenta',
     },
     footer: {
-      label: 'Pie de página',
       guides: 'Guías',
-      support: 'Ayuda',
       privacy: 'Privacidad',
       terms: 'Términos',
       createdBy: 'Creado por',
       languages: 'Idioma',
+      legal: 'Legal',
+      contact: 'Contacto',
       disclaimer: `${APP.name} es una herramienta de búsqueda, no una agencia de viajes, y no está vinculada a ninguna aerolínea. Las tarifas son orientativas: confirma el precio final en la web donde reserves.`,
     },
     langHint: {

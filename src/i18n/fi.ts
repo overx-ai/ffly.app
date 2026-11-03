@@ -18,13 +18,13 @@ const fi = {
       account: 'Tili',
     },
     footer: {
-      label: 'Alatunniste',
       guides: 'Oppaat',
-      support: 'Tuki',
       privacy: 'Tietosuoja',
       terms: 'Ehdot',
       createdBy: 'Tekijä:',
       languages: 'Kieli',
+      legal: 'Juridiset tiedot',
+      contact: 'Yhteystiedot',
       disclaimer: `${APP.name} on hakutyökalu, ei matkatoimisto, eikä se ole sidoksissa mihinkään lentoyhtiöön. Hinnat ovat suuntaa antavia: tarkista lopullinen hinta sivustolta, jolta varaat.`,
     },
     langHint: {

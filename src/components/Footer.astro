@@ -1,8 +1,8 @@
 ---
-import { CONSENT_NEEDED, CONTACT_EMAIL, DEVELOPER, PUBLISHER } from '../app';
-import LanguageLinks from './LanguageLinks.astro';
-import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
-import { hreflangOf, pathFor, type Slug } from '../site-pages';
+import { APP, CONSENT_NEEDED, CONTACT_EMAIL, DEVELOPER, PUBLISHER } from '../app';
+import LanguageMenu from './LanguageMenu.astro';
+import { DEFAULT_LANG, LANGS, otherScript, useLang, type Lang } from '../i18n';
+import { GUIDES_INDEX, hasGuides, hreflangOf, pathFor, type Slug } from '../site-pages';
 
 interface Props {
   lang?: Lang;
@@ -11,91 +11,139 @@ interface Props {
 
 const { lang = DEFAULT_LANG, slug } = Astro.props;
 const { t } = useLang(lang);
-const { footer } = t.common;
+const { nav, footer } = t.common;
 const year = new Date().getFullYear();
-const pageLinks = [
-  { slug: 'guides', label: footer.guides },
-  { slug: 'support', label: footer.support },
-  { slug: 'privacy', label: footer.privacy },
-  { slug: 'terms', label: footer.terms },
-] as const satisfies readonly { slug: Slug; label: string }[];
+const home = pathFor('', lang);
+const siteLinks = [
+  { href: `${home}#search`, label: nav.search },
+  { href: `${home}#plans`, label: nav.plans },
+  { href: pathFor('support', lang), hreflang: hreflangOf('support', lang), label: nav.support },
+];
+const legalLinks = (['privacy', 'terms'] as const).map((page) => ({
+  href: pathFor(page, lang),
+  hreflang: hreflangOf(page, lang),
+  label: footer[page],
+}));
+const hubs = LANGS.filter((l) => hasGuides(l.code)).map((l) => ({
+  locale: l,
+  href: pathFor(GUIDES_INDEX, l.code),
+  current: l.code === lang ? (slug === GUIDES_INDEX ? 'page' : 'true') : undefined,
+  script: otherScript(l, lang) ? 'other-script' : undefined,
+}));
 ---
 <footer>
   <div class="container">
-    <nav class="links" aria-label={footer.label}>
-      {pageLinks.map((link) => (
-        <a href={pathFor(link.slug, lang)} hreflang={hreflangOf(link.slug, lang)}>{link.label}</a>
-      ))}
-      {CONSENT_NEEDED && <button type="button" data-consent-open>{t.consent.settings}</button>}
-      <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-      <span>&copy; {year} {DEVELOPER}</span>
-      <span>{footer.createdBy} <a href={PUBLISHER.url} rel="noopener">{PUBLISHER.label}</a></span>
-    </nav>
-    <h2 class="langs-title" id="footer-languages">{footer.languages}</h2>
-    <nav class="langs" aria-labelledby="footer-languages">
-      <LanguageLinks lang={lang} slug={slug} guides />
-    </nav>
+    <div class="cols">
+      <nav class="col" aria-labelledby="footer-site">
+        <h2 class="label" id="footer-site">{APP.name}</h2>
+        <ul>
+          {siteLinks.map((link) => <li><a href={link.href} hreflang={link.hreflang}>{link.label}</a></li>)}
+        </ul>
+      </nav>
+      <nav class="col" aria-labelledby="footer-guides">
+        <h2 class="label" id="footer-guides">{footer.guides}</h2>
+        <ul class="hubs" style={`--rows: ${Math.ceil(hubs.length / 2)}`}>
+          {hubs.map(({ locale: l, href, current, script }) => (
+            <li><a href={href} hreflang={l.hreflang} lang={l.tag} class:list={['hub', script]} aria-current={current} data-lang-pick={l.code}>{l.name}</a></li>
+          ))}
+        </ul>
+      </nav>
+      <div class="col">
+        <nav aria-labelledby="footer-legal">
+          <h2 class="label" id="footer-legal">{footer.legal}</h2>
+          <ul>
+            {legalLinks.map((link) => <li><a href={link.href} hreflang={link.hreflang}>{link.label}</a></li>)}
+            {CONSENT_NEEDED && <li><button type="button" data-consent-open>{t.consent.settings}</button></li>}
+          </ul>
+        </nav>
+        <h2 class="label contact" id="footer-contact">{footer.contact}</h2>
+        <ul aria-labelledby="footer-contact">
+          <li><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom">
+      <LanguageMenu lang={lang} slug={slug} footer />
+      <p class="credit">
+        <span>&copy; {year} {DEVELOPER}</span>
+        <span aria-hidden="true">&middot;</span>
+        <span>{footer.createdBy} <a href={PUBLISHER.url} rel="noopener">{PUBLISHER.label}</a></span>
+      </p>
+    </div>
     <p class="fine">{footer.disclaimer}</p>
   </div>
 </footer>
 
 <style>
   footer {
-    padding-block: var(--space-lg) var(--space-xl);
+    margin-top: var(--space-2xl);
+    padding-block: var(--space-2xl) var(--space-xl);
+    border-top: 1px solid var(--rule);
     color: var(--ink-2);
     font-size: 14px;
   }
-  .links {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0 var(--space-lg);
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: space-between;
+    gap: var(--space-xl) var(--space-2xl);
   }
-  .links > :global(*) { min-height: 44px; display: inline-flex; align-items: center; gap: 0.3em; }
-  .links :global(a) { color: var(--ink-2); text-decoration: none; }
-  .links button {
-    padding: 0;
-    border: 0;
-    background: none;
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
-  }
-  .links :global(a:hover), .links button:hover { color: var(--ink); }
-  .links span a { text-decoration: underline; }
-  .langs-title {
+  .label {
+    color: var(--ink-2);
     font: 600 12px var(--font-mono);
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    padding-top: var(--space-md);
+    padding-bottom: var(--space-sm);
   }
-  .langs {
+  .contact { padding-top: var(--space-lg); }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { line-height: 2; }
+  /* Column-major, so the languages read down the first column, then the second. */
+  .hubs {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--space-sm) var(--space-lg);
-    padding-block: var(--space-sm);
+    grid-template-rows: repeat(var(--rows), auto);
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, max-content);
+    column-gap: var(--space-2xl);
   }
-  .langs :global(.cell) { display: flex; flex-direction: column; min-width: 0; }
-  .langs :global(a) {
-    display: flex;
-    align-items: center;
-    min-height: 44px;
+  .col a, .col button {
     color: var(--ink-2);
     text-decoration: none;
     overflow-wrap: anywhere;
   }
-  /* Name and hub text meet in the middle of the cell, so each keeps a full 44px target without looking detached. */
-  .langs :global(a.name) { align-items: flex-end; }
-  .langs :global(a.hub) { align-items: flex-start; padding-top: var(--space-xs); font-size: 12px; }
-  .langs :global(a:hover) { color: var(--ink); }
-  .langs :global([aria-current]) { color: var(--ink); font-weight: 700; }
-  @media (max-width: 599px) {
-    .langs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .col button {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    line-height: inherit;
+    cursor: pointer;
   }
+  .col a:hover, .col button:hover { color: var(--ink); }
+  .col [aria-current] { color: var(--ink); font-weight: 700; }
+  .other-script { font-family: var(--font-system); }
+  .bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm) var(--space-md);
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--rule);
+  }
+  .credit { display: flex; flex-wrap: wrap; gap: 0 0.5em; }
+  .credit a { color: inherit; }
+  .credit a:hover { color: var(--ink); }
   .fine {
     font-size: 13px;
     line-height: 1.55;
     max-width: 70ch;
-    padding-top: var(--space-xs);
+    padding-top: var(--space-md);
+  }
+  @media (max-width: 599px) {
+    .cols { grid-template-columns: minmax(0, 1fr); gap: var(--space-lg); }
+    .hubs { grid-auto-columns: minmax(0, 1fr); column-gap: var(--space-md); }
+    .col a, .col button { display: inline-flex; align-items: center; min-height: 44px; }
+    li { line-height: 1.4; }
   }
 </style>

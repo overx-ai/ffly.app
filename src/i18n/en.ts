@@ -25,13 +25,13 @@ const base = {
       account: 'Account',
     },
     footer: {
-      label: 'Footer',
       guides: 'Guides',
-      support: 'Support',
       privacy: 'Privacy',
       terms: 'Terms',
       createdBy: 'Created by',
       languages: 'Language',
+      legal: 'Legal',
+      contact: 'Contact',
       disclaimer: `${APP.name} is a search tool, not a travel agent, and is not affiliated with any airline. Fares are indicative: confirm the final price on the site you book on.`,
     },
     langHint: {

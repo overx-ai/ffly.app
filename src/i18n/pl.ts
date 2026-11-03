@@ -18,13 +18,13 @@ const pl = {
       account: 'Konto',
     },
     footer: {
-      label: 'Stopka',
       guides: 'Poradniki',
-      support: 'Pomoc',
       privacy: 'Prywatność',
       terms: 'Warunki',
       createdBy: 'Stworzone przez',
       languages: 'Język',
+      legal: 'Informacje prawne',
+      contact: 'Kontakt',
       disclaimer: `${APP.name} to wyszukiwarka, a nie biuro podróży, i nie jest powiązany z żadną linią lotniczą. Ceny są orientacyjne: ostateczną cenę sprawdź na stronie, na której rezerwujesz.`,
     },
     langHint: {

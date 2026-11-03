@@ -18,13 +18,13 @@ const nb = {
       account: 'Konto',
     },
     footer: {
-      label: 'Bunntekst',
       guides: 'Guider',
-      support: 'Hjelp',
       privacy: 'Personvern',
       terms: 'Vilkår',
       createdBy: 'Laget av',
       languages: 'Språk',
+      legal: 'Juridisk',
+      contact: 'Kontakt',
       disclaimer: `${APP.name} er et søkeverktøy, ikke et reisebyrå, og er ikke tilknyttet noe flyselskap. Prisene er veiledende: sjekk den endelige prisen på nettstedet der du bestiller.`,
     },
     langHint: {

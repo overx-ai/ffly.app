@@ -18,13 +18,13 @@ const nl = {
       account: 'Account',
     },
     footer: {
-      label: 'Voettekst',
       guides: 'Gidsen',
-      support: 'Hulp',
       privacy: 'Privacy',
       terms: 'Voorwaarden',
       createdBy: 'Gemaakt door',
       languages: 'Taal',
+      legal: 'Juridisch',
+      contact: 'Contact',
       disclaimer: `${APP.name} is een zoektool, geen reisbureau, en is niet verbonden aan een airline. Prijzen zijn indicatief: controleer de definitieve prijs op de site waar je boekt.`,
     },
     langHint: {

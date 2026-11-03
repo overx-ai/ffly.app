@@ -18,13 +18,13 @@ const da = {
       account: 'Konto',
     },
     footer: {
-      label: 'Sidefod',
       guides: 'Guides',
-      support: 'Hjælp',
       privacy: 'Privatliv',
       terms: 'Vilkår',
       createdBy: 'Lavet af',
       languages: 'Sprog',
+      legal: 'Juridisk',
+      contact: 'Kontakt',
       disclaimer: `${APP.name} er et søgeværktøj, ikke et rejsebureau, og har ingen tilknytning til noget flyselskab. Priserne er vejledende: tjek den endelige pris på den side, du booker på.`,
     },
     langHint: {

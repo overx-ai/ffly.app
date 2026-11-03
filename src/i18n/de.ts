@@ -18,13 +18,13 @@ const de = {
       account: 'Konto',
     },
     footer: {
-      label: 'Fußzeile',
       guides: 'Ratgeber',
-      support: 'Hilfe',
       privacy: 'Datenschutz',
       terms: 'AGB',
       createdBy: 'Erstellt von',
       languages: 'Sprache',
+      legal: 'Rechtliches',
+      contact: 'Kontakt',
       disclaimer: `${APP.name} ist ein Suchwerkzeug, kein Reisebüro, und mit keiner Airline verbunden. Die Preise sind Richtwerte: Prüfe den Endpreis auf der Seite, auf der du buchst.`,
     },
     langHint: {

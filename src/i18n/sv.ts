@@ -18,13 +18,13 @@ const sv = {
       account: 'Konto',
     },
     footer: {
-      label: 'Sidfot',
       guides: 'Guider',
-      support: 'Hjälp',
       privacy: 'Integritet',
       terms: 'Villkor',
       createdBy: 'Skapad av',
       languages: 'Språk',
+      legal: 'Juridiskt',
+      contact: 'Kontakt',
       disclaimer: `${APP.name} är ett sökverktyg, inte en resebyrå, och har ingen koppling till något flygbolag. Priserna är vägledande: kontrollera slutpriset på sajten där du bokar.`,
     },
     langHint: {

@@ -644,23 +644,27 @@ for (const [file, html] of htmlPages) {
   }
 }
 const switcherLinks = (html) =>
-  [...html.matchAll(/<a href="([^"]+)"(?![^>]*class="hub\b)[^>]*\shreflang="([^"]+)"[^>]*\sdata-lang-pick=/g)].map(([, href, hreflang]) => `${hreflang} ${href}`);
-const hubLinks = (html) => [...html.matchAll(/<a href="([^"]+)" hreflang="[^"]+" class="hub\b/g)].map(([, href]) => href);
-// The footer switcher links, in the order of LANGS, each language's guides hub from a guide page (its home while it has
-// no guide), else the same page in each language where it has one, else its home: each link that page's canonical URL.
-// Under each language with a guide, the footer grid also links its guides hub.
+  [...html.matchAll(/<a href="([^"]+)"[^>]*\shreflang="([^"]+)"[^>]*\sdata-lang-pick=/g)].map(([, href, hreflang]) => `${hreflang} ${href}`);
+const menuOf = (html) => html.match(/<details class="lang-menu\b[\s\S]*?<\/details>/)?.[0];
+const hubLinks = (html) =>
+  [...html.matchAll(/<a\b[^>]*>/g)].map(([tag]) => tag).filter((tag) => /\sclass="hub\b/.test(tag)).map((tag) => tag.match(/\shref="([^"]+)"/)?.[1]);
+// The footer's language menu links, in the order of LANGS, each language's guides hub from a guide page (its home while
+// it has no guide), else the same page in each language where it has one, else its home: each link that page's
+// canonical URL. Its Guides column links the hub of every language with a guide, and no other.
 for (const [file, html] of htmlPages) {
-  const nav = html.match(/<nav class="langs"[^>]*>([\s\S]*?)<\/nav>/)?.[1];
-  if (nav === undefined) {
-    check(!html.includes('<footer'), `${file}: the footer language switcher is missing`);
+  const footer = html.match(/<footer\b[\s\S]*?<\/footer>/)?.[0];
+  if (footer === undefined) continue;
+  const menu = menuOf(footer);
+  if (menu === undefined) {
+    check(false, `${file}: the footer language switcher is missing`);
     continue;
   }
   const onGuide = file.split('/').includes('guides');
   const slugFor = (lang) => (onGuide ? (hasGuides(lang) ? 'guides' : '') : localizedFiles.get(file) ?? '');
-  const links = switcherLinks(nav);
+  const links = switcherLinks(menu);
   const want = LANGS.map((lang) => `${lang.hreflang} ${pagePath(slugFor(lang), lang)}`);
   const hubs = LANGS.filter(hasGuides).map((lang) => pagePath('guides', lang));
-  check(JSON.stringify(hubLinks(nav)) === JSON.stringify(hubs), `${file}: the footer must link the guides hub of exactly ${hubs.join(', ')}`);
+  check(JSON.stringify(hubLinks(footer)) === JSON.stringify(hubs), `${file}: the footer Guides column must link the guides hub of exactly ${hubs.join(', ')}`);
   check(JSON.stringify(links) === JSON.stringify(want), `${file}: the language switcher must link ${want.join(', ')}`);
   for (const lang of LANGS) {
     const href = pagePath(slugFor(lang), lang);
@@ -670,9 +674,9 @@ for (const [file, html] of htmlPages) {
   // Spec 012: the header menu offers exactly the footer's links.
   const header = html.match(/<header\b[\s\S]*?<\/header>/)?.[0];
   check(header !== undefined, `${file}: a page with the footer switcher must have the header`);
-  const menu = header?.match(/<details class="lang-menu\b[\s\S]*?<\/details>/)?.[0];
-  check(menu !== undefined, `${file}: the header language switcher is missing`);
-  check(JSON.stringify(switcherLinks(menu ?? '')) === JSON.stringify(links), `${file}: the header language switcher must link what the footer's does`);
+  const headerMenu = menuOf(header ?? '');
+  check(headerMenu !== undefined, `${file}: the header language switcher is missing`);
+  check(JSON.stringify(switcherLinks(headerMenu ?? '')) === JSON.stringify(links), `${file}: the header language switcher must link what the footer's does`);
 }
 const hubUrls = new Set(LANGS.map((lang) => `${origin}${pagePath('guides', lang)}`));
 for (const [loc, links] of sitemapAlternates) {

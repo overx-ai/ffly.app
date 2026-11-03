@@ -18,13 +18,13 @@ const pt = {
       account: 'Conta',
     },
     footer: {
-      label: 'Rodapé',
       guides: 'Guias',
-      support: 'Apoio',
       privacy: 'Privacidade',
       terms: 'Termos',
       createdBy: 'Criado por',
       languages: 'Idioma',
+      legal: 'Legal',
+      contact: 'Contacto',
       disclaimer: `${APP.name} é uma ferramenta de pesquisa, não uma agência de viagens, e não está associado a nenhuma companhia aérea. As tarifas são indicativas: confirme o preço final no site onde reservar.`,
     },
     langHint: {

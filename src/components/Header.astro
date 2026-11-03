@@ -1,7 +1,7 @@
 ---
-import LanguageLinks from './LanguageLinks.astro';
+import LanguageMenu from './LanguageMenu.astro';
 import { APP, AUTH, SIGN_IN } from '../app';
-import { DEFAULT_LANG, localeOf, shortCode, useLang, type Lang } from '../i18n';
+import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
 import { hreflangOf, pathFor, type Slug } from '../site-pages';
 
 interface Props {
@@ -10,9 +10,8 @@ interface Props {
 }
 
 const { lang = DEFAULT_LANG, slug } = Astro.props;
-const { nav, footer } = useLang(lang).t.common;
+const { nav } = useLang(lang).t.common;
 const home = pathFor('', lang);
-const code = shortCode(localeOf(lang));
 ---
 <header>
   <div class="container bar">
@@ -35,18 +34,7 @@ const code = shortCode(localeOf(lang));
           <span>{nav.signIn}</span>
         </a>
       )}
-      <details class="lang-menu">
-        <summary aria-label={`${footer.languages} (${code})`}>
-          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <circle cx="12" cy="12" r="9" />
-            <path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z" />
-          </svg>
-          <span aria-hidden="true">{code}</span>
-        </summary>
-        <nav class="lang-panel" aria-label={footer.languages}>
-          <LanguageLinks lang={lang} slug={slug} />
-        </nav>
-      </details>
+      <LanguageMenu lang={lang} slug={slug} />
     </nav>
   </div>
 </header>
@@ -110,51 +98,6 @@ const code = shortCode(localeOf(lang));
   nav .nav-sign-in[data-signed-in] { padding-inline: 0; border-radius: var(--radius-sm); background: none; color: var(--ink-2); font-weight: 400; }
   nav .nav-sign-in[data-signed-in]:hover { color: var(--ink); filter: none; }
   .nav-sign-in svg { display: none; }
-  .lang-menu { position: relative; }
-  .lang-menu summary {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 44px;
-    min-height: 44px;
-    padding-inline: 10px;
-    border: 1px solid var(--rule);
-    border-radius: var(--radius-pill);
-    color: var(--ink-2);
-    font: 600 13px var(--font-mono);
-    list-style: none;
-    cursor: pointer;
-  }
-  .lang-menu summary::-webkit-details-marker { display: none; }
-  .lang-menu summary:hover,
-  .lang-menu[open] summary { color: var(--ink); border-color: var(--ink-2); }
-  .lang-panel {
-    position: absolute;
-    top: calc(100% + 6px);
-    right: 0;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2px;
-    width: max-content;
-    max-width: calc(100vw - 2 * var(--gutter));
-    padding: 6px;
-    background: var(--surface);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow);
-  }
-  .lang-panel :global(a) {
-    display: flex;
-    align-items: center;
-    min-height: 44px;
-    padding-inline: 12px;
-    border-radius: var(--radius-sm);
-    color: var(--ink);
-    font-size: 15px;
-    text-decoration: none;
-  }
-  .lang-panel :global(a:hover) { background: var(--fill); }
-  .lang-panel :global([aria-current]) { background: var(--fill); font-weight: 700; }
   /* Below this the sign-in link is an icon the size of the language button, its label kept for screen readers. */
   @media (max-width: 900px) {
     nav .nav-sign-in { min-width: 44px; padding-inline: 0; }
@@ -169,8 +112,6 @@ const code = shortCode(localeOf(lang));
   }
   @media (max-width: 420px) {
     .bar, nav { gap: 8px; }
-    .lang-menu summary { padding-inline: 0; justify-content: center; }
-    .lang-menu summary span { display: none; }
   }
   @media (max-width: 359px) {
     .bar, nav { gap: 6px; }

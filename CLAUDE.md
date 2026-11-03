@@ -151,7 +151,7 @@ Those repos are the source of truth for copy, colours and claims.
   `GUIDE_LANGS` in `src/guides.ts`: every language in `LANGS`, folder `nb` for `/no`), rendered by
   `GuideLayout.astro`. Frontmatter `cluster:` (the `seo/clusters.md` letter) links a guide to the same-cluster guides in
   the other languages. A language's `/{prefix}/guides` is noindex, without hreflang and out of the sitemap until it has a
-  guide of its own (`isIndexed` in `src/site-pages.ts`); the footer language grid links a language's guides hub once it has one.
+  guide of its own (`isIndexed` in `src/site-pages.ts`); the footer's Guides column links a language's guides hub, by its native name, once it has one.
   The markdown `# ` heading is the H1. `src/guide-markdown.ts` builds FAQPage from the
   `## FAQ` section's `### question`s and HowTo from `### 1.`...`### N.` headings; `npm test` asserts both.
   A new guide needs its `guides/{slug}` entry in `SITE_PAGES` (`de/guides/{slug}` for a German one; the build fails
@@ -183,8 +183,8 @@ Those repos are the source of truth for copy, colours and claims.
   `/{prefix}/guides` lists that language's guides first, then the English ones marked "In English".
 - Every page self-canonical. Localized pages: reciprocal hreflang for all 13 plus `x-default` → root, same
   set in the sitemap (`alternates()` in `src/site-pages.ts`). English-only pages: no alternates.
-- Never redirect by browser language or IP. Instead (spec 012): the header carries the footer's switcher
-  (`LanguageLinks.astro`, one list for both, the same page in each language where it has one, else that language's
+- Never redirect by browser language or IP. Instead (spec 012): the header and the footer carry one switcher
+  (`LanguageMenu.astro` over `LanguageLinks.astro`, one list for both, opening upward in the footer, the same page in each language where it has one, else that language's
   home) as a globe `<details>` menu, and on localized pages only a hidden card (`LangHint.astro`, every language's
   `common.langHint` and target in `data-hints`) offers the first of `navigator.languages` the site has when it is not
   the page's, in that language. It never shows again once dismissed or once any language link is clicked
