@@ -93,6 +93,13 @@ All volumes are **estimated** tiers inferred from SERP shape. No keyword-tool da
 | enkelresa eller tur och retur | sv | B | comparison | med (est.) | idea | 2026-11-03. momondo.se Enkelbiljetter, BusinessClass threads ("Enkel vs tur och retur – hur tänker flygbolagen"). |
 | open jaw flyg | sv | B | definition | low (est.) | idea | 2026-11-03. English glossaries (ThePointsGuy, AltexSoft) and BusinessClass threads; Swedish searchers use the English term. |
 | missat anslutningsflyg separata biljetter | sv | B | troubleshooting | low-med (est.) | idea | 2026-11-03. Konsumentverket "Missat anslutningsflyg" ("Du kan inte kräva något av flygbolaget om du inte haft tillräckligt med tid mellan bytena"), ARN rulings on lagen.nu, airadvisor.com/sv, BusinessClass. |
+| flyve mellem flere byer i Europa | da | A (pillar) | how-to | low-med (est.) | published | 2026-11-03: live at /da/guides/flyve-mellem-flere-byer-europa (brief in its frontmatter). No Danish guide: skagenonline.dk FAQ templates (200-400 words), Finnair dk-da "multi-city-reservationer", momondo.dk / kayak.dk "rundrejser" / "flere byer" product pages, machine-translated guias-viajar.com/da. **Gap: order and dates of low-cost one-ways, worked example.** |
+| i hvilken rækkefølge besøge byer (billigst) | da | A | how-to | low (est.) | idea | 2026-11-03. Literal "billigste rækkefølge" is unnatural Danish and near-zero volume; nothing relevant ranks. Covered inside the da pilot. |
+| rundrejse i Europa med fly | da | D (pillar) | planning | med (est.) | idea | 2026-11-03. guias-viajar.com/da, skagenonline FAQ, airBaltic da-dk deals. Weak. |
+| flybillet til flere byer | da | B (pillar) | informational / transactional | low-med (est.) | idea | 2026-11-03. Also "multi-city flybillet". Finnair dk-da, kayak.dk "Flybilletter til flere byer", momondo.dk "Rundrejser". |
+| enkeltbillet eller returbillet | da | B | comparison | med (est.) | idea | 2026-11-03. Mostly Norwegian/Swedish/German pages (smartepenger.no, reisetopia); no good Danish page. |
+| open jaw billet | da | B | definition | low (est.) | idea | 2026-11-03. English glossaries only (Wikipedia, Going, NerdWallet). |
+| billigt at flyve rundt i Europa | da | D | planning | low-med (est.) | idea | 2026-11-03. TV2 Kosmopol, airadvisor.com/da, skagenonline. |
 
 ---
 
@@ -376,3 +383,21 @@ Sources (sv):
 - https://www.flashback.org/t2137851
 - https://www.dagensps.se/weekend/resor/ny-trend-se-fyra-storstader-pa-en-resa-har-ar-europas-smartaste-rutter/
 - https://www.businessclass.com/forum/threads/enkel-vs-tur-och-retur-hur-t%C3%A4nker-flygbolagen.100035/post-903220
+
+---
+
+## da research (2026-11-03, `/seo research --lang da`)
+
+Native seed terms, searched in Danish: billigste rækkefølge at besøge byer, flyve mellem flere byer, rundrejse Europa fly, flere destinationer flybillet, enkeltbilletter eller retur, open jaw billet, storbyferie flere byer, billigt at flyve rundt i Europa. Not seeded from the English backlog. Searched with the WebSearch tool in Danish, not a literal google.dk hl=da&gl=dk session; PAA candidates are inferred. Volumes are estimated tiers.
+
+What the Danish SERP looks like: very thin. skagenonline.dk FAQ templates, Finnair dk-da, momondo.dk and kayak.dk product pages, a machine-translated Spanish guide, airBaltic deals; taenk.dk for consumer rights. Danish phrasing: "enkeltbillet", "tur-retur", "rundrejse", "storbyferie", "lavprisselskab", "reservationsnummer". Local low-cost: Ryanair from Copenhagen (32 routes summer 2025, incl. Barcelona; Ryanair left Billund in 2025), Norwegian from Billund (5 to 15 destinations from spring 2026: Barcelona, Rome, Porto and more), airBaltic Copenhagen/Billund-Riga. Note: momondo.dk's "enkeltbilletter kan være et bedre valg" is about domestic legs after a long-haul arrival; do not cite it for intra-Europe.
+
+Sources (da):
+- https://taenk.dk/forbrugerliv/rejser-og-ferie/flybilletter-hvem-skal-du-koebe-billetten-af
+- https://www.finnair.com/dk-da/multi-city-reservationer
+- https://www.momondo.dk/Flybilletter-Rundrejser.mc-fd.ksp
+- https://www.kayak.dk/Flybilletter-til-flere-byer.mc-fd.ksp
+- https://corporate.ryanair.com/news/ryanair-celebrates-10-years-of-operations-at-copenhagen-with-new-summer-2025-schedule/
+- https://www.thelocal.dk/20251002/danish-airport-billund-gets-10-new-destinations-with-airline-norwegian
+- https://www.airbaltic.com/da-dk/flyaftaler/billige-flyafgange-til-europa
+- https://www.skagenonline.dk/faq/hvor-er-det-billigst-at-flyve-til-i-europa
