@@ -3,29 +3,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import NoBreak from '../components/NoBreak.astro';
-import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
-import { formatDate, hreflangOf, isoDate, pathFor } from '../site-pages';
+import { useLang, type Lang } from '../i18n';
+import { formatDate, isoDate, pathFor } from '../site-pages';
 import { parseGuide } from '../guide-markdown';
-import { GUIDES_INDEX, getGuides, guideLang, guidePageSlug } from '../guides';
+import { GUIDES_INDEX, getGuides, guidePageSlug } from '../guides';
 
 interface Props { lang: Lang; }
 
 const { lang } = Astro.props;
 const { t, fmt } = useLang(lang);
 const { guides: copy } = t;
-// This language's own guides first, then the English ones, each marked as English.
-const own = lang === DEFAULT_LANG ? [] : await getGuides(lang);
-const guides = [...own, ...(await getGuides())].map((guide) => {
-  const slug = guidePageSlug(guide);
-  const english = guideLang(guide) !== lang;
-  return {
-    ...guide.data,
-    href: pathFor(slug),
-    hreflang: english ? hreflangOf(slug, lang) : undefined,
-    english,
-    minutes: parseGuide(guide.body).minutes,
-  };
-});
+const guides = (await getGuides(lang)).map((guide) => ({
+  ...guide.data,
+  href: pathFor(guidePageSlug(guide)),
+  minutes: parseGuide(guide.body).minutes,
+}));
 ---
 <BaseLayout title={copy.title} description={copy.description} slug={GUIDES_INDEX} lang={lang}>
   <Header lang={lang} slug={GUIDES_INDEX} />
@@ -36,11 +28,10 @@ const guides = [...own, ...(await getGuides())].map((guide) => {
     <ul class="list">
       {guides.map((g) => (
         <li>
-          <h2><a href={g.href} hreflang={g.hreflang} lang={g.hreflang}><NoBreak text={g.title} /></a></h2>
-          <p lang={g.hreflang}>{g.description}</p>
+          <h2><a href={g.href}><NoBreak text={g.title} /></a></h2>
+          <p>{g.description}</p>
           <p class="meta">
             <time datetime={isoDate(g.published)}>{formatDate(g.published, lang)}</time> · {fmt.text(copy.minRead, { n: g.minutes })}
-            {g.english && <span class="lang">{t.common.inEnglish}</span>}
           </p>
         </li>
       ))}
@@ -58,5 +49,4 @@ const guides = [...own, ...(await getGuides())].map((guide) => {
   .list h2 a:hover { text-decoration: underline; text-decoration-color: var(--gold); }
   .list p { color: var(--ink-2); }
   .list .meta { font: 400 13px var(--font-mono); }
-  .list .lang { font: 600 11px var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; margin-left: var(--space-xs); }
 </style>

@@ -613,8 +613,10 @@ for (const slug of LOCALIZED_SLUGS) {
     check(JSON.stringify(ogAlternates) === JSON.stringify(otherOgs), `${where}: og:locale:alternate must name every other language once`);
     if (slug === '') check(/<section[^>]*\bid="search"/.test(html), `${where}: the #search section is missing`);
     if (slug === 'guides') {
-      for (const name of guideNames) check(html.includes(`href="/guides/${name}"`), `${where}: must list guides/${name}`);
-      if (lang.prefix) check(html.includes(`href="/guides/${guideNames[0]}" hreflang="en"`), `${where}: English guides must be linked with hreflang="en"`);
+      const hub = pagePath('guides', lang);
+      const own = subdirs(`${DIST}${hub.slice(1)}`).map((name) => `${hub}/${name}`);
+      const listed = [...html.matchAll(/<h2[^>]*><a href="([^"]+)"/g)].map(([, href]) => href).sort();
+      check(JSON.stringify(listed) === JSON.stringify(own.sort()), `${where}: must list exactly its own language's guides`);
     }
   }
 }

@@ -6,7 +6,6 @@ const nl = {
     skipLink: 'Naar de inhoud',
     appForIphone: `${APP.name} voor iPhone`,
     searchFree: 'Zoek gratis routes',
-    inEnglish: 'In het Engels',
     nights: { one: '{n} nacht', other: '{n} nachten' },
     nav: {
       label: 'Hoofdmenu',

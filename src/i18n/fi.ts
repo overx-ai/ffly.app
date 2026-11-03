@@ -6,7 +6,6 @@ const fi = {
     skipLink: 'Siirry sisältöön',
     appForIphone: `${APP.name} iPhonelle`,
     searchFree: 'Hae reittejä ilmaiseksi',
-    inEnglish: 'Englanniksi',
     nights: { one: '{n} yö', other: '{n} yötä' },
     nav: {
       label: 'Päävalikko',

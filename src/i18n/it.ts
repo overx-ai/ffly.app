@@ -6,7 +6,6 @@ const it = {
     skipLink: 'Vai al contenuto',
     appForIphone: `${APP.name} per iPhone`,
     searchFree: 'Cerca itinerari gratis',
-    inEnglish: 'In inglese',
     nights: { one: '{n} notte', other: '{n} notti' },
     nav: {
       label: 'Principale',

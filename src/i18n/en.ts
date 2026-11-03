@@ -13,7 +13,6 @@ const base = {
     skipLink: 'Skip to content',
     appForIphone: `${APP.name} for iPhone`,
     searchFree: 'Search routes free',
-    inEnglish: 'In English',
     nights: p({ one: '{n} night', other: '{n} nights' }),
     nav: {
       label: 'Main',

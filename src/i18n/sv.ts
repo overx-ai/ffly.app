@@ -6,7 +6,6 @@ const sv = {
     skipLink: 'Hoppa till innehållet',
     appForIphone: `${APP.name} för iPhone`,
     searchFree: 'Sök rutter gratis',
-    inEnglish: 'På engelska',
     nights: { one: '{n} natt', other: '{n} nätter' },
     nav: {
       label: 'Huvudmeny',

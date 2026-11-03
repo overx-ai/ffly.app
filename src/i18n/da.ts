@@ -6,7 +6,6 @@ const da = {
     skipLink: 'Spring til indholdet',
     appForIphone: `${APP.name} til iPhone`,
     searchFree: 'Søg ruter gratis',
-    inEnglish: 'På engelsk',
     nights: { one: '{n} nat', other: '{n} nætter' },
     nav: {
       label: 'Hovedmenu',

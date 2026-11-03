@@ -6,7 +6,6 @@ const ru = {
     skipLink: 'Перейти к содержимому',
     appForIphone: `${APP.name} для iPhone`,
     searchFree: 'Искать маршруты бесплатно',
-    inEnglish: 'На английском',
     nights: { one: '{n} ночь', few: '{n} ночи', many: '{n} ночей', other: '{n} ночи' },
     nav: {
       label: 'Главное меню',
