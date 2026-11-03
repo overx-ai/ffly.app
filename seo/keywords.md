@@ -71,6 +71,14 @@ All volumes are **estimated** tiers inferred from SERP shape. No keyword-tool da
 | in che ordine visitare più città | it | A (pillar) | how-to | low (est.) | idea | 2026-11-03. No head term; kayak.it/news "Gira l'Europa a meno di 1500 €" (2017), interrail.com/it, cheap-city lists. No Italian page compares orders on price. Next it pick. |
 | quante notti per città | it | A | how-to | low (est.) | idea | 2026-11-03. No strong Italian page (pt/es/en results). |
 | voli all'alba low cost evitare | it | A | troubleshooting | low (est.) | idea | 2026-11-03. theflightclub.it (2022), fanpage.it, siviaggia: all say dawn flights are cheaper; nobody prices avoiding them. |
+| viajar por várias cidades da Europa de avião | pt | A (pillar; keyword wording overlaps D) | how-to | low-med (est.) | published | 2026-11-03: live at /pt/guides/viajar-varias-cidades-europa-aviao (brief in its frontmatter; judge 79 FAIL, then 83 after one revision). SERP (web search with pt-PT queries; google.pt unreachable to the crawler): Brazilian Eurotrip guides and forums (eurodicas, viajenaviagem, pontospravoar, falandodeviagem), rail.ninja/pt, youth.europa.eu. No pt-PT page from Lisboa/Porto/Faro; nobody shows order and dates changing the total. States flights only up front (cluster D honesty rule). |
+| voos multidestino | pt | B (pillar) | how-to | med (est.) | idea | 2026-11-03. Booking engines (edreams.pt "pesquisa multidestino", kayak/momondo "várias cidades", skyscanner.pt) and Brazilian blogs where multidestino is a Brazil-Europe fare. Next pt pick, as a guide, not a landing page. |
+| ordem das cidades viagem Europa mais barato | pt | A | how-to | very low (est.) | idea | 2026-11-03. Nothing ranks; only mochileiros forum advice. Covered inside the pt pillar. |
+| roteiro Europa low cost várias cidades | pt | A | how-to | low (est.) | idea | 2026-11-03. e-konomista.pt (coach/rail, old), sapo TRAVELMAGG cheap-city lists, nit.pt Ryanair sale news. None covers flight legs. |
+| quantas noites em cada cidade Europa | pt | A | how-to | low (est.) | idea | 2026-11-03. Brazilian forums and blogs only (mochileiros, eurodicas). |
+| voos só de ida ou ida e volta mais barato | pt | B | comparison | low-med (est.) | idea | 2026-11-03. flytap.com/pt_pt "Voos só ida" landing, e-konomista, momondo. No low-cost explanation. |
+| bilhetes separados ligação perdida | pt | B | troubleshooting | low (est.) | idea | 2026-11-03. sapo.pt (2024, connection times), NiT skiplagging piece, deco.proteste.pt passenger rights. Gap for an honest pt-PT explainer. |
+| Ryanair multidestino | pt | B | navigational / how-to | low-med (est.) | idea | 2026-11-03. Ryanair help page (Multicity, reportedly open jaw only, not for domestic flights within Portugal) returned 403; only second-hand (travelgoeat.com). Verify before writing. |
 | in welke volgorde steden bezoeken (goedkoopst) | nl | A (pillar) | how-to | low (est.) | published | 2026-11-03: live at /nl/guides/volgorde-steden-bezoeken-goedkoopst (brief in its frontmatter). No Dutch page answers it: English pages (ratepunk, smartertravel), kayak.nl / be.kayak.com "vliegtickets meerdere bestemmingen" product pages, generic tips listicles (travelvalley.nl "tips & trucs" with "retour of twee enkeltjes?", reischeck.nl stedentrip). **Gap: order and dates of low-cost one-ways, worked example.** |
 | meerdere steden bezoeken vliegen | nl | A | how-to | low-med (est.) | idea | 2026-11-03. Variant "stedentrip meerdere steden combineren". reischeck.nl, travelvalley.nl, test-aankoop.be "goedkoper reizen", Air Transat NL "meervoudige bestemming". None covers flight order or dates. |
 | vliegtickets meerdere bestemmingen | nl | B (pillar) | transactional / definition | med (est.) | idea | 2026-11-03. Variant "multi-city vlucht". kayak.nl and be.kayak.com tool pages (about 1,000-1,300 words with FAQ), Finnair. Tool and OTA pages own the head term. |
@@ -401,3 +409,19 @@ Sources (da):
 - https://www.thelocal.dk/20251002/danish-airport-billund-gets-10-new-destinations-with-airline-norwegian
 - https://www.airbaltic.com/da-dk/flyaftaler/billige-flyafgange-til-europa
 - https://www.skagenonline.dk/faq/hvor-er-det-billigst-at-flyve-til-i-europa
+
+---
+
+## pt research (2026-11-03, `/seo research --lang pt`)
+
+Native seed terms, searched in pt-PT: voos multidestino, só de ida, várias cidades da Europa, ordem das cidades, bilhetes separados, quantas noites. google.pt, Bing (cc=PT) and DuckDuckGo (kl=pt-pt) were bot-walled; observations come from web search with pt-PT queries (some filtered to .pt domains) plus fetched pages. Rank order is approximate; no real PAA.
+
+What the Portuguese SERP looks like: Brazilian sites dominate every unfiltered query, and there "multidestino" is a Brazil-Europe fare. Portugal-based results (e-konomista, sapo, nit, edreams.pt) appear only when filtered and none covers order or dates. Vocabulary: voo, bilhete (never passagem), só de ida (the site's term), multidestino, ligação, bilhetes separados, comboio, planear.
+
+Sources (pt):
+- https://eco.sapo.pt/2025/05/28/easyjet-ja-voa-para-27-destinos-em-12-paises-a-partir-do-aeroporto-francisco-sa-carneiro/
+- https://sapo.pt/planear/dicas/artigos/sabe-qual-e-o-tempo-minimo-de-conexao-que-deve-existir-entre-voos
+- https://wizzlink.wizzair.com/
+- https://www.edreams.pt/melhor-dia-para-comprar-voos/
+- https://www.e-konomista.pt/companhias-aereas-low-cost-operar-portugal/
+- https://travelgoeat.com/?p=35883 (second-hand on Ryanair Multicity; not used in copy)
