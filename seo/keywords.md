@@ -79,6 +79,14 @@ All volumes are **estimated** tiers inferred from SERP shape. No keyword-tool da
 | voos só de ida ou ida e volta mais barato | pt | B | comparison | low-med (est.) | idea | 2026-11-03. flytap.com/pt_pt "Voos só ida" landing, e-konomista, momondo. No low-cost explanation. |
 | bilhetes separados ligação perdida | pt | B | troubleshooting | low (est.) | idea | 2026-11-03. sapo.pt (2024, connection times), NiT skiplagging piece, deco.proteste.pt passenger rights. Gap for an honest pt-PT explainer. |
 | Ryanair multidestino | pt | B | navigational / how-to | low-med (est.) | idea | 2026-11-03. Ryanair help page (Multicity, reportedly open jaw only, not for domestic flights within Portugal) returned 403; only second-hand (travelgoeat.com). Verify before writing. |
+| jak zaplanować podróż po kilku miastach Europy | pl | A (pillar; keyword wording overlaps D) | how-to | low-med (est.) | published | 2026-11-03: live at /pl/guides/jak-zaplanowac-podroz-po-kilku-miastach-europy (brief in its frontmatter; judge 76 FAIL with a hard fail, then 84 after one revision). SERP (web search with Polish queries; google.pl unreachable to the crawler): long blog guides and route listicles (istotnie.pl, podrozepoeuropie.pl, wyskoczmy.pl, bringbackmemories.pl), a rail guide, an app listicle. Rules of thumb ("jedź w jednym kierunku", "bez zygzaków"), no prices. States flights only up front (cluster D honesty rule). |
+| tanie loty multicity | pl | B (pillar) | how-to | mid (est.) | idea | 2026-11-03. istotnie.pl, momondo.pl, fly4free.pl/tag/multicity (long-haul Qatar/LOT deals), turystyka.wp.pl (2017). Nobody explains multicity for low-cost carriers inside Europe. Next pl pick. |
+| tanie loty kilka miast w jednej podróży | pl | A | commercial | low-mid (est.) | idea | 2026-11-03. fly4free.pl deal posts ("Paryż, Barcelona i Rzym w jednej podróży"), klubpodroznikow, tanie-loty.com.pl. Fixed deal snapshots only. |
+| lot wieloodcinkowy | pl | B | definition | low-mid (est.) | idea | 2026-11-03. lot.com "podróż wieloodcinkowa" pages, momondo.pl, tanie-loty.com.pl Q&A. Legacy-carrier framing. |
+| samodzielna przesiadka ryzyko | pl | B | troubleshooting | low-mid (est.) | idea | 2026-11-03. Insurers and claims sites (airadvisor.com/pl, rankomat.pl, warta.pl, link4.pl, bezprawnik.pl). |
+| WIZZ Link jak działa | pl | B | product | low, rising (est.) | idea | 2026-11-03. instalki.pl news (25/02/2026) only; wizzlink.wizzair.com is English-only. No Polish explainer. |
+| Ryanair loty łączone | pl | B | how-to | low-mid (est.) | idea | 2026-11-03. pasazer.com (2017), corporate.ryanair.com (2019 Charleroi). All outdated. |
+| bilety w jedną stronę czy w obie strony co taniej | pl | B | comparison | mid (est.) | idea | 2026-11-03. loty.ai (2026), drava.pl, OTA pages. No multi-city angle. |
 | in welke volgorde steden bezoeken (goedkoopst) | nl | A (pillar) | how-to | low (est.) | published | 2026-11-03: live at /nl/guides/volgorde-steden-bezoeken-goedkoopst (brief in its frontmatter). No Dutch page answers it: English pages (ratepunk, smartertravel), kayak.nl / be.kayak.com "vliegtickets meerdere bestemmingen" product pages, generic tips listicles (travelvalley.nl "tips & trucs" with "retour of twee enkeltjes?", reischeck.nl stedentrip). **Gap: order and dates of low-cost one-ways, worked example.** |
 | meerdere steden bezoeken vliegen | nl | A | how-to | low-med (est.) | idea | 2026-11-03. Variant "stedentrip meerdere steden combineren". reischeck.nl, travelvalley.nl, test-aankoop.be "goedkoper reizen", Air Transat NL "meervoudige bestemming". None covers flight order or dates. |
 | vliegtickets meerdere bestemmingen | nl | B (pillar) | transactional / definition | med (est.) | idea | 2026-11-03. Variant "multi-city vlucht". kayak.nl and be.kayak.com tool pages (about 1,000-1,300 words with FAQ), Finnair. Tool and OTA pages own the head term. |
@@ -425,3 +433,21 @@ Sources (pt):
 - https://www.edreams.pt/melhor-dia-para-comprar-voos/
 - https://www.e-konomista.pt/companhias-aereas-low-cost-operar-portugal/
 - https://travelgoeat.com/?p=35883 (second-hand on Ryanair Multicity; not used in copy)
+
+---
+
+## pl research (2026-11-03, `/seo research --lang pl`)
+
+Native seed terms, searched in Polish: multicity, lot wieloodcinkowy, w jedną stronę, kilka miast w jednej podróży, samodzielna przesiadka, open jaw, WIZZ Link. google.pl, Bing (cc=PL) and DuckDuckGo (kl=pl-pl) were bot-walled; observations come from web search with Polish queries plus fetched pages. Rank order is approximate; no real PAA ("Podobne pytania") captured.
+
+What the Polish SERP looks like: long blog guides and route listicles with rules of thumb and no prices; fly4free deal posts; LOT owns "wieloodcinkowy". Vocabulary: Poles type "multicity"; "podróż wieloodcinkowa" is the formal term; "tanie linie", "w jedną stronę", "samodzielna przesiadka", "open jaw" left in English.
+
+Sources (pl):
+- https://www.momondo.pl/Bilety-Lotnicze-Do-Wielu-Miejsc.mc-fd.ksp
+- https://istotnie.pl/artykuly/837-tanie-loty-multicity-jak-planowac-zlozone-trasy
+- https://www.pasazer.com/news/34539/ryanair,wprowadza,do,sprzedazy,bilety,laczone.html
+- https://www.instalki.pl/news/internet/wizz-air-rozwiazal-przesiadkowy-problem-wystarczylo-nieco-technologii/
+- https://www.euronews.com/2026/02/12/wizz-air-just-made-it-easier-to-book-connecting-flights-but-its-still-self-transfer
+- https://corporate.ryanair.com/informacje/ryanair-oglasza-rekordowy-letni-rozklad-lotow-2026z-katowic/
+- https://www.podrozepoeuropie.pl/gdzie-i-jak-szukac-tanich-lotow/
+- https://turystyka.wp.pl/multicity-sprytny-sposob-na-tanie-bilety-6100963749786241a
