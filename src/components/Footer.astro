@@ -85,8 +85,8 @@ const hubs = LANGS.filter((l) => hasGuides(l.code)).map((l) => ({
   .cols {
     display: grid;
     grid-template-columns: repeat(3, auto);
-    justify-content: space-between;
-    gap: var(--space-xl) var(--space-2xl);
+    justify-content: start;
+    gap: var(--space-xl) clamp(var(--space-2xl), 8vw, 160px);
   }
   .label {
     color: var(--ink-2);
@@ -141,7 +141,9 @@ const hubs = LANGS.filter((l) => hasGuides(l.code)).map((l) => ({
     padding-top: var(--space-md);
   }
   @media (max-width: 599px) {
-    .cols { grid-template-columns: minmax(0, 1fr); gap: var(--space-lg); }
+    /* Guides on top at full width, the two short columns side by side under it. */
+    .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-lg) var(--space-md); }
+    .cols > :nth-child(2) { grid-column: 1 / -1; order: -1; }
     .hubs { grid-auto-columns: minmax(0, 1fr); column-gap: var(--space-md); }
     .col a, .col button { display: inline-flex; align-items: center; min-height: 44px; }
     li { line-height: 1.4; }
