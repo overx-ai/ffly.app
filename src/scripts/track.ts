@@ -5,9 +5,9 @@ import type { Tier } from './ffly-api';
 export type TrackEvent = (typeof EVENTS)[keyof typeof EVENTS];
 
 export interface TrackParams {
-  placement: 'results' | 'progress' | 'route';
-  kind: string;
-  tier: Tier;
+  placement: string;
+  kind?: string;
+  tier?: Tier;
   value?: number;
 }
 

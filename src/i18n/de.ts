@@ -33,7 +33,6 @@ const de = {
     },
     store: {
       download: 'Laden im App Store',
-      soon: 'Bald im App Store',
     },
     guideLinks: {
       cheapestOrder: 'unseren Ratgeber zur günstigsten Reihenfolge deiner Städte',

@@ -17,4 +17,11 @@ describe('track', () => {
     track(EVENTS.kit, { placement: 'route', kind: 'hotel', tier: 'pro' });
     expect(gtag).toHaveBeenCalledWith('event', 'kit_click', { placement: 'route', kind: 'hotel', tier: 'pro', transport_type: 'beacon' });
   });
+
+  it('counts an App Store click by its placement alone', () => {
+    const gtag = vi.fn();
+    setAnalytics(gtag);
+    track(EVENTS.store, { placement: 'footer' });
+    expect(gtag).toHaveBeenCalledWith('event', 'app_store_click', { placement: 'footer', transport_type: 'beacon' });
+  });
 });

@@ -1,6 +1,7 @@
-import { AD_NETWORK_SCRIPT, CONSENT_NEEDED, GA_MEASUREMENT_ID, GTAG_SCRIPT } from '../app';
+import { AD_NETWORK_SCRIPT, CONSENT_NEEDED, EVENTS, GA_MEASUREMENT_ID, GTAG_SCRIPT } from '../app';
 import { CHOICES, analyticsCookies, choiceCookie, expiryCookies, initialChoice, mustReload, readChoice, setAnalytics, shouldShowBanner, type Choice, type Gtag } from './consent-state';
 import { loadScript } from './load-script';
+import { track } from './track';
 
 declare global {
   interface Window {
@@ -83,3 +84,9 @@ function start() {
 }
 
 if (CONSENT_NEEDED) start();
+
+// Delegated, because result rows are cloned in after load.
+document.addEventListener('click', (event) => {
+  const placement = (event.target as Element).closest<HTMLElement>('[data-store]')?.dataset.store;
+  if (placement) track(EVENTS.store, { placement });
+});

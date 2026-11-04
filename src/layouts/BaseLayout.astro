@@ -77,7 +77,7 @@ else if (slug !== undefined) schemas = [...structuredData, breadcrumb(title, slu
     <meta property="og:image:height" content="675" />
     <meta name="twitter:card" content="summary_large_image" />
 
-    {APP_STORE_ID && <meta name="apple-itunes-app" content={`app-id=${APP_STORE_ID}`} />}
+    <meta name="apple-itunes-app" content={`app-id=${APP_STORE_ID}`} />
 
     {/* Raster icons only. An image/svg+xml icon would silently outrank every PNG. */}
     <link rel="icon" href="/favicon.ico" sizes="any" />

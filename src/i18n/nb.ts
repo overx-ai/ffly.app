@@ -33,7 +33,6 @@ const nb = {
     },
     store: {
       download: 'Last ned fra App Store',
-      soon: 'Kommer snart til App Store',
     },
     guideLinks: {
       cheapestOrder: 'guiden om å finne den billigste rekkefølgen å besøke byene i',

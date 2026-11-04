@@ -33,7 +33,6 @@ const da = {
     },
     store: {
       download: 'Download i App Store',
-      soon: 'Snart i App Store',
     },
     guideLinks: {
       cheapestOrder: 'hvordan du finder den billigste rækkefølge at besøge byer i',

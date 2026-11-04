@@ -33,7 +33,6 @@ const pl = {
     },
     store: {
       download: 'Pobierz z App Store',
-      soon: 'Wkrótce w App Store',
     },
     guideLinks: {
       cheapestOrder: 'jak znaleźć najtańszą kolejność odwiedzania miast',

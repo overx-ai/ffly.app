@@ -19,7 +19,6 @@ const w = t.widget;
 const col = w.columns;
 const COLUMNS = ['rank', 'route', 'dates', 'nights', 'flights', 'warn', 'total', 'details'] as const;
 
-const openApp = APP_STORE_URL ?? '#app-side';
 const LOCK = '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" height="10" rx="2"/>';
 // Spec 014's strings ship only with its UI, so the page stays as it was while CONTRACT_1_12 is off.
 const v12 = CONTRACT_1_12 ? { offers: w.offers, account: w.account } : {};
@@ -39,7 +38,7 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
   <noscript>
     <div class="card notice">
       <p>{w.noscript}</p>
-      <AppStoreBadge lang={lang} />
+      <AppStoreBadge lang={lang} placement="noscript" />
     </div>
   </noscript>
 
@@ -319,7 +318,7 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
     {SIGN_IN && (
       <p class="upsell-account">{w.account.alreadyPro} <button type="button" class="link-button" data-sign-in>{w.account.sameAccount}</button></p>
     )}
-    <AppStoreBadge lang={lang} />
+    <AppStoreBadge lang={lang} placement="upsell" />
   </section>
 
   <dialog id="library-sheet" class="sheet library-sheet" aria-labelledby="library-title">
@@ -451,7 +450,7 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
       <span class="locked-text"></span>
     </td>
     <td class="total" data-label={col.total}></td>
-    <td class="details"><a class="open-app" href={openApp}>{w.openApp}</a></td>
+    <td class="details"><a class="open-app" href={APP_STORE_URL} rel="noopener" data-store="results">{w.openApp}</a></td>
   </tr>
 </template>
 

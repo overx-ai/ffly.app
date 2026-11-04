@@ -40,7 +40,6 @@ const base = {
     },
     store: {
       download: 'Download on the App Store',
-      soon: 'Coming soon to the App Store',
     },
     guideLinks: {
       cheapestOrder: 'how to find the cheapest order to visit cities',

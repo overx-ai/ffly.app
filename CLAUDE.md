@@ -58,7 +58,7 @@ Those repos are the source of truth for copy, colours and claims.
     compares Free and Pro with no number and leads with "Already have Pro? Sign in with the same account".
   - **Trip kit**: `GET /trip-kit` in the progress card, `route.trip_kit[]` in each route's details, each block headed
     **"Partner offers"**, text only, labelled from the site's i18n by kind, never with the API's `seller`.
-  - **Tracking** (`track.ts`): Book and kit clicks send GA4 `EVENTS` (`placement`, `kind`, `tier`; never a city, date,
+  - **Tracking** (`track.ts`): App Store links carry `data-store="<placement>"`, counted by one listener in `consent.ts` as `EVENTS.store`. Book and kit clicks send GA4 `EVENTS` (`placement`, `kind`, `tier`; never a city, date,
     price or account) only once Accept has started analytics (`consent-state.ts` `analytics()`), by beacon, never
     delaying or cancelling the click.
   - **CSP**: `PROVIDER_CSP` in `scripts/sign-in.mjs` (Apple JS's host in `script-src`; GIS's in `script-src`,

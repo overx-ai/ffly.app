@@ -33,7 +33,6 @@ const pt = {
     },
     store: {
       download: 'Descarregar na App Store',
-      soon: 'Brevemente na App Store',
     },
     guideLinks: {
       cheapestOrder: 'como encontrar a ordem mais barata para visitar várias cidades',

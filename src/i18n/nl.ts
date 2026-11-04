@@ -33,7 +33,6 @@ const nl = {
     },
     store: {
       download: 'Download in de App Store',
-      soon: 'Binnenkort in de App Store',
     },
     guideLinks: {
       cheapestOrder: 'hoe je de goedkoopste volgorde vindt om steden te bezoeken',

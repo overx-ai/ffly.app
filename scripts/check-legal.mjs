@@ -638,6 +638,7 @@ for (const lang of LANGS.filter((l) => l.prefix)) {
 }
 for (const [file, html] of htmlPages) {
   const lang = LANGS.find((l) => l.prefix && file.startsWith(`${l.prefix}/`)) ?? LANGS[0];
+  for (const [link] of html.matchAll(/<a\b[^>]*apps\.apple\.com[^>]*>/g)) check(link.includes('data-store='), `${file}: an App Store link must carry data-store: ${link}`);
   const searchLink = `${pagePath('', lang)}#search`;
   if (html.includes('<header')) check(html.includes(`href="${searchLink}"`), `${file}: the header must link ${searchLink}`);
   check(!/\bundefined\b|\[object Object\]/.test(withoutCss(html)), `${file}: a literal "undefined" or "[object Object]" leaked into the page`);

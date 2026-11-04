@@ -33,7 +33,6 @@ const ru = {
     },
     store: {
       download: 'Загрузите в App Store',
-      soon: 'Скоро в App Store',
     },
     guideLinks: {
       cheapestOrder: 'как найти самый дешёвый порядок посещения городов',

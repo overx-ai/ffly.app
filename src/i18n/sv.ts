@@ -33,7 +33,6 @@ const sv = {
     },
     store: {
       download: 'Hämta i App Store',
-      soon: 'Snart i App Store',
     },
     guideLinks: {
       cheapestOrder: 'hur du hittar den billigaste ordningen att besöka städer i',

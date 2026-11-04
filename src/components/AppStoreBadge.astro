@@ -3,21 +3,17 @@ import { APP_STORE_URL } from '../app';
 import { APPLE_LOGO } from '../icons';
 import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
 
-interface Props { lang?: Lang; }
+interface Props { lang?: Lang; placement: string; }
 
-const { lang = DEFAULT_LANG } = Astro.props;
+const { lang = DEFAULT_LANG, placement } = Astro.props;
 const { store } = useLang(lang).t.common;
-const Tag = APP_STORE_URL ? 'a' : 'span';
-const attrs = APP_STORE_URL
-  ? { class: 'store', href: APP_STORE_URL, rel: 'noopener' }
-  : { class: 'store soon', 'aria-disabled': 'true' };
 ---
-<Tag {...attrs}>
+<a class="store" href={APP_STORE_URL} rel="noopener" data-store={placement}>
   <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" focusable="false">
     <path d={APPLE_LOGO} />
   </svg>
-  <span>{APP_STORE_URL ? store.download : store.soon}</span>
-</Tag>
+  <span>{store.download}</span>
+</a>
 
 <style>
   /* A parent can invert the pill by setting --store-bg and --store-ink, as the dark close band does. */
@@ -35,6 +31,5 @@ const attrs = APP_STORE_URL
     min-height: 44px;
     text-decoration: none;
   }
-  a.store:hover { text-decoration: none; filter: brightness(1.15); }
-  .soon { cursor: default; }
+  .store:hover { text-decoration: none; filter: brightness(1.15); }
 </style>

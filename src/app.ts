@@ -31,11 +31,9 @@ export const EXAMPLE_TRIP = {
   ],
 } as const;
 
-// TODO(owner): set the numeric App Store id once App Store Connect has the app record. Until then
-// the badge renders as "Coming soon", and the Smart App Banner and installUrl are omitted: a dead
-// store link is worse than none.
-export const APP_STORE_ID: string | undefined = undefined;
-export const APP_STORE_URL = APP_STORE_ID ? `https://apps.apple.com/app/id${APP_STORE_ID}` : undefined;
+// No storefront in the path: Apple opens each visitor's own.
+export const APP_STORE_ID = '6818642936';
+export const APP_STORE_URL = `https://apps.apple.com/app/id${APP_STORE_ID}`;
 
 // The domain as named in copy. Not the build's `site` (astro.config.mjs), which PUBLIC_SITE_URL overrides.
 export const SITE_HOST = 'ffly.app';
@@ -99,7 +97,7 @@ export const GOOGLE_JS = 'https://accounts.google.com/gsi/client';
 
 // GA4 events of the web search (specs 014 and 015), sent only after Accept. Their params name a placement, an offer kind
 // or kit category, a rating and the tier; never a city, date, price or account.
-export const EVENTS = { book: 'book_click', kit: 'kit_click', rate: 'search_rating' } as const;
+export const EVENTS = { book: 'book_click', kit: 'kit_click', rate: 'search_rating', store: 'app_store_click' } as const;
 
 // Contract caps of a search request (ffly API SearchRequest, unchanged by 1.12.0), never plan limits: those come only
 // from /meta. tests/contract/ffly-api-parity.test.ts reads them back from the pinned schema.

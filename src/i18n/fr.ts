@@ -33,7 +33,6 @@ const fr = {
     },
     store: {
       download: 'Télécharger dans l’App Store',
-      soon: 'Bientôt sur l’App Store',
     },
     guideLinks: {
       cheapestOrder: 'comment trouver l’ordre le moins cher pour visiter plusieurs villes',

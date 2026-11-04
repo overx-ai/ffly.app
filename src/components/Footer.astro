@@ -1,5 +1,5 @@
 ---
-import { APP, CONSENT_NEEDED, CONTACT_EMAIL, DEVELOPER, PUBLISHER } from '../app';
+import { APP, APP_STORE_URL, CONSENT_NEEDED, CONTACT_EMAIL, DEVELOPER, PUBLISHER } from '../app';
 import LanguageMenu from './LanguageMenu.astro';
 import { DEFAULT_LANG, LANGS, otherScript, useLang, type Lang } from '../i18n';
 import { GUIDES_INDEX, hasGuides, hreflangOf, pathFor, type Slug } from '../site-pages';
@@ -11,7 +11,7 @@ interface Props {
 
 const { lang = DEFAULT_LANG, slug } = Astro.props;
 const { t } = useLang(lang);
-const { nav, footer } = t.common;
+const { nav, footer, store } = t.common;
 const year = new Date().getFullYear();
 const home = pathFor('', lang);
 const siteLinks = [
@@ -38,6 +38,7 @@ const hubs = LANGS.filter((l) => hasGuides(l.code)).map((l) => ({
         <h2 class="label" id="footer-site">{APP.name}</h2>
         <ul>
           {siteLinks.map((link) => <li><a href={link.href} hreflang={link.hreflang}>{link.label}</a></li>)}
+          <li><a href={APP_STORE_URL} rel="noopener" data-store="footer">{store.download}</a></li>
         </ul>
       </nav>
       <nav class="col" aria-labelledby="footer-guides">

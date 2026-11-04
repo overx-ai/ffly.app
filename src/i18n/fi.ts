@@ -33,7 +33,6 @@ const fi = {
     },
     store: {
       download: 'Lataa App Storesta',
-      soon: 'Tulossa pian App Storeen',
     },
     guideLinks: {
       cheapestOrder: 'opas halvimman kaupunkijärjestyksen löytämiseen',
