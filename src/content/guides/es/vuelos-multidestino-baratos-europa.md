@@ -5,6 +5,8 @@ keyword: vuelos multidestino baratos Europa
 locale: es
 published: 2026-11-02
 updated: 2026-11-02
+hero_alt: "Maleta de cabina abierta con billetes de papel y un sombrero de paja, sobre un suelo de barro al sol"
+hero_color: "#795f4a"
 cluster: B. Booking mechanics on low-cost carriers
 intent: how-to
 serp_format: "Búsqueda del 2026-11-02 (es). Domina el SERP la promoción transatlántica desde Argentina: infoviajera.com (Turkish Airlines desde Buenos Aires, 2017-2021, precios en pesos) y turismocity.com.ar (multidestinos a Europa en dólares), más una página de Air Europa en guialowcost.es, la pregunta de es.trip.com y las páginas de producto de kayak y momondo. Todo es un billete de largo radio o una oferta caducada; nadie explica cómo montar un multidestino dentro de Europa con vuelos low cost. Formato a batir: guía práctica de 1.200 a 1.600 palabras, respuesta corta, pasos, un ejemplo real, FAQ."
@@ -49,7 +51,6 @@ internal_links:
   - /es/guides/orden-visitar-varias-ciudades-mas-barato (pilar del cluster A, en español)
   - /guides/multi-city-vs-one-way-tickets (pilar del cluster B, en inglés)
   - /guides/open-jaw-flights-europe (cluster B, en inglés)
-hero_prompt: Un billete largo de varias escalas al lado de una pila de tarjetas de embarque cortas sobre fondo azul marino, líneas de ruta doradas punteadas entre ciudades europeas. Ilustración vectorial plana, sin texto.
 judge: 85 PASS (2026-11-02, fresh subagent; fixes applied)
 status: ready
 ---

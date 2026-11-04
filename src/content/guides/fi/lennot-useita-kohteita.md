@@ -5,6 +5,8 @@ keyword: lennot useita kohteita
 locale: fi
 published: 2026-11-03
 updated: 2026-11-03
+hero_alt: "Muki ja avoin muistikirja lentoaseman ikkunalaudalla, taustalla luminen kenttä aamunkoitteessa"
+hero_color: "#6c7787"
 cluster: A. Route order and dates
 intent: how-to
 serp_format: "Haku 2026-11-03 (fi; Googlen tulossivu jäi suostumusseinän taakse, joten kysyntä on Googlen hakuehdotuksista hl=fi gl=fi ja tulosten koostumus WebSearchista). Suomeksi ei ole yhtään ohjetta. Tuloksissa on matkatoimistojen ja hakukoneiden lomakesivuja (tjareborg.fi, fi.kayak.com, travellink.fi, omio.com/fi), suljetun ebookers.fi:n sivu, airBalticin etusivu, Finnairin useamman kohteen varaus ja UKK, Skyscannerin ohjesivu ja stopover-artikkeli. Muoto: käytännön opas, noin 1 300-1 700 sanaa, lyhyt vastaus, vaiheet, oikea esimerkki, UKK."
@@ -54,7 +56,6 @@ internal_links:
   - /fi/search (ilmainen haku verkossa)
   - /guides/cheapest-order-to-visit-cities (klusterin A pilari, englanniksi)
   - /guides/open-jaw-flights-europe (klusteri B, englanniksi)
-hero_prompt: Euroopan yökartta tummansinisenä, kultainen katkoviiva Varsovasta Pariisin, Lissabonin, Barcelonan, Rooman ja Ateenan kautta takaisin Varsovaan, viivan yllä valkoinen kärpänen lentokoneen siivin. Tasainen vektorikuvitus, ei tekstiä.
 judge: 81 PASS (2026-11-03, fresh subagent; fixes applied)
 status: ready
 ---

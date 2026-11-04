@@ -4,6 +4,8 @@ slug: multi-city-vs-one-way-tickets
 keyword: multi-city vs one-way tickets
 published: 2026-10-05
 updated: 2026-10-16
+hero_alt: "One long folded paper ticket beside five short separate tickets on a dark wooden table"
+hero_color: "#614c39"
 cluster: B. Booking mechanics on low-cost carriers
 intent: comparison
 serp_format: 1,500-2,500 word comparison with a quick answer, a comparison table, pros and cons and an FAQ. Ranking pages are written for long-haul flights on full-service airlines.
@@ -29,7 +31,6 @@ internal_links:
   - /guides/open-jaw-flights-europe (cluster B supporting, added 2026-10-09)
   - / (home)
   - /search
-hero_prompt: Two boarding passes side by side on a navy background, one long multi-city pass and a stack of short one-way passes, gold dotted route lines, flat vector, no text.
 status: ready
 ---
 

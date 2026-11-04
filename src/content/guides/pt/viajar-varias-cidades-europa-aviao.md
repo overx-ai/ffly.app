@@ -5,6 +5,8 @@ keyword: viajar por várias cidades da Europa de avião
 locale: pt
 published: 2026-11-03
 updated: 2026-11-03
+hero_alt: "Caderno com uma rota tracejada entre cidades desenhadas, pastel de nata e café numa mesa de azulejos"
+hero_color: "#7d7972"
 cluster: A. Route order and dates
 intent: how-to
 serp_format: "Pesquisa de 2026-11-03 (pt-PT, pesquisa web com termos de Portugal; google.pt inacessível ao crawler, ordem aproximada, sem PAA reais). Dominam páginas brasileiras (eurodicas, viajenaviagem «10 roteiros de 15 dias», pontospravoar, falandodeviagem), onde «multidestino» é uma tarifa Brasil-Europa, mais uma FAQ do rail.ninja/pt (comboio), uma página da youth.europa.eu e uma lista de uma eSIM. Formato: guias longos e fóruns sobre quantas cidades ver e comboio ou avião. Formato a bater: guia prático de 1.300 a 1.600 palavras com resposta curta, passos, um exemplo real e FAQ."
@@ -38,7 +40,6 @@ internal_links:
   - /guides/cheapest-order-to-visit-cities (pilar do cluster A, em inglês)
   - /guides/multi-city-vs-one-way-tickets (pilar do cluster B, em inglês)
   - /guides/open-jaw-flights-europe (cluster B, em inglês)
-hero_prompt: "Mapa da Europa à noite em azul-marinho, uma linha de pontos dourados de Varsóvia a Paris, Lisboa, Barcelona, Roma e Atenas e regresso, uma mosca branca com asas de avião sobre a linha. Ilustração vetorial plana, sem texto."
 judge: 83 PASS (2026-11-03, second fresh subagent after one revision; first judge 79 FAIL; fixes applied)
 status: ready
 ---

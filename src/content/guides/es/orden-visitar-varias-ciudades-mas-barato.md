@@ -5,6 +5,8 @@ keyword: en qué orden visitar varias ciudades (más barato)
 locale: es
 published: 2026-11-02
 updated: 2026-11-02
+hero_alt: "Tarjetas con monumentos dibujados en fila sobre una mesa de mosaico, junto a un café en una terraza soleada"
+hero_color: "#8e7f71"
 cluster: A. Route order and dates
 intent: how-to
 serp_format: "Búsqueda del 2026-11-02 (es), igual que la del 2026-10-26. Nadie responde a la pregunta. Salen ryanair.com/es, una página de consejos de FareCompare, promociones argentinas de turismocity («multidestinos a Europa», precios en dólares desde Buenos Aires), eurovistatrips («ciudad más barata para volar a Europa», intención de puerta de entrada) y páginas de producto de kayak y momondo. Formato a batir: guía práctica de 1.300 a 1.600 palabras, respuesta corta, pasos, un ejemplo real, FAQ."
@@ -44,7 +46,6 @@ internal_links:
   - /es/search (búsqueda gratis en la web)
   - /guides/cheapest-order-to-visit-cities (pilar del cluster A, en inglés)
   - /guides/open-jaw-flights-europe (cluster B, en inglés)
-hero_prompt: Mapa de Europa de noche en azul marino, una ruta de puntos dorados de Varsovia a París, Lisboa, Barcelona, Roma y Atenas y vuelta a Varsovia, una mosca blanca con alas de avión sobre la línea. Ilustración vectorial plana, sin texto.
 judge: 84 PASS (2026-11-02, fresh subagent; fixes applied)
 status: ready
 ---

@@ -5,6 +5,8 @@ keyword: voli multitratta low cost
 locale: it
 published: 2026-11-03
 updated: 2026-11-03
+hero_alt: "Tazzina di caffè, biglietti di carta e passaporto su un banco di marmo, con una cupola oltre la finestra ad arco"
+hero_color: "#7f7368"
 cluster: B. Booking mechanics on low-cost carriers
 intent: how-to
 serp_format: "Ricerca del 2026-11-03 (it, ricerca web con query italiane; google.it non raggiungibile dal crawler, ordine approssimativo, niente PAA reali). In testa le landing di momondo.it e kayak.it (modulo di ricerca + FAQ di 6 domande, circa 1.500 parole con il contorno) e una guida Q&A di un'agenzia online; il resto del top 10 è fuori tema (italiaoggi sulle tariffe, una tesi LUISS, archivi varesenews, una pagina rotta di skyscanner.ch). Formato da battere: guida pratica di 1.200-1.500 parole con risposta breve, passi, un esempio reale e FAQ."
@@ -44,7 +46,6 @@ internal_links:
   - /guides/multi-city-vs-one-way-tickets (pilastro del cluster B, in inglese)
   - /guides/cheapest-order-to-visit-cities (pilastro del cluster A, in inglese)
   - /guides/open-jaw-flights-europe (cluster B, in inglese)
-hero_prompt: "Mappa dell'Europa di notte in blu navy, una linea di punti dorati da Varsavia a Parigi, Lisbona, Barcellona, Roma e Atene e ritorno, una mosca bianca con ali d'aereo sulla linea. Illustrazione vettoriale piatta, senza testo."
 judge: 85 PASS (2026-11-03, fresh subagent; fixes applied)
 status: ready
 ---

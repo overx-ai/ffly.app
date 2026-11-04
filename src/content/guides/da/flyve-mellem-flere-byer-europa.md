@@ -5,6 +5,8 @@ keyword: flyve mellem flere byer i Europa
 locale: da
 published: 2026-11-03
 updated: 2026-11-03
+hero_alt: "Papirkort med rød tråd mellem nåle i en rundtur, på et bord ved et regnfuldt vindue mod en fjord"
+hero_color: "#767674"
 cluster: A
 intent: how-to
 serp_format: "Søgt 2026-11-03 (da, WebSearch med danske søgeord, ikke en google.dk-session med hl=da&gl=dk). Ingen dansk side svarer på spørgsmålet. Der ranker korte skabelon-FAQ'er (skagenonline.dk, 200-400 ord), Finnairs danske side om multi-city-reservationer (cirka 600 ord), momondo.dk og kayak.dk 'rundrejser'/'flere byer' (produktside plus FAQ), en maskinoversat spansk Europa-guide (guias-viajar.com/da) og airBaltics tilbudsside. Format at slå: praktisk guide på 1.200 til 1.600 ord med kort svar, trin, et rigtigt eksempel og FAQ."
@@ -31,7 +33,6 @@ internal_links:
   - /da/search (gratis søgning på nettet)
   - /guides/cheapest-order-to-visit-cities (søjle klynge A, på engelsk)
   - /guides/multi-city-vs-one-way-tickets (søjle klynge B, på engelsk)
-hero_prompt: Europakort i marineblåt om natten, en rute af gyldne prikker fra Warszawa til Paris, Lissabon, Barcelona, Rom og Athen og tilbage, en hvid flue med flyvinger over linjen. Flad vektorillustration, ingen tekst.
 judge: 90 PASS (2026-11-03, fresh subagent, revision 2 of 3; first pass 79; fixes applied)
 status: published
 ---

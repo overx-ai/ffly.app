@@ -5,6 +5,8 @@ keyword: Gabelflug Europa Billigflieger
 locale: de
 published: 2026-10-26
 updated: 2026-10-26
+hero_alt: "Zwei leere Papiertickets neben einem Blatt, auf dem sich eine Bleistiftlinie in zwei Enden gabelt"
+hero_color: "#8d867a"
 cluster: B. Booking mechanics on low-cost carriers
 intent: definition / how-to
 serp_format: "Gesucht am 2026-10-26 (de). Für die genaue Anfrage rankt nichts Passendes: fluege.de- und urlaubsguru-Produktseiten zu Billigfliegern, eine airadvisor-Rangliste, skyscanner.de, ein wandernundmehr.at-FAQ zu Low-Cost-Airlines. Für 'Gabelflug' ranken airhelp.de (Definition, Single und Double Open Jaw, 'keine feste Regel' beim Preis, aktualisiert 28.06.2026), schnaeppchenfuchs.com (2019, Langstrecke, innerhalb der EU 'lohnt sich in der Regel nicht'), navan.com/de, die wandernundmehr.at-FAQ-Seiten. Format hier: Definition plus Anleitung, 1.200 bis 1.500 Wörter, Schritte, FAQ."
@@ -54,7 +56,6 @@ internal_links:
   - /guides/multi-city-vs-one-way-tickets (Cluster-B-Pillar, englisch)
   - /de (Startseite, Multi-City-Reiseplaner)
   - /de/search (kostenlose Websuche)
-hero_prompt: Eine schlichte Karte Europas in Marineblau mit zwei goldenen Flugbögen, einer landet in Lissabon, einer startet in Athen, die Lücke dazwischen als gepunktete weiße Linie. Flache Vektorgrafik, kein Text.
 judge: 84 PASS (2026-10-26, fresh subagent; fixes applied)
 status: ready
 ---

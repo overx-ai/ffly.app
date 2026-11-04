@@ -156,6 +156,7 @@ Those repos are the source of truth for copy, colours and claims.
   `## FAQ` section's `### question`s and HowTo from `### 1.`...`### N.` headings; `npm test` asserts both.
   A new guide needs its `guides/{slug}` entry in `SITE_PAGES` (`de/guides/{slug}` for a German one; the build fails
   without it), with `lastmod` equal to its frontmatter `updated`.
+- Every guide has a hero photo: `hero_alt` and `hero_color` in its frontmatter, files in `public/img/guides/{lang}-{slug}-*` from `~/.claude/skills/seo/scripts/encode-hero.py` (AVIF and WebP, one grade, byte budgets in `check-legal`), cached immutable, so a replaced photo needs a new name.
 - **App facts live in `src/app.ts`**: limits, operator, publisher, API hosts,
   retention, external URLs. Do not hardcode any of them in a page.
 - **One contact address: `CONTACT_EMAIL` (`support@overx.ai`)** for support, contact and privacy

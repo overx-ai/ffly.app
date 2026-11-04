@@ -214,6 +214,8 @@ export const GTAG_SCRIPT = (id: string) => `https://www.googletagmanager.com/gta
 // The articles at /guides (src/content/guides).
 export const GUIDES = {
   wordsPerMinute: 230,
+  // Encoded by ~/.claude/skills/seo/scripts/encode-hero.py; `sizes` follows .page's --max-width-prose.
+  hero: { widths: [480, 800, 1200, 1600], fallback: 800, width: 1600, height: 900, sizes: '(min-width: 768px) 720px, 100vw', dir: '/img/guides' },
 } as const;
 
 export const EXTERNAL = {

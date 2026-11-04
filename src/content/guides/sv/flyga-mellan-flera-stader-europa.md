@@ -5,6 +5,8 @@ keyword: flyga mellan flera städer i Europa
 locale: sv
 published: 2026-11-03
 updated: 2026-11-03
+hero_alt: "Papperskarta med en inritad rutt, kompass och pappersbiljetter på ett träbord vid ett fönster mot en sjö"
+hero_color: "#888379"
 cluster: A
 intent: how-to
 serp_format: "Sökt 2026-11-03 (sv, WebSearch med svenska sökord, inte en google.se-session med hl=sv&gl=se). Ingen svensk guide svarar på frågan. Det rankar momondo.se (prissida för Europa och 'Boka flyg med flera stopp', cirka 750 ord plus FAQ), Finnairs sida om bokningar med flera destinationer, en Flashback-tråd från 2013 ('stad till stad eller via Sthlm?'), BusinessClass-forumet och Dagens PS 'Se fyra storstäder på en resa' (cirka 400 ord, tåg och buss). Format att slå: praktisk guide på 1 300 till 1 700 ord med kort svar, steg, ett riktigt exempel och FAQ."
@@ -36,7 +38,6 @@ internal_links:
   - /guides/cheapest-order-to-visit-cities (pelare kluster A, på engelska)
   - /guides/multi-city-vs-one-way-tickets (pelare kluster B, på engelska)
   - /guides/open-jaw-flights-europe (kluster B, på engelska)
-hero_prompt: Europakarta i marinblått på natten, en rutt av gyllene prickar från Warszawa till Paris, Lissabon, Barcelona, Rom och Aten och tillbaka, en vit fluga med flygplansvingar över linjen. Platt vektorillustration, ingen text.
 judge: 88 PASS (2026-11-03, fresh subagent, revision 2 of 3; first pass 85; fixes applied)
 status: published
 ---

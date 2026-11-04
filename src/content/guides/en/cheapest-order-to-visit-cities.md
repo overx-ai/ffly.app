@@ -4,6 +4,8 @@ slug: cheapest-order-to-visit-cities
 keyword: cheapest order to visit cities
 published: 2026-10-05
 updated: 2026-10-16
+hero_alt: "Coffee and a notebook with a dotted route between sketched cities, at an airport window with a plane at sunrise"
+hero_color: "#7e7468"
 cluster: A. Route order and dates
 intent: how-to
 serp_format: 1,500-2,000 word how-to with a direct answer, steps, one worked example and an FAQ. Current top results answer "cheapest cities to fly into", a different question.
@@ -24,7 +26,6 @@ internal_links:
   - /search (free web search)
   - /guides/multi-city-vs-one-way-tickets (sibling, cluster B pillar)
   - /guides/open-jaw-flights-europe (cluster B supporting, added 2026-10-09)
-hero_prompt: A minimal night map of Europe in navy with a dotted gold route looping through Paris, Lisbon, Barcelona, Rome and Athens and back to Warsaw, a small white fly with airplane wings on the route. Flat vector, no text.
 status: ready
 ---
 

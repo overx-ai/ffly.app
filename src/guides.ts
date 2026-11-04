@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { GUIDES } from './app';
 import { DEFAULT_LANG, LANGS, localeOf, type Lang } from './i18n/locales';
 import { GUIDES_INDEX, isSlug, type Slug } from './site-pages';
 
@@ -29,6 +30,13 @@ export const clusterSiblings = async (guide: Guide) =>
   guide.data.cluster === undefined
     ? []
     : getCollection('guides', (other) => other.data.cluster === guide.data.cluster && guideLang(other) !== guideLang(guide));
+
+export function heroOf(guide: Guide) {
+  const { dir, widths, fallback } = GUIDES.hero;
+  const base = `${dir}/${guideLang(guide)}-${guideName(guide)}`;
+  const srcset = (ext: string) => widths.map((width) => `${base}-${width}.${ext} ${width}w`).join(', ');
+  return { avif: srcset('avif'), webp: srcset('webp'), src: `${base}-${fallback}.webp`, og: `${base}-og.jpg` };
+}
 
 export function guidePageSlug(guide: Guide): Slug {
   const slug = [localeOf(guideLang(guide)).prefix, GUIDES_INDEX, guideName(guide)].filter(Boolean).join('/');

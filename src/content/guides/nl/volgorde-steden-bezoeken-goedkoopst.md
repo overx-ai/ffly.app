@@ -5,6 +5,8 @@ keyword: in welke volgorde steden bezoeken (goedkoopst)
 locale: nl
 published: 2026-11-03
 updated: 2026-11-03
+hero_alt: "Getekende stadskaartjes met stapeltjes munten van verschillende hoogte in de vensterbank boven een gracht"
+hero_color: "#7b756b"
 cluster: A
 intent: how-to
 serp_format: "Gezocht op 2026-11-03 (nl, WebSearch met Nederlandse zoektermen, geen google.nl-sessie met hl=nl&gl=nl). Geen enkele Nederlandse pagina beantwoordt de vraag. Er ranken Engelse pagina's (ratepunk, smartertravel), de pagina 'vliegtickets meerdere bestemmingen' van Kayak (nl en be), algemene tipslijsten (travelvalley.nl 'tips & trucs', ongeveer 1.400 woorden, met 'retour of twee enkeltjes?'; reischeck.nl stedentrip) en 27vakantiedagen.nl 'goedkope stedentrip Europa'. Te verslaan formaat: praktische gids van 1.300 tot 1.700 woorden met kort antwoord, stappen, een echt voorbeeld en FAQ."
@@ -34,7 +36,6 @@ internal_links:
   - /guides/cheapest-order-to-visit-cities (pijler cluster A, Engels)
   - /guides/open-jaw-flights-europe (cluster B, Engels)
   - /guides/multi-city-vs-one-way-tickets (pijler cluster B, Engels)
-hero_prompt: Kaart van Europa bij nacht in marineblauw, een route van gouden stippen van Warschau naar Parijs, Lissabon, Barcelona, Rome en Athene en terug, een witte vlieg met vliegtuigvleugels boven de lijn. Vlakke vectorillustratie, geen tekst.
 judge: 83 PASS (2026-11-03, fresh subagent, revision 2 of 3; first pass 78; fixes applied)
 status: published
 ---

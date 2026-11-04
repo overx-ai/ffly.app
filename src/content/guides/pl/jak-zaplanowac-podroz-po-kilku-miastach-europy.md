@@ -5,6 +5,8 @@ keyword: jak zaplanować podróż po kilku miastach Europy
 locale: pl
 published: 2026-11-03
 updated: 2026-11-03
+hero_alt: "Dłonie układają kolorowe karteczki w trasę na drewnianym biurku, a za oknem widać dachy starego miasta"
+hero_color: "#7d5a41"
 cluster: A. Route order and dates
 intent: how-to
 serp_format: "Wyszukiwanie z 2026-11-03 (pl, wyszukiwarka z polskimi zapytaniami; google.pl niedostępne dla crawlera, kolejność przybliżona, bez prawdziwych PAA). Ranking: długie blogowe poradniki i listy tras (istotnie.pl «Tanie loty multicity», ok. 2000 słów, lipiec 2026; podrozepoeuropie.pl, ok. 3000 słów; wyskoczmy.pl, do 5500 słów; bringbackmemories.pl, ok. 700 słów; babazcukrem.pl o pociągach; lista aplikacji wycieczkizplanem.pl). Zasady na oko («jedź w jednym kierunku», «bez zygzaków»), bez cen i bez porównania kolejności. Format do pobicia: praktyczny poradnik 1300-1600 słów z krótką odpowiedzią, krokami, prawdziwym przykładem i FAQ."
@@ -40,7 +42,6 @@ internal_links:
   - /guides/cheapest-order-to-visit-cities (filar klastra A, po angielsku)
   - /guides/multi-city-vs-one-way-tickets (filar klastra B, po angielsku)
   - /guides/open-jaw-flights-europe (klaster B, po angielsku)
-hero_prompt: "Mapa Europy nocą w granacie, złota kropkowana trasa z Warszawy do Paryża, Lizbony, Barcelony, Rzymu i Aten i z powrotem, biała mucha ze skrzydłami samolotu nad linią. Płaska ilustracja wektorowa, bez tekstu."
 judge: 84 PASS (2026-11-03, second fresh subagent after one revision; first judge 76 FAIL with a hard fail for two invented first-person lines, removed; fixes applied)
 status: ready
 ---

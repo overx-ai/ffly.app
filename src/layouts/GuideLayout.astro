@@ -3,21 +3,23 @@ import BaseLayout from './BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import NoBreak from '../components/NoBreak.astro';
+import RouteMap from '../components/RouteMap.astro';
 import StoreCtas from '../components/StoreCtas.astro';
-import { DEVELOPER } from '../app';
+import { DEVELOPER, GUIDES } from '../app';
 import { localeOf, otherScript, useLang } from '../i18n';
 import { formatDate, isoDate, pathFor } from '../site-pages';
 import { articleSchema, faqSchema, howToSchema, type Crumb } from '../schema';
 import { parseGuide } from '../guide-markdown';
-import { GUIDES_INDEX, clusterSiblings, guideLang, guidePageSlug, type Guide } from '../guides';
+import { GUIDES_INDEX, clusterSiblings, guideLang, guidePageSlug, heroOf, type Guide } from '../guides';
 
 interface Props { guide: Guide; }
 
 const { guide } = Astro.props;
-const { title, description, published, updated } = guide.data;
+const { title, description, published, updated, hero_alt, hero_color } = guide.data;
 const lang = guideLang(guide);
 const { t, fmt } = useLang(lang);
 const slug = guidePageSlug(guide);
+const hero = heroOf(guide);
 const { h1, faq, howTo, minutes } = parseGuide(guide.body);
 const siblings = (await clusterSiblings(guide)).map((other) => {
   const locale = localeOf(guideLang(other));
@@ -25,7 +27,7 @@ const siblings = (await clusterSiblings(guide)).map((other) => {
 });
 const parent: Crumb = { name: t.common.footer.guides, slug: GUIDES_INDEX };
 const structuredData = [
-  articleSchema({ headline: h1, description, slug, published, updated }),
+  articleSchema({ headline: h1, description, slug, published, updated, image: hero.og }),
   ...(faq.length ? [faqSchema(faq, lang)] : []),
   ...(howTo ? [howToSchema(howTo)] : []),
 ];
@@ -35,6 +37,8 @@ const structuredData = [
   description={description}
   slug={slug}
   ogType="article"
+  ogImage={hero.og}
+  preloadImage={{ srcset: hero.avif, sizes: GUIDES.hero.sizes }}
   parent={parent}
   structuredData={structuredData}
   lang={lang}
@@ -55,7 +59,13 @@ const structuredData = [
         <span><time datetime={isoDate(published)}>{formatDate(published, lang)}</time> ·</span>
         <span>{fmt.text(t.guides.minRead, { n: minutes })}</span>
       </p>
+      <picture>
+        <source type="image/avif" srcset={hero.avif} sizes={GUIDES.hero.sizes} />
+        <source type="image/webp" srcset={hero.webp} sizes={GUIDES.hero.sizes} />
+        <img class="hero" src={hero.src} alt={hero_alt} width={GUIDES.hero.width} height={GUIDES.hero.height} fetchpriority="high" style={`background-color: ${hero_color}`} />
+      </picture>
       <div class="prose"><slot /></div>
+      <figure class="route"><RouteMap lang={lang} caption /></figure>
     </article>
 
     {siblings.length > 0 && (
@@ -103,6 +113,12 @@ const structuredData = [
     padding-top: var(--space-md);
   }
   .byline span { white-space: nowrap; }
+
+  .hero, .route { margin: var(--space-xl) 0 0; }
+  /* Below the fold: skip its layout and paint until it nears the viewport. */
+  .route { content-visibility: auto; contain-intrinsic-size: auto 560px; }
+  .hero, .route :global(.map) { border-radius: var(--radius-lg); border: 1px solid var(--rule); box-shadow: none; }
+  .hero { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
 
   .prose {
     padding-top: var(--space-xl);

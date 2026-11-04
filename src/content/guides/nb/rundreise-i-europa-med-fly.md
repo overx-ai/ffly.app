@@ -5,6 +5,8 @@ keyword: rundreise i Europa med fly
 locale: nb
 published: 2026-11-03
 updated: 2026-11-03
+hero_alt: "Papirkart med en rundreise lagt ut i små steiner, på et trebord ved et vindu mot en tåkete fjord"
+hero_color: "#767574"
 cluster: A. Route order and dates
 intent: how-to
 serp_format: "Søk 2026-11-03 (nb; Google-siden lå bak en samtykkevegg, så etterspørselen er fra Google-autoutfylling hl=nb gl=NO og trefflisten fra WebSearch). Ingen norsk side svarer. Det som rangerer: danske pakke- og grupperundreiser (rejsespejder.dk, besttravel.dk, togrejsereuropa.dk, nillesgislev.dk), tourradar.com, Expedia-landingsside og Wikipedia-treff på «Air Europa». For «flybilletter flere byer» dominerer Finnairs egne sider. Format: praktisk guide på 1 400 til 1 800 ord, kort svar, steg, et ekte eksempel, FAQ."
@@ -50,7 +52,6 @@ internal_links:
   - /no/search (gratis søk på nettet)
   - /guides/cheapest-order-to-visit-cities (pilar i klynge A, på engelsk)
   - /guides/open-jaw-flights-europe (klynge B, på engelsk)
-hero_prompt: Nattkart over Europa i marineblått, en gullstiplet rute fra Warszawa via Paris, Lisboa, Barcelona, Roma og Athen tilbake til Warszawa, en hvit flue med flyvinger over linjen. Flat vektorillustrasjon, uten tekst.
 judge: 87 PASS (2026-11-03, fresh subagent; fixes applied)
 status: ready
 ---

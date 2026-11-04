@@ -354,6 +354,27 @@ function checkGuideListed(page, schemas, index) {
   check(readHtml(index).includes(`href="/${page}"`), `/${index} must list ${page}`);
 }
 const isFile = (path) => existsSync(path) && statSync(path).isFile();
+// A guide's hero: its LCP element, so the two widths most devices fetch have a hard byte budget.
+const HERO_BUDGET = { avif: { 800: 40_000, 1600: 80_000 }, webp: { 800: 60_000, 1600: 120_000 } };
+const HERO_ALT_MAX = 125;
+const heroAlts = new Set();
+function checkHero(page, html, stem) {
+  const base = `img/guides/${stem}`;
+  check(isFile(`${DIST}${base}-og.jpg`) && new RegExp(`<meta property="og:image" content="[^"]*/${base}-og\\.jpg">`).test(html), `${page}: og:image must be its own hero`);
+  check(ofType(jsonLd(html), 'Article')[0]?.image?.endsWith(`/${base}-og.jpg`), `${page}: the Article image must be its own hero`);
+  check(html.includes('<link rel="preload" as="image" type="image/avif"'), `${page}: the hero must be preloaded`);
+  const img = html.match(/<img\b[^>]*class="hero[^>]*>/)?.[0] ?? '';
+  const alt = img.match(/\balt="([^"]*)"/)?.[1] ?? '';
+  check(!/loading=/.test(img) && /fetchpriority="high"/.test(img), `${page}: the hero must load eagerly with fetchpriority=high`);
+  check(alt.length > 0 && alt.length <= HERO_ALT_MAX && !heroAlts.has(alt) && !html.includes(`<title>${alt}`), `${page}: hero alt must be set, under ${HERO_ALT_MAX} characters, unique and not the title`);
+  heroAlts.add(alt);
+  for (const [ext, widths] of Object.entries(HERO_BUDGET)) {
+    for (const [width, bytes] of Object.entries(widths)) {
+      const file = `${DIST}${base}-${width}.${ext}`;
+      check(isFile(file) && statSync(file).size <= bytes, `${base}-${width}.${ext}: missing or over ${bytes} bytes`);
+    }
+  }
+}
 const resolves = (path) => isFile(`${DIST}${path}`) || isFile(`${DIST}${path}/index.html`);
 check(guideNames.length > 0, 'Guides: no guide pages in the build');
 for (const name of HOWTO_GUIDES) check(guideNames.includes(name), `Guides: ${name} missing from the build`);
@@ -365,6 +386,7 @@ for (const name of guideNames) {
   check(faq.length === 1 && faq[0].mainEntity.length === GUIDE_FAQ_QUESTIONS, `${page}: FAQPage must have ${GUIDE_FAQ_QUESTIONS} questions`);
   check((ofType(schemas, 'HowTo').length === 1) === HOWTO_GUIDES.includes(name), `${page}: HowTo only on ${HOWTO_GUIDES.join(', ')}`);
   checkGuideListed(page, schemas, 'guides');
+  checkHero(page, html, `en-${name}`);
 }
 
 const vercel = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
@@ -634,6 +656,7 @@ for (const lang of LANGS.filter((l) => l.prefix)) {
     check(html.includes(`<meta property="og:locale" content="${lang.og}">`), `${page}: og:locale must be ${lang.og}`);
     check(sitemapAlternates.get(url)?.length === 0, `${page}: must be in the sitemap with no alternates`);
     checkGuideListed(page, jsonLd(html), `${lang.prefix}/guides`);
+    checkHero(page, html, `${lang.code}-${name}`);
   }
 }
 for (const [file, html] of htmlPages) {

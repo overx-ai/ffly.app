@@ -5,6 +5,8 @@ keyword: dans quel ordre visiter plusieurs villes (moins cher)
 locale: fr
 published: 2026-10-24
 updated: 2026-10-24
+hero_alt: "Main traçant un itinéraire en pointillés dans un carnet, à côté d'un croissant et d'un café en terrasse"
+hero_color: "#7e746d"
 cluster: A. Route order and dates
 intent: how-to
 serp_format: "Recherche du 2026-10-24 (fr). Aucune page ne répond à la question. On trouve milesopedia.fr (guide multi-destinations, 20 octobre 2026, environ 9 minutes de lecture), kayak.fr (page produit), airhelp.fr (billet multidestination), flytrippers.com/fr (bons plans Europe, prix en CAD/USD), un fil voyageforum et des pages de vols jetcost. Format ici : guide pratique de 1 400 à 1 700 mots, réponse courte, étapes, un exemple réel, FAQ."
@@ -30,7 +32,6 @@ internal_links:
   - /fr/search (recherche gratuite sur le web)
   - /guides/cheapest-order-to-visit-cities (pilier du cluster A, en anglais)
   - /guides/open-jaw-flights-europe (cluster B, en anglais)
-hero_prompt: Une carte de l’Europe de nuit, bleu marine, un itinéraire en pointillés dorés de Varsovie à Paris, Lisbonne, Barcelone, Rome et Athènes puis retour à Varsovie, une petite mouche blanche aux ailes d’avion sur le tracé. Illustration vectorielle plate, sans texte.
 judge: 86 PASS (2026-10-24, fresh subagent; fixes applied)
 status: ready
 ---

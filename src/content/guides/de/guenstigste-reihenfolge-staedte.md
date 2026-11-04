@@ -5,6 +5,8 @@ keyword: günstigste Reihenfolge Städte Flug
 locale: de
 published: 2026-10-24
 updated: 2026-10-24
+hero_alt: "Eine Hand sortiert Karten mit Stadtsilhouetten auf einem Cafétisch in einer Bahnhofshalle neu"
+hero_color: "#827363"
 cluster: A. Route order and dates
 intent: how-to
 serp_format: "Gesucht am 2026-10-24 (de). Niemand beantwortet die Frage. Es ranken Multi-City-Glossare (wandernundmehr.at), Produktseiten von KAYAK und momondo, die Multi-City-Seite von British Airways, eine trip.com-Frage, ein leinetal24-Spartipp und zwei Uni-PDFs zum Rundreiseproblem. Format hier: Anleitung mit 1.400 bis 1.700 Wörtern, kurze Antwort, Schritte, ein echtes Beispiel, FAQ."
@@ -30,7 +32,6 @@ internal_links:
   - /de/search (kostenlose Websuche)
   - /guides/cheapest-order-to-visit-cities (Cluster-A-Pillar, englisch)
   - /guides/multi-city-vs-one-way-tickets (Cluster-B-Pillar, englisch)
-hero_prompt: Eine schlichte Nachtkarte Europas in Marineblau, eine gepunktete goldene Route von Warschau über Paris, Lissabon, Barcelona, Rom und Athen zurück nach Warschau, eine kleine weiße Fliege mit Flugzeugflügeln auf der Route. Flache Vektorgrafik, kein Text.
 judge: 81 PASS (2026-10-24, fresh subagent; fixes applied)
 status: ready
 ---

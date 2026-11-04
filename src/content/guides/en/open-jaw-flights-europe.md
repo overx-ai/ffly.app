@@ -4,6 +4,8 @@ slug: open-jaw-flights-europe
 keyword: open jaw flights Europe
 published: 2026-10-09
 updated: 2026-10-16
+hero_alt: "Backpack and open notebook with a route between two separate dots, on an airport bench at dusk"
+hero_color: "#6e6866"
 cluster: B. Booking mechanics on low-cost carriers
 intent: definition / how-to
 serp_format: Glossary definitions of 300-800 words (Going, Navan, AirHelp's opener) plus 1,200-2,500 word guides (Thrifty Traveler, Dollar Flight Club, Going, AirHelp) with a definition, the three types, how to book and an FAQ. Every ranking page is written for long-haul flights on full-service airlines; none covers budget airlines.
@@ -37,7 +39,6 @@ internal_links:
   - /guides/cheapest-order-to-visit-cities (cluster A pillar)
   - / (home: multi-city trip planner)
   - /search (free web search)
-hero_prompt: A minimal navy map of Europe with two gold flight arcs, one landing in Lisbon and one leaving from Athens, the open gap between them drawn as a dotted white line, flat vector, no text.
 status: ready
 ---
 

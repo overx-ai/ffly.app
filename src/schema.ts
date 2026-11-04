@@ -1,7 +1,7 @@
 import { APP, APP_STORE_URL, DEVELOPER, PUBLISHER } from './app';
 import type { HowTo } from './guide-markdown';
 import { DEFAULT_LANG, localeOf, useLang, type Lang } from './i18n';
-import { DEFAULT_OG_IMAGE, isoDate, siteOrigin, urlFor, type Slug } from './site-pages';
+import { isoDate, siteOrigin, urlFor, type Slug } from './site-pages';
 
 // No offers.price and no aggregateRating. Prices are territory-set and the app has no
 // ratings yet, so quoting either would be a claim the store does not back.
@@ -92,13 +92,14 @@ export function articleSchema(article: {
   slug: Slug;
   published: Date;
   updated: Date;
+  image: string;
 }) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: article.headline,
     description: article.description,
-    image: `${siteOrigin}${DEFAULT_OG_IMAGE}`,
+    image: `${siteOrigin}${article.image}`,
     author: developer,
     publisher: overx,
     datePublished: isoDate(article.published),
