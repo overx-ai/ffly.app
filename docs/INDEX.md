@@ -18,6 +18,7 @@
 - [Spec 009 - /meta without places](specs/009-meta-without-places.md): `/meta?places=false`, the stored list read when idle, a stored list at the live version never fetched again, `places.json?v=` cached immutably
 - [Spec 010 - Russian and Nordic languages, local city names](specs/010-russian-and-nordic.md): ru, sv, da, nb, fi; search by local name and every code, "All airports", Cyrillic fonts only where needed, places cache marked with the site's languages
 - [Spec 012 - Header language switcher, language hint](specs/012-language-hint-and-header-switcher.md): the footer's switcher as a globe menu in the header, a dismissable card offering the visitor's own language, never a redirect
+- [Spec 019 - Privacy covers search alerts](specs/019-privacy-search-alerts.md): the push token, how long a followed search stays, how to stop it.
 - [PINS](PINS.md): the ffly API contract version the site codes against
 - [Plan - Spec 003](plans/spec-003.md): how spec 003 was built, and its binding deviations
 
@@ -34,7 +35,6 @@ README.md (overview + verification)
 
 ## Cross-project
 - App: `../../0E-extensions/ios-ffly` (`docs/specs/014-night-gold-palette.md` shares this palette; `Template/PrivacyInfo.xcprivacy`,
-- [019 - Privacy covers search alerts](specs/019-privacy-search-alerts.md)
   `docs/compliance/data-inventory.yaml`, `Template/Core/Constants/LegalLinks.swift`,
   `fastlane/metadata/en-US/*_url.txt`)
 - API: `1B-bots` `apps/ffly-api` (`config.py` retention values)
