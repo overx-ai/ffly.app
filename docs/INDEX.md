@@ -19,6 +19,7 @@
 - [Spec 010 - Russian and Nordic languages, local city names](specs/010-russian-and-nordic.md): ru, sv, da, nb, fi; search by local name and every code, "All airports", Cyrillic fonts only where needed, places cache marked with the site's languages
 - [Spec 012 - Header language switcher, language hint](specs/012-language-hint-and-header-switcher.md): the footer's switcher as a globe menu in the header, a dismissable card offering the visitor's own language, never a redirect
 - [Spec 019 - Privacy covers search alerts](specs/019-privacy-search-alerts.md): the push token, how long a followed search stays, how to stop it.
+- [Spec 020 - Very good search on phones](specs/020-mobile-search.md): home hero, sheets, compact results, sort and filter on phones.
 - [PINS](PINS.md): the ffly API contract version the site codes against
 - [Plan - Spec 003](plans/spec-003.md): how spec 003 was built, and its binding deviations
 
