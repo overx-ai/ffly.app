@@ -9,6 +9,9 @@ const storage = (() => {
   }
 })();
 
+// A browser without popovers keeps the links in the bar, and throws on this selector.
+const POPOVERS = CSS.supports('selector(:popover-open)');
+
 const openMenu = () => document.querySelector<HTMLDetailsElement>('.lang-menu[open]');
 
 const closeMenuOutside = (target: EventTarget | null) => {
@@ -22,7 +25,7 @@ document.addEventListener('click', (event) => {
   if (pick?.dataset.langPick) settle(storage, pick.dataset.langPick);
   closeMenuOutside(target);
   // The menu's fragment links glide within the page, which would leave the popover over the target.
-  if (target?.closest('#site-menu a')) document.querySelector<HTMLElement>('#site-menu:popover-open')?.hidePopover();
+  if (POPOVERS && target?.closest('#site-menu a')) document.querySelector<HTMLElement>('#site-menu:popover-open')?.hidePopover();
 });
 
 // Tabbing past the open menu would leave its panel over the next focused control.

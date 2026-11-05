@@ -14,13 +14,13 @@ Those repos are the source of truth for copy, colours and claims.
   `check-legal` reads, `config.json` the routes it checks); `npm run preview` is `scripts/preview.mjs`, because
   `astro preview` does not support the adapter.
 - **Zero client JavaScript, except the search widget, the consent module and the language module.** Theme switching
-  is pure CSS, the FAQ and the header language menu are `<details>`. `ConsentBanner.astro` (in `BaseLayout`, every page)
+  is pure CSS, the FAQ and the header language menu are `<details>`; on phones the header links sit in a `popover` menu. `ConsentBanner.astro` (in `BaseLayout`, every page)
   loads `src/scripts/consent.ts`, whose logic is the DOM-free, tested `consent-state.ts`. `LangHint.astro` (in
   `BaseLayout`, every page) loads `src/scripts/lang-hint.ts` (spec 012), whose logic is the DOM-free, tested
   `lang-hint-state.ts`: it shows the language hint, remembers a picked language, and closes the header menu on Escape
   or a click outside.
   `SearchForm.astro` (specs 001 and 003) sits on `/` under `#search` and on `/search`, and ships one bundled
-  script: `src/scripts/search.ts` over small DOM-free modules (`ffly-api`, `combobox`, `calendar`, `prefs`,
+  script: `src/scripts/search.ts` over small DOM-free modules (`ffly-api`, `combobox`, `calendar`, `route-view`, `sheet`, `prefs`,
   `nudges`, `results`, `notify`, `scroll`, `ticker`, `places`, `places-store`, `filters`, `library`, `share-text`, `visa`)
   that `tests/` covers. Plain TypeScript, no framework, custom controls
   only (no `<select>`, `<datalist>`, date, time or number input), rendering via `textContent`/`<template>` only (never

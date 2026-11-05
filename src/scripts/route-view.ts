@@ -1,4 +1,6 @@
+import type { Route } from './ffly-api';
 import type { RouteRow, Warn } from './results';
+import { routePlaces } from './share-text';
 
 export const ROUTE_SORTS = ['best', 'price', 'stops'] as const;
 export type RouteSort = (typeof ROUTE_SORTS)[number];
@@ -22,9 +24,25 @@ const SORT_KEY: Partial<Record<RouteSort, (row: Viewable) => number>> = {
   stops: (row) => (row.kind === 'full' ? row.stops : UNKNOWN),
 };
 
-export const isLocked = (row: Pick<RouteRow, 'kind'>) => row.kind === 'locked';
+const isLocked = (row: Pick<RouteRow, 'kind'>) => row.kind === 'locked';
 
-export const shownRoutes = (rows: readonly Pick<RouteRow, 'kind'>[]) => rows.filter((row) => !isLocked(row)).length;
+export const unlockedCount = (rows: readonly Pick<RouteRow, 'kind'>[]) => rows.filter((row) => !isLocked(row)).length;
+
+// What a phone's counts claim: the routes the visitor can read. Only a result of nothing but locked rows counts those,
+// as routes found; it offers no filter.
+export function routeCount<T extends Viewable>(rows: readonly T[], view: RouteView): number {
+  return unlockedCount(rows) ? unlockedCount(viewRoutes(rows, view)) : rows.length;
+}
+
+// A card leaves out the flight back to where the trip began, as the summary above it says that.
+export function cardPlaces(route: Route): string[] {
+  const places = routePlaces(route);
+  return places.length > 1 && places[0] === places[places.length - 1] ? places.slice(0, -1) : places;
+}
+
+export function toggleHide(view: RouteView, hide: RouteHide): RouteView {
+  return { ...view, hide: view.hide.includes(hide) ? view.hide.filter((other) => other !== hide) : [...view.hide, hide] };
+}
 
 // Best match is the API's order. Array.prototype.sort is stable, so ties keep it too. Locked rows are never sorted,
 // filtered or moved up: what is behind them must not show through their position.

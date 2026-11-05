@@ -1,6 +1,6 @@
 import type { Place } from './ffly-api';
 import { fold, placeNames } from './places';
-import { fitToViewport, isPhone, lockScroll, onPhoneChange, unlockScroll } from './sheet';
+import { fitToViewport, focusBox, isPhone, lockScroll, onSheetExit, unlockScroll } from './sheet';
 
 export interface ComboState {
   open: boolean;
@@ -134,7 +134,12 @@ export class Combobox<T = Place> {
       if (!this.sheetOpen) event.preventDefault();
     });
     for (const button of this.sheet.querySelectorAll('.combo-back, .combo-done')) button.addEventListener('click', () => this.hideSheet());
-    onPhoneChange(() => this.hideSheet());
+    onSheetExit(() => this.hideSheet());
+    // Tabbing or a keyboard's Next out of the sheet would leave it over the field that took focus.
+    this.sheet.addEventListener('focusout', (event) => {
+      const next = event.relatedTarget as Node | null;
+      if (next && !this.sheet.contains(next)) this.hideSheet(false);
+    });
     o.list.addEventListener('click', (event) => {
       const row = (event.target as Element).closest<HTMLElement>('[data-index]');
       if (row) this.pick(Number(row.dataset.index));
@@ -164,7 +169,7 @@ export class Combobox<T = Place> {
     this.unfit = fitToViewport(this.sheet);
   }
 
-  private hideSheet() {
+  private hideSheet(refocus = true) {
     if (!this.sheetOpen) return;
     this.sheetOpen = false;
     this.sheet.classList.remove('sheet-open');
@@ -173,8 +178,7 @@ export class Combobox<T = Place> {
     this.o.input.blur();
     this.closeList();
     // The input itself would bring the sheet straight back.
-    this.sheet.tabIndex = -1;
-    this.sheet.focus({ preventScroll: true });
+    if (refocus) focusBox(this.sheet);
   }
 
   // The options changed under an open list (the places arrived): redraw it, else nothing.

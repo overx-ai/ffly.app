@@ -1,7 +1,7 @@
 ---
 id: 020
 title: "Very good search on phones"
-status: approved
+status: done
 priority: p1
 created: 2026-11-05
 updated: 2026-11-05
@@ -15,7 +15,7 @@ tasks: []
 
 # 020 - Very good search on phones
 
-> **TL;DR** — On phones the home title sits over the route map with a big gold search button, cities and dates open in sheets, and results become compact cards with a sticky summary, sort and filters. Desktop is unchanged. Nothing to do except a real iPhone check of keyboard and safe areas.
+> **TL;DR** — On phones the home title now sits over the route map with a big gold search button, cities and dates open in sheets, and results are compact cards with a sticky summary, sort and filters. Desktop stayed the same. Owner: check the keyboard and safe areas on a real iPhone.
 
 ## Requirements
 Approved mockups: https://claude.ai/artifact/TGoTCGuyRWBnWaHY6gJiQF. Home option C. Phones are 760px and below unless stated; 1280px renders as today.
@@ -56,17 +56,17 @@ Approved mockups: https://claude.ai/artifact/TGoTCGuyRWBnWaHY6gJiQF. Home option
 ## Tasks
 | ID | Description | Agent | Depends On | Status | Files |
 |----|-------------|-------|------------|--------|-------|
-| T1 | Platform, hero, header menu, slim consent | dev | - | pending | `src/layouts/BaseLayout.astro`, `src/views/Home.astro`, `src/components/Header.astro`, `src/components/ConsentBanner.astro` |
-| T2 | Form rows, city sheet, dates sheet | dev | T1 | pending | `src/components/SearchForm.astro`, `src/components/PlaceCombo.astro`, `src/styles/search.css`, `src/scripts/combobox.ts`, `src/scripts/calendar.ts` |
-| T3 | Searching state, sticky summary, compact results, open legs | dev | T2 | pending | `src/scripts/search.ts`, `src/styles/search.css` |
-| T4 | Sort and filter sheet with tested module | dev | T3 | pending | `src/scripts/route-view.ts`, `tests/route-view.test.ts` |
-| T5 | Copy in 13 languages | dev | T4 | pending | `src/i18n/*.ts` |
+| T1 | Platform, hero, header menu, slim consent | dev | - | done | `src/layouts/BaseLayout.astro`, `src/views/Home.astro`, `src/components/Header.astro`, `src/components/ConsentBanner.astro` |
+| T2 | Form rows, city sheet, dates sheet | dev | T1 | done | `src/components/SearchForm.astro`, `src/components/PlaceCombo.astro`, `src/styles/search.css`, `src/scripts/combobox.ts`, `src/scripts/calendar.ts` |
+| T3 | Searching state, sticky summary, compact results, open legs | dev | T2 | done | `src/scripts/search.ts`, `src/styles/search.css` |
+| T4 | Sort and filter sheet with tested module | dev | T3 | done | `src/scripts/route-view.ts`, `tests/route-view.test.ts` |
+| T5 | Copy in 13 languages | dev | T4 | done | `src/i18n/*.ts` |
 
 ## Acceptance Criteria
-- [ ] At 390px the title, map and search button fit above the consent row with no scrolling.
-- [ ] A full search works end to end at 320, 390 and 430, light and dark, with no horizontal scroll or console errors.
-- [ ] All tappables on the search flow are at least 44px on touch.
-- [ ] About six route cards fit on a 390x844 screen.
-- [ ] 1280px home and search look the same as before.
-- [ ] `npm test` passes, including `check-legal` across 13 languages.
-- [ ] Code review clean.
+- [x] At 390px the title, map and search button fit above the consent row with no scrolling.
+- [x] A full search works end to end at 320, 390 and 430, light and dark, with no horizontal scroll or console errors.
+- [x] All tappables on the search flow are at least 44px on touch.
+- [x] About six route cards fit on a 390x844 screen.
+- [x] 1280px home and search look the same as before.
+- [x] `npm test` passes, including `check-legal` across 13 languages.
+- [x] Code review clean.

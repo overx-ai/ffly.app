@@ -120,6 +120,8 @@ const comboText = { clear: w.clear, back: w.sheetBack, done: w.done };
         <p id="ends-hint" class="hint" hidden>{w.backMany}</p>
       </div>
 
+      <button id="travellers-row" type="button" class="form-row" aria-controls="options"><span class="k">{w.options.travellers}</span><span id="travellers-text" class="v"></span></button>
+
       <div class="cities-row">
         <div id="cities-field" class="field">
           <label id="city-label" for="city">
@@ -134,8 +136,6 @@ const comboText = { clear: w.clear, back: w.sheetBack, done: w.done };
         </div>
         <button id="submit" class="btn" type="submit">{w.submit}</button>
       </div>
-
-      <button id="travellers-row" type="button" class="form-row" aria-controls="options"><span class="k">{w.options.travellers}</span><span id="travellers-text" class="v"></span></button>
 
       <p id="form-error" class="form-error" role="alert"></p>
 

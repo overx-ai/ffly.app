@@ -1,4 +1,4 @@
-import { isPhone, lockScroll, onPhoneChange, unlockScroll } from './sheet';
+import { isPhone, lockScroll, onSheetExit, unlockScroll } from './sheet';
 
 export interface Day {
   iso: string;
@@ -118,18 +118,16 @@ export class RangePicker {
   private focusDay = '';
   private inSheet = false;
   private readonly text: ReturnType<typeof calendarText>;
-  private readonly done: HTMLButtonElement;
   private readonly value: HTMLElement;
 
   constructor(private readonly o: PickerOptions) {
     this.text = calendarText(o.locale);
-    this.done = o.dialog.querySelector('.cal-done')!;
     this.value = o.dialog.querySelector('.cal-value')!;
-    this.done.addEventListener('click', () => this.close());
+    o.dialog.querySelector('.cal-done')!.addEventListener('click', () => this.close());
     o.dialog.addEventListener('click', (event) => {
       if (this.inSheet && event.target === o.dialog) this.close();
     });
-    onPhoneChange(() => {
+    onSheetExit(() => {
       if (!o.dialog.hidden) this.close(false);
     });
     o.trigger.addEventListener('click', () => (o.dialog.hidden ? this.open() : this.close()));
@@ -263,7 +261,6 @@ export class RangePicker {
     this.o.months.replaceChildren(...tables);
     const { from, to } = this.draft;
     this.value.textContent = from && to ? this.o.format({ from, to }) : '';
-    this.done.disabled = Boolean(from && !to);
   }
 
   private monthTable(year: number, month: number, today: string): HTMLElement {

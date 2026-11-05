@@ -4,7 +4,7 @@ import { fill, plural, type Plural, type Vars } from '../i18n/text';
 import { setupAccount } from './auth';
 import type { Change } from './auth-state';
 import { RangePicker, addDays, daysBetween, localToday, stepNights, type Nights } from './calendar';
-import { Combobox, matchPlaces } from './combobox';
+import { Combobox, matchPlaces, type ComboOptions } from './combobox';
 import {
   ACTIVE,
   API_HOURS,
@@ -70,9 +70,9 @@ import { PlacesStore, provisionalMeta, type PlaceSet } from './places-store';
 import { quotaNote, quotaSpent } from './quota';
 import { cookieString, fillPrefs, finishOf, namesPlaces, parseCookies, sameSearch, savedCookies, sharedRequest, shareUrl, type Prefs } from './prefs';
 import { kitGroups, routeRows, type BookLink, type KitGroup, type LegRow, type RouteRow, type Warn } from './results';
-import { DEFAULT_VIEW, shownRoutes, viewRoutes, type RouteHide, type RouteSort, type RouteView } from './route-view';
+import { DEFAULT_VIEW, cardPlaces, routeCount, toggleHide, unlockedCount, viewRoutes, type RouteHide, type RouteSort, type RouteView } from './route-view';
 import { glideLinks } from './scroll';
-import { isPhone, lockScroll, onPhoneChange, unlockScroll } from './sheet';
+import { focusBox, isPhone, lockScroll, onPhoneChange, onSheetExit, unlockScroll } from './sheet';
 import { canShare, routePlaces, shareText, withLink } from './share-text';
 import { Ticker } from './ticker';
 import { TimeList } from './time-list';
@@ -224,7 +224,6 @@ const el = {
   summaryEdit: byId<HTMLButtonElement>('summary-edit'),
   sortOpen: byId<HTMLButtonElement>('sort-open'),
   sortSheet: byId<HTMLDialogElement>('sort-sheet'),
-  sortClear: byId<HTMLButtonElement>('sort-clear'),
   sortShow: byId<HTMLButtonElement>('sort-show'),
   filteredEmpty: byId('filtered-empty'),
   filteredClear: byId<HTMLButtonElement>('filtered-clear'),
@@ -281,13 +280,14 @@ const formatMoney = (amount: number) => money.format(amount);
 const listOf = new Intl.ListFormat(LOCALE, { type: 'conjunction' });
 const anyOf = new Intl.ListFormat(LOCALE, { type: 'disjunction' });
 const dayFormat = new Intl.DateTimeFormat(LOCALE, { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
+const summaryFormat = new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'short', timeZone: 'UTC' });
 const countFormat = new Intl.NumberFormat(LOCALE);
 const searchedFormat = new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 // The home page keeps the address on its #search section; /search has no such anchor.
 const SHARE_HASH = document.getElementById('search') ? '#search' : '';
-const formatDay = (iso: string) => dayFormat.format(new Date(`${iso}T00:00:00Z`));
-const summaryFormat = new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'short', timeZone: 'UTC' });
-const summaryDay = (iso: string) => summaryFormat.format(new Date(`${iso}T00:00:00Z`));
+const utcDate = (iso: string) => new Date(`${iso}T00:00:00Z`);
+const formatDay = (iso: string) => dayFormat.format(utcDate(iso));
+const summaryDay = (iso: string) => summaryFormat.format(utcDate(iso));
 const formatDays = (from: string, to: string) => `${formatDay(from)} – ${formatDay(to)}`;
 
 const picker = new RangePicker({
@@ -412,7 +412,7 @@ const focusField = (input: HTMLInputElement) => {
 type Codes = () => (string | undefined)[];
 
 // Until the place list is there a field says it is loading, never that nothing matches.
-function placeBox(input: HTMLInputElement, list: HTMLElement, exclude: Codes, onPick: (place: Place) => void, notice?: () => string | undefined, keepOpen?: () => boolean) {
+function placeBox(input: HTMLInputElement, list: HTMLElement, exclude: Codes, onPick: (place: Place) => void, { notice, keepOpen }: Pick<ComboOptions<Place>, 'notice' | 'keepOpen'> = {}) {
   const box = new Combobox({
     input,
     list,
@@ -738,7 +738,7 @@ function setSearching(on: boolean) {
 
 // The table stays on the page: before any search it shows the empty state, while one runs its placeholders pulse.
 function showPlaceholder(searching: boolean) {
-  for (const node of [el.resultsTitle, el.resultsTrip, el.searchAgain, el.resultsEmpty, el.insights, el.appHint, el.more, el.coverage, el.visaNote, el.rating]) {
+  for (const node of [el.resultsTitle, el.resultsTrip, el.searchAgain, el.sortOpen, el.resultsEmpty, el.filteredEmpty, el.insights, el.appHint, el.more, el.coverage, el.visaNote, el.rating]) {
     node.hidden = true;
   }
   el.routeRows.replaceChildren();
@@ -772,8 +772,8 @@ function showProblem(message: string, retry?: () => void, upsell = false) {
 }
 
 function renderSummary(r: SearchRequest) {
-  const places = r.cities.length ? listOf.format(r.cities.map(nameOf)) : anyOf.format(r.ends.map(nameOf));
-  el.summaryRoute.textContent = `${nameOf(r.start)} → ${places}`;
+  const destinations = r.cities.length ? listOf.format(r.cities.map(nameOf)) : anyOf.format(r.ends.map(nameOf));
+  el.summaryRoute.textContent = `${nameOf(r.start)} → ${destinations}`;
   const dates = `${summaryDay(r.date_from)} – ${summaryDay(r.date_to)}`;
   const stay = r.cities.length ? nightsSpan(r.min_nights, r.max_nights, count(TEXT.nights, r.max_nights)) : '';
   el.summaryMeta.textContent = [dates, stay].filter(Boolean).join(' · ');
@@ -933,6 +933,11 @@ async function showProgressKit(request: SearchRequest) {
   box.hidden = false;
 }
 
+function cardNights(route: Route): string {
+  const stays = route.nights ?? [];
+  return stays.length ? [...stays.slice(0, -1), count(TEXT.nights, stays[stays.length - 1])].join(' · ') : '';
+}
+
 function renderRow(row: RouteRow, ctx: RouteContext, teaser = false): HTMLElement[] {
   if (row.kind === 'locked') {
     const tr = clone('locked-row-template');
@@ -940,16 +945,13 @@ function renderRow(row: RouteRow, ctx: RouteContext, teaser = false): HTMLElemen
     return [tr];
   }
   const tr = clone('route-row-template');
-  const stays = ctx.route.nights ?? [];
-  const places = ctx.route.places ?? [];
   setTexts(tr, {
     '.rank': String(row.rank),
     '.route-full': row.route,
-    // A card leaves out the flight back to where the trip began, as the summary above it says that.
-    '.route-short': places[0] === places[places.length - 1] ? places.slice(0, -1).map(nameOf).join(' → ') : row.route,
+    '.route-short': cardPlaces(ctx.route).map(nameOf).join(' → '),
     '.dates': row.dates,
     '.nights-list': row.nights,
-    '.nights-unit': stays.length ? [...stays.slice(0, -1), count(TEXT.nights, stays[stays.length - 1])].join(' · ') : '',
+    '.nights-unit': cardNights(ctx.route),
     '.flights': row.flights ? String(row.flights) : '',
     '.total': row.total,
   });
@@ -981,8 +983,7 @@ function renderRow(row: RouteRow, ctx: RouteContext, teaser = false): HTMLElemen
   }
   toggle.setAttribute('aria-controls', legs.map((l) => l.id).join(' '));
   legs[legs.length - 1].classList.add('detail-end');
-  const best = row.rank === 1;
-  for (const node of [tr, ...legs]) node.classList.toggle('best', best);
+  if (row.rank === 1) for (const node of [tr, ...legs]) node.classList.add('best');
   const key = routeKey(ctx.route);
   const show = (open: boolean) => {
     toggle.setAttribute('aria-expanded', String(open));
@@ -1010,24 +1011,23 @@ function pushAds() {
   for (const _ of slots) w.adsbygoogle.push({});
 }
 
-// Unfiltered, the title counts locked rows too, as it always has; a filter's count is what it left to open.
-const routeCount = (viewed: RouteRow[], view: RouteView) => (view.hide.length ? shownRoutes(viewed) : viewed.length);
-
 function renderResults(view: SearchView, request: SearchRequest) {
   shown = { view, request };
   const { rows, more } = routeRows(view, { name: nameOf, money: formatMoney, day: formatDay }, CONTRACT_1_12);
   lastRows = rows;
-  const current = isPhone() ? routeView : DEFAULT_VIEW;
-  const viewed = viewRoutes(rows, current);
+  const phone = isPhone();
+  const viewed = viewRoutes(rows, phone ? routeView : DEFAULT_VIEW);
+  const found = phone ? routeCount(rows, routeView) : rows.length;
   const teaserRank = viewed.find((r) => r.proSaving !== undefined)?.rank;
   const searched = searchedSeconds(view);
   renderSummary(request);
-  showText(el.resultsTitle, viewed.length ? count(MESSAGES.found, routeCount(viewed, current)) : MESSAGES.none);
+  showText(el.resultsTitle, found ? count(MESSAGES.found, found) : MESSAGES.none);
   showText(el.resultsTrip, tripLine(request));
   el.searchAgain.hidden = true;
   el.resultsEmpty.hidden = rows.length > 0;
-  el.sortOpen.hidden = !shownRoutes(rows);
-  el.filteredEmpty.hidden = !shownRoutes(rows) || shownRoutes(viewed) > 0;
+  const anyUnlocked = unlockedCount(rows) > 0;
+  el.sortOpen.hidden = !anyUnlocked;
+  el.filteredEmpty.hidden = !anyUnlocked || unlockedCount(viewed) > 0;
   renderSkipped(request);
   showText(el.insights, view.insights ? insightsLine(view.insights) : '');
   showText(el.appHint, CONTRACT_1_12 ? '' : (appHintLine(view.app_hint, view.routes[0]?.price, formatMoney, TEXT.nudges.appHint) ?? ''));
@@ -1825,14 +1825,16 @@ const cityBox = placeBox(
   el.cityList,
   () => taken('cities'),
   (p) => addTo('cities', p.code),
-  () => (lists.cities.length >= maxCities() && !isPro() ? TEXT.nudges.cityCap : undefined),
-  () => !comboOf(el.city).hidden,
+  {
+    notice: () => (lists.cities.length >= maxCities() && !isPro() ? TEXT.nudges.cityCap : undefined),
+    keepOpen: () => !comboOf(el.city).hidden,
+  },
 );
 placeBox(el.from, el.fromList, () => lists.cities, (p) => {
   setFrom(p.code);
   remembered('from', false);
 });
-placeBox(el.back, el.backList, () => taken('ends'), (p) => addTo('ends', p.code), undefined, () => severalEnds() && !comboOf(el.back).hidden);
+placeBox(el.back, el.backList, () => taken('ends'), (p) => addTo('ends', p.code), { keepOpen: () => severalEnds() && !comboOf(el.back).hidden });
 placeBox(el.to, el.toList, () => [pickedFrom], (p) => setDestination(p.code));
 boxes.set(el.passport, passportBox);
 
@@ -1990,7 +1992,7 @@ el.searchAgain.addEventListener('click', () => el.form.requestSubmit());
 // Only a way back to the filled form: a running search keeps it held, and nothing here submits.
 el.summaryEdit.addEventListener('click', () => {
   el.form.scrollIntoView({ block: 'start' });
-  el.form.focus({ preventScroll: true });
+  focusBox(el.form);
 });
 
 function paintSort() {
@@ -2000,7 +2002,7 @@ function paintSort() {
   for (const button of el.sortSheet.querySelectorAll<HTMLButtonElement>('[data-hide]')) {
     button.setAttribute('aria-pressed', String(sortDraft.hide.includes(button.dataset.hide as RouteHide)));
   }
-  el.sortShow.textContent = count(PHONE.show, routeCount(viewRoutes(lastRows, sortDraft), sortDraft));
+  el.sortShow.textContent = count(PHONE.show, routeCount(lastRows, sortDraft));
 }
 
 function applyView(view: RouteView) {
@@ -2023,7 +2025,7 @@ el.sortSheet.addEventListener('click', (event) => {
   const sort = target.closest<HTMLButtonElement>('[data-sort]')?.dataset.sort as RouteSort | undefined;
   const hide = target.closest<HTMLButtonElement>('[data-hide]')?.dataset.hide as RouteHide | undefined;
   if (sort) sortDraft = { ...sortDraft, sort };
-  if (hide) sortDraft = { ...sortDraft, hide: sortDraft.hide.includes(hide) ? sortDraft.hide.filter((h) => h !== hide) : [...sortDraft.hide, hide] };
+  if (hide) sortDraft = toggleHide(sortDraft, hide);
   if (target.closest('#sort-clear')) sortDraft = DEFAULT_VIEW;
   paintSort();
 });
@@ -2038,10 +2040,11 @@ el.filteredClear.addEventListener('click', () => {
   el.sortOpen.focus();
 });
 
-onPhoneChange(() => {
+onSheetExit(() => {
   if (el.sortSheet.open) el.sortSheet.close();
-  redrawResults();
 });
+
+onPhoneChange(redrawResults);
 
 function closeNotifyAsk() {
   askedToNotify = true;

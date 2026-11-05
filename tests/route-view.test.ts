@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { RouteRow, Warn } from '../src/scripts/results';
-import { DEFAULT_VIEW, shownRoutes, viewRoutes } from '../src/scripts/route-view';
+import type { Route } from '../src/scripts/ffly-api';
+import { DEFAULT_VIEW, cardPlaces, routeCount, unlockedCount, viewRoutes } from '../src/scripts/route-view';
 
 const row = (rank: number, price: number, stops = 0, warnings: Warn[] = [], kind: RouteRow['kind'] = 'full') => ({ rank, price, stops, warnings, kind });
 const locked = (rank: number, price: number) => row(rank, price, 0, [], 'locked');
@@ -33,7 +34,7 @@ describe('viewRoutes', () => {
   it('leaves only the locked rows when every route is filtered out', () => {
     const view = viewRoutes([row(1, 100, 1, ['stops']), locked(2, 90)], { sort: 'price', hide: ['stops'] });
     expect(ranks(view)).toEqual([2]);
-    expect(shownRoutes(view)).toBe(0);
+    expect(unlockedCount(view)).toBe(0);
   });
 
   it('sorts a route without legs after those with known stops', () => {
@@ -41,9 +42,31 @@ describe('viewRoutes', () => {
     expect(ranks(viewRoutes(partial, { sort: 'stops', hide: [] }))).toEqual([2, 1]);
   });
 
+  it('counts only the routes that can be read, unless locked rows are all there is', () => {
+    expect(routeCount(rows, DEFAULT_VIEW)).toBe(4);
+    expect(routeCount(rows, { sort: 'best', hide: ['stops', 'late'] })).toBe(1);
+    expect(routeCount([row(1, 100, 1, ['stops']), locked(2, 90)], { sort: 'best', hide: ['stops'] })).toBe(0);
+    expect(routeCount([locked(1, 90), locked(2, 80)], DEFAULT_VIEW)).toBe(2);
+  });
+
   it('does not change the rows it is given', () => {
     const before = [...rows];
     viewRoutes(rows, { sort: 'price', hide: ['late'] });
     expect(rows).toEqual(before);
+  });
+});
+
+describe('cardPlaces', () => {
+  const route = (fields: Partial<Route>) => fields as Route;
+
+  it('drops the return to the start, and keeps a trip that ends elsewhere', () => {
+    expect(cardPlaces(route({ places: ['WAW', 'ROM', 'WAW'] }))).toEqual(['WAW', 'ROM']);
+    expect(cardPlaces(route({ places: ['WAW', 'ROM'] }))).toEqual(['WAW', 'ROM']);
+  });
+
+  it('reads the legs when places is missing, and keeps a single place', () => {
+    const legs = [{ from_place: 'WAW', to_place: 'ROM' }, { from_place: 'ROM', to_place: 'WAW' }] as Route['legs'];
+    expect(cardPlaces(route({ legs }))).toEqual(['WAW', 'ROM']);
+    expect(cardPlaces(route({ places: ['WAW'] }))).toEqual(['WAW']);
   });
 });

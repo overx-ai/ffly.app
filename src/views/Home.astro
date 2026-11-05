@@ -306,7 +306,7 @@ const faq: FaqItem[] = [
       justify-content: center;
       height: min(var(--map-natural), max(var(--map-natural) * 0.85, 100vh - var(--hero-rest)));
       height: min(var(--map-natural), max(var(--map-natural) * 0.85, 100dvh - var(--hero-rest)));
-      margin-inline: calc(-1 * var(--gutter));
+      margin-inline: calc(-1 * var(--edge-left)) calc(-1 * var(--edge-right));
       overflow: hidden;
       -webkit-mask-image: linear-gradient(to bottom, transparent 4%, #000 21%);
       mask-image: linear-gradient(to bottom, transparent 4%, #000 21%);
@@ -333,5 +333,9 @@ const faq: FaqItem[] = [
   @media (max-width: 760px) and (max-height: 600px) {
     .hero { padding-top: 10px; }
     .hero-cta.phone-only { min-height: 50px; margin-top: 8px; }
+  }
+  /* Riding over the banner here would cover the title, so the button keeps its place under the map. */
+  @media (max-width: 760px) and (max-height: 479px) {
+    :global(body:has(#consent:not([hidden]))) .hero-cta.phone-only { position: static; }
   }
 </style>
