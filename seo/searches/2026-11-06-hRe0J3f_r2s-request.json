@@ -1,0 +1,1 @@
+{"start": "LON", "ends": ["LON"], "cities": ["PAR", "ROM", "BCN", "AMS"], "date_from": "2027-02-01", "date_to": "2027-02-28", "min_nights": 2, "max_nights": 3, "priority": "price", "client_request_id": "80ce631f-f4ef-4ad9-8b92-469dd64759dd"}

@@ -1,0 +1,1 @@
+{"start": "ROM", "ends": ["ROM"], "cities": ["PAR", "BER", "BUD", "WAR"], "date_from": "2027-02-01", "date_to": "2027-02-28", "min_nights": 2, "max_nights": 3, "priority": "price", "client_request_id": "b6f3ca5b-ee14-4f34-902e-164e98fa2eb3"}
