@@ -47,6 +47,8 @@ export interface RouteRow {
   flights: number;
   warnings: Warn[];
   total: string;
+  price: number;
+  stops: number;
   nCities: number;
   legs: LegRow[];
   proSaving?: number;
@@ -140,6 +142,8 @@ function routeRow(route: Route, rank: number, f: Format, v12: boolean): RouteRow
     flights: legs.length,
     warnings: warningsOf(legs),
     total: f.money(route.price),
+    price: route.price,
+    stops: legs.reduce((sum, leg) => sum + leg.stops, 0),
     nCities: route.n_cities,
     legs: legs.map((l, i) => legRow(l, f, route.nights?.[i], v12)),
     proSaving: v12 && route.pro_preview && route.pro_preview.saving > 0 ? route.pro_preview.saving : undefined,
