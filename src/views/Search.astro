@@ -36,4 +36,7 @@ const guideLink = pageLink('guides/cheapest-order-to-visit-cities', t.common.gui
   .search-head { display: flex; flex-direction: column; gap: var(--space-md); max-width: var(--max-width-prose); }
   h1 { font-size: clamp(2.4rem, 6vw, 3.4rem); letter-spacing: -0.04em; overflow-wrap: break-word; hyphens: auto; }
   .guide-link { color: var(--ink-2); font-size: 14px; }
+  @media (max-width: 359px) {
+    h1 { font-size: 2rem; }
+  }
 </style>

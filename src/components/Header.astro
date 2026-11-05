@@ -20,11 +20,15 @@ const home = pathFor('', lang);
       <span>{APP.name}</span>
     </a>
     <nav aria-label={nav.label}>
-      {/* Absolute, not bare fragments: the ids live on the home page only. */}
-      <a class="wide" href={`${home}#why`}>{nav.why}</a>
-      <a class="wide" href={`${home}#plans`}>{nav.plans}</a>
-      <a href={`${home}#search`}>{nav.search}</a>
-      <a href={pathFor('support', lang)} hreflang={hreflangOf('support', lang)}>{nav.support}</a>
+      {/* Only a box on phones: wider, display: contents leaves its children in the bar. */}
+      <div id="site-menu" class="nav-menu" popover>
+        {/* Absolute, not bare fragments: the ids live on the home page only. */}
+        <a class="wide" href={`${home}#why`}>{nav.why}</a>
+        <a class="wide" href={`${home}#plans`}>{nav.plans}</a>
+        <a href={`${home}#search`}>{nav.search}</a>
+        <a href={pathFor('support', lang)} hreflang={hreflangOf('support', lang)}>{nav.support}</a>
+        <LanguageMenu lang={lang} slug={slug} />
+      </div>
       {SIGN_IN && (
         <a class="nav-sign-in" href={`${pathFor('search', lang)}${AUTH.signInHash}`} data-sign-in data-account-label={nav.account}>
           <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
@@ -34,7 +38,11 @@ const home = pathFor('', lang);
           <span>{nav.signIn}</span>
         </a>
       )}
-      <LanguageMenu lang={lang} slug={slug} />
+      <button type="button" class="menu-button" popovertarget="site-menu" aria-label={nav.menu}>
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      </button>
     </nav>
   </div>
 </header>
@@ -47,6 +55,7 @@ const home = pathFor('', lang);
     backdrop-filter: saturate(160%) blur(12px);
     background: color-mix(in srgb, var(--bg) 86%, transparent);
     border-bottom: 1px solid var(--rule);
+    padding-top: var(--safe-top);
   }
   .bar {
     display: flex;
@@ -75,6 +84,9 @@ const home = pathFor('', lang);
   }
   .brand img { border-radius: 11px; }
   nav { flex: none; display: flex; align-items: center; gap: var(--space-lg); }
+  .nav-menu { display: contents; }
+  .nav-menu :global(.lang-menu) { order: 1; }
+  .menu-button { display: none; }
   nav a {
     color: var(--ink-2);
     font-size: 15px;
@@ -83,7 +95,9 @@ const home = pathFor('', lang);
     align-items: center;
     text-decoration: none;
   }
-  nav a:hover { color: var(--ink); }
+  @media (hover: hover) {
+    nav a:hover { color: var(--ink); }
+  }
   /* Signed out, the search form's gold Sign in; signed in (Account), a quiet nav link. The nav prefix outranks the scoped nav a. */
   nav .nav-sign-in {
     justify-content: center;
@@ -94,9 +108,13 @@ const home = pathFor('', lang);
     font-weight: 700;
     white-space: nowrap;
   }
-  nav .nav-sign-in:hover { color: var(--on-gold); filter: brightness(1.05); }
+  @media (hover: hover) {
+    nav .nav-sign-in:hover { color: var(--on-gold); filter: brightness(1.05); }
+  }
   nav .nav-sign-in[data-signed-in] { padding-inline: 0; border-radius: var(--radius-sm); background: none; color: var(--ink-2); font-weight: 400; }
-  nav .nav-sign-in[data-signed-in]:hover { color: var(--ink); filter: none; }
+  @media (hover: hover) {
+    nav .nav-sign-in[data-signed-in]:hover { color: var(--ink); filter: none; }
+  }
   .nav-sign-in svg { display: none; }
   /* Below this the sign-in link is an icon the size of the language button, its label kept for screen readers. */
   @media (max-width: 900px) {
@@ -109,6 +127,43 @@ const home = pathFor('', lang);
   @media (max-width: 760px) {
     nav { gap: var(--space-md); }
     nav .wide { display: none; }
+    @supports selector(:popover-open) {
+      .nav-menu:not(:popover-open) { display: none; }
+      .nav-menu:popover-open {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 2px;
+        inset: var(--sticky-top) max(var(--gutter), var(--safe-right)) auto auto;
+        margin: 0;
+        padding: var(--space-sm);
+        width: min(280px, 100vw - 2 * var(--gutter));
+        max-height: calc(100dvh - var(--sticky-top) - var(--space-md));
+        overflow-y: auto;
+        background: var(--surface);
+        color: var(--ink);
+        border: 1px solid var(--rule);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow);
+      }
+      .nav-menu::backdrop { background: none; }
+      .nav-menu a:not(.wide) { display: flex; padding-inline: 12px; font-size: 16px; color: var(--ink); }
+      #site-menu :global(.lang-menu summary) { display: flex; justify-content: flex-start; border: 0; padding-inline: 12px; }
+      #site-menu :global(.lang-menu summary span) { display: inline; }
+      .nav-menu :global(.lang-panel) { position: static; width: auto; max-width: none; border: 0; box-shadow: none; }
+      .menu-button {
+        display: inline-grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border: 1px solid var(--rule);
+        border-radius: var(--radius-pill);
+        background: none;
+        color: var(--ink);
+        cursor: pointer;
+      }
+    }
   }
   @media (max-width: 420px) {
     .bar, nav { gap: 8px; }

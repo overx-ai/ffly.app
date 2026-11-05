@@ -1,3 +1,5 @@
+import { isPhone, lockScroll, onPhoneChange, unlockScroll } from './sheet';
+
 export interface Day {
   iso: string;
   day: number;
@@ -114,10 +116,22 @@ export class RangePicker {
   private draft: Range = {};
   private view = { year: 0, month: 0 };
   private focusDay = '';
+  private inSheet = false;
   private readonly text: ReturnType<typeof calendarText>;
+  private readonly done: HTMLButtonElement;
+  private readonly value: HTMLElement;
 
   constructor(private readonly o: PickerOptions) {
     this.text = calendarText(o.locale);
+    this.done = o.dialog.querySelector('.cal-done')!;
+    this.value = o.dialog.querySelector('.cal-value')!;
+    this.done.addEventListener('click', () => this.close());
+    o.dialog.addEventListener('click', (event) => {
+      if (this.inSheet && event.target === o.dialog) this.close();
+    });
+    onPhoneChange(() => {
+      if (!o.dialog.hidden) this.close(false);
+    });
     o.trigger.addEventListener('click', () => (o.dialog.hidden ? this.open() : this.close()));
     o.prev.addEventListener('click', () => this.shift(-1));
     o.next.addEventListener('click', () => this.shift(1));
@@ -161,12 +175,20 @@ export class RangePicker {
     this.showMonthOf(this.focusDay);
     this.o.dialog.hidden = false;
     this.o.trigger.setAttribute('aria-expanded', 'true');
+    if (isPhone()) {
+      this.inSheet = true;
+      lockScroll();
+    }
     this.focus();
   }
 
   private close(returnFocus = true) {
     this.o.dialog.hidden = true;
     this.o.trigger.setAttribute('aria-expanded', 'false');
+    if (this.inSheet) {
+      this.inSheet = false;
+      unlockScroll();
+    }
     if (returnFocus) this.o.trigger.focus();
   }
 
@@ -177,8 +199,11 @@ export class RangePicker {
       const range = { from: this.draft.from, to: this.draft.to };
       this.set(range);
       this.o.onPick?.(range);
-      this.close();
-      return;
+      // The sheet closes on its Done button, so a tap on the last day can still be changed.
+      if (!this.inSheet) {
+        this.close();
+        return;
+      }
     }
     this.render();
     this.focus();
@@ -236,6 +261,9 @@ export class RangePicker {
       return this.monthTable(shown.year, shown.month, today);
     });
     this.o.months.replaceChildren(...tables);
+    const { from, to } = this.draft;
+    this.value.textContent = from && to ? this.o.format({ from, to }) : '';
+    this.done.disabled = Boolean(from && !to);
   }
 
   private monthTable(year: number, month: number, today: string): HTMLElement {

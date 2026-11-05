@@ -9,6 +9,7 @@ import { DEFAULT_LANG, useLang, type Lang } from '../i18n';
 import type { OptionField } from '../scripts/ffly-api';
 import { TRAVELLER_KINDS, TRIP_TYPES } from '../scripts/filters';
 import { webNudges } from '../scripts/nudges';
+import { ROUTE_HIDES, ROUTE_SORTS } from '../scripts/route-view';
 import '../styles/search.css';
 
 interface Props { lang?: Lang; }
@@ -33,6 +34,7 @@ const LOCKED_FIELD: Partial<Record<keyof typeof w.appOnly, OptionField>> = {
 const appChips = Object.entries(w.appOnly).filter(([key]) => !(CONTRACT_1_12 && key === 'cities'));
 const nudges = webNudges(w.script.nudges, tag);
 const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.priorities)[];
+const comboText = { clear: w.clear, back: w.sheetBack, done: w.done };
 ---
 <div class="search-ui" data-i18n={JSON.stringify({ ...w.script, nudges, columns: w.columns, nights: t.common.nights, loading: w.loading, ...v12 })}>
   <noscript>
@@ -55,9 +57,9 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
       </div>
 
       <div class="trip-row">
-        <div class="field">
+        <div id="from-field" class="field">
           <label id="from-label" for="from">{w.from} <span class="remembered" data-remembered="from" hidden>{w.remembered}</span></label>
-          <PlaceCombo id="from" placeholder={w.typeCity} clear={w.clear} />
+          <PlaceCombo id="from" placeholder={w.typeCity} {...comboText} />
         </div>
         <div id="back-field" class="field">
           <label id="back-label" for="back">
@@ -67,33 +69,38 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
           </label>
           <div class="place-box">
             <ul id="ends" class="chips" aria-label={w.back} data-placeholder={w.addCity} hidden></ul>
-            <PlaceCombo id="back" placeholder={w.sameAsFrom} describedBy="back-hint" clear={w.clear} />
+            <PlaceCombo id="back" placeholder={w.sameAsFrom} describedBy="back-hint" {...comboText} />
           </div>
           <p id="back-hint" class="sr-only">{w.backHint}</p>
         </div>
         <div id="to-field" class="field" hidden>
           <label id="to-label" for="to">{w.to}</label>
-          <PlaceCombo id="to" placeholder={w.typeCity} clear={w.clear} />
+          <PlaceCombo id="to" placeholder={w.typeCity} {...comboText} />
         </div>
-        <div class="field">
-          <span id="window-label" class="field-label">{w.window}</span>
+        <div id="window-field" class="field">
+          <span id="window-label" class="field-label"><span class="wide-text">{w.window}</span><span class="phone-text">{col.dates}</span></span>
           <div class="popover-anchor">
             <button id="window" type="button" class="picker" aria-haspopup="dialog" aria-expanded="false" aria-controls="calendar" aria-labelledby="window-label window-text">
               <span id="window-text"></span>
             </button>
             <div id="calendar" class="calendar" role="dialog" aria-labelledby="window-label" hidden>
-              <div class="cal-nav">
-                <button id="cal-prev" type="button" aria-label={w.prevMonth}>&lsaquo;</button>
-                <p class="hint">{w.calendarHint}</p>
-                <button id="cal-next" type="button" aria-label={w.nextMonth}>&rsaquo;</button>
+              <div class="cal-panel">
+                <div class="cal-head"><p class="cal-title">{w.window}</p><span class="cal-value"></span></div>
+                <div class="cal-nav">
+                  <button id="cal-prev" type="button" aria-label={w.prevMonth}>&lsaquo;</button>
+                  <p class="hint">{w.calendarHint}</p>
+                  <button id="cal-next" type="button" aria-label={w.nextMonth}>&rsaquo;</button>
+                </div>
+                <div id="cal-months" class="cal-months"></div>
+                <div class="cal-foot"><button type="button" class="btn cal-done">{w.done}</button></div>
               </div>
-              <div id="cal-months" class="cal-months"></div>
             </div>
           </div>
         </div>
         <fieldset id="nights-field" class="field">
           <legend class="field-label">{w.nights}</legend>
-          <div class="steppers">
+          <button id="nights-row" type="button" class="form-row" aria-expanded="false" aria-controls="nights-steppers"><span class="k">{w.nightsRow}</span><span id="nights-text" class="v"></span></button>
+          <div id="nights-steppers" class="steppers">
             {[
               { key: 'min', label: w.atLeast },
               { key: 'max', label: w.atMost },
@@ -121,12 +128,14 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
           </label>
           <div class="place-box">
             <ul id="cities" class="chips" aria-label={w.cities}></ul>
-            <PlaceCombo id="city" placeholder={w.addCity} describedBy="city-hint" clear={w.clear} />
+            <PlaceCombo id="city" placeholder={w.addCity} describedBy="city-hint" {...comboText} />
           </div>
           <p id="city-hint" class="sr-only">{w.cityHint}</p>
         </div>
         <button id="submit" class="btn" type="submit">{w.submit}</button>
       </div>
+
+      <button id="travellers-row" type="button" class="form-row" aria-controls="options"><span class="k">{w.options.travellers}</span><span id="travellers-text" class="v"></span></button>
 
       <p id="form-error" class="form-error" role="alert"></p>
 
@@ -214,7 +223,7 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
           <label id="passport-label" for="passport" class="field-label">{w.options.passports}</label>
           <div class="place-box">
             <ul id="passports" class="chips" aria-label={w.options.passports}></ul>
-            <PlaceCombo id="passport" placeholder={w.options.addPassport} describedBy="passport-hint" clear={w.clear} />
+            <PlaceCombo id="passport" placeholder={w.options.addPassport} describedBy="passport-hint" {...comboText} />
           </div>
           <p id="passport-hint" class="hint">{w.options.passportsHint}</p>
         </div>
@@ -223,6 +232,11 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
   </form>
 
   <AppStrip lang={lang} />
+
+  <div id="trip-summary" class="trip-summary" hidden>
+    <div class="summary-text"><b id="summary-route"></b><span id="summary-meta"></span></div>
+    <button id="summary-edit" type="button" class="btn btn-soon">{w.edit}</button>
+  </div>
 
   <div id="problem" class="card problem" role="alert" hidden>
     <p id="problem-text"></p>
@@ -240,7 +254,7 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
     <div id="notify-ask" class="notify-ask" hidden>
       <p>{w.notifyAsk}</p>
       <div class="notify-buttons">
-        <button id="notify-yes" type="button" class="btn">{w.notifyYes}</button>
+        <button id="notify-yes" type="button" class="btn"><span class="wide-text">{w.notifyYes}</span><span class="phone-text">{w.notifyReady}</span></button>
         <button id="notify-no" type="button" class="btn btn-soon">{w.notifyNo}</button>
       </div>
     </div>
@@ -251,9 +265,14 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
     <div class="results-head">
       <h2 id="results-title" hidden>{w.emptyState}</h2>
       <button id="search-again" type="button" class="btn btn-soon" hidden>{w.searchAgain}</button>
+      <button id="sort-open" type="button" class="btn btn-soon" aria-haspopup="dialog" hidden>{w.sort.open}</button>
     </div>
     <p id="results-trip" class="note" hidden></p>
     <p id="results-empty" class="note" hidden>{w.empty}</p>
+    <div id="filtered-empty" class="filtered-empty" hidden>
+      <p class="note">{w.sort.empty}</p>
+      <button id="filtered-clear" type="button" class="link-button">{w.clear}</button>
+    </div>
     <div id="skipped" class="skipped" hidden>
       <span id="skipped-label" class="lbl"></span>
       <ul id="skipped-list" class="skipped-list" aria-labelledby="skipped-label"></ul>
@@ -321,6 +340,28 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
     <AppStoreBadge lang={lang} placement="upsell" />
   </section>
 
+  <dialog id="sort-sheet" class="sheet library-sheet sort-sheet" aria-labelledby="sort-title">
+    <div class="sort-head">
+      <h2 id="sort-title">{w.sort.open}</h2>
+      <button id="sort-clear" type="button" class="link-button">{w.clear}</button>
+    </div>
+    <div class="sort-options">
+      <p id="sort-by" class="note">{w.sort.by}</p>
+      <div role="group" aria-labelledby="sort-by">
+        {ROUTE_SORTS.map((sort) => (
+          <button type="button" class="choice" data-sort={sort} aria-pressed="false"><span>{w.sort[sort]}</span><span class="dot" aria-hidden="true"></span></button>
+        ))}
+      </div>
+      <p id="sort-hide" class="note">{w.sort.hide}</p>
+      <div role="group" aria-labelledby="sort-hide">
+        {ROUTE_HIDES.map((hide) => (
+          <button type="button" class="choice" data-hide={hide} aria-pressed="false"><span>{w.sort.hides[hide]}</span><span class="switch" aria-hidden="true"><i></i></span></button>
+        ))}
+      </div>
+    </div>
+    <div class="sort-foot"><button id="sort-show" type="button" class="btn"></button></div>
+  </dialog>
+
   <dialog id="library-sheet" class="sheet library-sheet" aria-labelledby="library-title">
     <h2 id="library-title">{w.library.open}</h2>
     <section class="library-block" aria-labelledby="saved-title">
@@ -374,7 +415,7 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
 </template>
 
 <template id="place-option-row-template">
-  <li class="place-option"><span class="place-option-name"></span><span class="pin popover-anchor" hidden><button type="button" class="picker pin-picker" aria-haspopup="dialog" aria-expanded="false"><span class="pin-text"></span></button><button type="button" class="chip-remove pin-remove" hidden>&times;</button><div class="calendar" role="dialog" hidden><div class="cal-nav"><button type="button" class="cal-prev" aria-label={w.prevMonth}>&lsaquo;</button><p class="hint">{w.calendarHint}</p><button type="button" class="cal-next" aria-label={w.nextMonth}>&rsaquo;</button></div><div class="cal-months"></div></div></span><span class="airport-toggles" hidden></span></li>
+  <li class="place-option"><span class="place-option-name"></span><span class="pin popover-anchor" hidden><button type="button" class="picker pin-picker" aria-haspopup="dialog" aria-expanded="false"><span class="pin-text"></span></button><button type="button" class="chip-remove pin-remove" hidden>&times;</button><div class="calendar" role="dialog" hidden><div class="cal-panel"><div class="cal-head"><p class="cal-title"></p><span class="cal-value"></span></div><div class="cal-nav"><button type="button" class="cal-prev" aria-label={w.prevMonth}>&lsaquo;</button><p class="hint">{w.calendarHint}</p><button type="button" class="cal-next" aria-label={w.nextMonth}>&rsaquo;</button></div><div class="cal-months"></div><div class="cal-foot"><button type="button" class="btn cal-done">{w.done}</button></div></div></div></span><span class="airport-toggles" hidden></span></li>
 </template>
 
 <template id="library-row-template">
@@ -384,9 +425,9 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
 <template id="route-row-template">
   <tr class="route-row">
     <td class="rank" data-label={col.rank}></td>
-    <td class="route" data-label={col.route}></td>
+    <td class="route" data-label={col.route}><span class="route-full"></span><span class="route-short"></span></td>
     <td class="dates" data-label={col.dates}></td>
-    <td class="nights" data-label={col.nights}></td>
+    <td class="nights" data-label={col.nights}><span class="nights-list"></span><span class="nights-unit"></span></td>
     <td class="flights" data-label={col.flights}></td>
     <td class="warn" data-label={col.warn}><ul class="warn-chips"></ul></td>
     <td class="total" data-label={col.total}></td>
@@ -406,9 +447,7 @@ const PRIORITIES = Object.keys(w.options.priorities) as (keyof typeof w.options.
         <span class="leg-time"></span>
         <span class="leg-path"><span class="leg-from"></span> <code class="leg-from-code"></code> &rarr; <span class="leg-to"></span> <code class="leg-to-code"></code></span>
         <span class="leg-nights"></span>
-        <span class="leg-carrier"></span>
-        <span class="leg-stops"></span>
-        <span class="leg-price"></span>
+        <span class="leg-meta"><span class="leg-carrier"></span><span class="leg-stops"></span><span class="leg-price"></span></span>
         <a class="btn book" target="_blank" rel="sponsored noopener">{w.book}</a>
         <span class="leg-warn" hidden></span>
         <span class="leg-menu popover-anchor" hidden><button type="button" class="leg-more" aria-haspopup="menu" aria-expanded="false">&middot;&middot;&middot;</button><span class="menu" role="menu" hidden><button type="button" class="menu-item leg-skip" role="menuitem"></button></span></span>

@@ -1,5 +1,6 @@
 import type { Place } from './ffly-api';
 import { fold, placeNames } from './places';
+import { fitToViewport, isPhone, lockScroll, onPhoneChange, unlockScroll } from './sheet';
 
 export interface ComboState {
   open: boolean;
@@ -103,6 +104,8 @@ export interface ComboOptions<T> {
   renderNotice: (text: string) => HTMLElement;
   notice?: () => string | undefined;
   onPick: (item: T) => void;
+  // A chip list stays in its phone sheet after a pick, to add another.
+  keepOpen?: () => boolean;
 }
 
 // ARIA 1.2 combobox: focus stays in the input, the active row is announced through aria-activedescendant.
@@ -110,22 +113,68 @@ export class Combobox<T = Place> {
   private state = CLOSED;
   private items: T[] = [];
   private noticeText: string | undefined;
+  private readonly sheet: HTMLElement;
+  private sheetOpen = false;
+  private unfit = () => {};
 
   constructor(private readonly o: ComboOptions<T>) {
+    // A chip list's sheet holds its chips too.
+    this.sheet = o.input.closest<HTMLElement>('.place-box') ?? o.input.closest<HTMLElement>('.combo')!;
     o.input.addEventListener('input', () => this.open());
-    o.input.addEventListener('focus', () => this.open());
-    o.input.addEventListener('blur', () => this.close());
+    o.input.addEventListener('focus', () => {
+      this.showSheet();
+      this.open();
+    });
+    o.input.addEventListener('blur', () => {
+      if (!this.sheetOpen) this.closeList();
+    });
     o.input.addEventListener('keydown', (event) => this.key(event));
-    o.list.addEventListener('pointerdown', (event) => event.preventDefault());
+    // In the sheet a blur closes nothing, and a prevented touch would keep the list from scrolling on some browsers.
+    o.list.addEventListener('pointerdown', (event) => {
+      if (!this.sheetOpen) event.preventDefault();
+    });
+    for (const button of this.sheet.querySelectorAll('.combo-back, .combo-done')) button.addEventListener('click', () => this.hideSheet());
+    onPhoneChange(() => this.hideSheet());
     o.list.addEventListener('click', (event) => {
       const row = (event.target as Element).closest<HTMLElement>('[data-index]');
       if (row) this.pick(Number(row.dataset.index));
     });
   }
 
+  // In the sheet the list is the whole screen, so closing it only redraws it.
   close() {
+    if (this.sheetOpen) this.open();
+    else this.closeList();
+  }
+
+  get inSheet() {
+    return this.sheetOpen;
+  }
+
+  private closeList() {
     this.state = CLOSED;
     this.render();
+  }
+
+  private showSheet() {
+    if (this.sheetOpen || !isPhone()) return;
+    this.sheetOpen = true;
+    this.sheet.classList.add('sheet-open');
+    lockScroll();
+    this.unfit = fitToViewport(this.sheet);
+  }
+
+  private hideSheet() {
+    if (!this.sheetOpen) return;
+    this.sheetOpen = false;
+    this.sheet.classList.remove('sheet-open');
+    this.unfit();
+    unlockScroll();
+    this.o.input.blur();
+    this.closeList();
+    // The input itself would bring the sheet straight back.
+    this.sheet.tabIndex = -1;
+    this.sheet.focus({ preventScroll: true });
   }
 
   // The options changed under an open list (the places arrived): redraw it, else nothing.
@@ -144,7 +193,14 @@ export class Combobox<T = Place> {
     this.render();
   }
 
+  private sheetKey(event: KeyboardEvent) {
+    event.preventDefault();
+    if (event.key === 'Enter' && this.items.length) this.pick(Math.max(this.state.active, 0));
+    else this.hideSheet();
+  }
+
   private key(event: KeyboardEvent) {
+    if (this.sheetOpen && (event.key === 'Escape' || event.key === 'Enter')) return this.sheetKey(event);
     if (!this.state.open && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) this.refresh();
     const step = comboKey(this.state, event.key, this.items.length);
     if (!step) return;
@@ -156,8 +212,15 @@ export class Combobox<T = Place> {
 
   private pick(index: number) {
     const item = this.items[index];
-    this.close();
+    this.closeList();
     if (item) this.o.onPick(item);
+    if (!this.sheetOpen) return;
+    if (this.o.keepOpen?.()) {
+      this.o.input.focus();
+      this.open();
+    } else {
+      this.hideSheet();
+    }
   }
 
   private render() {

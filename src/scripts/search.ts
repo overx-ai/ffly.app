@@ -70,7 +70,9 @@ import { PlacesStore, provisionalMeta, type PlaceSet } from './places-store';
 import { quotaNote, quotaSpent } from './quota';
 import { cookieString, fillPrefs, finishOf, namesPlaces, parseCookies, sameSearch, savedCookies, sharedRequest, shareUrl, type Prefs } from './prefs';
 import { kitGroups, routeRows, type BookLink, type KitGroup, type LegRow, type RouteRow, type Warn } from './results';
+import { DEFAULT_VIEW, shownRoutes, viewRoutes, type RouteHide, type RouteSort, type RouteView } from './route-view';
 import { glideLinks } from './scroll';
+import { isPhone, lockScroll, onPhoneChange, unlockScroll } from './sheet';
 import { canShare, routePlaces, shareText, withLink } from './share-text';
 import { Ticker } from './ticker';
 import { TimeList } from './time-list';
@@ -101,6 +103,7 @@ const TEXT = JSON.parse(document.querySelector<HTMLElement>('[data-i18n]')!.data
 const MESSAGES = TEXT.messages;
 const OPTIONS = TEXT.options;
 const ACTIONS = TEXT.actions;
+const PHONE = TEXT.phone;
 const SHELF = TEXT.library;
 // Spec 014's strings, on the page only with CONTRACT_1_12.
 const OFFERS = TEXT.offers!;
@@ -211,6 +214,20 @@ const el = {
   ratingStars: byId('rating-stars'),
   ratingSupport: byId('rating-support'),
   ratingDismiss: byId<HTMLButtonElement>('rating-dismiss'),
+  nightsRow: byId<HTMLButtonElement>('nights-row'),
+  nightsText: byId('nights-text'),
+  travellersRow: byId<HTMLButtonElement>('travellers-row'),
+  travellersText: byId('travellers-text'),
+  summary: byId('trip-summary'),
+  summaryRoute: byId('summary-route'),
+  summaryMeta: byId('summary-meta'),
+  summaryEdit: byId<HTMLButtonElement>('summary-edit'),
+  sortOpen: byId<HTMLButtonElement>('sort-open'),
+  sortSheet: byId<HTMLDialogElement>('sort-sheet'),
+  sortClear: byId<HTMLButtonElement>('sort-clear'),
+  sortShow: byId<HTMLButtonElement>('sort-show'),
+  filteredEmpty: byId('filtered-empty'),
+  filteredClear: byId<HTMLButtonElement>('filtered-clear'),
 };
 
 const clone = (id: string) => byId<HTMLTemplateElement>(id).content.firstElementChild!.cloneNode(true) as HTMLElement;
@@ -242,6 +259,11 @@ interface ShownResult {
 // The result on the page, and the ones a skipped flight replaced: Undo brings one back without a search.
 let shown: ShownResult | undefined;
 const undo: ShownResult[] = [];
+// Spec 020, phones only: how the visitor views the routes on the page, and which stay open across a redraw.
+let routeView: RouteView = DEFAULT_VIEW;
+let sortDraft: RouteView = DEFAULT_VIEW;
+let lastRows: RouteRow[] = [];
+const openRoutes = new Set<string>();
 
 const localName = (place: Place) => placeName(place, LOCALE);
 const countryName = countryNamer(LOCALE);
@@ -264,6 +286,8 @@ const searchedFormat = new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 
 // The home page keeps the address on its #search section; /search has no such anchor.
 const SHARE_HASH = document.getElementById('search') ? '#search' : '';
 const formatDay = (iso: string) => dayFormat.format(new Date(`${iso}T00:00:00Z`));
+const summaryFormat = new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'short', timeZone: 'UTC' });
+const summaryDay = (iso: string) => summaryFormat.format(new Date(`${iso}T00:00:00Z`));
 const formatDays = (from: string, to: string) => `${formatDay(from)} – ${formatDay(to)}`;
 
 const picker = new RangePicker({
@@ -379,12 +403,16 @@ function placeNotice(text: string): HTMLElement {
 }
 
 const comboOf = (input: HTMLInputElement) => input.closest<HTMLElement>('.combo')!;
-const boxes = new Map<HTMLInputElement, Pick<Combobox, 'update' | 'close'>>();
+const boxes = new Map<HTMLInputElement, Pick<Combobox, 'update' | 'close' | 'inSheet'>>();
+// On a phone an input's focus opens its sheet, which a chip removed from the form must not do.
+const focusField = (input: HTMLInputElement) => {
+  if (!isPhone() || boxes.get(input)?.inSheet) input.focus();
+};
 
 type Codes = () => (string | undefined)[];
 
 // Until the place list is there a field says it is loading, never that nothing matches.
-function placeBox(input: HTMLInputElement, list: HTMLElement, exclude: Codes, onPick: (place: Place) => void, notice?: () => string | undefined) {
+function placeBox(input: HTMLInputElement, list: HTMLElement, exclude: Codes, onPick: (place: Place) => void, notice?: () => string | undefined, keepOpen?: () => boolean) {
   const box = new Combobox({
     input,
     list,
@@ -394,6 +422,7 @@ function placeBox(input: HTMLInputElement, list: HTMLElement, exclude: Codes, on
     renderNotice: placeNotice,
     notice: () => (places.length ? notice?.() : TEXT.loading),
     onPick,
+    keepOpen,
   });
   boxes.set(input, box);
   return box;
@@ -474,7 +503,7 @@ function renderList(name: ListName) {
         lists[name] = removePlace(lists[name], code);
         remembered(list.remembered, false);
         renderList(name);
-        list.input.focus();
+        focusField(list.input);
       });
       return chip;
     }),
@@ -510,8 +539,11 @@ function limitStepper(stepper: HTMLElement, atMin: boolean, atMax: boolean) {
   part<HTMLButtonElement>(stepper, '[data-step="1"]').disabled = atMax;
 }
 
+const nightsSpan = (min: number, max: number, last: string | number) => (min === max ? String(last) : fill(PHONE.nightsRange, { min, max: last }));
+
 function renderNights() {
   const limit = meta?.limits.max_nights ?? nights.max;
+  el.nightsText.textContent = nightsSpan(nights.min, nights.max, nights.max);
   el.minNights.value = String(nights.min);
   el.maxNights.value = String(nights.max);
   for (const stepper of document.querySelectorAll<HTMLElement>('.stepper[data-nights]')) {
@@ -717,6 +749,9 @@ function showPlaceholder(searching: boolean) {
 function clearOutcome(searching = false) {
   stopPolling();
   shown = undefined;
+  routeView = DEFAULT_VIEW;
+  openRoutes.clear();
+  el.summary.hidden = true;
   kitRequestId = undefined;
   el.problem.hidden = true;
   el.upsell.hidden = true;
@@ -734,6 +769,15 @@ function showProblem(message: string, retry?: () => void, upsell = false) {
   el.retry.hidden = !retry;
   el.problem.hidden = false;
   el.upsell.hidden = !upsell || isPro();
+}
+
+function renderSummary(r: SearchRequest) {
+  const places = r.cities.length ? listOf.format(r.cities.map(nameOf)) : anyOf.format(r.ends.map(nameOf));
+  el.summaryRoute.textContent = `${nameOf(r.start)} → ${places}`;
+  const dates = `${summaryDay(r.date_from)} – ${summaryDay(r.date_to)}`;
+  const stay = r.cities.length ? nightsSpan(r.min_nights, r.max_nights, count(TEXT.nights, r.max_nights)) : '';
+  el.summaryMeta.textContent = [dates, stay].filter(Boolean).join(' · ');
+  el.summary.hidden = false;
 }
 
 function renderProgress(view: Pick<SearchView, 'status' | 'done' | 'total' | 'eta_s'>) {
@@ -896,11 +940,16 @@ function renderRow(row: RouteRow, ctx: RouteContext, teaser = false): HTMLElemen
     return [tr];
   }
   const tr = clone('route-row-template');
+  const stays = ctx.route.nights ?? [];
+  const places = ctx.route.places ?? [];
   setTexts(tr, {
     '.rank': String(row.rank),
-    '.route': row.route,
+    '.route-full': row.route,
+    // A card leaves out the flight back to where the trip began, as the summary above it says that.
+    '.route-short': places[0] === places[places.length - 1] ? places.slice(0, -1).map(nameOf).join(' → ') : row.route,
     '.dates': row.dates,
-    '.nights': row.nights,
+    '.nights-list': row.nights,
+    '.nights-unit': stays.length ? [...stays.slice(0, -1), count(TEXT.nights, stays[stays.length - 1])].join(' · ') : '',
     '.flights': row.flights ? String(row.flights) : '',
     '.total': row.total,
   });
@@ -931,17 +980,24 @@ function renderRow(row: RouteRow, ctx: RouteContext, teaser = false): HTMLElemen
     legs.push(actions);
   }
   toggle.setAttribute('aria-controls', legs.map((l) => l.id).join(' '));
-  const flip = () => {
-    const open = toggle.getAttribute('aria-expanded') !== 'true';
+  legs[legs.length - 1].classList.add('detail-end');
+  const best = row.rank === 1;
+  for (const node of [tr, ...legs]) node.classList.toggle('best', best);
+  const key = routeKey(ctx.route);
+  const show = (open: boolean) => {
     toggle.setAttribute('aria-expanded', String(open));
     toggle.textContent = open ? MESSAGES.hide : MESSAGES.details;
     tr.classList.toggle('open', open);
     for (const leg of legs) leg.hidden = !open;
+    if (open) openRoutes.add(key);
+    else openRoutes.delete(key);
   };
+  const flip = () => show(toggle.getAttribute('aria-expanded') !== 'true');
   toggle.addEventListener('click', flip);
   tr.addEventListener('click', (event) => {
     if (!(event.target as Element).closest('button, a')) flip();
   });
+  if (openRoutes.has(key)) show(true);
   return [tr, ...legs, ...after];
 }
 
@@ -954,20 +1010,29 @@ function pushAds() {
   for (const _ of slots) w.adsbygoogle.push({});
 }
 
+// Unfiltered, the title counts locked rows too, as it always has; a filter's count is what it left to open.
+const routeCount = (viewed: RouteRow[], view: RouteView) => (view.hide.length ? shownRoutes(viewed) : viewed.length);
+
 function renderResults(view: SearchView, request: SearchRequest) {
   shown = { view, request };
   const { rows, more } = routeRows(view, { name: nameOf, money: formatMoney, day: formatDay }, CONTRACT_1_12);
-  const teaserRank = rows.find((r) => r.proSaving !== undefined)?.rank;
+  lastRows = rows;
+  const current = isPhone() ? routeView : DEFAULT_VIEW;
+  const viewed = viewRoutes(rows, current);
+  const teaserRank = viewed.find((r) => r.proSaving !== undefined)?.rank;
   const searched = searchedSeconds(view);
-  showText(el.resultsTitle, rows.length ? count(MESSAGES.found, rows.length) : MESSAGES.none);
+  renderSummary(request);
+  showText(el.resultsTitle, viewed.length ? count(MESSAGES.found, routeCount(viewed, current)) : MESSAGES.none);
   showText(el.resultsTrip, tripLine(request));
   el.searchAgain.hidden = true;
   el.resultsEmpty.hidden = rows.length > 0;
+  el.sortOpen.hidden = !shownRoutes(rows);
+  el.filteredEmpty.hidden = !shownRoutes(rows) || shownRoutes(viewed) > 0;
   renderSkipped(request);
   showText(el.insights, view.insights ? insightsLine(view.insights) : '');
   showText(el.appHint, CONTRACT_1_12 ? '' : (appHintLine(view.app_hint, view.routes[0]?.price, formatMoney, TEXT.nudges.appHint) ?? ''));
   el.routeRows.replaceChildren(
-    ...rows.flatMap((row) => renderRow(row, { route: view.routes[row.rank - 1], request, searched }, row.rank === teaserRank)),
+    ...viewed.flatMap((row) => renderRow(row, { route: view.routes[row.rank - 1], request, searched }, row.rank === teaserRank)),
   );
   part(el.more, 'a').textContent = count(MESSAGES.more, more);
   el.more.hidden = more <= 0;
@@ -1206,6 +1271,7 @@ function remember(view: SearchView, request: SearchRequest) {
 function resume(saved: Saved, resubmitted = false): Promise<void> {
   clearOutcome(true);
   el.submit.disabled = true;
+  renderSummary(saved.request);
   renderReconnecting();
   if (CONTRACT_1_12) void showProgressKit(saved.request);
   return poll(saved, resubmitted);
@@ -1258,6 +1324,7 @@ async function submit(asked: SearchRequest, resubmitted = false): Promise<void> 
   const retry = () => submit(request, resubmitted);
   clearOutcome(true);
   renderSkipped(request);
+  renderSummary(request);
   writeUrl(request);
   el.submit.disabled = true;
   renderProgress({ status: 'fetching', done: 0, total: 0, eta_s: null });
@@ -1343,6 +1410,7 @@ function applyGate() {
   for (const node of el.options.querySelectorAll<HTMLElement>('[data-any]')) node.hidden = !on(node.dataset.any);
   for (const node of el.options.querySelectorAll<HTMLElement>('[data-field]')) node.hidden = !on(node.dataset.field);
   for (const node of el.form.querySelectorAll<HTMLElement>('[data-locked-field]')) node.hidden = on(node.dataset.lockedField);
+  el.travellersRow.hidden = !on('travellers');
   const anyChip = [...el.lockedChips.children].some((chip) => !(chip as HTMLElement).hidden);
   el.inAppLabel.hidden = !anyChip;
   el.lockedChips.hidden = !anyChip;
@@ -1358,6 +1426,7 @@ function renderOptions() {
     part<HTMLOutputElement>(stepper, 'output').value = String(party[kind]);
     limitStepper(stepper, party[kind] <= min, party[kind] >= max);
   }
+  el.travellersText.textContent = TRAVELLER_KINDS.filter((kind) => party[kind]).map((kind) => count(PHONE[kind], party[kind])).join(', ');
   const priority = options.priority ?? meta?.default_priority;
   for (const button of el.options.querySelectorAll<HTMLButtonElement>('[data-priority]')) {
     button.hidden = !meta?.priorities?.[button.dataset.priority!];
@@ -1482,6 +1551,7 @@ function renderPlaceOptions() {
     const { row, pin } = placeRow(code);
     const name = nameOf(code);
     part(row, '.place-option-name').textContent = name;
+    part(row, '.cal-title').textContent = name;
     const pinned = pins.find((p) => p.city === code);
     part(row, '.pin').hidden = !pinnable;
     pin.set({ from: pinned?.date_from ?? '', to: pinned ? lastDay(pinned) : '' });
@@ -1531,7 +1601,7 @@ function renderPassports() {
       remove.setAttribute('aria-label', fill(MESSAGES.removeCity, { name }));
       remove.addEventListener('click', () => {
         setPassports(passports.filter((other) => other !== code));
-        el.passport.focus();
+        focusField(el.passport);
       });
       return chip;
     }),
@@ -1579,6 +1649,7 @@ const passportBox = new Combobox<string>({
     el.passport.value = '';
     setPassports([...passports, code]);
   },
+  keepOpen: () => true,
 });
 
 // Your trips: saved routes (compare two or three) and recent searches, each kept whole so it opens after it expires.
@@ -1755,12 +1826,13 @@ const cityBox = placeBox(
   () => taken('cities'),
   (p) => addTo('cities', p.code),
   () => (lists.cities.length >= maxCities() && !isPro() ? TEXT.nudges.cityCap : undefined),
+  () => !comboOf(el.city).hidden,
 );
 placeBox(el.from, el.fromList, () => lists.cities, (p) => {
   setFrom(p.code);
   remembered('from', false);
 });
-placeBox(el.back, el.backList, () => taken('ends'), (p) => addTo('ends', p.code));
+placeBox(el.back, el.backList, () => taken('ends'), (p) => addTo('ends', p.code), undefined, () => severalEnds() && !comboOf(el.back).hidden);
 placeBox(el.to, el.toList, () => [pickedFrom], (p) => setDestination(p.code));
 boxes.set(el.passport, passportBox);
 
@@ -1832,9 +1904,15 @@ el.fields.addEventListener('click', (event) => {
     setOptions({ ...options, airports: toggleAirport(options.airports ?? {}, city, code, airportsOfPlace(city)) });
     return refocus(el.placeOptions, (button) => button.dataset.city === city && button.dataset.airport === code);
   }
-  if (target.closest('#options-toggle')) {
-    el.options.hidden = !el.options.hidden;
-    el.optionsToggle.setAttribute('aria-expanded', String(!el.options.hidden));
+  if (target.closest('#options-toggle')) return showOptions(el.options.hidden);
+  if (target.closest('#travellers-row')) {
+    showOptions(true);
+    return el.options.scrollIntoView({ block: 'start' });
+  }
+  if (target.closest('#nights-row')) {
+    const open = el.nightsRow.getAttribute('aria-expanded') !== 'true';
+    el.nightsRow.setAttribute('aria-expanded', String(open));
+    el.nightsField.classList.toggle('open', open);
     return;
   }
   if (target.closest('#library-open')) {
@@ -1849,6 +1927,11 @@ el.fields.addEventListener('click', (event) => {
   chip.setAttribute('aria-pressed', String(pressed));
   showText(el.chipNudge, pressed ? (chip.dataset.nudge ?? '') : '');
 });
+
+function showOptions(open: boolean) {
+  el.options.hidden = !open;
+  el.optionsToggle.setAttribute('aria-expanded', String(open));
+}
 
 function stepped(step: HTMLButtonElement) {
   const delta = Number(step.dataset.step);
@@ -1903,6 +1986,62 @@ el.ratingDismiss.addEventListener('click', () => {
 });
 
 el.searchAgain.addEventListener('click', () => el.form.requestSubmit());
+
+// Only a way back to the filled form: a running search keeps it held, and nothing here submits.
+el.summaryEdit.addEventListener('click', () => {
+  el.form.scrollIntoView({ block: 'start' });
+  el.form.focus({ preventScroll: true });
+});
+
+function paintSort() {
+  for (const button of el.sortSheet.querySelectorAll<HTMLButtonElement>('[data-sort]')) {
+    button.setAttribute('aria-pressed', String(button.dataset.sort === sortDraft.sort));
+  }
+  for (const button of el.sortSheet.querySelectorAll<HTMLButtonElement>('[data-hide]')) {
+    button.setAttribute('aria-pressed', String(sortDraft.hide.includes(button.dataset.hide as RouteHide)));
+  }
+  el.sortShow.textContent = count(PHONE.show, routeCount(viewRoutes(lastRows, sortDraft), sortDraft));
+}
+
+function applyView(view: RouteView) {
+  routeView = view;
+  redrawResults();
+}
+
+el.sortOpen.addEventListener('click', () => {
+  sortDraft = routeView;
+  paintSort();
+  lockScroll();
+  el.sortSheet.showModal();
+});
+
+el.sortSheet.addEventListener('close', unlockScroll);
+
+el.sortSheet.addEventListener('click', (event) => {
+  const target = event.target as Element;
+  if (target === el.sortSheet) return el.sortSheet.close();
+  const sort = target.closest<HTMLButtonElement>('[data-sort]')?.dataset.sort as RouteSort | undefined;
+  const hide = target.closest<HTMLButtonElement>('[data-hide]')?.dataset.hide as RouteHide | undefined;
+  if (sort) sortDraft = { ...sortDraft, sort };
+  if (hide) sortDraft = { ...sortDraft, hide: sortDraft.hide.includes(hide) ? sortDraft.hide.filter((h) => h !== hide) : [...sortDraft.hide, hide] };
+  if (target.closest('#sort-clear')) sortDraft = DEFAULT_VIEW;
+  paintSort();
+});
+
+el.sortShow.addEventListener('click', () => {
+  el.sortSheet.close();
+  applyView(sortDraft);
+});
+
+el.filteredClear.addEventListener('click', () => {
+  applyView(DEFAULT_VIEW);
+  el.sortOpen.focus();
+});
+
+onPhoneChange(() => {
+  if (el.sortSheet.open) el.sortSheet.close();
+  redrawResults();
+});
 
 function closeNotifyAsk() {
   askedToNotify = true;

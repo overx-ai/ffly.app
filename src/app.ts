@@ -159,6 +159,9 @@ export const WEB_SEARCH = {
   lateFrom: '23:00',
 } as const;
 
+// Phones in script; the CSS says the same 760px in its own media queries.
+export const PHONE_QUERY = '(max-width: 760px)';
+
 // The "this page is in your language" hint (spec 012) stops once the visitor dismisses it or picks a language.
 export const LANG_HINT = {
   storageKey: 'ffly.lang',

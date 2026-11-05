@@ -21,6 +21,8 @@ document.addEventListener('click', (event) => {
   const pick = target?.closest<HTMLElement>('[data-lang-pick]');
   if (pick?.dataset.langPick) settle(storage, pick.dataset.langPick);
   closeMenuOutside(target);
+  // The menu's fragment links glide within the page, which would leave the popover over the target.
+  if (target?.closest('#site-menu a')) document.querySelector<HTMLElement>('#site-menu:popover-open')?.hidePopover();
 });
 
 // Tabbing past the open menu would leave its panel over the next focused control.

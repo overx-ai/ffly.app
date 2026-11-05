@@ -3,13 +3,17 @@ interface Props {
   id: string;
   placeholder: string;
   clear: string;
+  back: string;
+  done: string;
   describedBy?: string;
 }
 
-const { id, placeholder, clear, describedBy } = Astro.props;
+const { id, placeholder, clear, back, done, describedBy } = Astro.props;
 ---
 <div class="combo">
-  <input id={id} type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls={`${id}-list`} aria-describedby={describedBy} autocomplete="off" spellcheck="false" placeholder={placeholder} />
+  <button type="button" class="combo-back" aria-label={back}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg></button>
+  <input id={id} type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls={`${id}-list`} aria-describedby={describedBy} autocomplete="off" autocapitalize="words" enterkeyhint="done" spellcheck="false" placeholder={placeholder} />
   <button type="button" class="combo-clear" aria-label={clear}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg></button>
+  <button type="button" class="combo-done">{done}</button>
   <ul id={`${id}-list`} class="listbox" role="listbox" aria-labelledby={`${id}-label`} hidden></ul>
 </div>

@@ -121,8 +121,10 @@
   border-radius: var(--radius-sm);
   cursor: pointer;
 }
-.search-form .place[aria-selected="true"],
-.search-form .place:hover { background: var(--fill); }
+.search-form .place[aria-selected="true"] { background: var(--fill); }
+@media (hover: hover) {
+  .search-form .place:hover { background: var(--fill); }
+}
 .search-form .place-name { grid-area: name; font-weight: 600; }
 .search-form .place-alt,
 .search-form .place-native { font-weight: 400; color: var(--ink-2); }
@@ -151,7 +153,9 @@
   border-left: 3px solid var(--gold);
   border-radius: 0;
 }
-.search-form .place-notice:hover { background: none; }
+@media (hover: hover) {
+  .search-form .place-notice:hover { background: none; }
+}
 
 .search-form svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; flex: none; }
 
@@ -176,7 +180,19 @@
   color: var(--ink-2);
   cursor: pointer;
 }
-.search-form .combo-clear:hover { color: var(--ink); background: var(--fill); }
+@media (hover: hover) {
+  .search-form .combo-clear:hover { color: var(--ink); background: var(--fill); }
+}
+.search-form :is(.combo-back, .combo-done),
+.search-form .form-row,
+.search-ui .phone-text,
+.search-ui .trip-summary,
+.search-ui #sort-open,
+.search-form .cal-head,
+.search-form .cal-foot,
+.results-table :is(.nights-unit, .route-short) { display: none; }
+.search-form .cal-panel,
+.results-table .leg-meta { display: contents; }
 .search-form .combo input:placeholder-shown ~ .combo-clear { display: none; }
 .search-form .chips,
 .search-form .locked-chips { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; }
@@ -204,7 +220,9 @@
   cursor: pointer;
   border-radius: var(--radius-pill);
 }
-.search-form .chip-remove:hover { color: var(--ink); }
+@media (hover: hover) {
+  .search-form .chip-remove:hover { color: var(--ink); }
+}
 
 /* Travel window */
 .search-form .calendar {
@@ -245,7 +263,9 @@
   font-variant-numeric: tabular-nums;
   cursor: pointer;
 }
-.search-form .cal-month button:hover:not(:disabled) { background: var(--fill); }
+@media (hover: hover) {
+  .search-form .cal-month button:hover:not(:disabled) { background: var(--fill); }
+}
 .search-form .cal-month button:disabled { color: var(--ink-2); opacity: 0.4; cursor: default; }
 .search-form .cal-month .today { text-decoration: underline 2px var(--gold); text-underline-offset: 4px; }
 .search-form .cal-month .in-range { background: var(--range); border-radius: 0; }
@@ -368,8 +388,10 @@
 }
 .results-table td { padding: 12px 14px; border-top: 1px solid var(--rule); vertical-align: middle; }
 .results-table .route-row { cursor: pointer; }
-.results-table .route-row:hover,
 .results-table .route-row.open { background: var(--fill); }
+@media (hover: hover) {
+  .results-table .route-row:hover { background: var(--fill); }
+}
 .results-table .rank { font: 600 14px var(--font-mono); color: var(--ink-2); }
 .results-table .route { font-weight: 600; min-width: 14em; }
 .results-table .dates,
@@ -641,8 +663,10 @@
 .search-form .hour .picker { width: auto; min-width: 6.5em; }
 .search-form .time-list { right: auto; min-width: 8em; max-height: 240px; outline: none; }
 .search-form .time-option { padding: 8px 12px; min-height: 40px; border-radius: var(--radius-sm); cursor: pointer; font-variant-numeric: tabular-nums; }
-.search-form .time-option:hover,
 .search-form .time-option.active { background: var(--fill); }
+@media (hover: hover) {
+  .search-form .time-option:hover { background: var(--fill); }
+}
 .search-form .time-option[aria-selected="true"] { font-weight: 700; }
 
 .search-form .place-options { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -740,8 +764,10 @@
   white-space: nowrap;
   cursor: pointer;
 }
-.search-ui .menu-item:hover,
 .search-ui .menu-item:focus-visible { background: var(--fill); }
+@media (hover: hover) {
+  .search-ui .menu-item:hover { background: var(--fill); }
+}
 .results-table .route-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 14px; background: var(--surface); border-radius: var(--radius-md); }
 .results-table .route-actions .btn { padding: 6px 16px; min-height: 36px; font-size: 14px; }
 .results-table .route-actions .btn[aria-pressed="true"] { border-color: var(--accent); }
@@ -779,8 +805,370 @@
   .search-ui .library-actions .btn,
   .search-ui .skipped .btn,
   .search-form .account .btn,
-  .search-ui .results-head .btn { min-height: 44px; }
+  .search-ui .results-head .btn,
+  .results-table .book,
+  .results-table .details-toggle,
+  .search-ui .apple-button,
+  .search-ui .link-button { min-height: 44px; }
+  .search-form .cal-month button { width: 44px; height: 44px; }
   .search-form .chip.maybe { --dash: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100%25' height='100%25' rx='23' fill='none' stroke='%23000' stroke-width='3' stroke-dasharray='5 8'/%3E%3C/svg%3E"); }
   .results-table .leg-more { min-width: 44px; }
   .search-ui .rating :is(a, .link-button) { display: inline-flex; align-items: center; min-height: 44px; }
+}
+
+/* Spec 020: phones. Everything below is the 760px layout of the approved mockups, kept last so it overrides the rest. */
+@media (max-width: 760px) {
+  .search-ui .wide-text { display: none; }
+  .search-ui .phone-text { display: inline; }
+  .search-form :is(.remembered, .count, #ends-hint, #sign-in) { display: none; }
+
+  /* One card of 52px rows. Cities sits with the trip here, so both grids dissolve into the fieldset's column. */
+  .search-ui .search-form { padding: 0; background: none; border: 0; border-radius: 0; scroll-margin-top: var(--sticky-top); }
+  .search-form:focus { outline: none; }
+  .search-form .fields { gap: 0; }
+  .search-form :is(.trip-row, .cities-row) { display: contents; }
+  .search-form .trip-type { order: 0; flex-wrap: nowrap; margin-bottom: 12px; }
+  .search-form .trip-type .segment { flex: 1 1 auto; justify-content: center; min-width: 0; padding: 0 6px; white-space: normal; text-align: center; line-height: 1.15; }
+  .search-form .trip-row > #from-field { order: 1; }
+  .search-form .trip-row > :is(#back-field, #to-field) { order: 2; }
+  .search-form .cities-row > #cities-field { order: 3; }
+  .search-form .trip-row > #window-field { order: 4; }
+  .search-form .trip-row > #nights-field { order: 5; }
+  .search-form #travellers-row { order: 6; }
+  .search-form .cities-row > #submit { order: 8; width: 100%; min-height: 50px; margin-top: 12px; padding: 0 16px; font-size: 17px; }
+  .search-form .form-error { order: 9; margin-top: 8px; }
+  .search-form .app-row { order: 10; }
+  .search-form .chip-nudge { order: 11; margin-top: 8px; }
+  .search-form .options { order: 12; margin-top: 8px; scroll-margin-top: var(--sticky-top); }
+
+  .search-form :is(#from-field, #back-field, #to-field, #cities-field, #window-field),
+  .search-form .form-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0 12px;
+    width: 100%;
+    min-height: 52px;
+    margin: 0;
+    padding: 2px 16px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 0;
+    border-inline: 1px solid var(--rule);
+    border-bottom: 1px solid var(--fill);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .search-form #from-field { border-top: 1px solid var(--rule); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+  .search-form #travellers-row,
+  .search-form .fields:has(#travellers-row[hidden]) #nights-field,
+  .search-form .fields:has(#travellers-row[hidden]):has(#nights-field[hidden]) #window-field {
+    border-bottom-color: var(--rule);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  }
+
+  .search-form .field > label,
+  .search-form #window-field .field-label,
+  .search-form .form-row .k { font: 400 14px var(--font-body); color: var(--ink-2); white-space: nowrap; }
+  .search-form .form-row .v { font: 600 16px var(--font-body); text-align: end; font-variant-numeric: tabular-nums; }
+
+  .search-form .place-box { justify-content: flex-end; min-width: 0; }
+  .search-form .field:has(.chip) { padding-top: 8px; }
+  .search-form .place-box:has(.chip) { grid-column: 1 / -1; justify-content: flex-start; padding-block: 0 4px; }
+  .search-form .place-box .combo { min-width: 6em; flex: 1 1 6em; }
+  .search-form .place-box:focus,
+  .search-form .combo:focus { outline: none; }
+  .search-form .combo { min-width: 0; }
+
+  .search-form .combo input[type="text"],
+  .search-form #window {
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    font-weight: 600;
+    text-align: end;
+    text-overflow: ellipsis;
+  }
+  .search-form .combo input::placeholder { font-weight: 400; }
+  .search-form .combo input:focus-visible,
+  .search-form #window:focus-visible { outline-offset: 2px; }
+  .search-form .combo-clear { display: none; }
+
+  /* Nights: the row shows the range and opens the steppers beneath it. */
+  .search-form #nights-field { display: block; background: var(--surface); }
+  .search-form #nights-field > legend { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); }
+  .search-form #nights-field .steppers { display: none; justify-content: center; padding-block: 4px; border-inline: 1px solid var(--rule); border-bottom: 1px solid var(--fill); }
+  .search-form #nights-field.open .steppers { display: flex; }
+  .search-form .form-row { display: flex; justify-content: space-between; gap: 12px; }
+
+  /* The quiet row under Find routes: the limit text and Options, then what else the form has. */
+  .search-form .app-row { justify-content: space-between; gap: 0 8px; padding: 2px 16px 0; border-top: 0; }
+  .search-form #quota-note { order: -1; flex: 1 1 8em; font-size: 14px; white-space: normal; }
+  .search-form .row-button { padding: 0 8px; border: 0; background: none; font-size: 14px; }
+  .search-form .row-button[aria-expanded="true"] { text-decoration: underline 2px var(--gold); text-underline-offset: 4px; }
+  .search-form .app-row .field-label { order: 1; flex-basis: 100%; }
+  .search-form .locked-chips { order: 2; flex-basis: 100%; }
+  .search-form .account { order: 3; }
+
+  /* City sheet: the field's own elements, laid out over the whole screen above the keyboard. */
+  .search-form .sheet-open {
+    position: fixed;
+    z-index: 30;
+    inset: var(--sheet-top, 0) 0 auto;
+    height: var(--sheet-height, 100vh);
+    height: var(--sheet-height, 100dvh);
+    display: grid;
+    grid-template: "back input done" auto "chips chips chips" auto "list list list" minmax(0, 1fr) / auto minmax(0, 1fr) auto;
+    align-items: center;
+    padding: var(--safe-top) var(--safe-right) 0 var(--safe-left);
+    background: var(--surface);
+  }
+  .search-form .sheet-open .combo { display: contents; }
+  .search-form .sheet-open .combo-back {
+    grid-area: back;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin: 8px 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .search-form .sheet-open .combo-back svg { width: 20px; height: 20px; stroke-width: 1.8; stroke-linejoin: round; }
+  .search-form .sheet-open input[type="text"] {
+    grid-area: input;
+    min-height: 48px;
+    margin: 8px 12px 8px 0;
+    padding: 0 48px 0 14px;
+    background: var(--bg);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-md);
+    font-weight: 400;
+    text-align: start;
+  }
+  .search-form .sheet-open .combo-clear { grid-area: input; display: grid; position: static; justify-self: end; margin-right: 14px; transform: none; }
+  .search-form .sheet-open input:placeholder-shown ~ .combo-clear { display: none; }
+  .search-form .sheet-open:has(.chip) .combo-done {
+    grid-area: done;
+    display: block;
+    min-height: 44px;
+    margin-right: 8px;
+    padding: 0 8px;
+    border: 0;
+    background: none;
+    color: var(--accent);
+    font: 700 16px var(--font-body);
+    text-decoration: underline 2px var(--gold);
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .search-form .sheet-open .chips { grid-area: chips; padding: 0 12px 8px; }
+  .search-form .sheet-open :is(.listbox, #from-list, #back-list, #to-list) {
+    grid-area: list;
+    position: static;
+    align-self: stretch;
+    width: auto;
+    max-height: none;
+    padding: 0 0 var(--safe-bottom);
+    border: 0;
+    border-top: 1px solid var(--rule);
+    border-radius: 0;
+    box-shadow: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .search-form .sheet-open .place { min-height: 60px; padding: 8px 16px; border-bottom: 1px solid var(--fill); border-radius: 0; }
+
+  /* Dates: a bottom sheet over a scrim, Done always in reach. */
+  .search-form .calendar {
+    position: fixed;
+    z-index: 30;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    width: auto;
+    max-width: none;
+    padding: 0;
+    background: var(--scrim);
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .search-form .cal-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    max-height: calc(100vh - 40px - var(--safe-top));
+    max-height: calc(100dvh - 40px - var(--safe-top));
+    background: var(--surface);
+    border-radius: 22px 22px 0 0;
+  }
+  .search-form .cal-panel::before { content: ""; flex: none; width: 40px; height: 4px; margin: 8px auto 0; border-radius: 2px; background: var(--rule); }
+  .search-form .cal-head { flex: none; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 12px; padding: 8px 16px; }
+  .search-form .cal-title { font: 700 21px var(--font-display); letter-spacing: -0.02em; }
+  .search-form .cal-value { font-weight: 600; font-variant-numeric: tabular-nums; text-align: end; }
+  .search-form .cal-nav { flex: none; padding-inline: 16px; }
+  .search-form .cal-nav .hint { text-align: center; }
+  /* Seven 44px days need 308px, which leaves 6px either side on a 320px screen. */
+  .search-form .cal-months { flex: 1 1 auto; min-height: 0; grid-template-columns: minmax(0, 1fr); gap: var(--space-md); padding-inline: max(6px, min(16px, 50vw - 154px)); overflow-y: auto; overscroll-behavior: contain; }
+  .search-form .cal-month { width: 100%; table-layout: fixed; }
+  .search-form .cal-month button { width: 100%; height: 44px; font-size: 16px; }
+  .search-form .cal-foot { display: block; flex: none; padding: 10px 16px calc(12px + var(--safe-bottom)); border-top: 1px solid var(--fill); }
+  .search-form .cal-done { width: 100%; min-height: 50px; justify-content: center; }
+
+  /* Searching: nothing but the trip, the progress and one quiet way to be told. */
+  .search-ui:has(.results.searching) .app-strip,
+  .search-ui .results.searching > .quiet,
+  .search-ui .progress .queue-nudge,
+  .search-ui #progress-title,
+  .search-ui .notify-ask > p,
+  .search-ui #notify-no { display: none; }
+  .search-ui .notify-ask { padding-top: 0; margin-top: 4px; border-top: 0; }
+  .search-ui .notify-buttons { flex: 1; }
+  .search-ui #notify-yes { flex: 1; min-height: 44px; padding: 0 16px; background: none; color: var(--ink); border: 1px solid var(--rule); font-size: 14px; }
+
+  .search-ui :is(.progress, .results, .upsell) { scroll-margin-top: calc(var(--sticky-top) + 64px); }
+  .search-ui .trip-summary {
+    position: sticky;
+    z-index: 4;
+    top: var(--sticky-top);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-inline: calc(-1 * var(--gutter));
+    padding: 8px var(--gutter);
+    background: var(--surface);
+    border-block: 1px solid var(--rule);
+  }
+  .search-ui .summary-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .search-ui .summary-text b { font-size: 15px; font-weight: 700; line-height: 1.3; }
+  .search-ui .summary-text span { font-size: 13px; line-height: 1.3; color: var(--ink-2); }
+  .search-ui #summary-edit { flex: none; min-height: 44px; padding: 0 16px; font-size: 14px; }
+
+  /* Results: compact cards from the table's own rows. */
+  .search-ui .results:has(#search-again[hidden]) #results-trip { display: none; }
+  .search-ui .results h2 { font-size: 19px; letter-spacing: -0.02em; }
+  .search-ui #sort-open { display: inline-flex; min-height: 44px; padding: 0 16px; font-size: 14px; white-space: nowrap; }
+  .search-ui .filtered-empty { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+
+  .results-table td[data-label]::before { display: none; }
+  .results-table :is(.rank, .flights, .nights-list, .route-full) { display: none; }
+  .results-table :is(.nights-unit, .route-short) { display: inline; }
+  .results-table .route-row {
+    position: relative;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 2px 8px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    cursor: pointer;
+  }
+  .results-table .route-row.best { padding: 9px 13px; border: 2px solid var(--gold); }
+  .results-table .route-row.open { background: var(--surface); }
+  .results-table .route-row:has(.details-toggle:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .results-table .route-row .route { grid-column: 1 / 3; grid-row: 1; align-self: baseline; display: block; font-size: 15px; font-weight: 700; line-height: 1.3; }
+  .results-table .route-row .total { grid-column: 3; grid-row: 1; align-self: baseline; display: block; font-size: 19px; line-height: 1.2; letter-spacing: -0.02em; }
+  .results-table .route-row :is(.dates, .nights) { grid-column: auto; grid-row: 2; display: block; font-size: 13px; line-height: 1.35; color: var(--ink-2); white-space: normal; }
+  .results-table .route-row .nights { grid-column: 2 / 4; }
+  .results-table .route-row .nights::before { display: inline; content: "· "; content: "· " / ""; }
+  .results-table .route-row .warn { grid-column: 1 / -1; grid-row: 3; margin-top: 4px; }
+  .results-table .route-row .warn:not(:has(li)) { display: none; }
+  .results-table .route-row .details { position: absolute; grid-column: auto; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+  .results-table tr.route-row.open { margin-bottom: 0; border-bottom: 0; border-radius: 14px 14px 0 0; }
+  .results-table :is(.leg-row, .kit-row, .actions-row) {
+    display: block;
+    margin: 0;
+    padding: 0 14px;
+    background: var(--surface);
+    border-block: 0;
+    border-radius: 0;
+  }
+  .results-table :is(.leg-row, .kit-row, .actions-row).best { padding-inline: 13px; border-inline: 2px solid var(--gold); }
+  .results-table tr.detail-end { margin-bottom: var(--space-sm); padding-bottom: 10px; border-radius: 0 0 14px 14px; border-bottom: 1px solid var(--rule); }
+  .results-table tr.detail-end.best { border-bottom: 2px solid var(--gold); }
+  .results-table :is(.leg-row, .kit-row, .actions-row) td { display: block; }
+  .results-table .leg {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 8px;
+    width: 100%;
+    padding: 12px 0;
+    border-top: 1px solid var(--fill);
+    border-radius: 0;
+  }
+  .results-table .leg-day { font-size: 14px; color: var(--ink-2); }
+  .results-table .leg-nights { order: 1; font-size: 14px; }
+  .results-table .leg-time { order: 2; margin-left: auto; font-size: 14px; color: var(--ink-2); }
+  .results-table .leg-path { order: 3; flex-basis: 100%; font-size: 16px; font-weight: 700; }
+  .results-table .leg-meta { order: 4; flex: 1 1 0; display: block; min-width: 0; font-size: 14px; color: var(--ink-2); }
+  .results-table .leg-price { font-weight: 400; }
+  .results-table .leg-stops::before,
+  .results-table .leg-price:not(:empty)::before { content: " · "; content: " · " / ", "; }
+  .results-table .leg-carrier:empty + .leg-stops::before { content: none; }
+  .results-table .leg .book { order: 5; min-width: 88px; min-height: 44px; padding: 0 18px; font-size: 15px; }
+  .results-table .leg-menu { order: 6; }
+  .results-table .leg-more { min-width: 44px; min-height: 44px; }
+  .results-table .leg-warn { order: 7; flex-basis: 100%; }
+  .results-table .kit-row .kit { padding: 10px 0; border-top: 1px solid var(--fill); border-radius: 0; }
+  .results-table .route-actions { padding: 10px 0 0; border-top: 1px solid var(--fill); border-radius: 0; }
+  .results-table .route-actions .btn { flex: 1; min-height: 44px; }
+
+  .results-table .locked-row { position: relative; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; padding: 10px 14px; border-radius: 14px; }
+  .results-table .locked-row .locked-cell { grid-column: 1; min-height: 0; font-size: 14px; }
+  .results-table .locked-row .blurred { display: none; }
+  .results-table .locked-row .total { grid-column: 2; grid-row: 1; font-size: 19px; }
+  .results-table .locked-row .details { grid-column: 1 / -1; font-size: 14px; }
+  .results-table .locked-text { position: static; padding: 0; }
+
+  /* Sort and filter: the shared sheet, from the bottom. */
+  .search-ui .sort-sheet {
+    position: fixed;
+    inset: auto 0 0;
+    width: 100%;
+    max-width: none;
+    max-height: calc(100vh - 40px);
+    max-height: calc(100dvh - 40px);
+    margin: 0;
+    padding: 12px 16px 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 22px 22px 0 0;
+  }
+  .search-ui .sort-sheet[open] { display: flex; flex-direction: column; }
+  .search-ui .sort-sheet::before { content: ""; flex: none; width: 40px; height: 4px; margin: -4px auto 8px; border-radius: 2px; background: var(--rule); }
+  .search-ui .sort-head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .search-ui .sort-head h2 { margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.02em; }
+  .search-ui .sort-options { min-height: 0; overflow-y: auto; }
+  .search-ui .sort-options .note { margin: 10px 0 4px; font-size: 13px; }
+  .search-ui .choice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    min-height: 52px;
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid var(--fill);
+    background: none;
+    color: var(--ink);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+  .search-ui .choice .dot { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--rule); }
+  .search-ui .choice[aria-pressed="true"] .dot { border: 7px solid var(--accent); }
+  .search-ui .choice .switch { flex: none; display: block; width: 46px; height: 28px; padding: 3px; border-radius: 14px; background: var(--fill); }
+  .search-ui .choice .switch i { display: block; width: 22px; height: 22px; border-radius: 50%; background: var(--surface); border: 1px solid var(--rule); }
+  .search-ui .choice[aria-pressed="true"] .switch { padding-left: 21px; background: var(--gold); }
+  .search-ui .sort-foot { flex: none; padding: 10px 0 calc(12px + var(--safe-bottom)); border-top: 1px solid var(--fill); }
+  .search-ui #sort-show { width: 100%; min-height: 50px; justify-content: center; }
 }

@@ -5,6 +5,7 @@ import Footer from '../components/Footer.astro';
 import StoreCtas from '../components/StoreCtas.astro';
 import RouteMap from '../components/RouteMap.astro';
 import BoardingPass from '../components/BoardingPass.astro';
+import AppStoreBadge from '../components/AppStoreBadge.astro';
 import SearchForm from '../components/SearchForm.astro';
 import { APP, EXAMPLE_TRIP } from '../app';
 import { useLang, type Lang } from '../i18n';
@@ -21,6 +22,8 @@ const { t, fmt } = useLang(lang);
 const { home } = t;
 const guideLink = (slug: Slug, label: string) => pageLink(slug, label, lang);
 const caveat = fmt.text(home.caveat, { date: formatDate(new Date(EXAMPLE_TRIP.searchedOn), lang) });
+const legend = fmt.plural(home.legend, EXAMPLE_TRIP.routesFound);
+const exampleTotal = fmt.money(EXAMPLE_TRIP.bestTotal, EXAMPLE_TRIP.currency);
 const [fineBefore, fineAfter] = home.plans.fine.split('{link}');
 
 const ICONS = {
@@ -79,23 +82,39 @@ const faq: FaqItem[] = [
       <div class="hero-grid">
         <div class="pitch">
           <h1>{home.h1}</h1>
-          <p class="sub">{home.sub}</p>
+          <p class="sub wide-only">{home.sub}</p>
+          <p class="sub phone-only">{home.subShort}</p>
           <StoreCtas lang={lang} placement="hero" />
         </div>
         <figure class="hero-map">
           <RouteMap lang={lang} />
           <div class="legend">
-            <span>{fmt.plural(home.legend, EXAMPLE_TRIP.routesFound)}</span>
-            <b>{fmt.money(EXAMPLE_TRIP.bestTotal, EXAMPLE_TRIP.currency)}</b>
+            <span>{legend}</span>
+            <b>{exampleTotal}</b>
           </div>
           <figcaption>{caveat}</figcaption>
         </figure>
+        <a class="btn hero-cta phone-only" href={`${pathFor('', lang)}#search`}>
+          {t.common.searchFree}
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </a>
       </div>
     </section>
 
     <section class="sect container" id="search" tabindex="-1" aria-labelledby="search-title">
       <h2 id="search-title">{t.common.searchFree}</h2>
       <SearchForm lang={lang} />
+    </section>
+
+    <section class="after-search container phone-only" aria-label={legend}>
+      <div class="example">
+        <b>{exampleTotal}</b>
+        <div>
+          <p class="example-legend">{legend}</p>
+          <p>{caveat}</p>
+        </div>
+      </div>
+      <AppStoreBadge lang={lang} placement="hero" />
     </section>
 
     <section class="sect container" id="why">
@@ -268,9 +287,51 @@ const faq: FaqItem[] = [
   @media (max-width: 900px) {
     .pass-wrap { grid-template-columns: minmax(0, 1fr); }
   }
+  .phone-only { display: none; }
   @media (max-width: 760px) {
     .hero-grid, .vals, .home-faq { grid-template-columns: minmax(0, 1fr); }
-    .hero-map { order: -1; }
-    .hero { padding-top: var(--space-md); }
+    .wide-only { display: none; }
+    .phone-only { display: block; }
+    .hero { padding-block: 18px var(--space-lg); }
+    .hero-grid { gap: 0; }
+    h1 { font-size: clamp(34px, 10.2vw, 56px); line-height: 1.02; letter-spacing: -0.035em; }
+    .sub { font-size: 16px; max-width: none; margin: 8px 0 0; }
+    .pitch > :global(.ctas), .legend, .hero-map figcaption { display: none; }
+    .hero-map {
+      /* Short screens crop the map from both ends, never past the point where a label reaches the fade. */
+      --map-natural: calc(100vw * 543 / 640);
+      --hero-rest: 360px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: min(var(--map-natural), max(var(--map-natural) * 0.85, 100vh - var(--hero-rest)));
+      height: min(var(--map-natural), max(var(--map-natural) * 0.85, 100dvh - var(--hero-rest)));
+      margin-inline: calc(-1 * var(--gutter));
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(to bottom, transparent 4%, #000 21%);
+      mask-image: linear-gradient(to bottom, transparent 4%, #000 21%);
+    }
+    .hero-map :global(.map) { flex: none; border-radius: 0; box-shadow: none; }
+    .hero-cta.phone-only {
+      display: flex;
+      justify-content: center;
+      position: sticky;
+      bottom: calc(var(--safe-bottom) + 12px);
+      min-height: 58px;
+      margin-top: 12px;
+      font-size: 18px;
+      box-shadow: 0 12px 24px -12px rgba(7, 18, 48, 0.55);
+    }
+    /* On a short screen the button rides up over the map rather than go under the banner, in any language. */
+    :global(body:has(#consent:not([hidden]))) .hero-cta.phone-only { bottom: calc(var(--safe-bottom) + 136px); }
+    .hero-cta svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .after-search { display: flex; flex-direction: column; gap: var(--space-md); padding-block: var(--space-lg); border-top: 1px solid var(--rule); }
+    .example { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 4px var(--space-md); font-size: 13px; color: var(--ink-2); }
+    .example b { font: 800 30px/1.1 var(--font-display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--ink); }
+    .example-legend { color: var(--ink); font-weight: 600; }
+  }
+  @media (max-width: 760px) and (max-height: 600px) {
+    .hero { padding-top: 10px; }
+    .hero-cta.phone-only { min-height: 50px; margin-top: 8px; }
   }
 </style>
