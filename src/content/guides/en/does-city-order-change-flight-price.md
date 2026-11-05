@@ -63,23 +63,23 @@ The median gap was 30%, or about €62. Gaps in euros ran from €21 to €127.
 
 ## On identical dates, the gap shrinks
 
-The table mixes order with everything else that moved. Only two pairs of routes flew on exactly the same days, so those are the fairest test of order alone:
+The table mixes order with everything else that moved. Only two pairs of routes flew on exactly the same days, so those are the fairest test I have:
 
 - **From Milan, 12 to 24 February:** two different orders cost €196 and €197, with the same nights and no connections. Order changed almost nothing.
-- **From Warsaw, 10 to 21 February:** swapping Paris and Barcelona moved the total from €231 to €260. The dearer route also had an extra connection.
+- **From Warsaw, on matching days from 10 February:** swapping Paris and Barcelona moved the total by about €28, from €231 to €260. The dearer route was also listed with an extra connection.
 
-Two pairs can't give you a typical figure. They do show why I wouldn't call a 65% gap the effect of order alone.
+Even these pairs used different airports and flight times, so they aren't pure tests of order, and two pairs can't give you a typical figure. They do show why I wouldn't call a 65% gap the effect of order alone.
 
 ## Reversing the trip
 
-Sixteen pairs of routes were exact reversals of each other. The gaps ran from 0.1% to 16%, with a median of about 6%, though the dates differed each time. From Paris, one route and its reverse cost €161 either way, while from Madrid one pair cost €208 and €241.
+Sixteen pairs of routes were exact reversals of each other. The gaps ran from 0.1% to 16%, with a median of about 6%, though the dates differed each time. That flatters reversal a little, because both directions had to rank among the cheapest routes shown. From Paris, one route and its reverse cost €161 either way, while from Madrid one pair cost €208 and €241.
 
 ## Where the numbers fall short
 
 - **Other things moved too.** Between the cheapest and dearest routes, the dates differed on every trip, total nights on five and connections on four.
 - **I only compared what was shown.** Four cities have 24 possible orders, and each search showed 4 to 8 of them, so the true dearest order may cost more.
 - **One cheap route can stretch a gap.** Berlin's 65% rests on one €195 route. Its next cheapest order shown cost €260.
-- **It's one day's fares.** Another day will give other numbers.
+- **It's a snapshot.** I ran the searches on 6 November 2026, and some fares were last seen a few days earlier. Another day will give other numbers.
 
 Trip size doesn't explain it neatly either. Berlin and Amsterdam, both with Lisbon and Athens on opposite sides of Europe, had the widest gaps. But London's trip was fairly compact and still swung by 37%.
 
@@ -95,7 +95,7 @@ Booking separate flights carries a risk of its own: a late flight can cost you t
 Yes, though dates usually matter as well. In eight searches, the cheapest and dearest orders shown were 14% to 65% apart on different dates. On identical dates, two pairs of routes differed by €1 and €28.
 
 ### Is it cheaper to fly a trip in reverse?
-It's often close. In 16 reversed pairs from my searches, the gaps ran from 0.1% to 16%, with a median of about 6%, on different dates. Each direction has its own fares, so check both for your trip.
+It's often close. In 16 reversed pairs among the cheapest routes shown, the gaps ran from 0.1% to 16%, with a median of about 6%. Each direction has its own fares, so check both for your trip.
 
 ### How many orders are there for four cities?
 With a fixed start and finish, four cities have 24 possible orders. Five cities have 120 and six have 720, and each order has its own possible dates.
@@ -104,7 +104,7 @@ With a fixed start and finish, four cities have 24 possible orders. Five cities 
 In my searches, the two widest same-trip gaps came with dates more than a week apart, and the two pairs on identical dates were much closer. That's a small sample, so compare both for your own trip.
 
 ### Can I book these fares?
-No. They're indicative fares from one search on 6 November 2026, and they don't include bags. Treat them as a sign of how much routes can differ, then confirm the price where you book.
+No. They're indicative fares from searches run on 6 November 2026, some last seen a few days earlier, and they don't include bags. Treat them as a sign of how much routes can differ, then confirm the price where you book.
 
 ## How ffly fits in
 
@@ -115,6 +115,6 @@ To see how your own cities compare, [try a search free on the web](/search) or i
 ## Key takeaways
 
 - Across eight searches, the cheapest and dearest routes shown for the same cities were 14% to 65% apart, with dates, nights and connections also changing.
-- The only two pairs flown on identical dates differed by €1 and €28.
-- Reversed routes were usually close, with a median gap of about 6% across 16 pairs.
+- The only two pairs flown on identical days differed by €1 and €28, and even they used different airports.
+- Reversed routes shown were usually close, with a median gap of about 6% across 16 pairs.
 - A form that asks for each leg makes you choose the order first, so compare whole routes before you fix it.
