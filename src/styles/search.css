@@ -1035,6 +1035,7 @@
   .search-ui :is(#notify-yes, #summary-edit, #sort-open) { min-height: 44px; padding: 0 16px; font-size: 14px; }
   .search-ui #notify-yes { flex: 1; background: none; color: var(--ink); border: 1px solid var(--rule); }
 
+  .search-ui .app-strip { order: 1; }
   .search-ui :is(.progress, .results, .upsell) { scroll-margin-top: calc(var(--sticky-top) + 64px); }
   .search-ui .trip-summary {
     position: sticky;
