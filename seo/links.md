@@ -60,7 +60,7 @@ Subject: A test of city order on multi-city trips
 
 Hi Patrick,
 
-I saw your post on Kiwi.com Nomad. Your readers may like a small test I ran: eight four-city Europe trips, comparing how much order and dates move the total. On identical dates the order changed the total by €1 on one trip and €28 on another: https://ffly.app/guides/does-city-order-change-flight-price
+I saw your post on Kiwi.com Nomad. Your readers may like a small test I ran: eight four-city Europe trips, comparing how much order and dates move the total. The only two pairs on identical days differed by €1 and €28, though even those used different airports: https://ffly.app/guides/does-city-order-change-flight-price
 
 I built ffly, the free tool used for the searches. It may also suit a post on multi-city planning if you try it and like it.
 
@@ -74,7 +74,7 @@ I had a one-month visa and a long list of cities. Budget airlines sell one-way f
 
 ffly takes your cities, a travel window and a range of nights, then compares orders and dates for the whole trip. It avoids pre-dawn flights where it can, and counts a midnight landing as the hotel night it costs you. You book each flight yourself on the airline's site or a booking site.
 
-I tested how much the order matters on eight trips. The result surprised me: routes were 14% to 65% apart, but on identical dates two pairs differed by only €1 and €28. Write-up with limits: https://ffly.app/guides/does-city-order-change-flight-price
+I tested how much the order matters on eight trips. Routes were 14% to 65% apart, but on identical dates two pairs differed by only €1 and €28. Write-up with limits: https://ffly.app/guides/does-city-order-change-flight-price
 
 Try it without an account: https://ffly.app/search
 
