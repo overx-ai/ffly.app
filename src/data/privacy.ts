@@ -49,7 +49,7 @@ const REPRESENTATIVE_ROWS = REPRESENTATIVES.map(([role, who]) => `
 
 const ALL_IDS = [
   'who-we-are', 'representatives', 'app-store-labels', 'not-collected', 'searches', 'app-user-id', 'ip-address',
-  'purchases', 'analytics', 'crash-performance', 'attribution', 'live-activity', 'feedback', 'on-device',
+  'purchases', 'analytics', 'crash-performance', 'attribution', 'live-activity', 'search-alerts', 'feedback', 'on-device',
   'booking-links', 'partner-offers', 'account', 'web-search', 'website', 'legal-bases', 'sharing', 'transfers',
   'security', 'retention', 'rights', 'ccpa', 'children', 'changes', 'contact',
 ] as const;
@@ -101,7 +101,7 @@ export const PRIVACY: LegalDocument = {
   summaryText: `ffly works without an account. If you choose to sign in with Apple or Google, we keep your email
     address and an account identifier, so your plan applies wherever you sign in. We don't collect your name, phone
     number or location, and we get your email address only if you add it to feedback or sign in. To find routes, we receive the trip you search for. We
-    delete a search from the app within ${SERVICE.searchRetentionHours} hours, and keep a web search's result, with
+    delete a search from the app within ${SERVICE.searchRetentionHours} hours, unless you ask ffly to follow it, and keep a web search's result, with
     nothing that identifies you, until the trip starts, so its link keeps working. We collect usage analytics, crash
     and performance data to improve the app. If you allow tracking, ffly uses Apple's advertising identifier, with
     AppsFlyer, to measure which ads bring people to ffly; in the EEA, the UK and Switzerland, AppsFlyer uses your data
@@ -265,6 +265,19 @@ export const PRIVACY: LegalDocument = {
         notification service. The push token is deleted with the search, within ${SERVICE.searchRetentionHours}
         hours. You can turn Live Activities off for ffly in iOS Settings.</p>`,
     },
+    'search-alerts': {
+      title: 'Search Alerts',
+      content: `
+        <p>If you allow notifications, iOS gives ffly a push token for your iPhone, which ffly sends to us. Our own
+        notification service keeps it under your installation identifier (${ref('app-user-id')}), or your account if
+        you sign in. We use it only to send you search alerts through Apple's push notification service.</p>
+        <p>If you tap <strong>Tell me when this gets better</strong> on a search, we keep that search and re-run it from
+        time to time, and we send you an alert when it finds a route or a lower price.</p>
+        <p>A search you follow stays with us until you stop following it in ffly's Settings, you delete your account, or
+        the last date of the search passes. We keep the push token until you delete your account, or until you ask us
+        to remove it at ${mailto(CONTACT_EMAIL)}. To stop the alerts alone, turn off notifications for ffly in iOS
+        Settings.</p>`,
+    },
     feedback: {
       title: 'Feedback You Send',
       content: `
@@ -298,7 +311,8 @@ export const PRIVACY: LegalDocument = {
           <li><strong>App settings:</strong> things like whether you've finished onboarding, your trip defaults and
           your Ad measurement choice.</li>
           <li><strong>Notifications:</strong> ffly can tell you when a search is ready. It asks first, the
-          notifications come from your iPhone itself, and you can turn them off in iOS Settings.</li>
+          notifications come from your iPhone itself, and you can turn them off in iOS Settings. Search alerts work
+          differently (${ref('search-alerts')}).</li>
         </ul>
         <p>None of this is sent to us. Deleting the app removes it, except the free-search count and the installation
         identifier in ${ref('analytics')}.</p>
@@ -353,7 +367,7 @@ export const PRIVACY: LegalDocument = {
         page's address carries the places, dates and nights of your search, so you can share it.</p>
         <p>When a web search finishes, we keep its result without anything that identifies you, so anyone who opens
         the link to the same search sees that result until the trip's first day. Searches from the app are still
-        deleted within ${SERVICE.searchRetentionHours} hours.</p>
+        deleted within ${SERVICE.searchRetentionHours} hours, unless you follow them (${ref('search-alerts')}).</p>
         <p>If you choose <strong>Notify me</strong>, your browser asks whether ${SITE_HOST} may send you
         notifications, and tells you when your routes are ready while the tab is open. Nothing is asked until you
         choose it, the notification comes from your browser itself, and you can turn it off in your browser's
@@ -421,7 +435,7 @@ export const PRIVACY: LegalDocument = {
         <ul>
           <li><strong>Performance of a contract</strong>, to provide ffly: running your searches, the installation
           identifier, checking and restoring your purchases, the free-search count, the push token that updates a
-          Live Activity, and your account, if you sign in.</li>
+          Live Activity, the search alerts you ask for, and your account, if you sign in.</li>
           <li><strong>Your consent</strong>: ${CONSENT_BASES.join('; ')}. You can withdraw consent at any time, as
           ${ref('attribution')} and ${ref('website')} describe, without affecting what happened before.</li>
           <li><strong>Our legitimate interests</strong>: usage analytics, crash and performance data, to improve ffly
@@ -439,7 +453,7 @@ export const PRIVACY: LegalDocument = {
         its part of ffly needs.</p>
         <ul>
           <li><strong>Apple Inc.</strong> sells ${APP.proName} on the App Store and handles payments and refunds,
-          delivers Live Activity updates through its push notification service, provides the Apple Search Ads
+          delivers Live Activity updates and search alerts through its push notification service, provides the Apple Search Ads
           campaign report and SKAdNetwork, and, if you choose to sign in with Apple, confirms who you are
           (${ref('account')}). Apple does this as an independent company, under
           ${externalLink(EXTERNAL.applePrivacy, "Apple's Privacy Policy")}.</li>
@@ -490,7 +504,8 @@ export const PRIVACY: LegalDocument = {
       content: `
         <ul>
           <li>Searches in the app are deleted within ${SERVICE.searchRetentionHours} hours, with the push token of
-          their Live Activity. A web search's result is kept, without anything that identifies you, until the trip's
+          their Live Activity. A search you follow stays until you stop following it, you delete your account, or its last
+          date passes (${ref('search-alerts')}). A web search's result is kept, without anything that identifies you, until the trip's
           first day, then deleted.</li>
           <li>${QUOTAS} The web search's free-search count resets daily, and so does the ${APP.proName} fair-use
           count. We keep your in-app free-search count only as long as the Free limit needs it.</li>

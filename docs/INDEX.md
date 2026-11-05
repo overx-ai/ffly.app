@@ -34,6 +34,7 @@ README.md (overview + verification)
 
 ## Cross-project
 - App: `../../0E-extensions/ios-ffly` (`docs/specs/014-night-gold-palette.md` shares this palette; `Template/PrivacyInfo.xcprivacy`,
+- [019 - Privacy covers search alerts](specs/019-privacy-search-alerts.md)
   `docs/compliance/data-inventory.yaml`, `Template/Core/Constants/LegalLinks.swift`,
   `fastlane/metadata/en-US/*_url.txt`)
 - API: `1B-bots` `apps/ffly-api` (`config.py` retention values)

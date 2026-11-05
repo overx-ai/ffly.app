@@ -17,8 +17,8 @@ import { DEFAULT_LANG, LANGS, X_DEFAULT, localeOf, type Lang } from './i18n/loca
 // listing (fastlane/metadata/*/{marketing,support,privacy}_url.txt) point at them.
 export const SITE_PAGES = [
   { slug: '',        lastmod: '2026-10-16' },
-  { slug: 'support', lastmod: '2026-10-16' },
-  { slug: 'privacy', lastmod: '2026-10-16' },
+  { slug: 'support', lastmod: '2026-11-05' },
+  { slug: 'privacy', lastmod: '2026-11-05' },
   { slug: 'terms',   lastmod: '2026-10-15' },
   { slug: 'search',  lastmod: '2026-10-16' },
   { slug: 'guides',  lastmod: '2026-10-05' },

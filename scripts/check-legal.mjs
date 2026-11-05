@@ -118,7 +118,7 @@ const placeholderValue = (name) => appConstant(name)?.match(/^'([^']*)'$/)?.[1];
 const REPRESENTED = Boolean(placeholderValue('EU_REPRESENTATIVE') || placeholderValue('UK_REPRESENTATIVE'));
 const PRIVACY_IDS = [
   'who-we-are', ...(REPRESENTED ? ['representatives'] : []), 'app-store-labels', 'not-collected', 'searches', 'app-user-id', 'ip-address',
-  'purchases', 'analytics', 'crash-performance', 'attribution', 'live-activity', 'feedback', 'on-device',
+  'purchases', 'analytics', 'crash-performance', 'attribution', 'live-activity', 'search-alerts', 'feedback', 'on-device',
   'booking-links', 'partner-offers', 'account', 'web-search', 'website', 'legal-bases', 'sharing', 'transfers',
   'security', 'retention', 'rights', 'ccpa', 'children', 'changes', 'contact',
 ];
@@ -282,6 +282,14 @@ check(/at no extra cost/.test(privacy('booking-links')), 'Privacy: partner links
 const sharedSearch = /without anything that identifies you[^.]*link[^.]*until the trip's first day/;
 check(sharedSearch.test(copyText(webSearch)), "Privacy: #web-search must say shared web searches are stored without anything that identifies you, until the trip's first day");
 const retention = copyText(privacy('retention'));
+// Spec 019: a followed search and the device's push token outlive the 24 hours every other app search keeps to.
+const alerts = copyText(privacy('search-alerts'));
+check(
+  /push token/.test(alerts) && /Apple's push notification service/.test(alerts) && /stop following it in ffly's Settings/.test(alerts) && alerts.includes(CONTACT),
+  'Privacy: #search-alerts must cover the push token, Apple, how to stop and how to ask for the token to go',
+);
+check(/until you stop following it/.test(retention), 'Privacy: #retention must say how long a followed search stays');
+check(/search alerts/.test(copyText(privacy('legal-bases'))) && /search alerts/.test(copyText(privacy('sharing'))), 'Privacy: #legal-bases and #sharing must cover search alerts');
 check(
   /in the app are deleted within \d+ hours/.test(retention) && /until the trip's first day/.test(retention),
   "Privacy: #retention must keep app searches to 24 hours and web search results until the trip's first day",
