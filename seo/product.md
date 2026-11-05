@@ -8,7 +8,7 @@ ffly finds the order and dates that make a multi-city trip cost the least, with 
 ## Platforms
 - iOS: yes (iPhone, iOS 17 or later; iPad layouts exist)
 - Android: no
-- Web: yes, a free search at ffly.app/search (5 a day per network, per `WEB_SEARCH.freeSearchesPerDay` in src/app.ts; shows the best route's cities, nights and total)
+- Web: yes, a free search at ffly.app/search (limits come from `/meta`, so copy names no count; on 2026-11-06 the free web tier showed every route unlocked)
 
 ## Pricing
 - Free: 3 searches in the app. Shows the cities in the cheapest order, the nights in each and the total price. Other routes show only price and city count.

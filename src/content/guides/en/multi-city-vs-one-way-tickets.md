@@ -3,7 +3,7 @@ title: Multi-city vs one-way tickets on Europe's budget airlines
 slug: multi-city-vs-one-way-tickets
 keyword: multi-city vs one-way tickets
 published: 2026-10-05
-updated: 2026-10-16
+updated: 2026-11-06
 hero_alt: "One long folded paper ticket beside five short separate tickets on a dark wooden table"
 hero_color: "#614c39"
 cluster: B. Booking mechanics on low-cost carriers
@@ -105,6 +105,8 @@ Budget fares often don't include a cabin bag or checked luggage. Add the bags yo
 ### Book the hard legs first
 
 If one leg has only a few flights a week, book it first and fit the rest around it. Separate tickets let you do that.
+
+The ticket type is only half of it. I also tested [whether the order of cities changes the flight price](/guides/does-city-order-change-flight-price) on eight trips.
 
 ## How ffly fits in
 

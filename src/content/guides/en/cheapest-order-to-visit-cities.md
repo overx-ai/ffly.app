@@ -3,7 +3,7 @@ title: The cheapest order to visit cities on a multi-city trip
 slug: cheapest-order-to-visit-cities
 keyword: cheapest order to visit cities
 published: 2026-10-05
-updated: 2026-10-16
+updated: 2026-11-06
 hero_alt: "Coffee and a notebook with a dotted route between sketched cities, at an airport window with a plane at sunrise"
 hero_color: "#7e7468"
 cluster: A. Route order and dates
@@ -90,6 +90,8 @@ The top route was Warsaw, then Paris for 5 nights, Lisbon for 4, Barcelona for 3
 That isn't the cheapest fare on the list. One route was €9.18 cheaper, but it ranked lower on schedule, so the top pick traded a few euros for better flight times. Even so, the top route still loses about 4 hours of sleep across the trip, which is the kind of thing I want to see before I book.
 
 Two caveats. Fares were checked on that day, and some airlines' fares were missing from that search, so a run on another day could find cheaper legs. Treat it as one result. Your trip and dates will give different numbers.
+
+I later ran eight more searches to test [how much the order of cities changes the flight price](/guides/does-city-order-change-flight-price), with the full results.
 
 ## Doing it by hand
 

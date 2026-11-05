@@ -3,7 +3,7 @@ title: Open jaw flights in Europe, built from budget one-ways
 slug: open-jaw-flights-europe
 keyword: open jaw flights Europe
 published: 2026-10-09
-updated: 2026-10-16
+updated: 2026-11-06
 hero_alt: "Backpack and open notebook with a route between two separate dots, on an airport bench at dusk"
 hero_color: "#6e6866"
 cluster: B. Booking mechanics on low-cost carriers
@@ -133,7 +133,7 @@ If you're flying in from outside Europe, book the long-haul ticket yourself and 
 
 ffly covers flights only, so a train across the jaw is yours to plan. It's a search tool, not a travel agent: you book each flight on the airline's site or a booking site, and fares may not include bags. To see how your own cities line up, [try a search free on the web](/search) or in the iPhone app.
 
-Once the finish is open, the next question is the order of the cities in between. I've covered it in German ([günstigste Reihenfolge der Städte](/de/guides/guenstigste-reihenfolge-staedte)), in French ([dans quel ordre visiter plusieurs villes](/fr/guides/ordre-visiter-plusieurs-villes-moins-cher)) and in Spanish ([en qué orden visitar varias ciudades](/es/guides/orden-visitar-varias-ciudades-mas-barato)). German readers have their own guide to the open jaw itself: [Gabelflug in Europa mit Billigfliegern](/de/guides/gabelflug-europa-billigflieger). In Spanish, [vuelos multidestino baratos por Europa](/es/guides/vuelos-multidestino-baratos-europa) covers building a multi-city trip from budget one-ways.
+Once the finish is open, the next question is the order of the cities in between. I tested [how much that order changes the flight price](/guides/does-city-order-change-flight-price) on eight trips. I've covered it in German ([günstigste Reihenfolge der Städte](/de/guides/guenstigste-reihenfolge-staedte)), in French ([dans quel ordre visiter plusieurs villes](/fr/guides/ordre-visiter-plusieurs-villes-moins-cher)) and in Spanish ([en qué orden visitar varias ciudades](/es/guides/orden-visitar-varias-ciudades-mas-barato)). German readers have their own guide to the open jaw itself: [Gabelflug in Europa mit Billigfliegern](/de/guides/gabelflug-europa-billigflieger). In Spanish, [vuelos multidestino baratos por Europa](/es/guides/vuelos-multidestino-baratos-europa) covers building a multi-city trip from budget one-ways.
 
 ## FAQ
 
