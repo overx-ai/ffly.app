@@ -7,6 +7,7 @@ import RouteMap from '../components/RouteMap.astro';
 import BoardingPass from '../components/BoardingPass.astro';
 import AppStoreBadge from '../components/AppStoreBadge.astro';
 import SearchForm from '../components/SearchForm.astro';
+import NoBreak from '../components/NoBreak.astro';
 import { APP, EXAMPLE_TRIP } from '../app';
 import { useLang, type Lang } from '../i18n';
 import { formatDate, hreflangOf, pageLink, pathFor, type Slug } from '../site-pages';
@@ -14,12 +15,16 @@ import { appSchema, faqSchema, organizationSchema } from '../schema';
 import type { FaqItem } from '../data/types';
 import { searchWindow } from '../scripts/ffly-api';
 import { WEB_META } from '../scripts/places-store';
+import { GUIDES_INDEX, getGuides, guidePageSlug } from '../guides';
+
+const HOME_GUIDES = 3;
 
 interface Props { lang: Lang; }
 
 const { lang } = Astro.props;
 const { t, fmt } = useLang(lang);
 const { home } = t;
+const guides = (await getGuides(lang)).slice(0, HOME_GUIDES);
 const guideLink = (slug: Slug, label: string) => pageLink(slug, label, lang);
 const caveat = fmt.text(home.caveat, { date: formatDate(new Date(EXAMPLE_TRIP.searchedOn), lang) });
 const legend = fmt.plural(home.legend, EXAMPLE_TRIP.routesFound);
@@ -149,6 +154,15 @@ const faq: FaqItem[] = [
         </div>
       </div>
     </section>
+
+    {guides.length > 0 && (
+      <section class="sect container" id="guides">
+        <h2><a href={pathFor(GUIDES_INDEX, lang)}>{t.guides.h1}</a></h2>
+        <ul class="home-guides">
+          {guides.map((guide) => <li><a href={pathFor(guidePageSlug(guide))}><NoBreak text={guide.data.title} /></a></li>)}
+        </ul>
+      </section>
+    )}
 
     <section class="sect container" id="faq">
       <h2>{home.faq.title}</h2>
@@ -287,6 +301,11 @@ const faq: FaqItem[] = [
   @media (max-width: 900px) {
     .pass-wrap { grid-template-columns: minmax(0, 1fr); }
   }
+  #guides h2 a { color: inherit; text-decoration: none; }
+  #guides h2 a:hover { text-decoration: underline; text-decoration-color: var(--gold); }
+  .home-guides { list-style: none; margin: var(--space-md) 0 0; padding: 0; }
+  .home-guides li { border-top: 1px solid var(--rule); }
+  .home-guides a { display: flex; align-items: center; min-height: 52px; padding-block: var(--space-sm); font-weight: 600; }
   .phone-only { display: none; }
   @media (max-width: 760px) {
     .hero-grid, .vals, .home-faq { grid-template-columns: minmax(0, 1fr); }

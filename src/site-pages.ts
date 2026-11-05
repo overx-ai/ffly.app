@@ -16,7 +16,7 @@ import { DEFAULT_LANG, LANGS, X_DEFAULT, localeOf, type Lang } from './i18n/loca
 // /, /support, /privacy and /terms are fixed: the iOS app (LegalLinks.swift) and the App Store
 // listing (fastlane/metadata/*/{marketing,support,privacy}_url.txt) point at them.
 export const SITE_PAGES = [
-  { slug: '',        lastmod: '2026-10-16' },
+  { slug: '',        lastmod: '2026-11-05' },
   { slug: 'support', lastmod: '2026-11-05' },
   { slug: 'privacy', lastmod: '2026-11-05' },
   { slug: 'terms',   lastmod: '2026-10-15' },

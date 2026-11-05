@@ -73,6 +73,8 @@ Supporting:
 
 ## Internal linking sketch
 
+- Layers: 3-5 inbound links at publish from the same cluster and locale; the home page links the 3 newest guides, same locale (`HOME_GUIDES` in `src/views/Home.astro`); `/seo review` runs `links.py`.
+- `~/.claude/skills/seo/scripts/links.py` proposes phrases that pages at position 4-15 rank for, using first-party `gsc.py` only. Add a link only after the owner's OK, log it in `published.md`, and never rewrite a sentence to fit an anchor. The weekly job prints the count and edits nothing.
 - A-pillar <-> B-pillar (order vs ticket type are the two halves of "how do I pay less for this trip")
 - Every article -> home page (anchor: "multi-city trip planner") and -> ffly.app/search for a reader's own try
 - B supporting (Ryanair / Wizz) -> B-pillar; A supporting -> A-pillar
