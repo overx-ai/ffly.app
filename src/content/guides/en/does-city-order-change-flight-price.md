@@ -3,7 +3,7 @@ title: Does the order of cities change flight price? 8 trips tested
 slug: does-city-order-change-flight-price
 keyword: does the order of cities change flight price
 published: 2026-11-06
-updated: 2026-11-06
+updated: 2026-11-09
 hero_alt: "Hands moving blank paper cards on a wooden table beside a dotted route map and a cup of coffee"
 hero_color: "#7b746b"
 cluster: A. Route order and dates
@@ -85,7 +85,7 @@ Trip size doesn't explain it neatly either. Berlin and Amsterdam, both with Lisb
 
 ## What I'd do with this
 
-Don't fix the order before you see prices. Most search forms ask you to type each leg, so you've picked an order before you've seen a fare. List the cities and a range of nights, then compare whole routes, dates included. The [cheapest order to visit cities](/guides/cheapest-order-to-visit-cities) guide walks through that by hand.
+Don't fix the order before you see prices. Most search forms ask you to type each leg, so you've picked an order before you've seen a fare. List the cities and a range of nights, then compare whole routes, dates included. The [cheapest order to visit cities](/guides/cheapest-order-to-visit-cities) guide walks through that by hand, and [flexible dates on multi-city flights](/guides/flexible-dates-multi-city-flights) covers searching a travel window instead of fixed dates.
 
 Booking separate flights carries a risk of its own: a late flight can cost you the next one. I cover that in [multi-city vs one-way tickets](/guides/multi-city-vs-one-way-tickets).
 

@@ -21,7 +21,7 @@ Supporting:
 - best order to visit European cities (list / how-to, est. med): itinerary blogs rank on geography, not price
 - does the order of cities change the flight price (how-to, est. low): forum threads plus thin answers
 - how to find the cheapest route between multiple cities (how-to, est. low-med)
-- flexible dates multi-city flights (how-to, est. low-med)
+- flexible dates multi-city flights (how-to, est. low-med): /guides/flexible-dates-multi-city-flights (2026-11-09)
 - how many nights in each city Europe (how-to, est. med): ffly takes nights per city as an input
 - traveling salesman problem flights / cheapest route through cities (definition, est. low): only academic or CS pages rank
 - avoid early morning flights budget airlines (troubleshooting, est. low): ties to "favours sensible flight times"

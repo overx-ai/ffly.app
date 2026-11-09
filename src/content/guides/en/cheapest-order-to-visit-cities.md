@@ -3,7 +3,7 @@ title: The cheapest order to visit cities on a multi-city trip
 slug: cheapest-order-to-visit-cities
 keyword: cheapest order to visit cities
 published: 2026-10-05
-updated: 2026-11-06
+updated: 2026-11-09
 hero_alt: "Coffee and a notebook with a dotted route between sketched cities, at an airport window with a plane at sunrise"
 hero_color: "#7e7468"
 cluster: A. Route order and dates
@@ -37,7 +37,7 @@ There's no fixed rule like "go clockwise". On low-cost airlines each flight is p
 
 Budget airlines in Europe sell one-way fares. A flight from Paris to Lisbon has its own price on each day, and the flight in the other direction has a different one. Change the order of your cities and you're buying a different set of flights.
 
-The dates move with the order. If you stay four nights in Lisbon instead of three, every flight after Lisbon leaves a day later, and each of those flights has a new price.
+The dates move with the order. If you stay four nights in Lisbon instead of three, every flight after Lisbon leaves a day later, and each of those flights has a new price. I show how to search that way in [flexible dates on multi-city flights](/guides/flexible-dates-multi-city-flights).
 
 That makes the number of options grow fast. With a fixed start and finish, four cities can be visited in 24 orders, five cities in 120, six in 720. Each order then has its own set of possible dates. Nobody checks that by hand. The shortcut is to book the cheapest first flight and hope the rest works out, and that's how a bargain first leg locks you into an expensive trip.
 

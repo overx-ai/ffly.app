@@ -3,7 +3,7 @@ title: Open jaw flights in Europe, built from budget one-ways
 slug: open-jaw-flights-europe
 keyword: open jaw flights Europe
 published: 2026-10-09
-updated: 2026-11-06
+updated: 2026-11-09
 hero_alt: "Backpack and open notebook with a route between two separate dots, on an airport bench at dusk"
 hero_color: "#6e6866"
 cluster: B. Booking mechanics on low-cost carriers
@@ -95,7 +95,7 @@ Ryanair's MultiCity tool isn't much help here. Irish Travel Addict's guide says 
 
 ### 1. List the cities, not the order
 
-Write down the cities you want to see, your travel window and roughly how many nights each one deserves. Leave the order blank for now. Going in through Lisbon and out through Athens is a guess until you've seen the prices.
+Write down the cities you want to see, your travel window and roughly how many nights each one deserves. Leave the order blank for now. Going in through Lisbon and out through Athens is a guess until you've seen the prices. My guide to [flexible dates on multi-city flights](/guides/flexible-dates-multi-city-flights) shows how to search a window rather than fixed dates.
 
 ### 2. Keep the finish open
 
