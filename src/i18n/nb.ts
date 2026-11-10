@@ -197,6 +197,7 @@ const nb = {
     addCity: 'Legg til en by',
     cityHint: `Velg hver by fra listen. ${APP.name} finner rekkefølgen.`,
     window: 'Reiseperiode',
+    leaveBetween: 'Avreise mellom',
     prevMonth: 'Forrige måned',
     nextMonth: 'Neste måned',
     calendarHint: 'Velg den første dagen, deretter den siste.',

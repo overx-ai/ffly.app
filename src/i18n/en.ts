@@ -205,6 +205,7 @@ const base = {
     addCity: 'Add a city',
     cityHint: `Pick each city from the list. ${APP.name} works out the order.`,
     window: 'Travel window',
+    leaveBetween: 'Leave between',
     prevMonth: 'Previous month',
     nextMonth: 'Next month',
     calendarHint: 'Pick the first day, then the last.',

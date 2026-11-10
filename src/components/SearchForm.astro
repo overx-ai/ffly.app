@@ -78,7 +78,7 @@ const comboText = { clear: w.clear, back: w.sheetBack, done: w.done };
           <PlaceCombo id="to" placeholder={w.typeCity} {...comboText} />
         </div>
         <div id="window-field" class="field">
-          <span id="window-label" class="field-label"><span class="wide-text">{w.window}</span><span class="phone-text">{col.dates}</span></span>
+          <span id="window-label" class="field-label"><span class="wide-text">{w.window}</span><span class="phone-text any-trip-text">{col.dates}</span><span class="phone-text oneway-text">{w.leaveBetween}</span></span>
           <div class="popover-anchor">
             <button id="window" type="button" class="picker" aria-haspopup="dialog" aria-expanded="false" aria-controls="calendar" aria-labelledby="window-label window-text">
               <span id="window-text"></span>

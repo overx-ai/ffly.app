@@ -81,6 +81,20 @@ function rankOf({ codes, names, words }: Folded, q: string): number | undefined 
   return undefined;
 }
 
+// Typed text the user never picked from the list: an exact code or name, else the one place it matches.
+// Several matches stay unresolved, so "Lon" is never silently London.
+export function resolvePlace(places: readonly Place[], raw: string, lang: string): string | undefined {
+  const text = raw.trim();
+  if (!text) return undefined;
+  const code = text.toUpperCase();
+  if (places.some((p) => p.code === code)) return code;
+  const typed = fold(text);
+  const exact = foldedOf(places, lang).find((f) => f.names.includes(typed));
+  if (exact) return exact.place.code;
+  const matches = matchPlaces(places, text, { exclude: new Set(), limit: 2, lang });
+  return matches.length === 1 ? matches[0].code : undefined;
+}
+
 // Exact code (a city's airport codes included) > name prefix > word start > contains, top places first within each.
 export function matchPlaces(places: readonly Place[], query: string, opts: { exclude: Set<string>; limit: number; lang: string }): Place[] {
   const q = fold(query.trim());

@@ -816,6 +816,10 @@
 @media (max-width: 760px) {
   .search-ui .wide-text { display: none; }
   .search-ui .phone-text { display: inline; }
+  /* A one-way window is when you leave, not a return date. */
+  .search-ui .phone-text.oneway-text,
+  .search-ui [data-trip="oneway"] .phone-text.any-trip-text { display: none; }
+  .search-ui [data-trip="oneway"] .phone-text.oneway-text { display: inline; }
   .search-form :is(.remembered, .count, #ends-hint, #sign-in) { display: none; }
 
   /* One card of 52px rows. Cities sits with the trip here, so both grids dissolve into the fieldset's column. */

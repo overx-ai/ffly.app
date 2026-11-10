@@ -197,6 +197,7 @@ const sv = {
     addCity: 'Lägg till en stad',
     cityHint: `Välj varje stad i listan. ${APP.name} räknar ut ordningen.`,
     window: 'Reseperiod',
+    leaveBetween: 'Avresa mellan',
     prevMonth: 'Föregående månad',
     nextMonth: 'Nästa månad',
     calendarHint: 'Välj första dagen och sedan den sista.',

@@ -4,7 +4,7 @@ import { fill, plural, type Plural, type Vars } from '../i18n/text';
 import { setupAccount } from './auth';
 import type { Change } from './auth-state';
 import { RangePicker, addDays, daysBetween, localToday, stepNights, type Nights } from './calendar';
-import { Combobox, matchPlaces, type ComboOptions } from './combobox';
+import { Combobox, matchPlaces, resolvePlace as resolveTyped, type ComboOptions } from './combobox';
 import {
   ACTIVE,
   API_HOURS,
@@ -65,7 +65,7 @@ import {
 import { Library, canCompare, routeKey, searchKey, toggleCompare, type Finished, type HistoryEntry, type SavedRoute } from './library';
 import { ask, canAsk, routesReady } from './notify';
 import { appHintLine, rotation, type webNudges } from './nudges';
-import { addPlace, countryNamer, fold, optionParts, placeName, placeNames, removePlace } from './places';
+import { addPlace, countryNamer, optionParts, placeName, removePlace } from './places';
 import { PlacesStore, provisionalMeta, type PlaceSet } from './places-store';
 import { quotaNote, quotaSpent } from './quota';
 import { cookieString, fillPrefs, finishOf, namesPlaces, parseCookies, sameSearch, savedCookies, sharedRequest, shareUrl, type Prefs } from './prefs';
@@ -316,13 +316,7 @@ function refocus(root: ParentNode, match: (button: HTMLButtonElement) => boolean
   [...root.querySelectorAll<HTMLButtonElement>('button')].find(match)?.focus();
 }
 
-function resolvePlace(raw: string): string | undefined {
-  const text = raw.trim();
-  if (!text) return undefined;
-  if (byCode.has(text.toUpperCase())) return text.toUpperCase();
-  const typed = fold(text);
-  return places.find((p) => placeNames(p, LOCALE).some((name) => fold(name) === typed))?.code;
-}
+const resolvePlace = (raw: string) => resolveTyped(places, raw, LOCALE);
 
 function remembered(field: Field, on: boolean) {
   for (const tag of document.querySelectorAll<HTMLElement>(`[data-remembered="${field}"]`)) tag.hidden = !on;

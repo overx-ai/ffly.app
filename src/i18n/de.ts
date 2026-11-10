@@ -197,6 +197,7 @@ const de = {
     addCity: 'Stadt hinzufügen',
     cityHint: `Wähle jede Stadt aus der Liste. ${APP.name} findet die Reihenfolge.`,
     window: 'Reisezeitraum',
+    leaveBetween: 'Abflug zwischen',
     prevMonth: 'Vorheriger Monat',
     nextMonth: 'Nächster Monat',
     calendarHint: 'Wähle den ersten Tag, dann den letzten.',

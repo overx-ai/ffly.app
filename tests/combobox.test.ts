@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import STATIC from '../public/places.json';
 import { WEB_SEARCH } from '../src/app';
 import type { Place } from '../src/scripts/ffly-api';
-import { comboKey, matchPlaces } from '../src/scripts/combobox';
+import { comboKey, matchPlaces, resolvePlace } from '../src/scripts/combobox';
 
 const places = [
   { code: 'WMI', name: 'Warsaw Modlin', top: false },
@@ -208,5 +208,25 @@ describe('matchPlaces folds each list once per language', () => {
     expect(find(before, 'warsz', 'pl')).toEqual([]);
     expect(find(after, 'warsz', 'pl')).toEqual(['WAR']);
     expect(find(after, 'warsch', 'pl')).toEqual([]);
+  });
+});
+
+describe('resolvePlace', () => {
+  const live = STATIC.places as Place[];
+  const resolve = (text: string) => resolvePlace(live, text, 'en-GB');
+
+  it('takes the one place a partial name matches (Warsaw to "Dush" was refused)', () => {
+    expect(resolve('Dush')).toBe('DYU');
+  });
+
+  it('takes an exact code or full name', () => {
+    expect(resolve('dyu')).toBe('DYU');
+    expect(resolve('Dushanbe')).toBe('DYU');
+  });
+
+  it('refuses text that matches several places or none', () => {
+    expect(resolve('Sant')).toBeUndefined();
+    expect(resolve('')).toBeUndefined();
+    expect(resolve('zzzzqq')).toBeUndefined();
   });
 });

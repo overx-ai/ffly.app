@@ -197,6 +197,7 @@ const pt = {
     addCity: 'Adicione uma cidade',
     cityHint: `Escolha cada cidade da lista. ${APP.name} trata da ordem.`,
     window: 'Período da viagem',
+    leaveBetween: 'Partida entre',
     prevMonth: 'Mês anterior',
     nextMonth: 'Mês seguinte',
     calendarHint: 'Escolha o primeiro dia e depois o último.',

@@ -197,6 +197,7 @@ const nl = {
     addCity: 'Voeg een stad toe',
     cityHint: `Kies elke stad uit de lijst. ${APP.name} bepaalt de volgorde.`,
     window: 'Reisperiode',
+    leaveBetween: 'Vertrek tussen',
     prevMonth: 'Vorige maand',
     nextMonth: 'Volgende maand',
     calendarHint: 'Kies de eerste dag, dan de laatste.',

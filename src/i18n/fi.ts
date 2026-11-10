@@ -197,6 +197,7 @@ const fi = {
     addCity: 'Lisää kaupunki',
     cityHint: `Valitse jokainen kaupunki listasta. ${APP.name} selvittää järjestyksen.`,
     window: 'Matka-ajanjakso',
+    leaveBetween: 'Lähtö välillä',
     prevMonth: 'Edellinen kuukausi',
     nextMonth: 'Seuraava kuukausi',
     calendarHint: 'Valitse ensimmäinen päivä ja sitten viimeinen.',

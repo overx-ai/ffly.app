@@ -216,6 +216,7 @@ const pl = {
     addCity: 'Dodaj miasto',
     cityHint: `Wybierz każde miasto z listy. ${APP.name} ustali kolejność.`,
     window: 'Kiedy możesz podróżować',
+    leaveBetween: 'Wylot między',
     prevMonth: 'Poprzedni miesiąc',
     nextMonth: 'Następny miesiąc',
     calendarHint: 'Wybierz pierwszy dzień, potem ostatni.',
