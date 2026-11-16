@@ -4,7 +4,7 @@ slug: ordre-visiter-plusieurs-villes-moins-cher
 keyword: dans quel ordre visiter plusieurs villes (moins cher)
 locale: fr
 published: 2026-10-24
-updated: 2026-10-24
+updated: 2026-11-16
 hero_alt: "Main traçant un itinéraire en pointillés dans un carnet, à côté d'un croissant et d'un café en terrasse"
 hero_color: "#7e746d"
 cluster: A. Route order and dates
@@ -124,7 +124,7 @@ Avec un départ et une arrivée fixes, c’est la factorielle du nombre de ville
 Oui, mais ce n’est qu’un début. Avec cinq villes, l’aller et le retour représentent 2 ordres sur 120, et les dates changent aussi le total. Mieux vaut comparer des itinéraires entiers.
 
 ### Un billet multi-destinations est-il moins cher que des allers simples ?
-Pas toujours, comme le note Milesopedia. En Europe sur des low cost, on réserve presque toujours des allers simples séparés, et c’est surtout l’ordre et les dates qui font le prix.
+Pas toujours, comme le note Milesopedia. En Europe sur des low cost, on réserve presque toujours des allers simples séparés, et c’est surtout l’ordre et les dates qui font le prix. J’explique comment les assembler dans [vol multi-destinations pas cher : la méthode low cost](/fr/guides/vol-multi-destinations-pas-cher).
 
 ### Combien de nuits prévoir par ville ?
 Plutôt une fourchette qu’un chiffre fixe, par exemple trois à cinq nuits. Les jours moins chers ont ainsi leur chance sans bouleverser votre voyage.
